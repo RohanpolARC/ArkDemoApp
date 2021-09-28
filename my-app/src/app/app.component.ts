@@ -189,14 +189,14 @@ this.enableCellChangeFlash = true;
   
 ngOnInit(): void { 
     
-    // this.rowData = this.http.get<any[]>('https://localhost:44366/api/ParGIRHistory/getdata');
+    this.rowData = this.http.get<any[]>('https://localhost:44366/api/ParGIRHistory/getdata');
     
-    // this.dataService.getEmployees().subscribe(  
-    //   values => {  
-    //     this.employees = values;  
-    //   },  
-    //   error => this.errorMessage = <any>error  
-    // );
+    this.dataService.getEmployees().subscribe(  
+      values => {  
+        this.employees = values;  
+      },  
+      error => this.errorMessage = <any>error  
+    );
     
     this.userName=this.dataService.getCurrentUserName()
 

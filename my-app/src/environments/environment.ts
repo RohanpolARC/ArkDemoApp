@@ -5,9 +5,9 @@
 export const environment = {
   production: false,
   baseUrl:'https://localhost:44366/',  
-  scopeUri: ['api://ab6a919a-a91b-457f-b309-a7448a12b3a3/arcwebportal'],  
+  scopeUri: ['api://9b736f43-2e69-4120-b923-7632886f29cc/arc-api'],  
   tenantId: '1aca2fbe-6078-4dfb-8c1f-9d98d6245214',  
-  uiClienId: '49dba4a1-f615-40de-959b-898b9ef373d4',  
+  uiClienId: '9a06035c-d10f-4b52-817d-8cc7583721a1',  
   redirectUrl: 'http://localhost:4200'  
 };
 
