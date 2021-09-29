@@ -1,0 +1,62 @@
+<div class="asset-grid">
+
+    <div class="title">
+    
+      Portfolio History - Going In Rates Editor
+        
+    </div>
+    
+    
+    
+    <div class="button-row">
+    
+     <!-- <button (click)="logout()" mat-stroked-button color="primary" class="btn-add-new"> + Add New Record </button>  -->
+    
+    </div>
+    
+    <mat-card>
+    
+      <div>
+      <div class="search-row">
+    
+          
+          <!-- <input matInput type="search" placeholder="Search here" class="search-input">
+          <mat-icon matPrefix>search</mat-icon> -->
+    
+      </div>
+      </div>
+    <div class="grid-component">
+      
+    <ag-grid-angular
+        style="width: 1500px; height: 750px;"
+        class="ag-theme-alpine"
+        [rowData]="rowData | async"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        [modules]="modules"
+        (gridReady)="onGridReady($event)"
+       
+        (cellEditingStopped)="onRowEditingStopped($event)"
+        (cellEditingStarted)="onRowEditingStarted($event)"
+      
+        [suppressClickEdit]="true"
+        [rowGroupPanelShow]="rowGroupPanelShow"
+        toolPanel='columns'
+        [sideBar]="sideBar"
+        (adaptableReady)="onAdaptableReady($event)"
+        [adaptableOptions]="adaptableOptions"
+        [frameworkComponents]="frameworkComponents"
+        [stopEditingWhenCellsLoseFocus] = "false"
+        [undoRedoCellEditing]="undoRedoCellEditing"
+        [undoRedoCellEditingLimit]="undoRedoCellEditingLimit"
+        [enableCellChangeFlash]="enableCellChangeFlash"
+    >
+    </ag-grid-angular>
+    
+    </div>
+    </mat-card>
+    
+    </div>
+    
+    
+    <br/>

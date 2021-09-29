@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { environment } from 'src/environments/environment';  
 import { MsalModule, MsalInterceptor } from '@azure/msal-angular';  
 import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';  
-import { MsalUserService } from './msaluser.service';  
+import { MsalUserService } from './core/services/Auth/msaluser.service';  
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';  
 import { AgGridModule } from '@ag-grid-community/angular';
 import {MatToolbarModule} from '@angular/material/toolbar';
@@ -14,7 +14,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule} from '@angular/material/sidenav'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import {MatDialogModule} from '@angular/material/dialog';
-import { AddAssetGirComponent } from './add-asset-gir/add-asset-gir.component'
 import {FormsModule,ReactiveFormsModule} from '@angular/forms'
 import {MatListModule} from '@angular/material/list';
 import {MatButtonModule} from '@angular/material/button';
@@ -22,7 +21,9 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatCardModule} from '@angular/material/card';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import { BtnCellRenderer } from './btn-cell-renderer.component';
+import {PortfolioHistoryModule} from './modules/portfolio-history/portfolio-history.module'
+import {MatMenuModule} from '@angular/material/menu';
+
 
 export const protectedResourceMap: any =  
   [  
@@ -32,7 +33,7 @@ export const protectedResourceMap: any =
   
 @NgModule({  
   declarations: [  
-    AppComponent, AddAssetGirComponent , BtnCellRenderer 
+    AppComponent
   ],  
   imports: [  
     MsalModule.forRoot({  
@@ -46,7 +47,7 @@ export const protectedResourceMap: any =
     AppRoutingModule,  
     HttpClientModule,
     AdaptableAngularAgGridModule, 
-  AgGridModule.withComponents([BtnCellRenderer]),
+  AgGridModule.withComponents([]),
   MatToolbarModule,
   MatIconModule,
   BrowserAnimationsModule,
@@ -59,7 +60,9 @@ export const protectedResourceMap: any =
   MatAutocompleteModule,
   MatCardModule,
   MatExpansionModule,
-  MatFormFieldModule
+  MatFormFieldModule,
+  PortfolioHistoryModule,
+  MatMenuModule
   ],  
   providers: [  
     HttpClient,  

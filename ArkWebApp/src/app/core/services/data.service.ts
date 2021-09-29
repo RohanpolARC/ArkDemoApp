@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';  
 import { Observable } from 'rxjs';  
 import { environment } from 'src/environments/environment';  
-import { MsalUserService } from './msaluser.service';  
-import { Employee } from './Employee';  
-  
+import { MsalUserService } from './Auth/msaluser.service';  
+
+
 @Injectable({  
     providedIn: 'root'  
 })  
@@ -20,7 +20,7 @@ export class DataService {
     constructor(private http: HttpClient, private msalService: MsalUserService  
     ) { }  
   
-    getEmployees(): Observable<Employee[]> {  
+    getEmployees(): Observable<any[]> {  
          
         this.httpOptions = {  
             headers: new HttpHeaders({  
@@ -41,6 +41,7 @@ export class DataService {
     }
     
     getCurrentUserName(){  
+        this.msalService.GetAccessToken() 
         let userInfo = this.msalService.getCurrentUserInfo();  
         return userInfo.name
      }

@@ -1,0 +1,48 @@
+.dialog{
+    margin: auto;
+}
+.edit-container{
+    margin: 0 auto;
+
+    width: 70%;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    max-width: 500px;
+
+}
+
+#heading{
+    text-align: center;
+}
+
+.edit-col{
+    flex: 1;
+    width: 100%;
+}
+
+.action{
+    text-align: center;
+}
+
+.action button{
+    margin: 10px
+}
+
+::ng-deep .mat-form-field-appearance-outline{
+    color: #000 !important;
+}
+    /* Thin outline*/
+::ng-deep .mat-form-field-outline {
+    color: #ccc !important ;
+}
+
+.editable ::ng-deep .mat-form-field-outline {
+        color: #0590ca !important ;
+}    
+
+    /* Floating label*/
+::ng-deep .mat-form-field.mat-focused .mat-form-field-label {
+    color: #000 !important;
+}
