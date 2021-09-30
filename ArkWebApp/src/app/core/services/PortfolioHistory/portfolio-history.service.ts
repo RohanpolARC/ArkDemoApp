@@ -3,6 +3,7 @@ import { APIConfig } from 'src/app/configs/api-config';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import {AssetGIRModel} from '../../../shared/models/AssetGIRModel'
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,14 @@ export class PortfolioHistoryService {
     return this.http.get<any[]>(this.PORTFOLIO_HISTORY_GET_API).pipe(
       catchError((ex) => throwError(ex))
       );
+  }
+
+  public putAssetGIR(assetGIRModel:AssetGIRModel){
+
+  return  this.http.post<any>(this.PORTFOLIO_HISTORY_PUT_API,assetGIRModel).pipe(
+      catchError((ex) => throwError(ex))
+      );
+
   }
 
 

@@ -53,6 +53,7 @@ export class PortfolioHistoryComponent implements OnInit {
   public defaultColDef;
   public sideBar;
   public frameworkComponents;
+  public autoGroupColumnDef;
 
   // enables undo / redo
   public undoRedoCellEditing = true;
@@ -66,8 +67,8 @@ export class PortfolioHistoryComponent implements OnInit {
 columnDefs = [
   { headerName:"Position Id",field: 'positionId',hide: true },
   { headerName:"Asset Id",field: 'assetId',hide: true},
+  { headerName:"Issuer Short Name",field: 'issuerShortName',enableValue: true },
   { headerName:"Asset",field: 'asset',enableValue: true },
-  { headerName:"Issuer",field: 'issuerShortName',enableValue: true },
   { headerName:"Fund",field: 'fund' },
   { headerName:"Fund Hedging",field: 'fundHedging' },
   { headerName:"Fund Ccy", field: 'fundCcy' },
@@ -75,12 +76,12 @@ columnDefs = [
   { headerName:"Trade Date",field: 'tradeDate', rowGroup: true,hide: true, valueFormatter: this.dateFormatter },
   { headerName:"Settle Date",field: 'settleDate',  valueFormatter: this.dateFormatter },
   { headerName:"Position Ccy",field: 'positionCcy'},
-  { headerName:"Amount",field: 'amount',enableValue: true },
-  { headerName:"Par Amount",field: 'parAmount' },
-  { headerName:"ParAmountLocal",field: 'parAmountLocal'},
-  { headerName:"FundedParAmountLocal",field: 'fundedParAmountLocal'},
-  { headerName:"CostAmountLocal",field: 'costAmountLocal' },
-  { headerName:"FundedCostAmountLocal",field: 'fundedCostAmountLocal' },
+  { headerName:"Amount",field: 'amount',enableValue: true ,  valueFormatter: this.amountFormatter },
+  { headerName:"Par Amount",field: 'parAmount' ,  valueFormatter: this.amountFormatter },
+  { headerName:"ParAmountLocal",field: 'parAmountLocal' ,  valueFormatter: this.amountFormatter},
+  { headerName:"FundedParAmountLocal",field: 'fundedParAmountLocal' ,  valueFormatter: this.amountFormatter},
+  { headerName:"CostAmountLocal",field: 'costAmountLocal',  valueFormatter: this.amountFormatter },
+  { headerName:"FundedCostAmountLocal",field: 'fundedCostAmountLocal',  valueFormatter: this.amountFormatter },
   { headerName:"Going In Rate",field: 'fxRateBaseEffective',editable:true },
   {
     headerName:"Action",
@@ -130,6 +131,11 @@ columnDefs = [
       sortable: true,
       filter: true,
     };
+
+    this.autoGroupColumnDef = {
+      sort: 'desc'
+    };
+
     this.sideBar = 'columns';
 
     //this.getRowNodeId = data => data.id;
@@ -199,6 +205,17 @@ this.enableCellChangeFlash = true;
     else{
       return ""
     }
+  }
+
+  amountFormatter(params){
+    if(params.value!=undefined&&Number(params.value)!=0)
+    return Number(params.value).toLocaleString();
+    else if(Number(params.value)==0) {
+      return "-"
+    } else{
+      return ""
+    }
+
   }
   
   onGridReady(params) {
