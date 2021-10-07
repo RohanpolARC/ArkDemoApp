@@ -1,37 +1,37 @@
 <h2 mat-dialog-title>Update - Going In Rate</h2>
 <mat-dialog-content>
 
-    <div class="edit-container">
+    <div class="edit-container" *ngIf="!isGroupSelected">
         
         <div class="edit-col">
-            <mat-form-field  class="input" appearance="outline" floatLabel="always">
+            <mat-form-field appearance="outline" floatLabel="always">
                 <mat-label> Issuer </mat-label>
                 <input matInput placeholder="" [(ngModel)]="issuer" readonly>
             </mat-form-field>
     
-            <mat-form-field  class="input" appearance="outline" floatLabel="always">
+            <mat-form-field appearance="outline" floatLabel="always">
                 <mat-label> Asset </mat-label>
                 <input matInput placeholder="" [(ngModel)]="asset" readonly>
             </mat-form-field>
     
-            <mat-form-field  class="input" appearance="outline" floatLabel="always">
+            <mat-form-field appearance="outline" floatLabel="always">
                 <mat-label> Fund Hedging </mat-label>
                 <input matInput [(ngModel)]="fundhedging" readonly>
             </mat-form-field>
         </div>
     
         <div class="edit-col">
-            <mat-form-field class="input" appearance="outline" floatLabel="always">
+            <mat-form-field appearance="outline" floatLabel="always">
                 <mat-label> Trade Date </mat-label>
                 <input matInput [(ngModel)]="tradeDate" readonly>
             </mat-form-field>
 
-            <mat-form-field class="input" appearance="outline" floatLabel="always">
+            <mat-form-field appearance="outline" floatLabel="always">
                 <mat-label> Fund Currency </mat-label>
                 <input matInput [(ngModel)]="fundCcy" readonly>
             </mat-form-field>
 
-            <mat-form-field class="input" appearance="outline" floatLabel="always">
+            <mat-form-field appearance="outline" floatLabel="always">
                 <mat-label> Position Currency </mat-label>
                 <input matInput [(ngModel)]="positionCcy" readonly>
             </mat-form-field>
@@ -42,8 +42,38 @@
             </mat-form-field>
         </div>
     </div>
+
+    <div class="group-selected" *ngIf="isGroupSelected">
+        <div class="bulk-gir-update" *ngIf="isGroupSelectedValid">
+
+            <div>
+                Conversion from {{allLeafChildrenData[0].fundCcy}} to {{allLeafChildrenData[0].positionCcy}}
+                
+                <mat-form-field class="editable" appearance="outline" floatLabel="always" color="accent">
+                    <mat-label> Going In Rate </mat-label>
+                    <input matInput class="forex" cdkFocusInitial  [(ngModel)]="goingInRate">
+                </mat-form-field>
+
+                <ag-grid-angular
+                style="width: 100%; height: 100%;"
+                [rowData]="allLeafChildrenData"
+                [columnDefs]="columnDefs"
+                >
+                </ag-grid-angular>
+            </div>
+            <div>
+                <!-- Ag GRID Data for selected group.-->
+            </div>
+            
+        </div>
+        <div class="invalid-grouping-message" *ngIf="!isGroupSelectedValid">
+            Fund Currency and Position Currency not Matching for all Rows.
+            <button mat-raised-button (click)="closeDialog()" >Cancel</button>
+        </div>
+    </div>
+
 </mat-dialog-content>
-    <mat-dialog-actions align="end">
+    <mat-dialog-actions align="end" *ngIf="isGroupSelectedValid || (!isGroupSelectedValid && !isGroupSelected)">
         <button mat-raised-button (click)="doAction()" color="primary">Update</button>
         <button mat-raised-button (click)="closeDialog()" >Cancel</button>
     <mat-dialog-actions>

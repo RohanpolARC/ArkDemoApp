@@ -1,4 +1,4 @@
-<div class="asset-grid">
+<div class="asset-grid h-100 w-100">
 
     <div class="title">
     
@@ -14,7 +14,7 @@
     
     </div>
     
-    <mat-card>
+    <mat-card class="h-100 w-100">
     
       <div>
       <div class="search-row">
@@ -25,11 +25,11 @@
     
       </div>
       </div>
-    <div class="grid-component">
+    <div class="grid-component h-100 w-100">
       
     <ag-grid-angular
-        style="width: 1500px; height: 750px;"
-        class="ag-theme-alpine"
+       
+        class="ag-theme-alpine ag-grid-portfolio-history"
         [rowData]="rowData | async"
         [columnDefs]="columnDefs"
         [defaultColDef]="defaultColDef"
@@ -50,6 +50,7 @@
         [undoRedoCellEditing]="undoRedoCellEditing"
         [undoRedoCellEditingLimit]="undoRedoCellEditingLimit"
         [enableCellChangeFlash]="enableCellChangeFlash"
+        [gridOptions]="gridOptions"
     >
     </ag-grid-angular>
     

@@ -38,7 +38,8 @@ $ArkWebApp-theme: mat.define-light-theme((
 // that you are using.
 @include mat.all-component-themes($ArkWebApp-theme);
 
-
+@import '~@adaptabletools/adaptable-angular-aggrid/index.css';
+@import '~@adaptabletools/adaptable-angular-aggrid/themes/dark.css';
 
 /* You can add global styles to this file, and also import other style files */
 
@@ -57,35 +58,3 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   color: #fff;
 }
 
-/***/
-.action-button {
-  border: none;
-  color: white;
-  padding: 3px 12px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  opacity: 0.7;
-}
-
-.action-button:hover {
-  opacity: 1;
-}
-
-.action-button.edit {
-  background-color: #008cba; /* Blue */
-}
-.action-button.update {
-  background-color: #4caf50; /* Green */
-}
-
-.action-button.delete {
-  background-color: #f44336; /* Red */
-}
-
-.action-button.cancel {
-  background-color: #e7e7e7; /* Gray */
-  color: black;
-}
-/***/

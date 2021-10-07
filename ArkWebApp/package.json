@@ -11,10 +11,9 @@
   "private": true,
   "dependencies": {
     "@adaptabletools/adaptable-angular-aggrid": "^9.1.5",
-    "@adaptabletools/adaptable-plugin-charts": "^9.1.1",
-    "@ag-grid-community/all-modules": "^26.0.0",
-    "@ag-grid-community/angular": "^26.0.0",
-    "@ag-grid-enterprise/all-modules": "^26.0.1",
+    "@ag-grid-community/all-modules": "^25.3.0",
+    "@ag-grid-community/angular": "^25.3.0",
+    "@ag-grid-enterprise/all-modules": "^25.3.0",
     "@angular/animations": "~12.2.0",
     "@angular/cdk": "^12.2.2",
     "@angular/common": "~12.2.0",

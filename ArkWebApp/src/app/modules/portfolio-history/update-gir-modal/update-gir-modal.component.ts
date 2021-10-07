@@ -4,7 +4,9 @@ import { Inject } from '@angular/core';
 import {AssetGIRModel} from '../../../shared/models/AssetGIRModel'
 import {DataService} from '../../../core/services/data.service'
 import { PortfolioHistoryService } from 'src/app/core/services/PortfolioHistory/portfolio-history.service';
+import { RowNode } from '@ag-grid-community/core';
 
+import { ColDef } from '@ag-grid-community/core';
 
 @Component({
   selector: 'app-update-gir-modal',
@@ -25,10 +27,34 @@ export class UpdateGirModalComponent implements OnInit {
   assetGIR: AssetGIRModel;
   currentUserName:string;
 
+  allLeafChildren: any[];   // Rows of a selected group.
+  allLeafChildrenData: any[];
+  bulkRowData: any[]; // Data for Ag-grid in bulk update modal.
+
+  isGroupSelected: boolean;   // If group is selected.
+  isGroupSelectedValid: boolean;  // If selected group is valid.
+
+  // Ag-grid variables.
+
+  columnDefs: ColDef[] = [
+    {headerName:'Issuer', field:'issuerShortName'},
+    {headerName:'Asset', field:'asset'},
+    {headerName:'Trade Date', field:'tradeDate'},
+    {headerName:'Fund Hedging', field:'fundHedging'},
+    {headerName:'FXRateBaseEffective', field:'fxRateBaseEffective'},
+  ];
+
   constructor(  public dialogRef: MatDialogRef<UpdateGirModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,private dataService:DataService, private portfolioHistoryService:PortfolioHistoryService ) { 
-   
-    this.rowData=data.data
+
+      this.assetGIR=new AssetGIRModel()
+
+  }
+
+
+  
+  initEditRow(): void{
+    this.rowData=this.data.data
 
     this.asset=this.rowData.asset
     this.issuer=this.rowData.issuerShortName
@@ -38,8 +64,29 @@ export class UpdateGirModalComponent implements OnInit {
     this.tradeDate=new Date(this.rowData.tradeDate).toLocaleDateString('en-GB')
     this.positionCcy=this.rowData.positionCcy
 
-    this.assetGIR=new AssetGIRModel()
+  }
 
+  initLeafChildrenData(): void{
+    this.allLeafChildren = this.data.allLeafChildren;
+    this.allLeafChildrenData = this.allLeafChildren.map(row => {
+      return row.data;
+    })
+    console.log(this.allLeafChildrenData);
+  }
+
+  isGroupValid(allLeafChildrenData: any[]): boolean{
+    if(allLeafChildrenData.length > 0){
+      const fundCurrency = allLeafChildrenData[0].fundCcy;
+      const positionCurrency = allLeafChildrenData[0].positionCcy;
+
+      for(let i = 1; i < allLeafChildrenData.length; i+= 1){
+        if((fundCurrency === allLeafChildrenData[i].fundCcy) && (positionCurrency === allLeafChildrenData[i].positionCcy))
+          continue;
+        else
+          return false;
+      }
+    }
+    return true;
   }
 
   ngOnInit(): void {
@@ -47,6 +94,23 @@ export class UpdateGirModalComponent implements OnInit {
     console.log(this.data.data)
 
     this.currentUserName=this.dataService.getCurrentUserInfo().name
+    this.isGroupSelected = this.data.group;
+
+      /* When no group is selected. */
+    if(this.isGroupSelected == false)    
+      this.initEditRow();   /* Initialises variable for editing */
+    else{
+      this.initLeafChildrenData();
+      this.isGroupSelectedValid = this.isGroupValid(this.allLeafChildrenData);
+      console.log("isGroupValid Result: " + this.isGroupSelectedValid);
+      
+      // this.bulkRowData = [];
+      // for(let i = 0; i < this.allLeafChildrenData.length; i+= 1){
+      //   this.bulkRowData.push(this.allLeafChildrenData[i]);
+      // }
+      // console.log(typeof this.bulkRowData);
+      // console.log(this.bulkRowData);
+    }
 
   }
 

@@ -43,10 +43,12 @@ export class BtnCellRenderer implements ICellRendererAngularComp, OnDestroy {
 
   openUpdateGirModal(){
 
+
   this.rowNode=this.params.api.getRowNode(this.params.node.id);
+  console.log(this.rowNode)
   this.rowData = this.rowNode.data
 
-  this.dialogRef = this.dialog.open(UpdateGirModalComponent,{data:this.rowNode})
+  this.dialogRef = this.dialog.open(UpdateGirModalComponent,{data: this.rowNode })
 
   this.dialogRef.afterClosed().subscribe(result => {
     if(result.event == 'Update'){

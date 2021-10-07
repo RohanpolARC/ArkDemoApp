@@ -16,7 +16,7 @@ import { MatIconRegistry } from '@angular/material/icon';
 import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
 import { MenuModule } from '@ag-grid-enterprise/menu';
 import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
-import charts from '@adaptabletools/adaptable-plugin-charts';
+//import charts from '@adaptabletools/adaptable-plugin-charts';
 import {
   ActionColumnButtonContext,
   AdaptableApi,
@@ -69,10 +69,10 @@ columnDefs = [
   { headerName:"Asset Id",field: 'assetId',hide: true},
   { headerName:"Issuer Short Name",field: 'issuerShortName',enableValue: true },
   { headerName:"Asset",field: 'asset',enableValue: true },
-  { headerName:"Fund",field: 'fund' },
+  { headerName:"Fund",field: 'fund',  autosize:true },
   { headerName:"Fund Hedging",field: 'fundHedging' },
   { headerName:"Fund Ccy", field: 'fundCcy' },
-  { headerName:"As Of Date", field: 'asOfDate',  valueFormatter: this.dateFormatter },
+  { headerName:"As Of Date", field: 'asOfDate',  valueFormatter: this.dateFormatter,hide: true },
   { headerName:"Trade Date",field: 'tradeDate', rowGroup: true,hide: true, valueFormatter: this.dateFormatter },
   { headerName:"Settle Date",field: 'settleDate',  valueFormatter: this.dateFormatter },
   { headerName:"Position Ccy",field: 'positionCcy'},
@@ -130,6 +130,7 @@ columnDefs = [
       enablePivot: true,
       sortable: true,
       filter: true,
+      autosize:true
     };
 
     this.autoGroupColumnDef = {
@@ -167,7 +168,7 @@ this.enableCellChangeFlash = true;
   public adaptableOptions: AdaptableOptions = {
     primaryKey: 'positionId',
     userName: "TestUser",
-    adaptableId: 'AdapTable Angular Demo',
+    adaptableId: '',
     adaptableStateKey: `${Date.now()}`,
 
     // userInterfaceOptions: {
@@ -179,7 +180,7 @@ this.enableCellChangeFlash = true;
         Tabs: [],
       },
       QuickSearch: {
-        QuickSearchText: 'Gold',
+        QuickSearchText: '',
         Style: {
           BackColor: '#ffff00',
           ForeColor: '#808080',
@@ -209,7 +210,10 @@ this.enableCellChangeFlash = true;
 
   amountFormatter(params){
     if(params.value!=undefined&&Number(params.value)!=0)
-    return Number(params.value).toLocaleString();
+    return Number(params.value).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
     else if(Number(params.value)==0) {
       return "-"
     } else{
