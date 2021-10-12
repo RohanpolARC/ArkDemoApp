@@ -73,7 +73,7 @@ columnDefs = [
   { headerName:"Fund Hedging",field: 'fundHedging' },
   { headerName:"Fund Ccy", field: 'fundCcy' },
   { headerName:"As Of Date", field: 'asOfDate',  valueFormatter: this.dateFormatter,hide: true },
-  { headerName:"Trade Date",field: 'tradeDate', rowGroup: true,hide: true, valueFormatter: this.dateFormatter },
+  { headerName:"Trade Date",field: 'tradeDate', rowGroup: true, SortOrder: 'Desc', hide: true, valueFormatter: this.dateFormatter },
   { headerName:"Settle Date",field: 'settleDate',  valueFormatter: this.dateFormatter },
   { headerName:"Position Ccy",field: 'positionCcy'},
   { headerName:"Amount",field: 'amount',enableValue: true ,  valueFormatter: this.amountFormatter },
@@ -83,11 +83,13 @@ columnDefs = [
   { headerName:"CostAmountLocal",field: 'costAmountLocal',  valueFormatter: this.amountFormatter },
   { headerName:"FundedCostAmountLocal",field: 'fundedCostAmountLocal',  valueFormatter: this.amountFormatter },
   { headerName:"Going In Rate",field: 'fxRateBaseEffective',editable:true },
+  { headerName:"Modified By", field: 'modifiedBy'},
+  { headerName:"Modified On", field: "modifiedOn", valueFormatter: this.dateTimeFormatter},
   {
     headerName:"Action",
     field: 'actionNew',
     cellRenderer: 'btnCellRenderer',
-    pinned: 'right',
+    pinned: 'left',
     // cellRendererParams: {
     //   clicked: function(field: any) {
     //     console.log(`${field} was clicked`);
@@ -95,7 +97,7 @@ columnDefs = [
     // },
     width: 95,
     autoSize:true
-  }
+  },
 ];
 
   constructor(private http: HttpClient,private portfolioHistoryService: PortfolioHistoryService,public dialog: MatDialog) { 
@@ -117,6 +119,7 @@ columnDefs = [
       },
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:true
+      
     //  rowData: this.rowData,
      // onGridReady: this.onGridReady,
     };
@@ -134,7 +137,8 @@ columnDefs = [
     };
 
     this.autoGroupColumnDef = {
-      sort: 'desc'
+      sort: 'desc',
+      sortable: true,
     };
 
     this.sideBar = 'columns';
@@ -162,7 +166,9 @@ this.enableCellChangeFlash = true;
 
   ngOnInit(): void {
     this.rowData = this.portfolioHistoryService.getPortfolioHistory();
+
   }
+
 
 
   public adaptableOptions: AdaptableOptions = {
@@ -175,6 +181,7 @@ this.enableCellChangeFlash = true;
     //   showAdaptableToolPanel: true
     // }
 
+    // autoSortGroupedColumns: false,
     predefinedConfig: {
       Dashboard: {
         Tabs: [],
@@ -185,7 +192,59 @@ this.enableCellChangeFlash = true;
           BackColor: '#ffff00',
           ForeColor: '#808080',
         },
+      
+      },
+    
+      Layout:{
+        Layouts: [{
+          Name: 'Basic',
+          Columns: [
+            // 'tradeDate',
+            // 'positionId',
+            'assetId',
+            'issuerShortName',
+            'fund',
+            'fundHedging',
+            'asOfDate',
+            'settleDate',
+            'positionCcy',
+            'amount',
+            'parAmount',
+            'parAmountLocal',
+            'fundedParAmountLocal',
+            'costAmountLocal',
+            'fundedCostAmountLocal',
+            'fxRateBaseEffective',
+            'modifiedBy',
+            'modifiedOn',
+            'actionNew'
+          ],
+          PinnedColumnsMap: {
+            actionNew: 'right',
+          },
+          RowGroupedColumns: ['tradeDate'],
+
+          
+
+          ColumnSorts: [
+            {
+              ColumnId: 'Group',
+              SortOrder: 'Desc',
+            },
+          ],
+        }]
       }
+    
+      // CustomSort: {
+      //   CustomSorts: [
+      //     {
+      //       ColumnId: 'tradeDate',
+      //       SortOrder: [],
+      //     },
+      //   ],
+      // },
+
+    
 
 
     }
@@ -201,11 +260,10 @@ this.enableCellChangeFlash = true;
   }
   
   dateTimeFormatter(params) {
-    if(params.value!=undefined)
-    return moment(params.value).format('DD/MM/YYYY HH:mm');
-    else{
+    if(params.value==undefined || params.value=="0001-01-01T00:00:00")
       return ""
-    }
+    else 
+      return moment(params.value).format('DD/MM/YYYY HH:mm');
   }
 
   amountFormatter(params){
@@ -225,7 +283,29 @@ this.enableCellChangeFlash = true;
   onGridReady(params) {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
+
+    // this.gridColumnApi.applyColumnState({state:[{colId: 'tradeDate', sort: 'desc'}], defaultState: {sort:'desc'},})
+
+    // this.sortGrid(params, 'tradeDate', 'desc');
+    // // const sortModel = [
+    //   {colId: 'tradeDate', sort: 'desc'}
+    // ];
+    // this.gridApi.setSortModel(sortModel);
+
+    // this.gridApi.setSortModel([{colId: 'tradeDate', sort: 'desc'}]);
   }
+
+  // sortGrid(event, field, sortDir){
+  //   const columnState = {
+  //     state: [
+  //       {
+  //         colId: field,
+  //         sort: sortDir
+  //       }
+  //     ]
+  //   }
+  //   event.columnApi.applyColumnState(columnState);
+  // }
 
   onAdaptableReady(
     {

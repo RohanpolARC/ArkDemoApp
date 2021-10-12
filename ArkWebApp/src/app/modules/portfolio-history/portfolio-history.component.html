@@ -38,7 +38,7 @@
         [autoGroupColumnDef]="autoGroupColumnDef"
         (cellEditingStopped)="onRowEditingStopped($event)"
         (cellEditingStarted)="onRowEditingStarted($event)"
-      
+        [getRowNodeId]="getRowNodeId"  
         [suppressClickEdit]="true"
         [rowGroupPanelShow]="rowGroupPanelShow"
         toolPanel='columns'

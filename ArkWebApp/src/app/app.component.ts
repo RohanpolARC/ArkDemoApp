@@ -15,7 +15,7 @@ export class AppComponent {
 
   public userName:string;
   public rightSidebarOpened:boolean=false;
-  public leftSIdebarOpened:boolean=true;
+  public leftSIdebarOpened:boolean=false;
 
   constructor(private http: HttpClient,private dataService: DataService,public dialog: MatDialog,iconRegistry:MatIconRegistry) {
 

@@ -30,6 +30,12 @@ export class BtnCellRenderer implements ICellRendererAngularComp, OnDestroy {
   public dialogRef;
   public rowData;
 
+
+  /*
+    My changes
+  */
+  public gridApi
+  
   constructor(public dialog: MatDialog){
 
   }
@@ -44,18 +50,17 @@ export class BtnCellRenderer implements ICellRendererAngularComp, OnDestroy {
   openUpdateGirModal(){
 
 
-  this.rowNode=this.params.api.getRowNode(this.params.node.id);
-  console.log(this.rowNode)
-  this.rowData = this.rowNode.data
+  // this.rowNode=this.params.api.getRowNode(this.params.node.id);
+  // this.rowData = this.rowNode.data
 
-  this.dialogRef = this.dialog.open(UpdateGirModalComponent,{data: this.rowNode })
+  this.dialogRef = this.dialog.open(UpdateGirModalComponent,{data: this.params.node })
 
   this.dialogRef.afterClosed().subscribe(result => {
-    if(result.event == 'Update'){
-      const rowNode = this.params.api.getRowNode(this.params.node.id);
-      console.log(rowNode)
-       rowNode.setData(result.data);
-    }
+//     if(result.event == 'Update'){
+//       const rowNode = this.params.api.getRowNode(this.params.node.id).setData(result.data);
+          
+// //      rowNode.setData(result.data);
+//     }
   });
 }
 

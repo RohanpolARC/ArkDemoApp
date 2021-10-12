@@ -46,3 +46,24 @@
 ::ng-deep .mat-form-field.mat-focused .mat-form-field-label {
     color: #000 !important;
 }
+
+.popup-cont-1{
+    display: flex;
+    justify-content: space-between;
+}
+
+.popup-cont-1 span{
+    padding-top: 2%;
+    font-weight: normal;
+    font-size: medium;
+}
+
+.success-msg{
+    color: rgb(8, 204, 90);
+    padding: 5px
+}
+
+.failure-msg{
+    color: red;
+    padding: 5px;
+}

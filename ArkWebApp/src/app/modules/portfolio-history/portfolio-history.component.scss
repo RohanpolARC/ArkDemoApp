@@ -17,6 +17,9 @@
   .asset-grid{
     padding-top: 25px;
     padding-left: 25px;
+
+    display: flex;
+    flex-direction: column;
   }
 
   .example-spacer{
@@ -36,9 +39,9 @@
     padding-top: 0px;
   }
 
-  .button-row{
-    margin-bottom: 15px;
-  }
+  // .button-row{
+  //   margin-bottom: 15px;
+  // }
 
   .btn-add-new{
     border-radius: 5px;

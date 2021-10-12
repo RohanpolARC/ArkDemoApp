@@ -23,7 +23,7 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {PortfolioHistoryModule} from './modules/portfolio-history/portfolio-history.module'
 import {MatMenuModule} from '@angular/material/menu';
-
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 export const protectedResourceMap: any =  
   [  
@@ -62,7 +62,8 @@ export const protectedResourceMap: any =
   MatExpansionModule,
   MatFormFieldModule,
   PortfolioHistoryModule,
-  MatMenuModule
+  MatMenuModule,
+  MatSnackBarModule
   ],  
   providers: [  
     HttpClient,  

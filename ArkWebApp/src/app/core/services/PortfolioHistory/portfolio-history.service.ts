@@ -5,6 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import {AssetGIRModel} from '../../../shared/models/AssetGIRModel'
 import { MsalUserService } from '../Auth/msaluser.service';  
+import { timeout } from 'rxjs-compat/operator/timeout';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,7 @@ export class PortfolioHistoryService {
 
   private PORTFOLIO_HISTORY_GET_API: string = APIConfig.PORTFOLIO_HISTORY_GET_API;
   private PORTFOLIO_HISTORY_PUT_API: string = APIConfig.PORTFOLIO_HISTORY_PUT_API;
+  private PORTFOLIO_HISTORY_BULK_PUT_API: string = APIConfig.PORTFOLIO_HISTORY_BULK_PUT_API;
 
   httpOptions = {  
     headers: new HttpHeaders({  
@@ -49,11 +51,22 @@ export class PortfolioHistoryService {
 
   };
 
-
-
   return  this.http.post<any>(this.PORTFOLIO_HISTORY_PUT_API,assetGIRModel,this.httpOptions).pipe(
       catchError((ex) => throwError(ex))
       );
+
+  }
+
+  public putBulkAssetGIR(bulkAssetGIRModel: AssetGIRModel []){
+
+    this.httpOptions = {  
+      headers: new HttpHeaders({  
+          'Content-Type': 'application/json',  
+          'Authorization': 'Bearer ' + this.msalService.GetAccessToken()  
+      })  
+    };
+
+    return this.http.post<any>(this.PORTFOLIO_HISTORY_BULK_PUT_API, bulkAssetGIRModel, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
 
   }
 

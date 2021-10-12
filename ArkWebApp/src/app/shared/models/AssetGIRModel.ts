@@ -13,4 +13,6 @@ export class AssetGIRModel {
     public ModifiedOn : Date
     public id  : Number
 
+    public TradeDate : Date; 
+    public FundHedging: string;
 }
