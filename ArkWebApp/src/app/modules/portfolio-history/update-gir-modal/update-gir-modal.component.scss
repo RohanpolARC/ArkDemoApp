@@ -6,6 +6,7 @@
 
     width: 70%;
     display: flex;
+
     justify-content: space-between;
     flex-wrap: wrap;
 
@@ -18,7 +19,7 @@
 }
 
 .edit-col{
-    flex: 1;
+    flex: 50%;
     width: 100%;
 }
 
@@ -66,4 +67,8 @@
 .failure-msg{
     color: red;
     padding: 5px;
+}
+
+.btn-update{
+    margin-right: 5px;
 }

@@ -41,7 +41,12 @@ export class UpdateGirModalComponent implements OnInit {
   updateMsg: string;
   isSuccessMsgAvailable: boolean;
   isFailureMsgAvailable: boolean;
+
+  gridData: any; // To hold data for pop up modal grid display. 
   // Ag-grid variables.
+
+  isEditAllowed: boolean;
+  isUpdateAllowed: boolean;
 
   gridApi;
   gridColumnApi;
@@ -78,8 +83,7 @@ export class UpdateGirModalComponent implements OnInit {
     this.tradeDate=new Date(this.rowData.tradeDate).toLocaleDateString('en-GB')
     this.positionCcy=this.rowData.positionCcy
 
-   
-
+    this.allLeafChildrenData = [this.rowData];
   }
 
   initLeafChildrenData(): void{
@@ -106,6 +110,9 @@ export class UpdateGirModalComponent implements OnInit {
 
   ngOnInit(): void {
 
+    this.isEditAllowed = false;
+    this.isUpdateAllowed = false;
+
     this.isSuccessMsgAvailable = false;
     this.isFailureMsgAvailable = false;
 
@@ -113,8 +120,10 @@ export class UpdateGirModalComponent implements OnInit {
     this.isGroupSelected = this.data.group;
 
       /* When no group is selected. */
-    if(this.isGroupSelected == false)    
-      this.initEditRow();   /* Initialises variable for editing */
+    if(this.isGroupSelected == false){
+      this.initEditRow();   /* Initialises variable for editing */      
+    }  
+      
     else{
 
       this.initLeafChildrenData();
@@ -124,7 +133,12 @@ export class UpdateGirModalComponent implements OnInit {
         this.goingInRate = this.allLeafChildrenData[0].fxRateBaseEffective;
 
     }
+    if(this.allLeafChildrenData[0].fundCcy !== this.allLeafChildrenData[0].positionCcy)
+        this.isEditAllowed = true;
+    else this.isEditAllowed = false;
 
+    this.isUpdateAllowed = this.isEditAllowed;
+       
   }
 
   openUpdateMsgSnackBar(message: string, action: string){
@@ -144,6 +158,10 @@ export class UpdateGirModalComponent implements OnInit {
   
   doAction(){
 
+    this.isUpdateAllowed = false;
+
+    this.isEditAllowed = false;
+    
     if(this.isGroupSelected && this.isGroupSelectedValid)
     {
       this.action='Update in Bulk';
@@ -183,6 +201,7 @@ export class UpdateGirModalComponent implements OnInit {
         next: data => {
 
           this.isSuccessMsgAvailable = true;
+          this.isFailureMsgAvailable = false;
           this.updateMsg = "Updated going in rate for " + this.allLeafChildrenData.length + (this.allLeafChildrenData.length > 1 ? " assets." : " asset.");
 
           // this.dialogRef.close({event: this.action, data: this.allLeafChildrenData});
@@ -202,6 +221,7 @@ export class UpdateGirModalComponent implements OnInit {
         },
         error: error => {
           this.isFailureMsgAvailable = true;
+          this.isSuccessMsgAvailable = false;
           this.updateMsg = "Update Failed.";
         }
       })
@@ -231,6 +251,8 @@ export class UpdateGirModalComponent implements OnInit {
           next: data => {     
             
             this.isSuccessMsgAvailable = true;
+            this.isFailureMsgAvailable = false;
+            
             this.updateMsg = "Going in rate updated successfully.";
 
             // this.dialogRef.close({event:this.action,data:this.rowData});
@@ -243,6 +265,7 @@ export class UpdateGirModalComponent implements OnInit {
           error: error => {
               console.error('There was an error!', error);
               this.isFailureMsgAvailable = true;
+              this.isSuccessMsgAvailable = false;
               this.updateMsg = "Update Failed.";
           }
     
@@ -253,7 +276,7 @@ export class UpdateGirModalComponent implements OnInit {
 
   closeDialog(){
 
-    this.action='Cancel'
+    this.action='Close';
 
     this.dialogRef.close({event:this.action});
   }

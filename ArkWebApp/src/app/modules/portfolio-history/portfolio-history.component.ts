@@ -158,7 +158,7 @@ this.undoRedoCellEditing = true;
 this.undoRedoCellEditingLimit = 5;
 
 // enables flashing to help see cell changes
-this.enableCellChangeFlash = true;
+this.enableCellChangeFlash = false;
 
 
 
@@ -181,7 +181,24 @@ this.enableCellChangeFlash = true;
     //   showAdaptableToolPanel: true
     // }
 
-    // autoSortGroupedColumns: false,
+    generalOptions: {
+      // autoSortGroupedColumns: true,
+
+      /* Adaptable calls this on grid init */
+      /* Custom comparator for descending order */  
+      columnSortComparers:[{
+        columnId: 'tradeDate',
+        comparer: (valueA: Date, valueB: Date) => {
+          if(valueA > valueB)
+            return -1;
+          else if(valueA < valueB)
+            return 1;
+          else
+            return 0; 
+        }
+      }]
+    },
+
     predefinedConfig: {
       Dashboard: {
         Tabs: [],
@@ -201,20 +218,22 @@ this.enableCellChangeFlash = true;
           Columns: [
             // 'tradeDate',
             // 'positionId',
-            'assetId',
             'issuerShortName',
+            'asset',
             'fund',
             'fundHedging',
-            'asOfDate',
+//            'asOfDate',
             'settleDate',
             'positionCcy',
+            'fundCcy',
+            'fxRateBaseEffective',
             'amount',
             'parAmount',
             'parAmountLocal',
             'fundedParAmountLocal',
             'costAmountLocal',
             'fundedCostAmountLocal',
-            'fxRateBaseEffective',
+            'assetId',
             'modifiedBy',
             'modifiedOn',
             'actionNew'
@@ -228,7 +247,7 @@ this.enableCellChangeFlash = true;
 
           ColumnSorts: [
             {
-              ColumnId: 'Group',
+              ColumnId: 'tradeDate',
               SortOrder: 'Desc',
             },
           ],
