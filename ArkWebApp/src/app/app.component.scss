@@ -34,6 +34,7 @@
     border: none;
     color: #fff;
     padding-top: 0px;
+    margin-left: 15px;
   }
 
   .button-row{
@@ -45,7 +46,7 @@
   }
 
   mat-sidenav-container{
-    height: 100%;
+    height: 89.5%;
   }
 
   
@@ -64,7 +65,8 @@
 
  mat-sidenav{
 background-color: #285170;
-width: 275px;
+width: 20%;
+min-width: 120px;
   }
 
  .right-sidenav{
