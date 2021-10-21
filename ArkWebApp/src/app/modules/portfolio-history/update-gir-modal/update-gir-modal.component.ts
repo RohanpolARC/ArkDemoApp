@@ -55,6 +55,8 @@ export class UpdateGirModalComponent implements OnInit {
     {headerName:'Issuer Short Name', field:'issuerShortName'},
     {headerName:'Asset', field:'asset'},
     {headerName:'Trade Date', field:'tradeDate', valueFormatter: this.dateFormatter},
+    {headerName:'Position Ccy', field:'positionCcy'},
+    {headerName:'Fund Ccy', field:'fundCcy'},
     {headerName:'Fund Hedging', field:'fundHedging'},
     // {headerName:'FXRateBaseEffective', field:'fxRateBaseEffective'},
   ];
