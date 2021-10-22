@@ -15,6 +15,7 @@ export class PortfolioHistoryService {
   private PORTFOLIO_HISTORY_GET_API: string = APIConfig.PORTFOLIO_HISTORY_GET_API;
   private PORTFOLIO_HISTORY_PUT_API: string = APIConfig.PORTFOLIO_HISTORY_PUT_API;
   private PORTFOLIO_HISTORY_BULK_PUT_API: string = APIConfig.PORTFOLIO_HISTORY_BULK_PUT_API;
+  private PORTFOLIO_HISTORY_DELETE_API: string = APIConfig.PORTFOLIO_HISTORY_DELETE_API;
 
   httpOptions = {  
     headers: new HttpHeaders({  
@@ -55,6 +56,17 @@ export class PortfolioHistoryService {
       catchError((ex) => throwError(ex))
       );
 
+  }
+
+  public deleteAssetGIR(assetGIRModel: AssetGIRModel){
+    this.httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + this.msalService.GetAccessToken(),
+      })
+    }
+
+    return this.http.post<any>(this.PORTFOLIO_HISTORY_DELETE_API, assetGIRModel, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
   }
 
   public putBulkAssetGIR(bulkAssetGIRModel: AssetGIRModel []){

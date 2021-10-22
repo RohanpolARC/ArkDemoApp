@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import {
   ColDef,
   GridApi,
@@ -8,8 +8,7 @@ import {
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { HttpClient } from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {MatDialog} from '@angular/material/dialog';
+import {Observable, Subscription} from 'rxjs';
 import * as moment from 'moment'
 import {MatAccordion} from '@angular/material/expansion';
 import { MatIconRegistry } from '@angular/material/icon';
@@ -18,25 +17,49 @@ import { MenuModule } from '@ag-grid-enterprise/menu';
 import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
 //import charts from '@adaptabletools/adaptable-plugin-charts';
 import {
-  ActionColumnButtonContext,
-  AdaptableApi,
-  AdaptableButton,
-  AdaptableOptions,
+ // ActionColumnButtonContext,
+  //AdaptableApi,
+  //AdaptableButton,
+  //AdaptableOptions,
   CustomToolPanelButtonContext,
   MenuContext,
   PredicateDefHandlerParams,
   ToolPanelButtonContext,
 } from '@adaptabletools/adaptable-angular-aggrid';
+import {
+  AdaptableOptions,
+  PredefinedConfig,
+  AdaptableApi,
+  AdaptableButton,
+  ActionColumnButtonContext,
+} from '@adaptabletools/adaptable/types';
 import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 import {DataService} from '../../core/services/data.service'
 import {BtnCellRenderer} from './btn-cell-renderer.component'
 import {PortfolioHistoryService} from '../../core/services/PortfolioHistory/portfolio-history.service'
+
+import Adaptable from '@adaptabletools/adaptable/agGrid';
+import {AssetGIRModel} from '../../shared/models/AssetGIRModel';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+
+
+let adapTableApi: AdaptableApi;
+
+@Component({
+  templateUrl:'./delete-confirm.html',
+})
+export class DialogDeleteComponent{
+  constructor(public dialogRef: MatDialogRef<DialogDeleteComponent>, @Inject(MAT_DIALOG_DATA) public data?: any) {} 
+}
+
 
 @Component({
   selector: 'app-portfolio-history',
   templateUrl: './portfolio-history.component.html',
   styleUrls: ['./portfolio-history.component.scss']
 })
+
+
 export class PortfolioHistoryComponent implements OnInit {
 
   rowData: Observable<any[]>;
@@ -55,6 +78,7 @@ export class PortfolioHistoryComponent implements OnInit {
   public frameworkComponents;
   public autoGroupColumnDef;
 
+  public subscriptions: Subscription[] = [];
   // enables undo / redo
   public undoRedoCellEditing = true;
 
@@ -74,6 +98,7 @@ columnDefs = [
   { headerName:"Fund Ccy", field: 'fundCcy' },
   { headerName:"As Of Date", field: 'asOfDate',  valueFormatter: this.dateFormatter,hide: true },
   { headerName:"Trade Date",field: 'tradeDate', rowGroup: true, SortOrder: 'Desc', hide: true, valueFormatter: this.dateFormatter },
+  { headerName:"Type", field: 'typeDesc'},
   { headerName:"Settle Date",field: 'settleDate',  valueFormatter: this.dateFormatter },
   { headerName:"Position Ccy",field: 'positionCcy'},
   { headerName:"Amount",field: 'amount',enableValue: true ,  valueFormatter: this.amountFormatter },
@@ -86,7 +111,7 @@ columnDefs = [
   { headerName:"Modified By", field: 'modifiedBy'},
   { headerName:"Modified On", field: "modifiedOn", valueFormatter: this.dateTimeFormatter},
   {
-    headerName:"Action",
+    headerName:"",
     field: 'actionNew',
     cellRenderer: 'btnCellRenderer',
     pinned: 'left',
@@ -95,12 +120,14 @@ columnDefs = [
     //     console.log(`${field} was clicked`);
     //   }
     // },
-    width: 95,
+    width: 40,
     autoSize:true
   },
 ];
 
-  constructor(private http: HttpClient,private portfolioHistoryService: PortfolioHistoryService,public dialog: MatDialog) { 
+
+
+  constructor(private http: HttpClient,private portfolioHistoryService: PortfolioHistoryService,public dialog: MatDialog, private dataService: DataService) { 
 
 
     this.gridOptions = {
@@ -164,12 +191,15 @@ this.enableCellChangeFlash = false;
 
   }
 
+
   ngOnInit(): void {
     this.rowData = this.portfolioHistoryService.getPortfolioHistory();
 
   }
 
-
+  ngOnDestroy(): void{
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
 
   public adaptableOptions: AdaptableOptions = {
     primaryKey: 'positionId',
@@ -177,10 +207,66 @@ this.enableCellChangeFlash = false;
     adaptableId: '',
     adaptableStateKey: `${Date.now()}`,
 
+    layoutOptions: {
+      autoSaveLayouts: false,
+    },
     // userInterfaceOptions: {
     //   showAdaptableToolPanel: true
     // }
+    userInterfaceOptions:{
+      actionColumns:[
+        {
+          columnId: 'ActionDelete',
+          actionColumnButton: {
+            onClick: (
+              button: AdaptableButton<ActionColumnButtonContext>,
+              context: ActionColumnButtonContext
+            ) => {
 
+              let confirmDelete:boolean = false;
+
+              let dialogRef = this.dialog.open(DialogDeleteComponent,{});
+              this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
+                confirmDelete = result;
+
+                if(confirmDelete){
+                  let AssetGIR: AssetGIRModel = new AssetGIRModel();
+                  AssetGIR.WSOAssetid = context.rowNode?.data.assetId;
+                  AssetGIR.AsOfDate = context.rowNode?.data.asOfDate;
+                  AssetGIR.Ccy = 0;    // ?
+                  AssetGIR.Rate = context.rowNode.data.fxRateBaseEffective;       // Updated GIR.
+                  AssetGIR.last_update = new Date();
+                  AssetGIR.CcyName = context.rowNode?.data.positionCcy;
+                  AssetGIR.Text = context.rowNode?.data.asset;
+                  AssetGIR.CreatedBy = this.dataService.getCurrentUserInfo().name;
+                  AssetGIR.ModifiedBy = this.dataService.getCurrentUserInfo().name;
+                  AssetGIR.CreatedOn = new Date(); 
+                  AssetGIR.ModifiedOn = new Date();
+                  AssetGIR.TradeDate = context.rowNode?.data.tradeDate;
+                  AssetGIR.FundHedging = context.rowNode?.data.fundHedging;
+  
+                  this.subscriptions.push(
+                    this.portfolioHistoryService.deleteAssetGIR(AssetGIR).subscribe({
+                      next: data => {
+                        adapTableApi.gridApi.deleteGridData([context.rowNode?.data]);
+                      },
+                      error: error => {
+                        console.error("Error deleting row.");
+                      }
+                    }));
+                }
+              }));
+              
+
+            },
+            icon:{
+              src:
+              '../assets/img/trash.svg',
+            }
+          },
+        },
+      ]
+    },
     generalOptions: {
       // autoSortGroupedColumns: true,
 
@@ -203,6 +289,16 @@ this.enableCellChangeFlash = false;
       Dashboard: {
         Tabs: [],
       },
+      FormatColumn:{
+        FormatColumns: [
+          {
+            Scope: {
+              ColumnIds: ['ActionDelete'],
+            },
+            HeaderName: " ",
+          }
+        ]
+      },
       QuickSearch: {
         QuickSearchText: '',
         Style: {
@@ -224,6 +320,7 @@ this.enableCellChangeFlash = false;
             'fundHedging',
 //            'asOfDate',
             'settleDate',
+            'typeDesc',
             'positionCcy',
             'fundCcy',
             'fxRateBaseEffective',
@@ -236,13 +333,18 @@ this.enableCellChangeFlash = false;
             'assetId',
             'modifiedBy',
             'modifiedOn',
-            'actionNew'
+            'actionNew',
+            'ActionDelete',
           ],
           PinnedColumnsMap: {
             actionNew: 'right',
+            ActionDelete: 'right',
           },
           RowGroupedColumns: ['tradeDate'],
-
+          
+          ColumnWidthMap:{
+            ActionDelete: 50,
+          },
           
 
           ColumnSorts: [
@@ -335,7 +437,7 @@ this.enableCellChangeFlash = false;
       vendorGrid: GridOptions;
     }
   ) {
-
+    adapTableApi = adaptableApi;
     adaptableApi.eventApi.on('SelectionChanged', selection => {
       // do stuff
     });

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PortfolioHistoryComponent } from './portfolio-history.component';
+import { DialogDeleteComponent, PortfolioHistoryComponent } from './portfolio-history.component';
 import { MatIconModule } from '@angular/material/icon';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatCardModule} from '@angular/material/card';
@@ -16,7 +16,7 @@ import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
-    PortfolioHistoryComponent,BtnCellRenderer, UpdateGirModalComponent
+    PortfolioHistoryComponent,BtnCellRenderer, UpdateGirModalComponent, DialogDeleteComponent
   ],
   imports: [
     CommonModule,
