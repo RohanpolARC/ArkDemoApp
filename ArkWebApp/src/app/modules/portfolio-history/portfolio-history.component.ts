@@ -41,17 +41,9 @@ import {PortfolioHistoryService} from '../../core/services/PortfolioHistory/port
 import Adaptable from '@adaptabletools/adaptable/agGrid';
 import {AssetGIRModel} from '../../shared/models/AssetGIRModel';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-
+import {DialogDeleteComponent} from './dialog-delete/dialog-delete.component';
 
 let adapTableApi: AdaptableApi;
-
-@Component({
-  templateUrl:'./delete-confirm.html',
-})
-export class DialogDeleteComponent{
-  constructor(public dialogRef: MatDialogRef<DialogDeleteComponent>, @Inject(MAT_DIALOG_DATA) public data?: any) {} 
-}
-
 
 @Component({
   selector: 'app-portfolio-history',
@@ -123,6 +115,7 @@ columnDefs = [
     width: 40,
     autoSize:true
   },
+  { headerName: "GIR Edited", field:'isEdited'},
 ];
 
 
@@ -224,40 +217,14 @@ this.enableCellChangeFlash = false;
             ) => {
 
               let confirmDelete:boolean = false;
-
-              let dialogRef = this.dialog.open(DialogDeleteComponent,{});
+              let dialogRef = this.dialog.open(DialogDeleteComponent,{
+                data: {
+                  rowData: context.rowNode?.data,
+                  adapTableApi: adapTableApi
+                }});
               this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
-                confirmDelete = result;
-
-                if(confirmDelete){
-                  let AssetGIR: AssetGIRModel = new AssetGIRModel();
-                  AssetGIR.WSOAssetid = context.rowNode?.data.assetId;
-                  AssetGIR.AsOfDate = context.rowNode?.data.asOfDate;
-                  AssetGIR.Ccy = 0;    // ?
-                  AssetGIR.Rate = context.rowNode.data.fxRateBaseEffective;       // Updated GIR.
-                  AssetGIR.last_update = new Date();
-                  AssetGIR.CcyName = context.rowNode?.data.positionCcy;
-                  AssetGIR.Text = context.rowNode?.data.asset;
-                  AssetGIR.CreatedBy = this.dataService.getCurrentUserInfo().name;
-                  AssetGIR.ModifiedBy = this.dataService.getCurrentUserInfo().name;
-                  AssetGIR.CreatedOn = new Date(); 
-                  AssetGIR.ModifiedOn = new Date();
-                  AssetGIR.TradeDate = context.rowNode?.data.tradeDate;
-                  AssetGIR.FundHedging = context.rowNode?.data.fundHedging;
-  
-                  this.subscriptions.push(
-                    this.portfolioHistoryService.deleteAssetGIR(AssetGIR).subscribe({
-                      next: data => {
-                        adapTableApi.gridApi.deleteGridData([context.rowNode?.data]);
-                      },
-                      error: error => {
-                        console.error("Error deleting row.");
-                      }
-                    }));
-                }
+                //console.log(result.message);
               }));
-              
-
             },
             icon:{
               src:
@@ -289,6 +256,15 @@ this.enableCellChangeFlash = false;
       Dashboard: {
         Tabs: [],
       },
+      Filter:{
+        ColumnFilters: [{
+          ColumnId: 'typeDesc',
+          Predicate: {
+            PredicateId: 'Values',
+            Inputs: ['Borrowing', 'Buy Trade']
+          }
+        }]
+      },
       FormatColumn:{
         FormatColumns: [
           {
@@ -312,13 +288,10 @@ this.enableCellChangeFlash = false;
         Layouts: [{
           Name: 'Basic',
           Columns: [
-            // 'tradeDate',
-            // 'positionId',
             'issuerShortName',
             'asset',
             'fund',
             'fundHedging',
-//            'asOfDate',
             'settleDate',
             'typeDesc',
             'positionCcy',

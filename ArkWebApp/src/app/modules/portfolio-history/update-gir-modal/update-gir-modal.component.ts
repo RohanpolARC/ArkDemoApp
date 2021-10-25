@@ -10,6 +10,7 @@ import { ColDef } from '@ag-grid-community/core';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import * as moment from 'moment';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -18,6 +19,8 @@ import * as moment from 'moment';
   styleUrls: ['./update-gir-modal.component.scss']
 })
 export class UpdateGirModalComponent implements OnInit {
+
+  subscriptions: Subscription[] = [];
 
   action:string;
   rowData:any;
@@ -144,6 +147,10 @@ export class UpdateGirModalComponent implements OnInit {
        
   }
 
+  ngOnDestroy(): void{
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
+
   openUpdateMsgSnackBar(message: string, action: string){
     this.updateMsgSnackBar.open(message, action, {
       duration: 5000,
@@ -200,7 +207,7 @@ export class UpdateGirModalComponent implements OnInit {
       }
 
 
-      this.portfolioHistoryService.putBulkAssetGIR(bulkAssetGIR).subscribe({
+      this.subscriptions.push(this.portfolioHistoryService.putBulkAssetGIR(bulkAssetGIR).subscribe({
         next: data => {
 
           this.isSuccessMsgAvailable = true;
@@ -219,6 +226,8 @@ export class UpdateGirModalComponent implements OnInit {
             this.data.allLeafChildren[i].setDataValue('fxRateBaseEffective', this.goingInRate);
             this.data.allLeafChildren[i].setDataValue('modifiedOn', new Date());
             this.data.allLeafChildren[i].setDataValue('modifiedBy', this.dataService.getCurrentUserName());
+
+            this.data.allLeafChildren[i].setDataValue('isEdited', true);
           }
           this.openUpdateMsgSnackBar("Updated going in rate for " + this.allLeafChildrenData.length + (uniqueAssetsCountMap.size > 1 ? " assets" : " asset"), "Dismiss");
         },
@@ -227,7 +236,7 @@ export class UpdateGirModalComponent implements OnInit {
           this.isSuccessMsgAvailable = false;
           this.updateMsg = "Update Failed.";
         }
-      })
+      }));
     }
     else{
     this.action='Update'
@@ -250,7 +259,7 @@ export class UpdateGirModalComponent implements OnInit {
 
     this.assetGIR.FundHedging = this.rowData.fundHedging;
 
-    this.portfolioHistoryService.putAssetGIR(this.assetGIR).subscribe({
+    this.subscriptions.push(this.portfolioHistoryService.putAssetGIR(this.assetGIR).subscribe({
           next: data => {     
             
             this.isSuccessMsgAvailable = true;
@@ -263,7 +272,8 @@ export class UpdateGirModalComponent implements OnInit {
             this.data.setDataValue('modifiedOn', new Date());
             this.data.setDataValue('modifiedBy', this.dataService.getCurrentUserName());
 
-            
+            this.data.setDataValue('isEdited', true);
+            this.data.isEdited = true;
           },
           error: error => {
               console.error('There was an error!', error);
@@ -272,7 +282,7 @@ export class UpdateGirModalComponent implements OnInit {
               this.updateMsg = "Update Failed.";
           }
     
-      })
+      }));
     }
 
 }

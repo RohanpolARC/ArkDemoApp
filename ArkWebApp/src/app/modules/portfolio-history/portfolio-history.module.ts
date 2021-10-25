@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DialogDeleteComponent, PortfolioHistoryComponent } from './portfolio-history.component';
+import { PortfolioHistoryComponent } from './portfolio-history.component';
+import { DialogDeleteComponent } from './dialog-delete/dialog-delete.component';
 import { MatIconModule } from '@angular/material/icon';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatCardModule} from '@angular/material/card';
