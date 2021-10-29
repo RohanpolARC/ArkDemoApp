@@ -43,6 +43,8 @@ import {AssetGIRModel} from '../../shared/models/AssetGIRModel';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {DialogDeleteComponent} from './dialog-delete/dialog-delete.component';
 
+import { ExcelExportModule } from "@ag-grid-enterprise/excel-export";
+
 let adapTableApi: AdaptableApi;
 
 @Component({
@@ -56,7 +58,7 @@ export class PortfolioHistoryComponent implements OnInit {
 
   rowData: Observable<any[]>;
 
-  modules: Module[] = [ClientSideRowModelModule,RowGroupingModule,ColumnsToolPanelModule,MenuModule,SetFilterModule];
+  modules: Module[] = [ClientSideRowModelModule,RowGroupingModule,ColumnsToolPanelModule,MenuModule,SetFilterModule, ExcelExportModule];
 
   public gridOptions: GridOptions;
   private gridApi;
@@ -254,6 +256,8 @@ this.enableCellChangeFlash = false;
 
     predefinedConfig: {
       Dashboard: {
+        ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
+        IsCollapsed: true,
         Tabs: [],
       },
       Filter:{
