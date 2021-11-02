@@ -200,7 +200,7 @@ this.enableCellChangeFlash = false;
     primaryKey: 'positionId',
     userName: "TestUser",
     adaptableId: '',
-    adaptableStateKey: `${Date.now()}`,
+    adaptableStateKey: `Some Random State Key`,
 
     layoutOptions: {
       autoSaveLayouts: false,
