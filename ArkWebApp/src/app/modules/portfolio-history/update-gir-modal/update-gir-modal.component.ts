@@ -93,10 +93,11 @@ export class UpdateGirModalComponent implements OnInit {
   }
 
   initLeafChildrenData(): void{
-    this.allLeafChildren = this.data.allLeafChildren;
+    
+    this.allLeafChildren = this.data.childrenAfterFilter; // Filtered data.
     this.allLeafChildrenData = this.allLeafChildren.map(row => {
       return row.data;
-    })
+    })    
   }
 
   isGroupValid(allLeafChildrenData: any[]): boolean{
