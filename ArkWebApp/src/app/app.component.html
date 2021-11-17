@@ -17,28 +17,52 @@
 </mat-toolbar>
 <mat-sidenav-container [hasBackdrop]="false">
 <mat-sidenav mode="side" class="left-sidenav" [(opened)]="leftSIdebarOpened" position="start">
+
+  <mat-list>
+    <mat-list-item routerLink="/" (click)= "leftSIdebarOpened = false; updateFilterPane('Portfolio')" [ngStyle]="GIREditorStyle">
+      Going In Rates Editor
+    </mat-list-item>
+  </mat-list>
+
   <mat-accordion class="example-headers-align" multi>
-    <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel [expanded]="false" >
       <mat-expansion-panel-header>
         <mat-panel-title>
           
-         NAVIGATION
+         Liquidity
         </mat-panel-title>
       </mat-expansion-panel-header>
 
       <mat-list>
-        <mat-list-item >
-            Going In Rates Editor
+        <mat-list-item routerLink="/cash-balance" (click)= "leftSIdebarOpened = false; updateFilterPane('Cash Balance');" [ngStyle]="CashBalanceStyle">
+            Cash Balance
           </mat-list-item>
         </mat-list>
   
     </mat-expansion-panel>
   </mat-accordion>
+
 </mat-sidenav>
 <mat-sidenav  class="right-sidenav" #right [(opened)]="rightSidebarOpened" position="end">
  
 <div class="sidenav-right-heading">
   FILTER PANE
+</div>
+
+<div *ngIf="filterPane.AsOfDate">
+  <div class="form-input">
+    <mat-form-field appearance="outline" class="date-form-field" color="primary" >
+        <mat-label>As of Date</mat-label>
+        <input matInput [(ngModel)]="searchDate" (ngModelChange)="getSearchDate($event)" [matDatepicker]="datepicker">
+        <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+        <mat-datepicker #datepicker>
+          <mat-datepicker-actions>
+            <button mat-button matDatepickerCancel>Cancel</button>
+            <button mat-raised-button color="primary" (click)="rightSidebarOpened=!rightSidebarOpened" matDatepickerApply>Apply</button>
+          </mat-datepicker-actions>
+        </mat-datepicker>
+    </mat-form-field>            
+  </div>
 </div>
 
 </mat-sidenav>

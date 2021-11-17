@@ -10,25 +10,11 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { HttpClient } from '@angular/common/http';
 import {Observable, Subscription} from 'rxjs';
 import * as moment from 'moment'
-import {MatAccordion} from '@angular/material/expansion';
-import { MatIconRegistry } from '@angular/material/icon';
 import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
 import { MenuModule } from '@ag-grid-enterprise/menu';
 import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
-//import charts from '@adaptabletools/adaptable-plugin-charts';
-import {
- // ActionColumnButtonContext,
-  //AdaptableApi,
-  //AdaptableButton,
-  //AdaptableOptions,
-  CustomToolPanelButtonContext,
-  MenuContext,
-  PredicateDefHandlerParams,
-  ToolPanelButtonContext,
-} from '@adaptabletools/adaptable-angular-aggrid';
 import {
   AdaptableOptions,
-  PredefinedConfig,
   AdaptableApi,
   AdaptableButton,
   ActionColumnButtonContext,
@@ -38,8 +24,6 @@ import {DataService} from '../../core/services/data.service'
 import {BtnCellRenderer} from './btn-cell-renderer.component'
 import {PortfolioHistoryService} from '../../core/services/PortfolioHistory/portfolio-history.service'
 
-import Adaptable from '@adaptabletools/adaptable/agGrid';
-import {AssetGIRModel} from '../../shared/models/AssetGIRModel';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {DialogDeleteComponent} from './dialog-delete/dialog-delete.component';
 
@@ -56,13 +40,11 @@ let adapTableApi: AdaptableApi;
 
 export class PortfolioHistoryComponent implements OnInit {
 
-  rowData: Observable<any[]>;
+  rowData: any[];
 
   modules: Module[] = [ClientSideRowModelModule,RowGroupingModule,ColumnsToolPanelModule,MenuModule,SetFilterModule, ExcelExportModule];
 
   public gridOptions: GridOptions;
-  private gridApi;
-  private gridColumnApi;
   public getRowNodeId;
   public userName: String;
   public dialogRef;
@@ -72,52 +54,44 @@ export class PortfolioHistoryComponent implements OnInit {
   public frameworkComponents;
   public autoGroupColumnDef;
 
+  private gridApi;
+  private gridColumnApi;
+
   public subscriptions: Subscription[] = [];
-  // enables undo / redo
-  public undoRedoCellEditing = true;
 
-// restricts the number of undo / redo steps to 2
-  public undoRedoCellEditingLimit = 5;
-
-// enables flashing to help see cell changes
-  public enableCellChangeFlash = true;
-
-columnDefs = [
-  { headerName:"Position Id",field: 'positionId',hide: true },
-  { headerName:"Asset Id",field: 'assetId',hide: true},
-  { headerName:"Issuer Short Name",field: 'issuerShortName',enableValue: true },
-  { headerName:"Asset",field: 'asset',enableValue: true },
-  { headerName:"Fund",field: 'fund',  autosize:true },
-  { headerName:"Fund Hedging",field: 'fundHedging' },
-  { headerName:"Fund Ccy", field: 'fundCcy' },
-  { headerName:"As Of Date", field: 'asOfDate',  valueFormatter: this.dateFormatter,hide: true },
-  { headerName:"Trade Date",field: 'tradeDate', rowGroup: true, SortOrder: 'Desc', hide: true, valueFormatter: this.dateFormatter },
-  { headerName:"Type", field: 'typeDesc'},
-  { headerName:"Settle Date",field: 'settleDate',  valueFormatter: this.dateFormatter },
-  { headerName:"Position Ccy",field: 'positionCcy'},
-  { headerName:"Amount",field: 'amount',enableValue: true ,  valueFormatter: this.amountFormatter },
-  { headerName:"Par Amount",field: 'parAmount' ,  valueFormatter: this.amountFormatter },
-  { headerName:"ParAmountLocal",field: 'parAmountLocal' ,  valueFormatter: this.amountFormatter},
-  { headerName:"FundedParAmountLocal",field: 'fundedParAmountLocal' ,  valueFormatter: this.amountFormatter},
-  { headerName:"CostAmountLocal",field: 'costAmountLocal',  valueFormatter: this.amountFormatter },
-  { headerName:"FundedCostAmountLocal",field: 'fundedCostAmountLocal',  valueFormatter: this.amountFormatter },
-  { headerName:"Going In Rate",field: 'fxRateBaseEffective',editable:true },
-  { headerName:"Modified By", field: 'modifiedBy'},
-  { headerName:"Modified On", field: "modifiedOn", valueFormatter: this.dateTimeFormatter},
+  columnDefs = [
+  { headerName:"Position Id",field: 'positionId',hide: true, type:'abColDefNumber' },
+  { headerName:"Asset Id",field: 'assetId',hide: true, type:'abColDefNumber'},
+  { headerName:"Issuer Short Name",field: 'issuerShortName',enableValue: true, type:'abColDefString' },
+  { headerName:"Asset",field: 'asset',enableValue: true, type:'abColDefString' },
+  { headerName:"Fund",field: 'fund',  autosize:true, type:'abColDefString' },
+  { headerName:"Fund Hedging",field: 'fundHedging', type:'abColDefString' },
+  { headerName:"Fund Ccy", field: 'fundCcy', type:'abColDefString' },
+  { headerName:"As Of Date", field: 'asOfDate',  valueFormatter: this.dateFormatter,hide: true, type:'abColDefDate' },
+  { headerName:"Trade Date",field: 'tradeDate', rowGroup: true, SortOrder: 'Desc', hide: true, valueFormatter: this.dateFormatter, type:'abColDefDate' },
+  { headerName:"Type", field: 'typeDesc', type:'abColDefString'},
+  { headerName:"Settle Date",field: 'settleDate',  valueFormatter: this.dateFormatter, type:'abColDefDate' },
+  { headerName:"Position Ccy",field: 'positionCcy', type:'abColDefString'},
+  { headerName:"Amount",field: 'amount',enableValue: true ,  valueFormatter: this.amountFormatter, type:'abColDefNumber' },
+  { headerName:"Par Amount",field: 'parAmount' ,  valueFormatter: this.amountFormatter, type:'abColDefNumber' },
+  { headerName:"ParAmountLocal",field: 'parAmountLocal' ,  valueFormatter: this.amountFormatter, type:'abColDefNumber'},
+  { headerName:"FundedParAmountLocal",field: 'fundedParAmountLocal' ,  valueFormatter: this.amountFormatter, type:'abColDefNumber'},
+  { headerName:"CostAmountLocal",field: 'costAmountLocal',  valueFormatter: this.amountFormatter , type:'abColDefNumber'},
+  { headerName:"FundedCostAmountLocal",field: 'fundedCostAmountLocal',  valueFormatter: this.amountFormatter , type:'abColDefNumber'},
+  { headerName:"Going In Rate",field: 'fxRateBaseEffective',editable:true , type:'abColDefNumber'},
+  { headerName:"Modified By", field: 'modifiedBy', type:'abColDefString'},
+  { headerName:"Modified On", field: "modifiedOn", valueFormatter: this.dateTimeFormatter, type:'abColDefDate'},
   {
     headerName:"",
     field: 'actionNew',
     cellRenderer: 'btnCellRenderer',
-    pinned: 'left',
-    // cellRendererParams: {
-    //   clicked: function(field: any) {
-    //     console.log(`${field} was clicked`);
-    //   }
-    // },
+    pinned: 'right',
     width: 40,
-    autoSize:true
+    autoSize:true,
+    type:'abColDefObject'
   },
-  { headerName: "GIR Edited", field:'isEdited'},
+  { headerName: "GIR Edited", field:'isEdited', type:'abColDefBoolean'},
+  { field:'uniqueID', type:'abColDefNumber'},
 ];
 
 
@@ -173,22 +147,21 @@ columnDefs = [
 
     this.rowGroupPanelShow = 'always';
 
-    // enables undo / redo
-this.undoRedoCellEditing = true;
-
-// restricts the number of undo / redo steps to 5
-this.undoRedoCellEditingLimit = 5;
-
-// enables flashing to help see cell changes
-this.enableCellChangeFlash = false;
-
-
 
   }
 
 
   ngOnInit(): void {
-    this.rowData = this.portfolioHistoryService.getPortfolioHistory();
+//    localStorage.clear();
+    this.subscriptions.push(this.portfolioHistoryService.getPortfolioHistory().subscribe({
+      next: data => {
+        this.rowData = data;
+      },
+      error: error => {
+        console.error("Error in fetching the data: " + error);
+      }
+    }));
+    //this.rowData = this.portfolioHistoryService.getPortfolioHistory();
 
   }
 
@@ -197,13 +170,13 @@ this.enableCellChangeFlash = false;
   }
 
   public adaptableOptions: AdaptableOptions = {
-    primaryKey: 'positionId',
+    primaryKey: "uniqueID",
     userName: "TestUser",
-    adaptableId: '',
-    adaptableStateKey: `Some Random State Key`,
+    adaptableId: "",
+    adaptableStateKey: `Portfolio State Key`,
 
     layoutOptions: {
-      autoSaveLayouts: false,
+      autoSaveLayouts: true,
     },
     // userInterfaceOptions: {
     //   showAdaptableToolPanel: true
@@ -225,7 +198,6 @@ this.enableCellChangeFlash = false;
                   adapTableApi: adapTableApi
                 }});
               this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
-                //console.log(result.message);
               }));
             },
             icon:{
@@ -289,8 +261,9 @@ this.enableCellChangeFlash = false;
       },
     
       Layout:{
+        CurrentLayout: 'Basic Portfolio History',
         Layouts: [{
-          Name: 'Basic',
+          Name: 'Basic Portfolio History',
           Columns: [
             'issuerShortName',
             'asset',
@@ -333,18 +306,6 @@ this.enableCellChangeFlash = false;
         }]
       }
     
-      // CustomSort: {
-      //   CustomSorts: [
-      //     {
-      //       ColumnId: 'tradeDate',
-      //       SortOrder: [],
-      //     },
-      //   ],
-      // },
-
-    
-
-
     }
   
   }
@@ -382,28 +343,7 @@ this.enableCellChangeFlash = false;
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
 
-    // this.gridColumnApi.applyColumnState({state:[{colId: 'tradeDate', sort: 'desc'}], defaultState: {sort:'desc'},})
-
-    // this.sortGrid(params, 'tradeDate', 'desc');
-    // // const sortModel = [
-    //   {colId: 'tradeDate', sort: 'desc'}
-    // ];
-    // this.gridApi.setSortModel(sortModel);
-
-    // this.gridApi.setSortModel([{colId: 'tradeDate', sort: 'desc'}]);
   }
-
-  // sortGrid(event, field, sortDir){
-  //   const columnState = {
-  //     state: [
-  //       {
-  //         colId: field,
-  //         sort: sortDir
-  //       }
-  //     ]
-  //   }
-  //   event.columnApi.applyColumnState(columnState);
-  // }
 
   onAdaptableReady(
     {
@@ -418,28 +358,9 @@ this.enableCellChangeFlash = false;
     adaptableApi.eventApi.on('SelectionChanged', selection => {
       // do stuff
     });
-  }
 
-  onRowEditingStarted(params) {
-    params.api.refreshCells({
-      columns: ["actionNew"],
-      rowNodes: [params.node],
-      force: true
-    });
+/* Close right sidebar toolpanel by default */
+    adaptableApi.toolPanelApi.closeAdapTableToolPanel();
   }
-  onRowEditingStopped(params) {
-    params.api.refreshCells({
-      columns: ["actionNew"],
-      rowNodes: [params.node],
-      force: true
-    });
-    params.api.refreshCells({
-      columns: ["fxRateBaseEffective"],
-      rowNodes: [params.node],
-      force: true
-    });
-  }
-  
-
 
 }

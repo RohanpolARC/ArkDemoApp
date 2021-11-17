@@ -23,7 +23,7 @@ export class PortfolioHistoryService {
     })  
 };  
 
-  constructor(private http: HttpClient,private msalService: MsalUserService  ) {
+  constructor(private http: HttpClient,private msalService: MsalUserService) {
 
    }
 

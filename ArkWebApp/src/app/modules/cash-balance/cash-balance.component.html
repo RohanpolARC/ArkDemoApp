@@ -1,0 +1,29 @@
+<div class="asset-grid">
+    <div class="header-container">
+        <span class="title">
+            Cash Balance        
+        </span>
+        <span *ngIf="sDate" class="label-date">
+            <mat-label matTooltip="Please visit Filter Pane to change As Of Date" matTooltipClass="date-tooltip">As Of Date: {{sDate | date:"dd/MM/yyyy"}}</mat-label>
+        </span>
+    </div>
+
+    <mat-card class="grid-parent">
+    
+    <div class="grid-component h-100 w-100">
+
+    <ag-grid-angular
+        [adaptableOptions]="adaptableOptions"
+        [gridOptions]="gridOptions"
+        [defaultColDef]="defaultColDef"
+        [modules]="agGridModules"
+        [rowData]="rowData"
+        [sideBar]="'columns'"
+        (adaptableReady)="onAdaptableReady($event)"
+        class="ag-theme-alpine h-100 w-100"
+    >
+    </ag-grid-angular>
+</div>
+</mat-card>
+
+</div>

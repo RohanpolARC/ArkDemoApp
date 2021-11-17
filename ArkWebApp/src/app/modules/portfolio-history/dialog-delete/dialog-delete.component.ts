@@ -56,6 +56,10 @@ export class DialogDeleteComponent{
               this.updateMsg = "GIR successfully deleted";
               
               this.data.rowData.isEdited = false;
+
+              this.data.rowData.fxRateBaseEffective = ' ';
+              this.data.rowData.modifiedBy = ' ';
+              this.data.rowData.modifiedOn = null;
             
               /* Uncomment this to actually delete the row from the grid */
 
