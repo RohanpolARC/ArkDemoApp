@@ -36,6 +36,7 @@ export class CashBalanceComponent implements OnInit {
   sDate: string = null;
 
   rowData: any[];
+  rowGroupPanelShow:string = 'always';
   subscriptions: Subscription[] = [];
 
   gridApi;
@@ -57,6 +58,8 @@ export class CashBalanceComponent implements OnInit {
     {field: 'fundLegalEntity', headerName: 'Fund Legal Entity', type: 'abColDefString'},
     {field: 'fund', headerName: 'Fund', type: 'abColDefString'},
     {field: 'fundStrategy', headerName: 'Fund Strategy', type: 'abColDefString'},
+    {field: 'marketValueFactor', headerName: 'MV Factor', type:'abColDefNumber'},
+    {field: 'euroBase', headerName: 'Euro Base', type:'abColDefNumber'},
   ];
 
   defaultColDef = {

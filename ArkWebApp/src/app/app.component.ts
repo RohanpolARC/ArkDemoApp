@@ -49,13 +49,23 @@ export class AppComponent {
   constructor(private http: HttpClient,private dataService: DataService,public dialog: MatDialog,iconRegistry:MatIconRegistry, private location:Location) {
 
 }   
-  
+
+getLastBusinessDay(){
+  let workday = moment();
+  let day = workday.day();
+  let diff = 1;  // returns yesterday
+  if (day == 0 || day == 1){  // is Sunday or Monday
+    diff = day + 2;  // returns Friday
+  }
+  return workday.subtract(diff, 'days').toDate();
+}
+
   ngOnInit(): void { 
     this.userName=this.dataService.getCurrentUserName();
 
     this.filterPane.AsOfDate = false;
 
-    this.searchDate = new Date();
+    this.searchDate = this.getLastBusinessDay();
     this.getSearchDate(this.searchDate);
 
 
