@@ -59,7 +59,10 @@ export class CashBalanceComponent implements OnInit {
     {field: 'fund', headerName: 'Fund', type: 'abColDefString'},
     {field: 'fundStrategy', headerName: 'Fund Strategy', type: 'abColDefString'},
     {field: 'marketValueFactor', headerName: 'MV Factor', type:'abColDefNumber'},
-    {field: 'euroBase', headerName: 'Euro Base', type:'abColDefNumber'},
+    {field: 'accountBalanceEur', headerName: 'Account Balance Eur', type:'abColDefNumber', valueFormatter: this.amountFormatter},
+    {field: 'mvFundHedging', headerName: 'MV FundHedging', type:'abColDefNumber', valueFormatter: this.amountFormatter},
+    {field: 'mvLegalEntity', headerName: 'MV FundLegalEntity', type:'abColDefNumber', valueFormatter: this.amountFormatter},
+    {field: 'isSplited', headerName: 'IsSplited', type:'abColDefBoolean'},
   ];
 
   defaultColDef = {
@@ -133,19 +136,20 @@ export class CashBalanceComponent implements OnInit {
         Layouts: [{
           Name: 'Basic Cash Flow',
           Columns: [
-            'asofDate',
+            'account',
             'pbName',
             'mapName',
-            'account',
             'currency',
             'pbClosingBalance',
             'fundCcy',
             'accountBalanceBase',
+            'accountBalanceEur',
             'portfolioName',
             'fundHedging',
             'fundLegalEntity',
             'fund',
             'fundStrategy',
+            'isSplited'
           ],
           RowGroupedColumns : [],
         }]
