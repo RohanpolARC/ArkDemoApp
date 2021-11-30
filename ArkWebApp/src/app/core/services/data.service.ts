@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { MsalUserService } from './Auth/msaluser.service';  
 
 import { BehaviorSubject } from 'rxjs';
+import { AsOfDate } from 'src/app/shared/models/FilterPaneModel';
 
 @Injectable({  
     providedIn: 'root'  
@@ -18,11 +19,11 @@ export class DataService {
         })  
     };  
   
-    private searchDateMessage = new BehaviorSubject<string>(null);
-    currentsearchDate = this.searchDateMessage.asObservable();
+    private searchDateMessage = new BehaviorSubject<any>(null);
+    currentSearchDate = this.searchDateMessage.asObservable();
 
-    changeSearchDate(searchDate: string){
-        this.searchDateMessage.next(searchDate);
+    changeSearchDate(range: AsOfDate){
+        this.searchDateMessage.next(range);
     }
 
     constructor(private http: HttpClient, private msalService: MsalUserService  

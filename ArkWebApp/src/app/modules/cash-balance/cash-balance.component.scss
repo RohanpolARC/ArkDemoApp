@@ -19,7 +19,7 @@
     
     .title{
       padding-top: 20px;
-      padding-bottom: 15px;
+      padding-bottom: 5px;
       font-size: 24px;
       font-weight: bold;
       font-family: Arial, Helvetica, sans-serif;
@@ -30,8 +30,6 @@
       width: fit-content;
     }
     
-  
-  
   .grid-parent{
     padding-bottom: 50px;
     height: 100%;
@@ -49,8 +47,10 @@
   }
 
   .label-date{
-      padding: 20px 15px 0 0;
-      font-size: 16px;
+      padding: 20px 15px 5px 0;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
   }
 
   .date-tooltip{
@@ -63,4 +63,9 @@
     //   background-color: whitesmoke;
     //   color: black !important;
     font-size: 12px;
+  }
+
+  .date-range{
+    margin-right: 5px;
+    color:#0590ca;
   }

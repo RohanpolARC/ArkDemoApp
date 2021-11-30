@@ -17,7 +17,7 @@
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$ArkWebApp-primary: mat.define-palette(mat.$indigo-palette);
+$ArkWebApp-primary: mat.define-palette(mat.$blue-palette, 800);
 $ArkWebApp-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
 
 // The warn palette is optional (defaults to red).
@@ -30,6 +30,12 @@ $ArkWebApp-theme: mat.define-light-theme((
     primary: $ArkWebApp-primary,
     accent: $ArkWebApp-accent,
     warn: $ArkWebApp-warn,
+
+
+    // Add custom colors like above here.
+
+
+
   )
 ));
 

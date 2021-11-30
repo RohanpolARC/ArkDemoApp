@@ -51,17 +51,25 @@
 
 <div *ngIf="filterPane.AsOfDate">
   <div class="form-input">
-    <mat-form-field appearance="outline" class="date-form-field" color="primary" >
-        <mat-label>As of Date</mat-label>
-        <input matInput [(ngModel)]="searchDate" (ngModelChange)="getSearchDate($event)" [matDatepicker]="datepicker">
-        <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
-        <mat-datepicker #datepicker>
-          <mat-datepicker-actions>
-            <button mat-button matDatepickerCancel>Cancel</button>
-            <button mat-raised-button color="primary" (click)="rightSidebarOpened=!rightSidebarOpened" matDatepickerApply>Apply</button>
-          </mat-datepicker-actions>
-        </mat-datepicker>
-    </mat-form-field>            
+    
+    <mat-form-field appearance="outline" class="date-form-field" color="primary">
+      <mat-label>As of Date</mat-label>
+      <mat-date-range-input [formGroup]="searchDateRange" [rangePicker]="picker">
+        <input matStartDate formControlName="start" placeholder="Start date">
+        <input matEndDate formControlName="end" placeholder="End date">
+      </mat-date-range-input>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker>
+        <mat-date-range-picker-actions>
+          <button mat-button matDateRangePickerCancel>Cancel</button>
+          <button mat-raised-button color="primary" (click)="rightSidebarOpened=!rightSidebarOpened; getSearchDateRange();" matDateRangePickerApply>Apply</button>
+        </mat-date-range-picker-actions>
+      </mat-date-range-picker>
+    
+      <mat-error *ngIf="searchDateRange.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+      <mat-error *ngIf="searchDateRange.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+    </mat-form-field>
+
   </div>
 </div>
 

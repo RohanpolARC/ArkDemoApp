@@ -21,6 +21,7 @@ import {
 import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 
 import * as moment from 'moment'
+import { AsOfDate } from 'src/app/shared/models/FilterPaneModel';
 
 
 @Component({
@@ -33,7 +34,7 @@ import * as moment from 'moment'
 export class CashBalanceComponent implements OnInit {
 
   searchDate: Date = null;
-  sDate: string = null;
+  sDate: AsOfDate = null;
 
   rowData: any[];
   rowGroupPanelShow:string = 'always';
@@ -94,7 +95,7 @@ export class CashBalanceComponent implements OnInit {
   ngOnInit(): void {
     this.rowData = [];
 
-    this.subscriptions.push(this.dataService.currentsearchDate.subscribe(sDate => {
+    this.subscriptions.push(this.dataService.currentSearchDate.subscribe(sDate => {
       this.sDate = sDate;
       if(this.sDate !== null)
         this.subscriptions.push(this.cashBalanceService.getCashBalance(this.sDate).subscribe({
@@ -136,6 +137,7 @@ export class CashBalanceComponent implements OnInit {
         Layouts: [{
           Name: 'Basic Cash Flow',
           Columns: [
+            'asofDate',
             'account',
             'pbName',
             'mapName',

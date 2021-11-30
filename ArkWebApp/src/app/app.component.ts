@@ -6,6 +6,8 @@ import { MatIconRegistry } from '@angular/material/icon';
 import * as moment from 'moment';
 import { FilterPane } from './shared/models/FilterPaneModel';
 import { Location } from '@angular/common';
+import {FormGroup, FormControl} from '@angular/forms';
+import { AsOfDate } from './shared/models/FilterPaneModel';
 
 @Component({  
   selector: 'app-root',  
@@ -24,7 +26,13 @@ export class AppComponent {
   filterPane:FilterPane = {
     AsOfDate: false,
   };
+  searchDateRange = new FormGroup({
+    start: new FormControl(),
+    end: new FormControl(),
+  });
 
+  range:AsOfDate = null;
+  
   notSelectedElement = {
 
     'color':'white', 
@@ -65,12 +73,17 @@ getLastBusinessDay(){
 
     this.filterPane.AsOfDate = false;
 
-    this.searchDate = this.getLastBusinessDay();
-    this.getSearchDate(this.searchDate);
+    this.range = {
+      start: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
+      end: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
+    }
 
-
-    // this.searchDate = moment('2021-05-26', 'YYYY-MM-DD').toDate();
-    // this.getSearchDate(moment('2021-05-26', 'YYYY-MM-DD').toDate());
+    this.searchDateRange.setValue({
+      start: this.range.start,
+      end: this.range.end,
+    })
+    
+    this.getSearchDateRange();
 
       /** On Initial Load */
       /** If Cash Balance screen is directly loaded */
@@ -91,9 +104,20 @@ getLastBusinessDay(){
     this.dataService.logout();  
   }  
 
-  getSearchDate(date){
-    let requestedDate:string = moment(date).format("YYYY-MM-DD"); 
-    this.dataService.changeSearchDate(requestedDate);
+  getSearchDateRange(){
+
+    this.range.start = moment(this.searchDateRange.get('start').value).format("YYYY-MM-DD");
+    this.range.end = moment(this.searchDateRange.get('end').value).format("YYYY-MM-DD");
+
+    if(this.range.end === 'Invalid date')
+      this.range.end = this.range.start;
+
+    this.searchDateRange.setValue({
+      start: this.range.start, 
+      end: this.range.end,
+    })
+    
+    this.dataService.changeSearchDate(this.range);
   }
 
   updateFilterPane(screen: string): void{

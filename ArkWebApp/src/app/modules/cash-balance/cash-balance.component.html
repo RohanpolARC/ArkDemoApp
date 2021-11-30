@@ -4,7 +4,8 @@
             Cash Balance        
         </span>
         <span *ngIf="sDate" class="label-date">
-            <mat-label matTooltip="Please visit Filter Pane to change As Of Date" matTooltipClass="date-tooltip">As Of Date: {{sDate | date:"dd/MM/yyyy"}}</mat-label>
+            <mat-icon class="date-range">date_range</mat-icon>
+            <mat-label matTooltip="Please visit Filter Pane to change As Of Date" matTooltipClass="date-tooltip">From: {{sDate.start | date:"dd MMM yyyy"}} To: {{sDate.end | date:"dd MMM yyyy"}}</mat-label>
         </span>
     </div>
 
