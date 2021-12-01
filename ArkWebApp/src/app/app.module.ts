@@ -24,6 +24,12 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {PortfolioHistoryModule} from './modules/portfolio-history/portfolio-history.module'
 import {MatMenuModule} from '@angular/material/menu';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { CashBalanceModule } from './modules/cash-balance/cash-balance.module';
+
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 
 export const protectedResourceMap: any =  
   [  
@@ -63,14 +69,25 @@ export const protectedResourceMap: any =
   MatFormFieldModule,
   PortfolioHistoryModule,
   MatMenuModule,
-  MatSnackBarModule
+  MatSnackBarModule,
+  CashBalanceModule,
+  MatDatepickerModule,
+  MatNativeDateModule,
+  MatInputModule
   ],  
   providers: [  
     HttpClient,  
     MsalUserService,  
     {  
       provide: HTTP_INTERCEPTORS, useClass: MsalInterceptor, multi: true  
-    }  
+    },
+    /* 
+      Default locale is 'en-US' : MM-DD-YYYY
+      Switched to: DD-MM-YYYY.
+      
+      Applicable to all Ng Material fields for this module.
+    */
+    {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  
   ],  
   bootstrap: [AppComponent]  
 })  

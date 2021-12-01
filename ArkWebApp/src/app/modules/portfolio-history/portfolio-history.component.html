@@ -9,23 +9,18 @@
     <mat-card class="grid-parent">
     
       <div>
-      <div class="search-row">
-    
-      </div>
       </div>
     <div class="grid-component h-100 w-100">
       
     <ag-grid-angular
        
         class="ag-theme-alpine ag-grid-portfolio-history"
-        [rowData]="rowData | async"
+        [rowData]="rowData"
         [columnDefs]="columnDefs"
         [defaultColDef]="defaultColDef"
         [modules]="modules"
         (gridReady)="onGridReady($event)"
         [autoGroupColumnDef]="autoGroupColumnDef"
-        (cellEditingStopped)="onRowEditingStopped($event)"
-        (cellEditingStarted)="onRowEditingStarted($event)"
         [getRowNodeId]="getRowNodeId"  
         [suppressClickEdit]="true"
         [rowGroupPanelShow]="rowGroupPanelShow"
@@ -34,10 +29,6 @@
         (adaptableReady)="onAdaptableReady($event)"
         [adaptableOptions]="adaptableOptions"
         [frameworkComponents]="frameworkComponents"
-        [stopEditingWhenCellsLoseFocus] = "false"
-        [undoRedoCellEditing]="undoRedoCellEditing"
-        [undoRedoCellEditingLimit]="undoRedoCellEditingLimit"
-        [enableCellChangeFlash]="enableCellChangeFlash"
         [gridOptions]="gridOptions"
     >
     </ag-grid-angular>
