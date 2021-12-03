@@ -1,0 +1,29 @@
+<div class="parent">
+<div class="capital-header">
+    <div class="capital-title">Capital Activity</div>
+    <br>
+    <div class="capital-action">
+    <button mat-icon-button (click)="openDialog()">
+        <mat-icon class="material-icons-outlined">add_circle_outline</mat-icon>
+
+    </button>
+
+    </div>
+</div>
+<div class="content">
+    <mat-card class="mat-content">
+        <ag-grid-angular
+            [adaptableOptions]="adaptableOptions"
+            [gridOptions]="gridOptions"
+            [defaultColDef]="defaultColDef"
+            [rowGroupPanelShow]="rowGroupPanelShow"
+            [modules]="agGridModules"
+            [rowData]="rowData"
+            [sideBar]="'columns'"
+            (adaptableReady)="onAdaptableReady($event)"
+            class="ag-theme-alpine ag-grid"
+        >
+        </ag-grid-angular>
+    </mat-card>
+</div>
+</div>

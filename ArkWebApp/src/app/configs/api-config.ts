@@ -17,4 +17,8 @@ export class APIConfig {
     public static DELETE_LAYOUT_API: string = APIConfig.BASEURL + "/api/layout/delete";
 
     public static CASH_BALANCE_GET_API: string = APIConfig.BASEURL + "/api/CashBalance/GetData";
+
+    public static CAPITAL_ACTIVITY_PUT_API: string = APIConfig.BASEURL + "/api/CapitalActivity/put";
+    public static CAPITAL_ACTIVITY_GET_API: string = APIConfig.BASEURL + "/api/CapitalActivity/get";
+    public static CAPITAL_ACTIVITY_GET_REF_API: string = APIConfig.BASEURL + "/api/CapitalActivity/getDropdownData";
 }

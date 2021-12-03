@@ -1,0 +1,119 @@
+<div class="title">{{ header }}</div>
+    
+    <!-- Add dynamic load content here -->
+<div>
+    <div class="success-msg" *ngIf="isSuccessMsgAvailable">
+        {{ updateMsg }}
+    </div>
+    <div class="failure-msg" *ngIf="isFailureMsgAvailable">
+        {{ updateMsg }}
+    </div>
+</div>
+
+<!-- <div *ngIf="capitalActivityForm.errors?.['dateError'] && (capitalActivityForm.touched || capitalActivityForm.dirty)" class="failure-msg">
+    Call Date cannot be greator than Value Date
+</div> -->
+
+<mat-dialog-content>   
+         <!-- Don't add any dynamic content here. It introduces scrollbar as it overshoots mat-dialog-content size. -->
+<form [formGroup]="capitalActivityForm" autocomplete="off" (ngSubmit)="onSubmit()">
+
+  <div class="input-field">
+    <div>
+
+      <mat-form-field appearance="outline" class="edit">
+        <mat-label>Call Date</mat-label>
+        <input matInput formControlName="callDate" [matDatepicker]="callDatePicker" />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="callDatePicker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #callDatePicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="edit">
+        <mat-label>Capital Type</mat-label>
+        <mat-select type="text" formControlName="capitalType">
+          <mat-option
+            *ngFor="let capitalType of capitalTypeOptions"
+            [value]="capitalType.type"
+          >
+            {{capitalType.type}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline" class="edit">
+        <mat-label>Fund Hedging</mat-label>
+        <mat-select type="text" formControlName="fundHedging">
+          <mat-option
+            *ngFor="let fundHedging of fundHedgingOptions"
+            [value]="fundHedging.name"
+          >
+            {{fundHedging.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="edit">
+        <mat-label>Issuer</mat-label>
+        <input matInput formControlName="issuer" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="edit">
+        <mat-label>Narrative</mat-label>
+        <input matInput formControlName="narrative" />
+      </mat-form-field>
+
+    </div>
+
+    <div>
+
+      <mat-form-field appearance="outline" class="edit">
+        <mat-label>Value Date</mat-label>
+        <input matInput formControlName="valueDate" [matDatepicker]="valueDatePicker" />
+        <mat-datepicker-toggle matSuffix [for]="valueDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #valueDatePicker></mat-datepicker>
+      </mat-form-field>
+    
+      <mat-form-field appearance="outline" class="edit">
+        <mat-label>Capital Subtype</mat-label>
+        <mat-select type="text" formControlName="capitalSubType">
+          <mat-option
+            *ngFor="let capitalSubType of capitalSubTypeOptions"
+            [value]="capitalSubType.subtype"
+          >
+            {{ capitalSubType.subtype }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="edit">
+        <mat-label> Total Amount </mat-label>
+        <input type="number" matInput formControlName="totalAmount" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="edit">
+        <mat-label>Asset</mat-label>
+        <input matInput formControlName="asset" />
+      </mat-form-field>
+
+      <div class="action">
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="(data.actionType === 'EDIT') ? (!capitalActivityForm.valid ? true: (actionfailed ? false : true)) : (!capitalActivityForm.valid )"
+        >
+          {{ buttontext }}
+        </button>
+        
+        <button class="close-button" type="button" mat-raised-button (click)="closeDialog(capitalAct)" >Close</button>
+
+      </div>
+
+    </div>
+    
+  </div>
+</form>
+</mat-dialog-content>

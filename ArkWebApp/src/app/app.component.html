@@ -38,6 +38,13 @@
             Cash Balance
           </mat-list-item>
         </mat-list>
+
+      <mat-list>
+        <mat-list-item routerLink="/capital-activity" (click)= "leftSIdebarOpened = false; updateFilterPane('Capital Activity');" [ngStyle]="CapitalActivityStyle">
+            Capital Activity
+        </mat-list-item>
+      </mat-list>
+  
   
     </mat-expansion-panel>
   </mat-accordion>
