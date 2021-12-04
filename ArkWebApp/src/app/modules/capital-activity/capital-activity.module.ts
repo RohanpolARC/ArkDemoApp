@@ -16,14 +16,16 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import {MatSelectModule} from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
+import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
 
 @NgModule({
   declarations: [
     CapitalActivityComponent,
-    AddCapitalModalComponent
+    AddCapitalModalComponent,
+    UpdateConfirmComponent
   ],
   /** Add all pop-up modal components here, for this module */
-  entryComponents: [AddCapitalModalComponent],
+  entryComponents: [AddCapitalModalComponent, UpdateConfirmComponent],
   imports: [
     CommonModule,
     BrowserAnimationsModule,

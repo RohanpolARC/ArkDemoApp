@@ -10,6 +10,7 @@ export interface CapitalActivityModel{
     narrative: string;
     source: string;
     sourceID: number;
+    fundCcy: string;
     totalAmount: number;
     createdOn: Date;
     createdBy: string;

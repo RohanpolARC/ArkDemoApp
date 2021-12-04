@@ -33,7 +33,7 @@ import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/ca
 export class CapitalActivityComponent implements OnInit {
 
   subscriptions: Subscription[] = [];
-  rowData: CapitalActivityModel[] = [];
+  rowData: CapitalActivityModel[];
   rowGroupPanelShow:string = 'always';
 
   agGridModules: Module[] = [
@@ -50,14 +50,15 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'valueDate', headerName: 'Value Date', type: 'abColDefDate', valueFormatter: this.dateFormatter},
     { field: 'callDate', headerName: 'Call Date', type: 'abColDefDate', valueFormatter: this.dateFormatter },
     { field: 'narrative', headerName: 'Narrative', type:'abColDefString'},
-    { field: 'capitalType', headerName: 'Capital Type'},
-    { field: 'capitalSubType', headerName: 'Capital Subtype'},
-    { field: 'totalAmount', headerName: 'Total Amount', valueFormatter: this.amountFormatter},
-    { field: 'fundHedging', headerName: 'Fund Hedging'},
-    { field: 'issuer', headerName: 'Issuer'},
-    { field: 'asset', headerName: 'Asset'},
-    { field: 'source', headerName: 'Source'},
-    { field: 'sourceID', headerName: 'Source ID'}
+    { field: 'capitalType', headerName: 'Capital Type', type:'abColDefString'},
+    { field: 'capitalSubType', headerName: 'Capital Subtype', type:'abColDefString'},
+    { field: 'fundCcy', headerName: 'Fund Ccy', type:'abColDefString'},
+    { field: 'totalAmount', headerName: 'Total Amount', valueFormatter: this.amountFormatter, type:'abColDefNumber'},
+    { field: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
+    { field: 'issuer', headerName: 'Issuer', type:'abColDefString'},
+    { field: 'asset', headerName: 'Asset', type:'abColDefString'},
+    { field: 'source', headerName: 'Source', type:'abColDefString'},
+    { field: 'sourceID', headerName: 'Source ID', type:'abColDefNumber'},
   ]
 
   defaultColDef = {
@@ -82,7 +83,7 @@ export class CapitalActivityComponent implements OnInit {
         AdaptableToolPanel: AdaptableToolPanelAgGridComponent
       },
       columnDefs: this.columnDefs,
-      allowContextMenuWithControlKey:true
+      allowContextMenuWithControlKey:false
     }
   }
 
@@ -109,13 +110,9 @@ export class CapitalActivityComponent implements OnInit {
               button: AdaptableButton<ActionColumnButtonContext>,
               context: ActionColumnButtonContext
             ) => {
-              let dialogRef = this.dialog.open(AddCapitalModalComponent,{
-                data: {
-                  rowData: context.rowNode?.data,
-                  adapTableApi: this.adapTableApi,
-                  actionType: 'EDIT',
-                }});
 
+              let rowData =  context.rowNode?.data;
+              this.openDialog(rowData, 'EDIT');
             },
             icon: {
               src: '../assets/img/edit.svg',
@@ -144,12 +141,12 @@ export class CapitalActivityComponent implements OnInit {
             'narrative',
             'capitalType',
             'capitalSubType',
+            'fundCcy',
             'totalAmount',
             'fundHedging',
             'issuer',
             'asset',
             'source',
-            'sourceID',
             'ActionEdit',
           ],
           RowGroupedColumns: [],
@@ -165,6 +162,11 @@ export class CapitalActivityComponent implements OnInit {
     }
   }
 
+  capitalTypeOptions: {type: string}[] = [];
+  capitalSubTypeOptions: {subtype: string}[]= [];
+
+  refData = [];
+
   fetchData(): void{
     this.subscriptions.push(this.capitalActivityService.getCapitalActivity().subscribe({
       next: data => {
@@ -179,21 +181,42 @@ export class CapitalActivityComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchData();
+
+    
+    this.subscriptions.push(this.capitalActivityService.getCapitalRefData().subscribe({
+      next: data => {
+        data.capitalType.forEach(x => { this.capitalTypeOptions.push({type : x}) });
+        data.capitalSubType.forEach(x => { this.capitalSubTypeOptions.push({subtype : x}) });
+
+        this.refData = data.portfolio_Info;
+      },
+      error: error => {
+        console.error("Couldn't fetch refData. Form dropdown fields will be disabled");
+      }
+    }));
+
   }
 
-  openDialog():void{
+  ngOnDestroy(): void{
+    this.subscriptions.forEach(subscription => subscription.unsubscribe())
+  }
+
+  openDialog(data? , actionType = 'ADD',):void{
 
     const dialogRef = this.dialog.open(AddCapitalModalComponent, {
       data: {
+        rowData : data,
         adapTableApi: this.adapTableApi,
-        actionType: 'ADD',
-      }});
-    dialogRef.afterClosed().subscribe((result) => {
-
-      if(result.data && result.event === 'Close with Success'){
-        this.fetchData(); // Reloading the datagrid to fetch capitalID for newly added rows.
-      }
+        actionType: actionType,
+        capitalTypes: this.capitalTypeOptions,
+        capitalSubTypes: this.capitalSubTypeOptions,
+        refData: this.refData,
+      },
+      minWidth: '650px',
     });
+    this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
+
+    }));
   }
 
   onAdaptableReady(
@@ -238,7 +261,7 @@ export class CapitalActivityComponent implements OnInit {
 
   zeroFormatter(params){
     if(params.value == undefined || Number(params.value) == 0)
-      return ""
+      return null;
     else return Number(params.value)
   }
 

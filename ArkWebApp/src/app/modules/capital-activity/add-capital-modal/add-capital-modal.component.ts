@@ -1,12 +1,13 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { ViewEncapsulation } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CapitalActivityModel } from 'src/app/shared/models/CapitalActivityModel';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
 import { Subscription } from 'rxjs';
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import * as moment from 'moment';
+import { UpdateConfirmComponent } from '../update-confirm/update-confirm.component';
 
 @Component({
   selector: 'app-add-capital-modal',
@@ -19,18 +20,12 @@ export class AddCapitalModalComponent implements OnInit {
   capitalAct: CapitalActivityModel = null;
 
   subscriptions: Subscription[] = [];
-  capitalTypeOptions = [
-    { type: 'Distribution' }, 
-    { type: 'Contribution' },
-  ];
-  capitalSubTypeOptions = [
-    { subtype: 'Income' }, 
-    { subtype: 'Investment' },
-  ];
-  fundHedgingOptions = [
-    { name: 'EUR-UNLEV' }, 
-    { name: 'USD-UNLEV' },
-  ];
+  capitalTypeOptions: {type: string}[] = [];
+  capitalSubTypeOptions: {subtype: string}[]= [];
+  fundHedgingOptions = [];
+  issuerOptions = [];
+  assetOptions = [];
+  fundCcyOptions = [];
 
   header: string;
   buttontext: string;
@@ -38,8 +33,7 @@ export class AddCapitalModalComponent implements OnInit {
   isSuccessMsgAvailable: boolean;
   isFailureMsgAvailable: boolean;
   updateMsg:string;
-  actionfailed: boolean;
-  
+  disableSubmit: boolean;
 
   capitalActivityForm = new FormGroup({
     valueDate: new FormControl(null, Validators.required),
@@ -47,6 +41,7 @@ export class AddCapitalModalComponent implements OnInit {
     narrative: new FormControl(null),
     capitalType: new FormControl(null, Validators.required),
     capitalSubType: new FormControl(null, Validators.required),
+    fundCcy: new FormControl(null, Validators.required),
     totalAmount: new FormControl(null, Validators.required),
     fundHedging: new FormControl(null, Validators.required),
     issuer: new FormControl(null, Validators.required),
@@ -56,13 +51,116 @@ export class AddCapitalModalComponent implements OnInit {
 
   constructor(public dialogRef: MatDialogRef<AddCapitalModalComponent>, 
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private capitalActivityService: CapitalActivityService, private msalService: MsalUserService) { }
+    public dialog: MatDialog,
+    private capitalActivityService: CapitalActivityService, 
+    private msalService: MsalUserService) { }
+
+  getUniqueOptions(options: any[], givenkey: string, resultkey: string): any[]{
+    let list = [];
+    let map = new Map();
+    options.forEach(x => {
+      if(!map.has(x[givenkey]) && x[givenkey])
+        map.set(x[givenkey], true);
+    })
+    for(const [key, val] of map.entries()){
+      let obj = {};
+      obj[resultkey] = key;
+      list.push(obj);
+    }
+    return list;
+  }
+
+  setDynamicOptions(FH?: string, Issuer?: string, Asset?: string): void {
+    if(FH || Issuer || Asset){
+      if(FH && !Issuer && !Asset){
+          /**
+              Options: Get ISSUERS & ASSETS for selected FundHedging.
+           */
+        let issuers = [];   
+        let assets = [];     
+        this.data.refData.forEach(row => {
+          if(row.fundHedging === FH){
+            issuers.push({issuer: row.issuer});
+            assets.push({asset: row.asset});
+          }
+        });
+        this.issuerOptions = this.getUniqueOptions(issuers, 'issuer', 'issuer');
+        this.assetOptions = this.getUniqueOptions(assets, 'asset', 'asset');
+      }
+      else if(FH && Issuer && !Asset){
+          /**
+              Options: Get ASSETS for selected FundHedging && Issuer.
+           */
+        let assets = [];
+        this.data.refData.forEach(row => {
+          if(row.fundHedging === FH && row.issuer === Issuer){
+            assets.push({asset: row.asset});
+          }
+        });
+        this.assetOptions = this.getUniqueOptions(assets, 'asset', 'asset');
+      }
+      else if(FH && Issuer && Asset){
+        /** 
+         * GET
+         *      ISSUERS for selected FundHedging.
+         *      ASSETS for selected FundHedging & Issuer.
+         *       
+         *  Invoked during initial load for EDIT. 
+         */
+        let issuers = [];   
+        let assets = [];
+        this.data.refData.forEach(row => {
+          if(row.fundHedging === FH){
+            issuers.push({issuer: row.issuer})
+            if(row.issuer === Issuer)
+              assets.push({asset: row.asset});
+          }
+        });
+        this.issuerOptions = this.getUniqueOptions(issuers, 'issuer', 'issuer');
+        this.assetOptions = this.getUniqueOptions(assets, 'asset', 'asset');
+
+      }
+
+    }
+    else{    
+        /**
+         *  Options: FETCH ALL OPTIONS.
+         *  Invoked during initial load for ADD. 
+         */
+  
+      for(let i = 0; i < this.data.refData.length; i+= 1){
+        this.issuerOptions.push({issuer: this.data.refData[i].issuer});
+        this.assetOptions.push({asset: this.data.refData[i].asset});
+      }
+
+      this.issuerOptions = this.getUniqueOptions(this.issuerOptions, 'issuer', 'issuer');
+      this.assetOptions = this.getUniqueOptions(this.assetOptions, 'asset', 'asset');
+    }
+  }   
 
   ngOnInit(): void {
+
+    /* Set Up Static Options */
+    this.capitalTypeOptions = this.data.capitalTypes;
+    this.capitalSubTypeOptions = this.data.capitalSubTypes;
+
+    for(let i = 0; i < this.data.refData.length; i+= 1){
+      this.fundHedgingOptions.push({name: this.data.refData[i].fundHedging});
+      this.fundCcyOptions.push({fundCcy: this.data.refData[i].fundCcy});
+    }
+    this.fundHedgingOptions = this.getUniqueOptions(this.fundHedgingOptions
+      , 'name', 'name');
+    this.fundCcyOptions = this.getUniqueOptions(this.fundCcyOptions, 'fundCcy', 'fundCcy')
+
+
+
     if(this.data.actionType === 'EDIT')
     {
       this.header = 'Edit Capital';
       this.buttontext = 'Update';
+
+      // Dynamic options for EDIT
+      this.setDynamicOptions(this.data.rowData.fundHedging, this.data.rowData.issuer, this.data.rowData.asset);
 
       this.capitalActivityForm.patchValue({
         valueDate: this.data.rowData.valueDate,
@@ -70,6 +168,7 @@ export class AddCapitalModalComponent implements OnInit {
         narrative: this.data.rowData.narrative,
         capitalType: this.data.rowData.capitalType,
         capitalSubType: this.data.rowData.capitalSubType,
+        fundCcy: this.data.rowData.fundCcy,
         totalAmount: this.data.rowData.totalAmount,
         fundHedging: this.data.rowData.fundHedging,
         issuer: this.data.rowData.issuer,
@@ -79,20 +178,30 @@ export class AddCapitalModalComponent implements OnInit {
     else{
       this.header = 'Add Capital';
       this.buttontext = 'Submit';
+        // Dynamic Options for ADD.
+      this.setDynamicOptions();
     }
 
     this.isSuccessMsgAvailable = this.isFailureMsgAvailable = false;
-    this.actionfailed = false;
+    this.disableSubmit = true;
 
     this.capitalActivityForm.statusChanges.subscribe(validity => {
-      if(validity === 'VALID'){
-        if(this.data.actionType === 'EDIT')
-        this.actionfailed = true;
-       
-      }
       console.log(validity);
+      if(validity === 'VALID' && this.disableSubmit === true){
+        this.disableSubmit = false;     
+      }
     })
 
+    this.capitalActivityForm.get('fundHedging').valueChanges.subscribe(FH => {
+      this.capitalActivityForm.get('issuer').reset();
+      this.capitalActivityForm.get('asset').reset();
+      this.setDynamicOptions(FH, null, null);
+    })
+
+    this.capitalActivityForm.get('issuer').valueChanges.subscribe(ISS => {
+      this.capitalActivityForm.get('asset').reset();
+      this.setDynamicOptions(this.capitalActivityForm.get('fundHedging').value, ISS, null);
+    })    
   }
 
   ngOnDestroy(): void{
@@ -100,11 +209,7 @@ export class AddCapitalModalComponent implements OnInit {
   }
 
 
-  onSubmit(): void {
-    if(!this.capitalActivityForm.valid){
-      return;
-    }
-
+  performSubmit() {
     this.capitalAct = <CapitalActivityModel>{};
 
     this.capitalAct.valueDate = this.capitalActivityForm.get('valueDate').value;
@@ -112,6 +217,7 @@ export class AddCapitalModalComponent implements OnInit {
     this.capitalAct.narrative = this.capitalActivityForm.get('narrative').value;
     this.capitalAct.capitalType = this.capitalActivityForm.get('capitalType').value;
     this.capitalAct.capitalSubType = this.capitalActivityForm.get('capitalSubType').value;
+    this.capitalAct.fundCcy = this.capitalActivityForm.get('fundCcy').value;
     this.capitalAct.totalAmount = this.capitalActivityForm.get('totalAmount').value;
     this.capitalAct.fundHedging = this.capitalActivityForm.get('fundHedging').value;
     this.capitalAct.issuer = this.capitalActivityForm.get('issuer').value;
@@ -120,7 +226,6 @@ export class AddCapitalModalComponent implements OnInit {
     this.capitalAct.valueDate = new Date(moment(this.capitalAct.valueDate).format('YYYY-MM-DD'));
     this.capitalAct.callDate = new Date(moment(this.capitalAct.callDate).format('YYYY-MM-DD'));
 
-    console.log(this.capitalAct);
     // Setting up audit columns.
     if(this.data.actionType === 'EDIT'){
       this.capitalAct.capitalID = this.data.rowData.capitalID;
@@ -138,33 +243,24 @@ export class AddCapitalModalComponent implements OnInit {
         this.isSuccessMsgAvailable = true;
         this.isFailureMsgAvailable = false;
 
-        if(this.data.actionType === 'ADD')
-          this.updateMsg = 'Capital activity successfully added';
-        else this.updateMsg = 'Capital activity updated';
-        console.log('Capital Activity Added');
-        
-
         if(this.data.actionType === 'ADD'){
+          if(data.data != -1)   // .data is the returned data(here, capitalID) of the newly inserted/updated row.
+            this.capitalAct.capitalID = data.data;
+
+          this.disableSubmit = true;
+          this.updateMsg = 'Capital activity successfully added';
           this.data.adapTableApi.gridApi.addGridData([this.capitalAct]);
 
-          this.capitalActivityForm.reset();
-
-          /** Clears the error state (red highlight) of fields on form reset */
-
-          Object.keys(this.capitalActivityForm.controls).forEach(key =>{
-            this.capitalActivityForm.controls[key].setErrors(null)
-          });
+          this.capitalActivityForm.reset(); // Resets form to invalid state
   
         }
         else{
+          this.disableSubmit = true;
+          this.capitalActivityForm.disable();
+          this.updateMsg = 'Capital activity successfully updated';
           this.data.adapTableApi.gridApi.updateGridData([this.capitalAct]);
         }
 
-        setTimeout(() => {
-          this.isSuccessMsgAvailable = false;
-        }, 10000)
-
-        this.actionfailed = false;
       },
       error: error => {
         this.isFailureMsgAvailable = true;
@@ -176,11 +272,31 @@ export class AddCapitalModalComponent implements OnInit {
 
         console.log('Capital Activity Failed');
 
-        this.actionfailed = true;   // To Enable submit again, if previous submit failed.
+        this.disableSubmit = false;   // To Enable submit again, if previous submit failed.
 
       }
     }));
 
+  }
+  onSubmit(): void {
+    if(!this.capitalActivityForm.valid){
+      return;
+    }
+
+    if(this.data.actionType === 'EDIT'){
+      const confirmDialog = this.dialog.open(UpdateConfirmComponent,{ 
+        data: {
+          actionType: 'EDIT'
+        }});
+      this.subscriptions.push(confirmDialog.afterClosed().subscribe(result => {
+        if(result.action === 'Confirm'){
+          this.performSubmit();
+        }
+      }));  
+    }
+    else if(this.data.actionType === 'ADD'){
+      this.performSubmit();
+    }
   }
 
   closeDialog(data?: CapitalActivityModel): void {
