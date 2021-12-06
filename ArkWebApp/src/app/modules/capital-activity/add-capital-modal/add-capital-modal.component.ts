@@ -138,6 +138,15 @@ export class AddCapitalModalComponent implements OnInit {
     }
   }   
 
+  setCcy(FH: string): void{
+    this.data.refData.forEach(row => {
+      if(row.fundHedging === FH)
+        this.capitalActivityForm.patchValue({
+          fundCcy: row.fundCcy
+        })
+    });
+  }
+
   changeListeners(): void{
     this.capitalActivityForm.statusChanges.subscribe(validity => {
       if(validity === 'VALID' && this.disableSubmit === true){
@@ -148,6 +157,7 @@ export class AddCapitalModalComponent implements OnInit {
     this.capitalActivityForm.get('fundHedging').valueChanges.subscribe(FH => {
       this.capitalActivityForm.get('issuer').reset();
       this.capitalActivityForm.get('asset').reset();
+      this.setCcy(this.capitalActivityForm.get('fundHedging').value);    // Sets currency field for the selected fundHedging
       this.setDynamicOptions(FH, null, null);
     })
 

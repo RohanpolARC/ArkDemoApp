@@ -52,7 +52,7 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'narrative', headerName: 'Narrative', type:'abColDefString'},
     { field: 'capitalType', headerName: 'Capital Type', type:'abColDefString'},
     { field: 'capitalSubType', headerName: 'Capital Subtype', type:'abColDefString'},
-    { field: 'fundCcy', headerName: 'Fund Ccy', type:'abColDefString'},
+    { field: 'fundCcy', headerName: 'Currency', type:'abColDefString'},
     { field: 'totalAmount', headerName: 'Total Amount', valueFormatter: this.amountFormatter, type:'abColDefNumber'},
     { field: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
     { field: 'issuer', headerName: 'Issuer', type:'abColDefString'},
