@@ -11,10 +11,11 @@
 
 .edit{
     width: 200px;
+    margin-right: 10px;
 }
   
 .edit .mat-form-field-wrapper{
-    padding: 5px;
+    padding: 10px;
 }
 
 .title{
@@ -41,4 +42,10 @@
 .failure-msg{
     color: red;
     padding: 5px;
+}
+
+.last-col{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 }
