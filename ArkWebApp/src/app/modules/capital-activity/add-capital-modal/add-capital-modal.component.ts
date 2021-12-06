@@ -138,6 +138,26 @@ export class AddCapitalModalComponent implements OnInit {
     }
   }   
 
+  changeListeners(): void{
+    this.capitalActivityForm.statusChanges.subscribe(validity => {
+      if(validity === 'VALID' && this.disableSubmit === true){
+        this.disableSubmit = false;     
+      }
+    })
+
+    this.capitalActivityForm.get('fundHedging').valueChanges.subscribe(FH => {
+      this.capitalActivityForm.get('issuer').reset();
+      this.capitalActivityForm.get('asset').reset();
+      this.setDynamicOptions(FH, null, null);
+    })
+
+    this.capitalActivityForm.get('issuer').valueChanges.subscribe(ISS => {
+      this.capitalActivityForm.get('asset').reset();
+      this.setDynamicOptions(this.capitalActivityForm.get('fundHedging').value, ISS, null);
+    })    
+
+  }
+
   ngOnInit(): void {
 
     /* Set Up Static Options */
@@ -152,7 +172,7 @@ export class AddCapitalModalComponent implements OnInit {
       , 'name', 'name');
     this.fundCcyOptions = this.getUniqueOptions(this.fundCcyOptions, 'fundCcy', 'fundCcy')
 
-
+    this.setDynamicOptions();
 
     if(this.data.actionType === 'EDIT')
     {
@@ -161,7 +181,7 @@ export class AddCapitalModalComponent implements OnInit {
 
       // Dynamic options for EDIT
       this.setDynamicOptions(this.data.rowData.fundHedging, this.data.rowData.issuer, this.data.rowData.asset);
-
+      
       this.capitalActivityForm.patchValue({
         valueDate: this.data.rowData.valueDate,
         callDate: this.data.rowData.callDate,
@@ -179,29 +199,13 @@ export class AddCapitalModalComponent implements OnInit {
       this.header = 'Add Capital';
       this.buttontext = 'Submit';
         // Dynamic Options for ADD.
-      this.setDynamicOptions();
     }
 
     this.isSuccessMsgAvailable = this.isFailureMsgAvailable = false;
     this.disableSubmit = true;
 
-    this.capitalActivityForm.statusChanges.subscribe(validity => {
-      console.log(validity);
-      if(validity === 'VALID' && this.disableSubmit === true){
-        this.disableSubmit = false;     
-      }
-    })
+    this.changeListeners();
 
-    this.capitalActivityForm.get('fundHedging').valueChanges.subscribe(FH => {
-      this.capitalActivityForm.get('issuer').reset();
-      this.capitalActivityForm.get('asset').reset();
-      this.setDynamicOptions(FH, null, null);
-    })
-
-    this.capitalActivityForm.get('issuer').valueChanges.subscribe(ISS => {
-      this.capitalActivityForm.get('asset').reset();
-      this.setDynamicOptions(this.capitalActivityForm.get('fundHedging').value, ISS, null);
-    })    
   }
 
   ngOnDestroy(): void{
@@ -269,8 +273,6 @@ export class AddCapitalModalComponent implements OnInit {
         if(this.data.actionType === 'ADD')
           this.updateMsg = 'Insert failed';
         else this.updateMsg = 'Update failed';
-
-        console.log('Capital Activity Failed');
 
         this.disableSubmit = false;   // To Enable submit again, if previous submit failed.
 
