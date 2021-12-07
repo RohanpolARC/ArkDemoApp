@@ -10,6 +10,10 @@
     </div>
 </div>
 
+<div *ngIf="valueErrorMessage && !isSuccessMsgAvailable" class="failure-msg">
+    {{ valueErrorMessage}}
+</div>
+
          <!-- Don't add any dynamic content here. It introduces scrollbar as it overshoots mat-dialog-content size. -->
 <form [formGroup]="capitalActivityForm" autocomplete="off" (ngSubmit)="onSubmit()">
 
@@ -18,7 +22,7 @@
     <div>
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Call Date</mat-label>
-        <input matInput formControlName="callDate" [matDatepicker]="callDatePicker" required/>
+        <input matInput formControlName="callDate" [matDatepicker]="callDatePicker" required />
         <mat-datepicker-toggle
           matSuffix
           [for]="callDatePicker"
@@ -31,14 +35,15 @@
 
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Capital Type</mat-label>
-        <mat-select type="text" required formControlName="capitalType">
+        <input type="text" matInput required formControlName="capitalType" [matAutocomplete]="autoCapitalType" matAutocompletePosition="below">
+        <mat-autocomplete autoActiveFirstOption #autoCapitalType="matAutocomplete" panelWidth="auto">
           <mat-option
-            *ngFor="let capitalType of capitalTypeOptions"
-            [value]="capitalType.type"
+            *ngFor="let capitalType of capitalTypeFilteredOptions | async"
+            [value]="capitalType"
           >
-            {{capitalType.type}}
+            {{capitalType}}
           </mat-option>
-        </mat-select>
+        </mat-autocomplete>
         <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('capitalType').reset()">
             <mat-icon>close</mat-icon>
         </button>
@@ -46,37 +51,8 @@
       
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Fund Hedging</mat-label>
-        <mat-select type="text" required formControlName="fundHedging">
-          <mat-option
-            *ngFor="let FH of fundHedgingOptions"
-            [value]="FH"
-          >
-            {{FH}}
-          </mat-option>
-        </mat-select>
-        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('fundHedging').reset()">
-            <mat-icon>close</mat-icon>
-        </button>
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="edit">
-        <mat-label>Issuer Short Name</mat-label>
-        <mat-select type="text" required formControlName="issuerShortName">
-          <mat-option
-            *ngFor="let ISS of netISS"
-            [value]="ISS[1]"
-          >
-            {{ISS[0]}}
-          </mat-option>
-        </mat-select>
-        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('issuerShortName').reset()">
-            <mat-icon>close</mat-icon>
-        </button>
-      </mat-form-field>
-
-      <!-- <mat-form-field appearance="outline" class="edit">
-        <mat-label>Fund Hedging</mat-label>
-        <input type="text" matInput required formControlName="fundHedging" [matAutocomplete]="auto">
-        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+        <input type="text" matInput required formControlName="fundHedging" [matAutocomplete]="auto" matAutocompletePosition="below">
+        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" disableOptionCentering panelWidth="auto">
           <mat-option
             *ngFor="let fundHedging of fundHedgingFilteredOptions | async"
             [value]="fundHedging"
@@ -91,19 +67,19 @@
 
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Issuer Short Name</mat-label>
-        <input type="text" matInput required formControlName="issuerShortName" [matAutocomplete]="autoISS">
-        <mat-autocomplete autoActiveFirstOption #autoISS="matAutocomplete">
+        <input type="text" matInput required formControlName="issuerShortName" [matAutocomplete]="autoissuer" matAutocompletePosition="below">
+        <mat-autocomplete autoActiveFirstOption style="font-size: 12px" #autoissuer="matAutocomplete" disableOptionCentering panelWidth="auto">
           <mat-option
             *ngFor="let ISS of issuerFilteredOptions | async"
             [value]="ISS[1]"
           >
-            {{ ISS[0] }}
+            {{ISS[0]}}
           </mat-option>
         </mat-autocomplete>
         <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('issuerShortName').reset()">
             <mat-icon>close</mat-icon>
         </button>
-      </mat-form-field> -->
+      </mat-form-field>
 
     </div>
 
@@ -119,51 +95,53 @@
       </mat-form-field>
     
       <mat-form-field appearance="outline" class="edit">
-        <mat-label>Capital Subtype</mat-label>
-        <mat-select type="text" required formControlName="capitalSubType">
+        <mat-label>Capital SubType</mat-label>
+        <input type="text" matInput required formControlName="capitalSubType" [matAutocomplete]="autoSubType" matAutocompletePosition="below">
+        <mat-autocomplete autoActiveFirstOption #autoSubType="matAutocomplete" panelWidth="auto">
           <mat-option
-            *ngFor="let capitalSubType of capitalSubTypeOptions"
-            [value]="capitalSubType.subtype"
+            *ngFor="let subtype of capitalSubTypeFilteredOptions | async"
+            [value]="subtype"
           >
-            {{ capitalSubType.subtype }}
+            {{subtype}}
           </mat-option>
-        </mat-select>
-        <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('capitalSubType').reset()">
+        </mat-autocomplete>
+        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('subtype').reset()">
             <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Currency</mat-label>
-        <mat-select type="text" required formControlName="fundCcy">
+        <input type="text" matInput required formControlName="fundCcy" [matAutocomplete]="autoCcy" matAutocompletePosition="below">
+        <mat-autocomplete autoActiveFirstOption #autoCcy="matAutocomplete" panelWidth="auto">
           <mat-option
-            *ngFor="let ccy of fundCcyOptions"
+            *ngFor="let ccy of fundCcyFilteredOptions | async"
             [value]="ccy"
           >
-            {{ ccy }}
+            {{ccy}}
           </mat-option>
-        </mat-select>
-        <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('fundCcy').reset()">
+        </mat-autocomplete>
+        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('fundCcy').reset()">
             <mat-icon>close</mat-icon>
         </button>
-
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Asset</mat-label>
-        <mat-select type="text" formControlName="asset">
+        <input type="text" matInput required formControlName="asset" [matAutocomplete]="autoAsset" matAutocompletePosition="below">
+        <mat-autocomplete autoActiveFirstOption #autoAsset="matAutocomplete" panelWidth="auto">
           <mat-option
-            *ngFor="let asset_ of assetOptions"
-            [value]="asset_"
+            *ngFor="let asset of assetFilteredOptions | async"
+            [value]="asset"
           >
-            {{ asset_ }}
+            {{asset}}
           </mat-option>
-        </mat-select>
+        </mat-autocomplete>
         <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('asset').reset()">
             <mat-icon>close</mat-icon>
         </button>
-
       </mat-form-field>
+
     </div>
 
     <div class="last-col">

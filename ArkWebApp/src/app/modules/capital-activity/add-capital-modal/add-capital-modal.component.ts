@@ -22,8 +22,8 @@ export class AddCapitalModalComponent implements OnInit {
   capitalAct: CapitalActivityModel = null;
 
   subscriptions: Subscription[] = [];
-  capitalTypeOptions: {type: string}[] = [];
-  capitalSubTypeOptions: {subtype: string}[]= [];
+  capitalTypeOptions: string[] = [];
+  capitalSubTypeOptions: string[]= [];
   fundHedgingOptions = [];
   issuerOptions = []; 
   issuerSNOptions = [];
@@ -38,9 +38,10 @@ export class AddCapitalModalComponent implements OnInit {
   updateMsg:string;
   disableSubmit: boolean;
   editClicks: number;
+  valueErrorMessage: string = null;
 
   capitalTypeFilteredOptions: Observable<string[]>;
-  capSubTypeFilteredOptions: Observable<string[]>;
+  capitalSubTypeFilteredOptions: Observable<string[]>;
   
   fundHedgingFilteredOptions: Observable<string[]>;
   assetFilteredOptions: Observable<string[]>;
@@ -48,6 +49,14 @@ export class AddCapitalModalComponent implements OnInit {
   fundCcyFilteredOptions: Observable<string[]>;
   
   netISS: [string, string][] = []; // [ issuer, issuerShortName] []
+
+  /** Hash Maps for value validation */
+  FHMap: Map<string, boolean>;
+  ISNMap: Map<string, boolean>;
+  CTMap: Map<string, boolean>;
+  CSTMap: Map<string, boolean>;
+  CcyMap: Map<string, boolean>;
+  ASMap: Map<string, boolean>;
 
   capitalValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     let issuerShortName: string = control.get('issuerShortName').value;
@@ -195,16 +204,19 @@ export class AddCapitalModalComponent implements OnInit {
   }
 
   _filterIS(value?: string): [string, string][]{
+    if(value === null)
+      return this.netISS; 
     const filterValue = value.toLowerCase();
     return this.netISS.filter(op => 
       op[1].toLowerCase().includes(filterValue))  // op = [issuer,issuerShortName]
   }
 
-  _filterFH(value?: string): string [] {
+  _filter(options: string[], value: string): string []{
+    if(value === null)
+      return options;
     const filterValue = value.toLowerCase();
-    return this.fundHedgingOptions.filter(op => op.toLowerCase().includes(filterValue));
+    return options.filter(op => op.toLowerCase().includes(filterValue));
   }
-
  
   changeListeners(): void{
     /** _ since statusChanges returns INVALID form even when it is valid. Hence, using custom cross field validator: `capitalValidator` */
@@ -219,6 +231,8 @@ export class AddCapitalModalComponent implements OnInit {
         this.disableSubmit = true;
     })
 
+    /** Listening for changing the autocomplete options, based on selected values */
+
     this.capitalActivityForm.get('fundHedging').valueChanges.subscribe(FH => {
       this.capitalActivityForm.get('issuerShortName').reset();
       this.capitalActivityForm.get('asset').reset();
@@ -231,17 +245,35 @@ export class AddCapitalModalComponent implements OnInit {
       this.setDynamicOptions(this.capitalActivityForm.get('fundHedging').value, ISN, null);
     })    
 
+    /** Listening for changing the autocomplete options, based on search */
+    
     this.fundHedgingFilteredOptions = this.capitalActivityForm.get('fundHedging').valueChanges.pipe(
       startWith(''),
-      map(value => this._filterFH(value))
+      map(value => this._filter(this.fundHedgingOptions, value))
     );
 
     this.issuerFilteredOptions = this.capitalActivityForm.get('issuerShortName').valueChanges.pipe(
       startWith(''),
       map(value => this._filterIS(value))
     )
+
+    this.assetFilteredOptions = this.capitalActivityForm.get('asset').valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(this.assetOptions, value))
+    )
     
-  
+    this.fundCcyFilteredOptions = this.capitalActivityForm.get('fundCcy').valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(this.fundCcyOptions, value))
+    )
+      
+    this.capitalTypeFilteredOptions = this.capitalActivityForm.get('capitalType').valueChanges.pipe( startWith(''), 
+      map(value => this._filter(this.capitalTypeOptions, value))
+    )
+
+    this.capitalSubTypeFilteredOptions = this.capitalActivityForm.get('capitalSubType').valueChanges.pipe(startWith(''), 
+      map(value => this._filter(this.capitalSubTypeOptions, value))
+    )
   }
   ngOnInit(): void {
     this.setDynamicOptions();
@@ -258,6 +290,20 @@ export class AddCapitalModalComponent implements OnInit {
     }
     this.fundHedgingOptions = [...new Set(this.fundHedgingOptions)]
     this.fundCcyOptions = [...new Set(this.fundCcyOptions)]
+
+    this.ISNMap = new Map();
+    this.ASMap = new Map();
+    this.FHMap = new Map();
+    this.CTMap = new Map();
+    this.CSTMap = new Map();
+    this.CcyMap = new Map();
+
+    this.issuerSNOptions.forEach(x => this.ISNMap.set(x, true));
+    this.assetOptions.forEach(x => this.ASMap.set(x, true));
+    this.fundHedgingOptions.forEach(x => this.FHMap.set(x, true));
+    this.capitalTypeOptions.forEach(x => this.CTMap.set(x, true));
+    this.capitalSubTypeOptions.forEach(x => this.CSTMap.set(x, true));
+    this.fundCcyOptions.forEach(x => this.CcyMap.set(x, true));
 
     if(this.data.actionType === 'EDIT')
     {
@@ -296,6 +342,15 @@ export class AddCapitalModalComponent implements OnInit {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
+  validateInput(model: CapitalActivityModel) {
+    return this.FHMap.has(model.fundHedging) 
+    && this.CTMap.has(model.capitalType) 
+    && this.CSTMap.has(model.capitalSubType) 
+    && this.CcyMap.has(model.fundCcy) 
+    && (model.issuerShortName ? this.ISNMap.has(model.issuerShortName) : true)
+    && (model.asset ? this.ASMap.has(model.asset) : true);
+  }
+
   performSubmit() {
     this.isSuccessMsgAvailable = this.isFailureMsgAvailable = false;
     this.capitalAct = <CapitalActivityModel>{};
@@ -324,6 +379,11 @@ export class AddCapitalModalComponent implements OnInit {
       this.capitalAct.capitalID = null;
       this.capitalAct.createdOn = new Date();
       this.capitalAct.createdBy = this.msalService.getUserName();  
+    }
+
+    if(!this.validateInput(this.capitalAct)){
+      this.valueErrorMessage = 'Please select values from the dropbox';
+      return;
     }
 
     this.subscriptions.push(this.capitalActivityService.putCapitalActivity(this.capitalAct).subscribe({
@@ -377,6 +437,7 @@ export class AddCapitalModalComponent implements OnInit {
         if(result.action === 'Confirm'){
           this.performSubmit();
         }
+        else this.disableSubmit = false;
       }));  
     }
     else if(this.data.actionType === 'ADD'){

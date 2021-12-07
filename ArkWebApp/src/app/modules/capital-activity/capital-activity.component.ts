@@ -162,8 +162,8 @@ export class CapitalActivityComponent implements OnInit {
     }
   }
 
-  capitalTypeOptions: {type: string}[] = [];
-  capitalSubTypeOptions: {subtype: string}[]= [];
+  capitalTypeOptions: string[] = [];
+  capitalSubTypeOptions: string[] = [];
 
   refData = [];
 
@@ -185,8 +185,8 @@ export class CapitalActivityComponent implements OnInit {
     
     this.subscriptions.push(this.capitalActivityService.getCapitalRefData().subscribe({
       next: data => {
-        data.capitalType.forEach(x => { this.capitalTypeOptions.push({type : x}) });
-        data.capitalSubType.forEach(x => { this.capitalSubTypeOptions.push({subtype : x}) });
+        data.capitalType.forEach(x => { this.capitalTypeOptions.push(x) });
+        data.capitalSubType.forEach(x => { this.capitalSubTypeOptions.push(x) });
 
         this.refData = data.portfolio_Info;
       },
