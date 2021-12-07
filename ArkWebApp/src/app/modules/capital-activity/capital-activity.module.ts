@@ -17,6 +17,7 @@ import {MatSelectModule} from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,7 @@ import { UpdateConfirmComponent } from './update-confirm/update-confirm.componen
     MatCardModule,
     AdaptableAngularAgGridModule,
     AgGridModule,
-
+    MatAutocompleteModule
   ],
   exports:[CapitalActivityComponent]
 })

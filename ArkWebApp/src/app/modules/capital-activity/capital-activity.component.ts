@@ -55,7 +55,7 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'fundCcy', headerName: 'Currency', type:'abColDefString'},
     { field: 'totalAmount', headerName: 'Total Amount', valueFormatter: this.amountFormatter, type:'abColDefNumber'},
     { field: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
-    { field: 'issuer', headerName: 'Issuer', type:'abColDefString'},
+    { field: 'issuerShortName', headerName: 'Issuer Short Name', type:'abColDefString'},
     { field: 'asset', headerName: 'Asset', type:'abColDefString'},
     { field: 'source', headerName: 'Source', type:'abColDefString'},
     { field: 'sourceID', headerName: 'Source ID', type:'abColDefNumber'},
@@ -144,7 +144,7 @@ export class CapitalActivityComponent implements OnInit {
             'fundCcy',
             'totalAmount',
             'fundHedging',
-            'issuer',
+            'issuerShortName',
             'asset',
             'source',
             'ActionEdit',
@@ -212,7 +212,7 @@ export class CapitalActivityComponent implements OnInit {
         capitalSubTypes: this.capitalSubTypeOptions,
         refData: this.refData,
       },
-      minWidth: '680px',
+      minWidth: '685px',
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
 

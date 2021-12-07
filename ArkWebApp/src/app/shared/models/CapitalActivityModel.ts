@@ -6,7 +6,7 @@ export interface CapitalActivityModel{
     capitalType: string;
     capitalSubType: string;
     fundHedging: string;
-    issuer: string;
+    issuerShortName: string;
     narrative: string;
     source: string;
     sourceID: number;

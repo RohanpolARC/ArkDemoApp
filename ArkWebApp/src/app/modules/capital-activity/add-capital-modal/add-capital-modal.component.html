@@ -24,6 +24,9 @@
           [for]="callDatePicker"
         ></mat-datepicker-toggle>
         <mat-datepicker #callDatePicker></mat-datepicker>
+        <button matSuffix mat-icon-button type="button" aria-label="Clear" (click)="capitalActivityForm.get('callDate').reset()">
+            <mat-icon>close</mat-icon>
+        </button>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="edit">
@@ -36,31 +39,72 @@
             {{capitalType.type}}
           </mat-option>
         </mat-select>
+        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('capitalType').reset()">
+            <mat-icon>close</mat-icon>
+        </button>
       </mat-form-field>
       
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Fund Hedging</mat-label>
         <mat-select type="text" required formControlName="fundHedging">
           <mat-option
-            *ngFor="let fundHedging of fundHedgingOptions"
-            [value]="fundHedging.name"
+            *ngFor="let FH of fundHedgingOptions"
+            [value]="FH"
           >
-            {{fundHedging.name}}
+            {{FH}}
           </mat-option>
         </mat-select>
+        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('fundHedging').reset()">
+            <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="edit">
+        <mat-label>Issuer Short Name</mat-label>
+        <mat-select type="text" required formControlName="issuerShortName">
+          <mat-option
+            *ngFor="let ISS of netISS"
+            [value]="ISS[1]"
+          >
+            {{ISS[0]}}
+          </mat-option>
+        </mat-select>
+        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('issuerShortName').reset()">
+            <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <!-- <mat-form-field appearance="outline" class="edit">
+        <mat-label>Fund Hedging</mat-label>
+        <input type="text" matInput required formControlName="fundHedging" [matAutocomplete]="auto">
+        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+          <mat-option
+            *ngFor="let fundHedging of fundHedgingFilteredOptions | async"
+            [value]="fundHedging"
+          >
+            {{fundHedging}}
+          </mat-option>
+        </mat-autocomplete>
+        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('fundHedging').reset()">
+            <mat-icon>close</mat-icon>
+        </button>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="edit">
-        <mat-label>Issuer</mat-label>
-        <mat-select type="text" required formControlName="issuer">
+        <mat-label>Issuer Short Name</mat-label>
+        <input type="text" matInput required formControlName="issuerShortName" [matAutocomplete]="autoISS">
+        <mat-autocomplete autoActiveFirstOption #autoISS="matAutocomplete">
           <mat-option
-            *ngFor="let isuer of issuerOptions"
-            [value]="isuer.issuer"
+            *ngFor="let ISS of issuerFilteredOptions | async"
+            [value]="ISS[1]"
           >
-            {{isuer.issuer}}
+            {{ ISS[0] }}
           </mat-option>
-        </mat-select>
-      </mat-form-field>
+        </mat-autocomplete>
+        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('issuerShortName').reset()">
+            <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field> -->
+
     </div>
 
     <div>
@@ -69,6 +113,9 @@
         <input matInput required formControlName="valueDate" [matDatepicker]="valueDatePicker" />
         <mat-datepicker-toggle matSuffix [for]="valueDatePicker"></mat-datepicker-toggle>
         <mat-datepicker #valueDatePicker></mat-datepicker>
+        <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('valueDate').reset()">
+            <mat-icon>close</mat-icon>
+        </button>
       </mat-form-field>
     
       <mat-form-field appearance="outline" class="edit">
@@ -81,6 +128,9 @@
             {{ capitalSubType.subtype }}
           </mat-option>
         </mat-select>
+        <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('capitalSubType').reset()">
+            <mat-icon>close</mat-icon>
+        </button>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="edit">
@@ -88,36 +138,51 @@
         <mat-select type="text" required formControlName="fundCcy">
           <mat-option
             *ngFor="let ccy of fundCcyOptions"
-            [value]="ccy.fundCcy"
+            [value]="ccy"
           >
-            {{ ccy.fundCcy }}
+            {{ ccy }}
           </mat-option>
         </mat-select>
+        <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('fundCcy').reset()">
+            <mat-icon>close</mat-icon>
+        </button>
+
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Asset</mat-label>
-        <mat-select type="text"  required formControlName="asset">
+        <mat-select type="text" formControlName="asset">
           <mat-option
             *ngFor="let asset_ of assetOptions"
-            [value]="asset_.asset"
+            [value]="asset_"
           >
-            {{ asset_.asset }}
+            {{ asset_ }}
           </mat-option>
         </mat-select>
+        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('asset').reset()">
+            <mat-icon>close</mat-icon>
+        </button>
+
       </mat-form-field>
     </div>
 
     <div class="last-col">
-
       <mat-form-field appearance="outline" class="edit">
         <mat-label> Total Amount </mat-label>
         <input type="number" required matInput formControlName="totalAmount" />
+        <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('totalAmount').reset()">
+            <mat-icon>close</mat-icon>
+        </button>
+
       </mat-form-field>
     
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Narrative</mat-label>
         <input matInput formControlName="narrative" />
+        <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('narrative').reset()">
+            <mat-icon>close</mat-icon>
+        </button>
+
       </mat-form-field>
     </div>
   </div>
