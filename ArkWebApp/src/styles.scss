@@ -64,3 +64,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   color: #fff;
 }
 
+// Autocomplete panel in Capital Activity screen (add-capital-modal.component.html)
+// Defined here, since autocomplete panel is in the overlay.
+.capital-autocomplete-panel{
+  max-height: 150px !important;
+}

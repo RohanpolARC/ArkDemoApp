@@ -1,5 +1,5 @@
 .input-field {
-    font-size: 13px;
+    font-size: 14px;
     display: flex;
     justify-content: space-between;
     max-width: 500px;
@@ -10,7 +10,7 @@
 // }
 
 .edit{
-    width: 200px;
+    width: 250px;
     margin-right: 17px;
 }
   
@@ -50,6 +50,16 @@
     justify-content: flex-end;
 }
 
+.main-content{
+    min-height: 325px;
+}
 .mat-option{
     font-size: 13px !important;
 }
+
+.mat-error{
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+// capital-autocomplete-panel defined in styles.scss.  

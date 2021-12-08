@@ -12,7 +12,7 @@
 
 .parent .content{
     flex: 1 1 auto;
-    margin: 0 15px 15px 25px;
+    margin: 0 15px 0 25px;
 }
   .capital-title {
     padding: 0;
@@ -48,6 +48,6 @@
   }
 
   .ag-grid{
-      height: 91.5%;
+      height: calc(100% - 40px);
       font-size: 0.8rem;
   }

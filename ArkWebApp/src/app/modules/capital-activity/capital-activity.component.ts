@@ -212,7 +212,7 @@ export class CapitalActivityComponent implements OnInit {
         capitalSubTypes: this.capitalSubTypeOptions,
         refData: this.refData,
       },
-      minWidth: '685px',
+      minWidth: '830px',
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
 

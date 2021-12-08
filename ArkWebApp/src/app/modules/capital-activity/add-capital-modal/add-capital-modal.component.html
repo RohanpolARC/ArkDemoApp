@@ -10,14 +10,10 @@
     </div>
 </div>
 
-<div *ngIf="valueErrorMessage && !isSuccessMsgAvailable" class="failure-msg">
-    {{ valueErrorMessage}}
-</div>
-
          <!-- Don't add any dynamic content here. It introduces scrollbar as it overshoots mat-dialog-content size. -->
 <form [formGroup]="capitalActivityForm" autocomplete="off" (ngSubmit)="onSubmit()">
 
-<mat-dialog-content>   
+<mat-dialog-content class="main-content">   
   <div class="input-field">
     <div>
       <mat-form-field appearance="outline" class="edit">
@@ -36,6 +32,7 @@
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Capital Type</mat-label>
         <input type="text" matInput required formControlName="capitalType" [matAutocomplete]="autoCapitalType" matAutocompletePosition="below">
+        <mat-error *ngIf="capitalActivityForm.get('capitalType').invalid">Please select capital type from the list</mat-error>
         <mat-autocomplete autoActiveFirstOption #autoCapitalType="matAutocomplete" panelWidth="auto">
           <mat-option
             *ngFor="let capitalType of capitalTypeFilteredOptions | async"
@@ -52,6 +49,7 @@
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Fund Hedging</mat-label>
         <input type="text" matInput required formControlName="fundHedging" [matAutocomplete]="auto" matAutocompletePosition="below">
+        <mat-error *ngIf="capitalActivityForm.get('fundHedging').invalid">Please select fund hedging from the list</mat-error>
         <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" disableOptionCentering panelWidth="auto">
           <mat-option
             *ngFor="let fundHedging of fundHedgingFilteredOptions | async"
@@ -66,9 +64,10 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="edit">
-        <mat-label>Issuer Short Name</mat-label>
-        <input type="text" matInput required formControlName="issuerShortName" [matAutocomplete]="autoissuer" matAutocompletePosition="below">
-        <mat-autocomplete autoActiveFirstOption style="font-size: 12px" #autoissuer="matAutocomplete" disableOptionCentering panelWidth="auto">
+        <mat-label>Issuer</mat-label>
+        <input type="text" matInput formControlName="issuerShortName" [matAutocomplete]="autoissuer" matAutocompletePosition="below">
+        <mat-error *ngIf="capitalActivityForm.get('issuerShortName').invalid">Please select issuer from the list</mat-error>
+        <mat-autocomplete autoActiveFirstOption #autoissuer="matAutocomplete" disableOptionCentering panelWidth="auto" class="capital-autocomplete-panel" classList="capital-autocomplete-panel">
           <mat-option
             *ngFor="let ISS of issuerFilteredOptions | async"
             [value]="ISS[1]"
@@ -97,6 +96,7 @@
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Capital SubType</mat-label>
         <input type="text" matInput required formControlName="capitalSubType" [matAutocomplete]="autoSubType" matAutocompletePosition="below">
+        <mat-error *ngIf="capitalActivityForm.get('capitalSubType').invalid">Please select capital subtype from the list</mat-error>
         <mat-autocomplete autoActiveFirstOption #autoSubType="matAutocomplete" panelWidth="auto">
           <mat-option
             *ngFor="let subtype of capitalSubTypeFilteredOptions | async"
@@ -105,7 +105,7 @@
             {{subtype}}
           </mat-option>
         </mat-autocomplete>
-        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('subtype').reset()">
+        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('capitalSubType').reset()">
             <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
@@ -113,6 +113,7 @@
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Currency</mat-label>
         <input type="text" matInput required formControlName="fundCcy" [matAutocomplete]="autoCcy" matAutocompletePosition="below">
+        <mat-error *ngIf="capitalActivityForm.get('fundCcy').invalid">Please select currency from the list</mat-error>
         <mat-autocomplete autoActiveFirstOption #autoCcy="matAutocomplete" panelWidth="auto">
           <mat-option
             *ngFor="let ccy of fundCcyFilteredOptions | async"
@@ -128,8 +129,10 @@
 
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Asset</mat-label>
-        <input type="text" matInput required formControlName="asset" [matAutocomplete]="autoAsset" matAutocompletePosition="below">
-        <mat-autocomplete autoActiveFirstOption #autoAsset="matAutocomplete" panelWidth="auto">
+        <input type="text" matInput formControlName="asset" [matAutocomplete]="autoAsset" matAutocompletePosition="below">
+        <mat-error *ngIf="capitalActivityForm.get('asset').invalid">Please select asset from the list</mat-error>
+
+        <mat-autocomplete autoActiveFirstOption #autoAsset="matAutocomplete" class="capital-autocomplete-panel" classList="capital-autocomplete-panel"  panelWidth="auto">
           <mat-option
             *ngFor="let asset of assetFilteredOptions | async"
             [value]="asset"

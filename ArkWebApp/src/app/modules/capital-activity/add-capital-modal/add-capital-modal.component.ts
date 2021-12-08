@@ -36,7 +36,7 @@ export class AddCapitalModalComponent implements OnInit {
   isSuccessMsgAvailable: boolean;
   isFailureMsgAvailable: boolean;
   updateMsg:string;
-  disableSubmit: boolean;
+  disableSubmit: boolean = true;
   editClicks: number;
   valueErrorMessage: string = null;
 
@@ -50,25 +50,54 @@ export class AddCapitalModalComponent implements OnInit {
   
   netISS: [string, string][] = []; // [ issuer, issuerShortName] []
 
-  /** Hash Maps for value validation */
-  FHMap: Map<string, boolean>;
-  ISNMap: Map<string, boolean>;
-  CTMap: Map<string, boolean>;
-  CSTMap: Map<string, boolean>;
-  CcyMap: Map<string, boolean>;
-  ASMap: Map<string, boolean>;
-
   capitalValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     let issuerShortName: string = control.get('issuerShortName').value;
+    if(this.issuerSNOptions.indexOf(issuerShortName) === -1 && issuerShortName !== null && issuerShortName !== ''){
+      control.get('issuerShortName').setErrors({invalid: true})
+      issuerShortName = null;
+    }
+    else control.get('issuerShortName').setErrors(null);
+
     let asset: string = control.get('asset').value;
+    if(this.assetOptions.indexOf(asset) === -1 && asset !== null && asset !== ''){
+      control.get('asset').setErrors({invalid: true})
+      asset = null;
+    }
+    else control.get('asset').setErrors(null);
+
     let narrative: string = control.get('narrative').value;
 
     let callDate: string = moment(control.get('callDate').value).format('YYYY-MM-DD');
     let valueDate: string = moment(control.get('valueDate').value).format('YYYY-MM-DD');
     let fundHedging: string = control.get('fundHedging').value;
-    let capitalType: string = control.get('capitalType').value;
+
+    if(this.fundHedgingOptions.indexOf(fundHedging) === -1){
+      control.get('fundHedging').setErrors({invalid: true})
+      fundHedging = null;
+    }
+    else control.get('fundHedging').setErrors(null);
+    
+    let capitalType: string = control.get('capitalType').value;    
+    if(this.capitalTypeOptions.indexOf(capitalType) === -1){
+      control.get('capitalType').setErrors({invalid: true})
+      capitalType = null;
+    }
+    else control.get('capitalType').setErrors(null);
+
     let capitalSubType: string = control.get('capitalSubType').value;
+    if(this.capitalSubTypeOptions.indexOf(capitalSubType) === -1){
+      control.get('capitalSubType').setErrors({invalid: true})
+      capitalSubType = null;
+    }
+    else control.get('capitalSubType').setErrors(null);
+
     let currency: string = control.get('fundCcy').value;
+    if(this.fundCcyOptions.indexOf(currency) === -1){
+      control.get('fundCcy').setErrors({invalid: true})
+      currency = null;
+    }
+    else control.get('fundCcy').setErrors(null);
+
     let totalAmount: number = control.get('totalAmount').value;
 
     let CD: boolean = (callDate !== null && callDate !== 'Invalid date')
@@ -220,12 +249,14 @@ export class AddCapitalModalComponent implements OnInit {
  
   changeListeners(): void{
     /** _ since statusChanges returns INVALID form even when it is valid. Hence, using custom cross field validator: `capitalValidator` */
+
     this.capitalActivityForm.statusChanges.subscribe(_ => {
-      
+  
       if(this.capitalActivityForm.errors?.['validated']){
         if(this.editClicks > 0 && this.data.actionType === 'EDIT')
           this.disableSubmit = true;
-        else this.disableSubmit = false;     
+        else if(!this.capitalActivityForm.pristine)
+          this.disableSubmit = false;     
       }
       else if(!this.capitalActivityForm.errors?.['validated'])
         this.disableSubmit = true;
@@ -278,8 +309,12 @@ export class AddCapitalModalComponent implements OnInit {
   ngOnInit(): void {
     this.setDynamicOptions();
 
-    this.changeListeners();
+    this.isSuccessMsgAvailable = this.isFailureMsgAvailable = false;
+  
+    this.editClicks = 0;
 
+    this.changeListeners();
+    this.disableSubmit = true;
     /* Set Up Static Options */
     this.capitalTypeOptions = this.data.capitalTypes;
     this.capitalSubTypeOptions = this.data.capitalSubTypes;
@@ -290,20 +325,6 @@ export class AddCapitalModalComponent implements OnInit {
     }
     this.fundHedgingOptions = [...new Set(this.fundHedgingOptions)]
     this.fundCcyOptions = [...new Set(this.fundCcyOptions)]
-
-    this.ISNMap = new Map();
-    this.ASMap = new Map();
-    this.FHMap = new Map();
-    this.CTMap = new Map();
-    this.CSTMap = new Map();
-    this.CcyMap = new Map();
-
-    this.issuerSNOptions.forEach(x => this.ISNMap.set(x, true));
-    this.assetOptions.forEach(x => this.ASMap.set(x, true));
-    this.fundHedgingOptions.forEach(x => this.FHMap.set(x, true));
-    this.capitalTypeOptions.forEach(x => this.CTMap.set(x, true));
-    this.capitalSubTypeOptions.forEach(x => this.CSTMap.set(x, true));
-    this.fundCcyOptions.forEach(x => this.CcyMap.set(x, true));
 
     if(this.data.actionType === 'EDIT')
     {
@@ -333,22 +354,10 @@ export class AddCapitalModalComponent implements OnInit {
         // Dynamic Options for ADD.
     }
 
-    this.isSuccessMsgAvailable = this.isFailureMsgAvailable = false;
-    this.disableSubmit = true;
-    this.editClicks = 0;
   }
 
   ngOnDestroy(): void{
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
-  }
-
-  validateInput(model: CapitalActivityModel) {
-    return this.FHMap.has(model.fundHedging) 
-    && this.CTMap.has(model.capitalType) 
-    && this.CSTMap.has(model.capitalSubType) 
-    && this.CcyMap.has(model.fundCcy) 
-    && (model.issuerShortName ? this.ISNMap.has(model.issuerShortName) : true)
-    && (model.asset ? this.ASMap.has(model.asset) : true);
   }
 
   performSubmit() {
@@ -379,11 +388,6 @@ export class AddCapitalModalComponent implements OnInit {
       this.capitalAct.capitalID = null;
       this.capitalAct.createdOn = new Date();
       this.capitalAct.createdBy = this.msalService.getUserName();  
-    }
-
-    if(!this.validateInput(this.capitalAct)){
-      this.valueErrorMessage = 'Please select values from the dropbox';
-      return;
     }
 
     this.subscriptions.push(this.capitalActivityService.putCapitalActivity(this.capitalAct).subscribe({
