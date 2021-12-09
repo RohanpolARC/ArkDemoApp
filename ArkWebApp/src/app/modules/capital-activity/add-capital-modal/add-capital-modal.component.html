@@ -50,7 +50,7 @@
         <mat-label>Fund Hedging</mat-label>
         <input type="text" matInput required formControlName="fundHedging" [matAutocomplete]="auto" matAutocompletePosition="below">
         <mat-error *ngIf="capitalActivityForm.get('fundHedging').invalid">Please select fund hedging from the list</mat-error>
-        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" disableOptionCentering panelWidth="auto">
+        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)='fundHedgingSelect($event)'  panelWidth="auto">
           <mat-option
             *ngFor="let fundHedging of fundHedgingFilteredOptions | async"
             [value]="fundHedging"
@@ -67,7 +67,7 @@
         <mat-label>Issuer</mat-label>
         <input type="text" matInput formControlName="issuerShortName" [matAutocomplete]="autoissuer" matAutocompletePosition="below">
         <mat-error *ngIf="capitalActivityForm.get('issuerShortName').invalid">Please select issuer from the list</mat-error>
-        <mat-autocomplete autoActiveFirstOption #autoissuer="matAutocomplete" disableOptionCentering panelWidth="auto" class="capital-autocomplete-panel" classList="capital-autocomplete-panel">
+        <mat-autocomplete autoActiveFirstOption #autoissuer="matAutocomplete" (optionSelected)='issuerSelect($event)'  panelWidth="auto" class="capital-autocomplete-panel" classList="capital-autocomplete-panel">
           <mat-option
             *ngFor="let ISS of issuerFilteredOptions | async"
             [value]="ISS[1]"

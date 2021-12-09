@@ -47,8 +47,8 @@ export class CapitalActivityComponent implements OnInit {
 
   columnDefs = [
     {field: 'capitalID', headerName: 'Capital ID', type: 'abColDefNumber'},
-    { field: 'valueDate', headerName: 'Value Date', type: 'abColDefDate', valueFormatter: this.dateFormatter},
-    { field: 'callDate', headerName: 'Call Date', type: 'abColDefDate', valueFormatter: this.dateFormatter },
+    { field: 'valueDate', headerName: 'Value Date', type: 'abColDefDate', valueFormatter: this.dateTimeFormatter},
+    { field: 'callDate', headerName: 'Call Date', type: 'abColDefDate', valueFormatter: this.dateTimeFormatter },
     { field: 'narrative', headerName: 'Narrative', type:'abColDefString'},
     { field: 'capitalType', headerName: 'Capital Type', type:'abColDefString'},
     { field: 'capitalSubType', headerName: 'Capital Subtype', type:'abColDefString'},
@@ -59,6 +59,10 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'asset', headerName: 'Asset', type:'abColDefString'},
     { field: 'source', headerName: 'Source', type:'abColDefString'},
     { field: 'sourceID', headerName: 'Source ID', type:'abColDefNumber'},
+    { field: 'createdOn', headerName: 'Created On', type:'abColDefDate', valueFormatter: this.dateTimeFormatter},
+    { field: 'createdBy', headerName: 'Created By', type:'abColDefString'},
+    { field: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', valueFormatter: this.dateTimeFormatter},
+    { field: 'modifiedBy', headerName: 'Modified By', type:'abColDefString'},
   ]
 
   defaultColDef = {
@@ -147,6 +151,10 @@ export class CapitalActivityComponent implements OnInit {
             'issuerShortName',
             'asset',
             'source',
+            'createdBy',
+            'createdOn',
+            'modifiedBy',
+            'modifiedOn',
             'ActionEdit',
           ],
           RowGroupedColumns: [],
@@ -237,12 +245,11 @@ export class CapitalActivityComponent implements OnInit {
     adaptableApi.toolPanelApi.closeAdapTableToolPanel();
   }
 
-  dateFormatter(params) {
-    if(params.value!=undefined)
-    return moment(params.value).format('DD/MM/YYYY');
-    else{
+  dateTimeFormatter(params) {
+    if(params.value==undefined || params.value=="0001-01-01T00:00:00")
       return ""
-    }
+    else 
+      return moment(params.value).format('DD/MM/YYYY HH:mm');
   }
 
   amountFormatter(params){

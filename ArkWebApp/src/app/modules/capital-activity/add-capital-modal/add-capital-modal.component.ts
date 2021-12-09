@@ -8,9 +8,9 @@ import { Subscription } from 'rxjs';
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import * as moment from 'moment';
 import { UpdateConfirmComponent } from '../update-confirm/update-confirm.component';
-import { ValidationResult } from '@adaptabletools/adaptable/types';
 import {Observable} from 'rxjs';
 import {startWith, map} from 'rxjs/operators';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 @Component({
   selector: 'app-add-capital-modal',
   templateUrl: './add-capital-modal.component.html',
@@ -37,7 +37,6 @@ export class AddCapitalModalComponent implements OnInit {
   isFailureMsgAvailable: boolean;
   updateMsg:string;
   disableSubmit: boolean = true;
-  editClicks: number;
   valueErrorMessage: string = null;
 
   capitalTypeFilteredOptions: Observable<string[]>;
@@ -50,53 +49,36 @@ export class AddCapitalModalComponent implements OnInit {
   
   netISS: [string, string][] = []; // [ issuer, issuerShortName] []
 
-  capitalValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
-    let issuerShortName: string = control.get('issuerShortName').value;
-    if(this.issuerSNOptions.indexOf(issuerShortName) === -1 && issuerShortName !== null && issuerShortName !== ''){
-      control.get('issuerShortName').setErrors({invalid: true})
-      issuerShortName = null;
-    }
-    else control.get('issuerShortName').setErrors(null);
+  validateField(options: string[], control: AbstractControl, field: string): string | null{
+      //  Validates individual fields and returns fetched value if it's an allowed value.
 
-    let asset: string = control.get('asset').value;
-    if(this.assetOptions.indexOf(asset) === -1 && asset !== null && asset !== ''){
-      control.get('asset').setErrors({invalid: true})
-      asset = null;
+    let val: string = control.get(field).value;
+    if(val !== null && val !== ''){
+      for(let i = 0; i < options.length; i+= 1){
+        if(options[i].trim() === val.trim())
+          return options[i];
+      }
     }
-    else control.get('asset').setErrors(null);
+    if((val === '' || val === null) && (field === 'issuerShortName' || field === 'asset'))
+      return val;
+
+    control.get(field).setErrors({invalid: true});
+    return null;
+  }
+
+  capitalValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    let issuerShortName: string = this.validateField(this.issuerSNOptions, control, 'issuerShortName');
+
+    let asset: string = this.validateField(this.assetOptions, control, 'asset');
 
     let narrative: string = control.get('narrative').value;
-
     let callDate: string = moment(control.get('callDate').value).format('YYYY-MM-DD');
     let valueDate: string = moment(control.get('valueDate').value).format('YYYY-MM-DD');
-    let fundHedging: string = control.get('fundHedging').value;
 
-    if(this.fundHedgingOptions.indexOf(fundHedging) === -1){
-      control.get('fundHedging').setErrors({invalid: true})
-      fundHedging = null;
-    }
-    else control.get('fundHedging').setErrors(null);
-    
-    let capitalType: string = control.get('capitalType').value;    
-    if(this.capitalTypeOptions.indexOf(capitalType) === -1){
-      control.get('capitalType').setErrors({invalid: true})
-      capitalType = null;
-    }
-    else control.get('capitalType').setErrors(null);
-
-    let capitalSubType: string = control.get('capitalSubType').value;
-    if(this.capitalSubTypeOptions.indexOf(capitalSubType) === -1){
-      control.get('capitalSubType').setErrors({invalid: true})
-      capitalSubType = null;
-    }
-    else control.get('capitalSubType').setErrors(null);
-
-    let currency: string = control.get('fundCcy').value;
-    if(this.fundCcyOptions.indexOf(currency) === -1){
-      control.get('fundCcy').setErrors({invalid: true})
-      currency = null;
-    }
-    else control.get('fundCcy').setErrors(null);
+    let fundHedging: string = this.validateField(this.fundHedgingOptions, control, 'fundHedging');
+    let capitalType: string = this.validateField(this.capitalTypeOptions, control, 'capitalType');
+    let capitalSubType: string = this.validateField(this.capitalSubTypeOptions, control, 'capitalSubType');
+    let currency: string = this.validateField(this.fundCcyOptions, control, 'fundCcy');
 
     let totalAmount: number = control.get('totalAmount').value;
 
@@ -200,6 +182,7 @@ export class AddCapitalModalComponent implements OnInit {
           }
         });
         this.assetOptions = [...new Set(assets)]
+
         this.createNetISS(issuers, issuerSN);
 
       }
@@ -217,7 +200,8 @@ export class AddCapitalModalComponent implements OnInit {
         this.assetOptions.push(this.data.refData[i].asset);
       }
 
-      this.assetOptions = [...new Set(this.assetOptions)]  
+      this.assetOptions = [...new Set(this.assetOptions)] 
+
       this.createNetISS(this.issuerOptions, this.issuerSNOptions);      
 
     }
@@ -240,41 +224,57 @@ export class AddCapitalModalComponent implements OnInit {
       op[1].toLowerCase().includes(filterValue))  // op = [issuer,issuerShortName]
   }
 
-  _filter(options: string[], value: string): string []{
+  _filter(options: string[],value:string): string []{
     if(value === null)
       return options;
     const filterValue = value.toLowerCase();
     return options.filter(op => op.toLowerCase().includes(filterValue));
   }
  
+/** Listening for changing the autocomplete options, based on selected values */  
+
+  issuerSelect(event: MatAutocompleteSelectedEvent){
+    let ISN: string = event.option.value;
+
+    /* 
+      DO NOT CHANGE THE ORDER:
+        1.) setDynamicOptions
+        2.) observable trigger (performed by reset() action here)
+      This will set the issuerSNOptions & assetOptions 
+
+      Similarly for fundHedgingSelect();
+    */
+    this.setDynamicOptions(this.capitalActivityForm.get('fundHedging').value, ISN, null);
+
+    /* 
+      Clears the asset field and triggers the observable for assetFilteredOptions via reset(). 
+      NOTE: If not reseting in future, make sure to TRIGGER OBSERVABLE manually.
+      
+      Triggering observable makes the newly set assetOptions available to assetFilteredOptions.
+    */
+    this.capitalActivityForm.get('asset').reset();
+  }
+
+  fundHedgingSelect(event: MatAutocompleteSelectedEvent){
+    let FH: string = event.option.value;
+    this.setDynamicOptions(FH, null, null);
+    this.capitalActivityForm.get('issuerShortName').reset();
+    this.capitalActivityForm.get('asset').reset();
+    this.setCcy(FH);
+  }
+
   changeListeners(): void{
     /** _ since statusChanges returns INVALID form even when it is valid. Hence, using custom cross field validator: `capitalValidator` */
 
     this.capitalActivityForm.statusChanges.subscribe(_ => {
-  
-      if(this.capitalActivityForm.errors?.['validated']){
-        if(this.editClicks > 0 && this.data.actionType === 'EDIT')
-          this.disableSubmit = true;
-        else if(!this.capitalActivityForm.pristine)
-          this.disableSubmit = false;     
-      }
+
+      if(this.capitalActivityForm.errors?.['validated'] && this.capitalActivityForm.touched)
+        this.disableSubmit = false;
       else if(!this.capitalActivityForm.errors?.['validated'])
         this.disableSubmit = true;
     })
 
-    /** Listening for changing the autocomplete options, based on selected values */
 
-    this.capitalActivityForm.get('fundHedging').valueChanges.subscribe(FH => {
-      this.capitalActivityForm.get('issuerShortName').reset();
-      this.capitalActivityForm.get('asset').reset();
-      this.setCcy(this.capitalActivityForm.get('fundHedging').value);    // Sets currency field for the selected fundHedging
-      this.setDynamicOptions(FH, null, null);
-    })
-
-    this.capitalActivityForm.get('issuerShortName').valueChanges.subscribe(ISN => {
-      this.capitalActivityForm.get('asset').reset();
-      this.setDynamicOptions(this.capitalActivityForm.get('fundHedging').value, ISN, null);
-    })    
 
     /** Listening for changing the autocomplete options, based on search */
     
@@ -290,7 +290,9 @@ export class AddCapitalModalComponent implements OnInit {
 
     this.assetFilteredOptions = this.capitalActivityForm.get('asset').valueChanges.pipe(
       startWith(''),
-      map(value => this._filter(this.assetOptions, value))
+      map(value => {
+        return (this._filter(this.assetOptions, value))
+      })
     )
     
     this.fundCcyFilteredOptions = this.capitalActivityForm.get('fundCcy').valueChanges.pipe(
@@ -311,11 +313,13 @@ export class AddCapitalModalComponent implements OnInit {
 
     this.isSuccessMsgAvailable = this.isFailureMsgAvailable = false;
   
-    this.editClicks = 0;
 
     this.changeListeners();
+
     this.disableSubmit = true;
+    
     /* Set Up Static Options */
+    
     this.capitalTypeOptions = this.data.capitalTypes;
     this.capitalSubTypeOptions = this.data.capitalSubTypes;
 
@@ -383,13 +387,26 @@ export class AddCapitalModalComponent implements OnInit {
       this.capitalAct.capitalID = this.data.rowData.capitalID;
       this.capitalAct.modifiedOn = new Date();
       this.capitalAct.modifiedBy = this.msalService.getUserName();
+
+      this.capitalAct.createdBy = this.data.rowData.createdBy;
+      this.capitalAct.createdOn = this.data.rowData.createdOn;
+
+      this.capitalAct.source = this.data.rowData.source;
+      this.capitalAct.sourceID = this.data.rowData.sourceID;  
     }
     else{
       this.capitalAct.capitalID = null;
       this.capitalAct.createdOn = new Date();
       this.capitalAct.createdBy = this.msalService.getUserName();  
+
+      this.capitalAct.modifiedBy = this.capitalAct.modifiedOn = null;
+
+      this.capitalAct.source = null;
+      this.capitalAct.sourceID = null;
+  
     }
 
+    this.capitalActivityForm.disable();
     this.subscriptions.push(this.capitalActivityService.putCapitalActivity(this.capitalAct).subscribe({
       next: data => {
         this.isSuccessMsgAvailable = true;
@@ -404,10 +421,10 @@ export class AddCapitalModalComponent implements OnInit {
           this.data.adapTableApi.gridApi.addGridData([this.capitalAct]);
 
           this.capitalActivityForm.reset(); // Resets form to invalid state
-  
+          this.capitalActivityForm.markAsPristine();
+          this.capitalActivityForm.enable();
         }
         else{
-          this.editClicks += 1;
           this.disableSubmit = true;
           this.capitalActivityForm.disable();
           this.updateMsg = 'Capital activity successfully updated';
@@ -423,9 +440,8 @@ export class AddCapitalModalComponent implements OnInit {
           this.updateMsg = 'Insert failed';
         else this.updateMsg = 'Update failed';
 
-        this.editClicks = 0;
         this.disableSubmit = false;   // To Enable submit again, if previous submit failed.
-
+        this.capitalActivityForm.enable();
       }
     }));
 
