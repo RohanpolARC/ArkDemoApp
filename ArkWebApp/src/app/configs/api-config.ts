@@ -19,6 +19,9 @@ export class APIConfig {
     public static CASH_BALANCE_GET_API: string = APIConfig.BASEURL + "/api/CashBalance/GetData";
 
     public static CAPITAL_ACTIVITY_PUT_API: string = APIConfig.BASEURL + "/api/CapitalActivity/put";
+    public static CAPITAL_INVESTMENT_GET_API: string = APIConfig.BASEURL + "/api/CapitalActivity/getPositionCash";
     public static CAPITAL_ACTIVITY_GET_API: string = APIConfig.BASEURL + "/api/CapitalActivity/get";
     public static CAPITAL_ACTIVITY_GET_REF_API: string = APIConfig.BASEURL + "/api/CapitalActivity/getDropdownData";
+    public static CAPITAL_ACTIVITY_LOOKUP_API: string = APIConfig.BASEURL + "/api/CapitalActivity/lookUpCapitalActivity";
+    public static CAPITAL_INVESTMENT_ASSOCIATE_API: string = APIConfig.BASEURL + "/api/CapitalActivity/associateInvestment";
 }

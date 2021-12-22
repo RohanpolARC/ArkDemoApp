@@ -16,4 +16,30 @@ export interface CapitalActivityModel{
     createdBy: string;
     modifiedOn: Date;
     modifiedBy: string;
+
+    localAmount: number;
+    fxRate: number
+}
+
+export interface CapitalInvestment{
+    positionID: number;
+    amount: number;
+    cashDate: Date;
+    issuerShortName: string;
+    asset: string;
+    fundHedging: string;
+    fund: string;
+    fundCcy: string;
+    positionCcy: string;
+    portfolio: string;
+    totalBase: number;
+    totalEur: number;
+
+    capitalID?: number;
+
+    createdOn: Date;
+    createdBy: string;
+    modifiedOn: Date;
+    modifiedBy: string;
+
 }

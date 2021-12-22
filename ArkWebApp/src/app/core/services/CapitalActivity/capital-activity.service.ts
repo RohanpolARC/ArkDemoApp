@@ -4,7 +4,7 @@ import { HttpClient, HttpParams,HttpHeaders } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { MsalUserService } from '../Auth/msaluser.service';  
-import { CapitalActivityModel } from '../../../shared/models/CapitalActivityModel'
+import { CapitalActivityModel, CapitalInvestment } from '../../../shared/models/CapitalActivityModel'
 
 @Injectable({
   providedIn: 'root'
@@ -15,9 +15,15 @@ export class CapitalActivityService {
   private CAPITAL_ACTIVITY_GET_API: string = APIConfig.CAPITAL_ACTIVITY_GET_API;
   private CAPITAL_ACTIVITY_GET_REF_API: string = APIConfig.CAPITAL_ACTIVITY_GET_REF_API;
 
+  private CAPITAL_INVESTMENT_GET_API: string = APIConfig.CAPITAL_INVESTMENT_GET_API;
+  private CAPITAL_INVESTMENT_ASSOCIATE_API: string = APIConfig.CAPITAL_INVESTMENT_ASSOCIATE_API;
+
+  private CAPITAL_ACTIVITY_LOOKUP_API: string = APIConfig.CAPITAL_ACTIVITY_LOOKUP_API;
+
   httpOptions = {  
     headers: new HttpHeaders({  
-        'Content-Type': 'application/json'  
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + this.msalService.GetAccessToken()  
     })  
   };
 
@@ -25,31 +31,30 @@ export class CapitalActivityService {
 
   public putCapitalActivity(capitalAct: CapitalActivityModel){
 
-    this.httpOptions = {  
-      headers: new HttpHeaders({  
-          'Content-Type': 'application/json',  
-          'Authorization': 'Bearer ' + this.msalService.GetAccessToken()  
-      })  
-    };
     return this.http.post<any>(this.CAPITAL_ACTIVITY_PUT_API, capitalAct, this.httpOptions).pipe(
       catchError((ex) => throwError(ex)));
   }
 
+  public lookUpCapitalActivity(capitalAct: CapitalActivityModel){
+    return this.http.post<any>(this.CAPITAL_ACTIVITY_LOOKUP_API, capitalAct, this.httpOptions).pipe(
+      catchError((ex) => throwError(ex)));
+  }
+
+  public associateCapitalInvestments(investments: CapitalInvestment[]){
+    return this.http.post<any>(this.CAPITAL_INVESTMENT_ASSOCIATE_API, investments, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
+  }
+
   public getCapitalActivity(){
-    this.httpOptions = {  
-      headers: new HttpHeaders({  
-          'Content-Type': 'application/json',  
-          'Authorization': 'Bearer ' + this.msalService.GetAccessToken()  
-      })};
     return this.http.get<any>(this.CAPITAL_ACTIVITY_GET_API, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
   }
 
+  public getCapitalInvestment(capitalID?: number){
+    if(!capitalID)
+      capitalID = -1;
+    return this.http.get<any>(`${this.CAPITAL_INVESTMENT_GET_API}/?capitalID=${capitalID}`, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
+  }
+
   public getCapitalRefData(){
-    this.httpOptions = {  
-      headers: new HttpHeaders({  
-          'Content-Type': 'application/json',  
-          'Authorization': 'Bearer ' + this.msalService.GetAccessToken()  
-      })};
     return this.http.get<any>(this.CAPITAL_ACTIVITY_GET_REF_API, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
   }
 }

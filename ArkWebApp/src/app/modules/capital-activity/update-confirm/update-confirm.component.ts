@@ -16,6 +16,8 @@ export class UpdateConfirmComponent implements OnInit {
   ngOnInit(): void {
     if(this.request.actionType === 'EDIT')
       this.confirmText = 'Are you sure you want to edit this capital activity?';
+    else if(this.request.actionType === 'ERROR-MSG')
+      this.confirmText = this.request.errorMsg;
   }
 
   closeDialog(action: string): void {

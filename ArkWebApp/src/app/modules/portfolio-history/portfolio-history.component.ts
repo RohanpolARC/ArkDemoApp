@@ -28,6 +28,7 @@ import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog
 import {DialogDeleteComponent} from './dialog-delete/dialog-delete.component';
 
 import { ExcelExportModule } from "@ag-grid-enterprise/excel-export";
+import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
 
 let adapTableApi: AdaptableApi;
 
@@ -67,20 +68,20 @@ export class PortfolioHistoryComponent implements OnInit {
   { headerName:"Fund",field: 'fund',  autosize:true, type:'abColDefString' },
   { headerName:"Fund Hedging",field: 'fundHedging', type:'abColDefString' },
   { headerName:"Fund Ccy", field: 'fundCcy', type:'abColDefString' },
-  { headerName:"As Of Date", field: 'asOfDate',  valueFormatter: this.dateFormatter,hide: true, type:'abColDefDate' },
-  { headerName:"Trade Date",field: 'tradeDate', rowGroup: true, SortOrder: 'Desc', hide: true, valueFormatter: this.dateFormatter, type:'abColDefDate' },
+  { headerName:"As Of Date", field: 'asOfDate',  valueFormatter: dateFormatter,hide: true, type:'abColDefDate' },
+  { headerName:"Trade Date",field: 'tradeDate', rowGroup: true, SortOrder: 'Desc', hide: true, valueFormatter: dateFormatter, type:'abColDefDate' },
   { headerName:"Type", field: 'typeDesc', type:'abColDefString'},
-  { headerName:"Settle Date",field: 'settleDate',  valueFormatter: this.dateFormatter, type:'abColDefDate' },
+  { headerName:"Settle Date",field: 'settleDate',  valueFormatter: dateFormatter, type:'abColDefDate' },
   { headerName:"Position Ccy",field: 'positionCcy', type:'abColDefString'},
-  { headerName:"Amount",field: 'amount',enableValue: true ,  valueFormatter: this.amountFormatter, type:'abColDefNumber' },
-  { headerName:"Par Amount",field: 'parAmount' ,  valueFormatter: this.amountFormatter, type:'abColDefNumber' },
-  { headerName:"ParAmountLocal",field: 'parAmountLocal' ,  valueFormatter: this.amountFormatter, type:'abColDefNumber'},
-  { headerName:"FundedParAmountLocal",field: 'fundedParAmountLocal' ,  valueFormatter: this.amountFormatter, type:'abColDefNumber'},
-  { headerName:"CostAmountLocal",field: 'costAmountLocal',  valueFormatter: this.amountFormatter , type:'abColDefNumber'},
-  { headerName:"FundedCostAmountLocal",field: 'fundedCostAmountLocal',  valueFormatter: this.amountFormatter , type:'abColDefNumber'},
-  { headerName:"Going In Rate",field: 'fxRateBaseEffective',editable:true , type:'abColDefNumber'},
+  { headerName:"Amount",field: 'amount',enableValue: true ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
+  { headerName:"Par Amount",field: 'parAmount' ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
+  { headerName:"ParAmountLocal",field: 'parAmountLocal' ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+  { headerName:"FundedParAmountLocal",field: 'fundedParAmountLocal' ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+  { headerName:"CostAmountLocal",field: 'costAmountLocal',  valueFormatter: amountFormatter , type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+  { headerName:"FundedCostAmountLocal",field: 'fundedCostAmountLocal',  valueFormatter: amountFormatter , type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+  { headerName:"Going In Rate",field: 'fxRateBaseEffective',editable:true , type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
   { headerName:"Modified By", field: 'modifiedBy', type:'abColDefString'},
-  { headerName:"Modified On", field: "modifiedOn", valueFormatter: this.dateTimeFormatter, type:'abColDefDate'},
+  { headerName:"Modified On", field: "modifiedOn", valueFormatter: dateTimeFormatter, type:'abColDefDate'},
   {
     headerName:"",
     field: 'actionNew',
@@ -309,36 +310,7 @@ export class PortfolioHistoryComponent implements OnInit {
     }
   
   }
-  
-  dateFormatter(params) {
-    if(params.value!=undefined)
-    return moment(params.value).format('DD/MM/YYYY');
-    else{
-      return ""
-    }
-  }
-  
-  dateTimeFormatter(params) {
-    if(params.value==undefined || params.value=="0001-01-01T00:00:00")
-      return ""
-    else 
-      return moment(params.value).format('DD/MM/YYYY HH:mm');
-  }
-
-  amountFormatter(params){
-    if(params.value!=undefined&&Number(params.value)!=0)
-    return Number(params.value).toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-    else if(Number(params.value)==0) {
-      return "-"
-    } else{
-      return ""
-    }
-
-  }
-  
+    
   onGridReady(params) {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;

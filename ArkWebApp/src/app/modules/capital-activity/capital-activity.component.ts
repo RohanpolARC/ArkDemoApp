@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import {MatAccordion} from '@angular/material/expansion';
 import { MatDialog } from '@angular/material/dialog';
 import { AddCapitalModalComponent } from './add-capital-modal/add-capital-modal.component';
 
 import {
   GridOptions,
   Module,
+  ColDef
 } from '@ag-grid-community/all-modules';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
@@ -19,11 +21,14 @@ import {
   ActionColumnButtonContext,
 } from '@adaptabletools/adaptable/types';
 import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
-import { CapitalActivityModel } from 'src/app/shared/models/CapitalActivityModel';
+import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/CapitalActivityModel';
 
-import * as moment from 'moment';
 import { Subscription } from 'rxjs';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
+import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
+
+import { getNodes, validateLinkSelect }from '../capital-activity/functions';
+import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
 
 @Component({
   selector: 'app-capital-activity',
@@ -32,8 +37,11 @@ import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/ca
 })
 export class CapitalActivityComponent implements OnInit {
 
+  @ViewChild(MatAccordion) accordion: MatAccordion;
+
   subscriptions: Subscription[] = [];
   rowData: CapitalActivityModel[];
+  rowDataInvstmnt: CapitalInvestment[];
   rowGroupPanelShow:string = 'always';
 
   agGridModules: Module[] = [
@@ -45,24 +53,42 @@ export class CapitalActivityComponent implements OnInit {
     ExcelExportModule
   ];
 
-  columnDefs = [
+  columnDefsInvstmnt: ColDef[] = [
+    {field: 'positionID', headerName: 'Position ID'},
+    {field: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter},
+    {field: 'fund', headerName: 'Fund'},
+    {field: 'fundHedging', headerName: 'Fund Hedging'},
+    {field: 'portfolio', headerName: 'Portfolio'},
+    {field: 'issuerShortName', headerName: 'Issuer'},
+    {field: 'asset', headerName: 'Asset'},
+    {field: 'fundCcy', headerName: 'Fund Ccy'},
+    {field: 'positionCcy', headerName: 'Position Ccy'},
+    {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    {field: 'totalEur', headerName: 'Total Eur', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'}
+  ]
+
+  columnDefs: ColDef[] = [
     {field: 'capitalID', headerName: 'Capital ID', type: 'abColDefNumber'},
-    { field: 'callDate', headerName: 'Call Date', type: 'abColDefDate', valueFormatter: this.dateFormatter },
-    { field: 'valueDate', headerName: 'Value Date', type: 'abColDefDate', valueFormatter: this.dateFormatter},
+    { field: 'callDate', headerName: 'Call Date', type: 'abColDefDate', valueFormatter: dateFormatter },
+    { field: 'valueDate', headerName: 'Value Date', type: 'abColDefDate', valueFormatter: dateFormatter},
     { field: 'capitalType', headerName: 'Capital Type', type:'abColDefString'},
     { field: 'capitalSubType', headerName: 'Capital Subtype', type:'abColDefString'},
     { field: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
     { field: 'fundCcy', headerName: 'Currency', type:'abColDefString'},
-    { field: 'totalAmount', headerName: 'Total Amount', valueFormatter: this.amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    { field: 'totalAmount', headerName: 'Total Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     { field: 'issuerShortName', headerName: 'Issuer Short Name', type:'abColDefString'},
     { field: 'asset', headerName: 'Asset', type:'abColDefString'},
     { field: 'narrative', headerName: 'Narrative', type:'abColDefString'},
     { field: 'source', headerName: 'Source', type:'abColDefString'},
     { field: 'sourceID', headerName: 'Source ID', type:'abColDefNumber'},
-    { field: 'createdOn', headerName: 'Created On', type:'abColDefDate', valueFormatter: this.dateTimeFormatter},
+    { field: 'createdOn', headerName: 'Created On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
     { field: 'createdBy', headerName: 'Created By', type:'abColDefString'},
-    { field: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', valueFormatter: this.dateTimeFormatter},
+    { field: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
     { field: 'modifiedBy', headerName: 'Modified By', type:'abColDefString'},
+
+    { field: 'localAmount', headerName: 'Local Amount', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    { field: 'fxRate', headerName: 'FX Rate', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
   ]
 
   defaultColDef = {
@@ -76,8 +102,72 @@ export class CapitalActivityComponent implements OnInit {
   };
   gridOptions: GridOptions;
   adapTableApi: AdaptableApi;
+  adaptableOptions: AdaptableOptions;
+
+  gridOptionsInvstmnt: GridOptions;
+  adapTableApiInvstmnt: AdaptableApi;
+  adaptableOptionsInvstmnt: AdaptableOptions;
 
   constructor(public dialog:MatDialog, private capitalActivityService: CapitalActivityService) { 
+  }
+
+
+  capitalTypeOptions: string[] = [];
+  capitalSubTypeOptions: string[] = [];
+
+  refData = [];
+
+  fullscreen: string = null;
+  maximize: boolean = false;
+
+  invstmntPanelOpenState = false;
+  investorPanelOpenState = false;
+
+  maximize_grid(grid: string, maximize: boolean){
+    if(grid === 'Investment' && maximize === true){
+      this.fullscreen = 'Investment';
+      this.maximize = true;
+    }
+    else if(grid === 'Investment' && maximize === false){
+      this.fullscreen = '-Investment';
+      this.maximize = false;
+    }
+    else if(grid === 'Investor' && maximize === true){
+      this.fullscreen = 'Investor';
+      this.maximize = true;
+    }
+    else if(grid === 'Investor' && maximize === false){
+      this.fullscreen = '-Investor';
+      this.maximize = false;
+    }
+  }
+
+  fetchData(): void{
+
+    this.subscriptions.push(this.capitalActivityService.getCapitalInvestment().subscribe({
+      next: data => {
+        this.rowDataInvstmnt = data;
+        this.adapTableApiInvstmnt.gridApi.loadGridData(this.rowDataInvstmnt);
+      },
+      error: error => {
+        this.rowDataInvstmnt = [];
+        console.error("Capital Investment Data fetch failed");
+      }
+    }))
+
+    this.subscriptions.push(this.capitalActivityService.getCapitalActivity().subscribe({
+      next: data => {
+        this.rowData = data;
+        this.adapTableApi.gridApi.loadGridData(this.rowData);
+      },
+      error: error => {
+        this.rowData = [];
+        console.error("Capital Activity Data fetch failed");
+      }
+    }));
+  }
+
+  ngOnInit(): void {
     this.gridOptions = {
       enableRangeSelection: false,
       sideBar: true,
@@ -89,105 +179,194 @@ export class CapitalActivityComponent implements OnInit {
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:false
     }
-  }
 
-  public adaptableOptions: AdaptableOptions = {
-    primaryKey: 'capitalID',
-    userName: 'TestUser',
-    adaptableId: '',
-    adaptableStateKey: `Capital Activity Key`,
-    
-    layoutOptions: {
-      autoSaveLayouts: false
-    },
+    this.gridOptionsInvstmnt = JSON.parse(JSON.stringify(this.gridOptions));
+    this.gridOptionsInvstmnt.columnDefs = this.columnDefsInvstmnt;
 
-    toolPanelOptions: {
-      toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
-    },
-
-    userInterfaceOptions: {
-      actionColumns: [
-        {
-          columnId: 'ActionEdit',
-          actionColumnButton: {
-            onClick: (
-              button: AdaptableButton<ActionColumnButtonContext>,
-              context: ActionColumnButtonContext
-            ) => {
-
-              let rowData =  context.rowNode?.data;
-              this.openDialog(rowData, 'EDIT');
-            },
-            icon: {
-              src: '../assets/img/edit.svg',
-              style: {
-                height: 25, width: 25
-              }
+    this.adaptableOptions = {
+      primaryKey: 'capitalID',
+      userName: 'TestUser',
+      adaptableId: '',
+      adaptableStateKey: `Capital Activity Key`,
+      
+      layoutOptions: {
+        autoSaveLayouts: false
+      },
+  
+      toolPanelOptions: {
+        toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
+      },
+  
+      userInterfaceOptions: {
+        actionColumns: [
+          {
+            columnId: 'ActionEdit',
+            actionColumnButton: {
+              onClick: (
+                button: AdaptableButton<ActionColumnButtonContext>,
+                context: ActionColumnButtonContext
+              ) => {
+  
+                let rowData =  context.rowNode?.data;
+                let investments = [];
+                this.capitalActivityService.getCapitalInvestment(rowData.capitalID).subscribe({
+                  next: data => {
+                    investments = data;
+                    this.openDialog(rowData, 'EDIT', investments);
+                  },
+                  error: error => {
+                    console.error("Couldn't fetch investments for this capitalID");
+                  }
+                })
+              },
+              icon: {
+                src: '../assets/img/edit.svg',
+                style: {
+                  height: 25, width: 25
+                }
+              },
             },
           }
-        }
-      ]
-    },
-
-    predefinedConfig: {
-      Dashboard: {
-        ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
-        IsCollapsed: true,
-        Tabs: [],
+        ]
       },
-      Layout: {
-        CurrentLayout: 'Basic Capital Activity',
-        Layouts: [{
-          Name: 'Basic Capital Activity',
-          Columns: [
-            'callDate',
-            'valueDate',
-            'capitalType',
-            'capitalSubType',
-            'fundHedging',
-            'fundCcy',
-            'totalAmount',
-            'issuerShortName',
-            'asset',
-            'narrative',
-            'source',
-            'createdBy',
-            'createdOn',
-            'modifiedBy',
-            'modifiedOn',
-            'ActionEdit',
-          ],
-          RowGroupedColumns: [],
-          ColumnWidthMap:{
-            ActionEdit: 50,
-          },
-          PinnedColumnsMap: {
-            ActionEdit: 'right',
-          },
-
-        }]
+  
+      predefinedConfig: {
+        Dashboard: {
+          ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
+          IsCollapsed: true,
+          Tabs: [],
+          IsHidden: false
+        },
+        Layout: {
+          CurrentLayout: 'Basic Capital Activity',
+          Layouts: [{
+            Name: 'Basic Capital Activity',
+            Columns: [
+              'callDate',
+              'valueDate',
+              'capitalType',
+              'capitalSubType',
+              'fundHedging',
+              'fundCcy',
+              'totalAmount',
+              'localAmount',
+              'fxRate',
+              'issuerShortName',
+              'asset',
+              'narrative',
+              'source',
+              'createdBy',
+              'createdOn',
+              'modifiedBy',
+              'modifiedOn',
+              'ActionEdit',
+            ],
+            RowGroupedColumns: [],
+            ColumnWidthMap:{
+              ActionEdit: 50,
+            },
+            PinnedColumnsMap: {
+              ActionEdit: 'right',
+            },
+  
+          }]
+        }
       }
     }
-  }
 
-  capitalTypeOptions: string[] = [];
-  capitalSubTypeOptions: string[] = [];
-
-  refData = [];
-
-  fetchData(): void{
-    this.subscriptions.push(this.capitalActivityService.getCapitalActivity().subscribe({
-      next: data => {
-        this.rowData = data;
-        this.adapTableApi.gridApi.loadGridData(this.rowData);
+    this.adaptableOptionsInvstmnt = {
+      primaryKey: '',
+      autogeneratePrimaryKey: true,
+      userName: 'TestUser',
+      adaptableId: '',
+      adaptableStateKey: `Investment CashFlow Key`,
+      
+      layoutOptions: {
+        autoSaveLayouts: false
       },
-      error: error => {
-        this.rowData = [];
-      }
-    }));
-  }
+  
+      toolPanelOptions: {
+        toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
+      },
 
-  ngOnInit(): void {
+      userInterfaceOptions: {
+        actionColumns: [
+          {
+            columnId: 'ActionLink',
+            includeGroupedRows: true,
+            actionColumnButton: {
+              onClick: (
+                button: AdaptableButton<ActionColumnButtonContext>,
+                context: ActionColumnButtonContext
+              ) => {
+
+                let error: string = validateLinkSelect(context);
+                if(error !== null){
+                  const errorDialog = this.dialog.open(UpdateConfirmComponent, {
+                    data: {
+                      actionType: 'ERROR-MSG',
+                      errorMsg: error
+                    }
+                  })
+                  return;
+                }
+                  /* Gets LAST LEAF DATA or INDIVIDUAL ROW DATA */
+                let linkData = getNodes(context);
+                this.openDialog(linkData, 'LINK-ADD');
+              },
+              icon: {
+                src: '../assets/img/sync_alt_black_24dp.svg',
+                style: {
+                  height: 25, width: 25
+                }
+              },
+            },
+          }
+        ]
+      },
+
+  
+      predefinedConfig: {
+        Dashboard: {
+          ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
+          IsCollapsed: true,
+          Tabs: [],
+          IsHidden: false
+        },
+        Layout: {
+          Layouts:[{
+            Name: 'Basic Investment Cashflow',
+            Columns: [
+              'positionID',
+              'cashDate',
+              'fund',
+              'fundHedging',
+              'portfolio',
+              'issuerShortName',
+              'asset',
+              'fundCcy',
+              'positionCcy',
+              'amount',
+              'totalBase',
+              'totalEur',
+              'ActionLink'
+            ],
+            ColumnWidthMap:{
+              ActionLink: 50,
+            },
+            RowGroupedColumns: ['fundHedging', 'cashDate', 'issuerShortName', 'positionCcy'],
+            PinnedColumnsMap: {
+              'ActionLink': 'right'
+            },
+            AggregationColumns: {
+              totalBase: 'sum',
+              totalEur: 'sum'
+            }
+          }]
+        }  
+      }
+    }
+
     this.fetchData();
 
     
@@ -199,7 +378,7 @@ export class CapitalActivityComponent implements OnInit {
         this.refData = data.portfolio_Info;
       },
       error: error => {
-        console.error("Couldn't fetch refData. Form dropdown fields will be disabled");
+        console.error("Couldn't fetch refData. Form dropdown fields not available");
       }
     }));
 
@@ -209,21 +388,23 @@ export class CapitalActivityComponent implements OnInit {
     this.subscriptions.forEach(subscription => subscription.unsubscribe())
   }
 
-  openDialog(data? , actionType = 'ADD',):void{
+  openDialog(data? , actionType = 'ADD', gridData = null):void{
 
     const dialogRef = this.dialog.open(AddCapitalModalComponent, {
       data: {
         rowData : data,
         adapTableApi: this.adapTableApi,
+        adapTableApiInvstmnt: this.adapTableApiInvstmnt,
         actionType: actionType,
         capitalTypes: this.capitalTypeOptions,
         capitalSubTypes: this.capitalSubTypeOptions,
         refData: this.refData,
+        gridData: gridData
       },
-      minWidth: '830px',
+      minWidth: (actionType === 'LINK-ADD') ? '1500px' : '830px',
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
-
+      /** ADD Rows to Investor Grid */
     }));
   }
 
@@ -245,39 +426,22 @@ export class CapitalActivityComponent implements OnInit {
     adaptableApi.toolPanelApi.closeAdapTableToolPanel();
   }
 
-  dateFormatter(params) {
-    if(params.value!=undefined)
-    return moment(params.value).format('DD/MM/YYYY');
-    else{
-      return ""
+  onAdaptableInvstmntReady(
+    {
+      adaptableApi,
+      vendorGrid,
+    }: {
+      adaptableApi: AdaptableApi;
+      vendorGrid: GridOptions;
     }
-  }
-
-  dateTimeFormatter(params) {
-    if(params.value==undefined || params.value=="0001-01-01T00:00:00")
-      return ""
-    else 
-      return moment(params.value).format('DD/MM/YYYY HH:mm');
-  }
-
-  amountFormatter(params){
-    if(params.value!=undefined&&Number(params.value)!=0)
-    return Number(params.value).toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+  ) {
+    this.adapTableApiInvstmnt  = adaptableApi;
+    adaptableApi.eventApi.on('SelectionChanged', selection => {
+      // do stuff
     });
-    else if(Number(params.value)==0) {
-      return "-"
-    } else{
-      return ""
-    }
 
-  }
-
-  zeroFormatter(params){
-    if(params.value == undefined || Number(params.value) == 0)
-      return null;
-    else return Number(params.value)
+/* Closes right sidebar on start */
+    adaptableApi.toolPanelApi.closeAdapTableToolPanel();
   }
 
 

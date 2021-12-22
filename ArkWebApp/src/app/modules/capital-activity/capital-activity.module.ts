@@ -18,12 +18,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { LinkInvestorModalComponent } from './link-investor-modal/link-investor-modal.component';
 
 @NgModule({
   declarations: [
     CapitalActivityComponent,
     AddCapitalModalComponent,
-    UpdateConfirmComponent
+    UpdateConfirmComponent,
+    LinkInvestorModalComponent
   ],
   /** Add all pop-up modal components here, for this module */
   entryComponents: [AddCapitalModalComponent, UpdateConfirmComponent],
@@ -42,7 +45,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     MatCardModule,
     AdaptableAngularAgGridModule,
     AgGridModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatExpansionModule
   ],
   exports:[CapitalActivityComponent]
 })

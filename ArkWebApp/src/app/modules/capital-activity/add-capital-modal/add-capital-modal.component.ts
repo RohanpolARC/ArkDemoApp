@@ -11,6 +11,11 @@ import { UpdateConfirmComponent } from '../update-confirm/update-confirm.compone
 import {Observable} from 'rxjs';
 import {startWith, map} from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { ColDef } from '@ag-grid-community/core';
+
+import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
+import { LinkInvestorModalComponent } from '../link-investor-modal/link-investor-modal.component';
+
 @Component({
   selector: 'app-add-capital-modal',
   templateUrl: './add-capital-modal.component.html',
@@ -49,6 +54,8 @@ export class AddCapitalModalComponent implements OnInit {
   
   netISS: [string, string][] = []; // [ issuer, issuerShortName] []
 
+  gridData: any[] = [];
+
   validateField(options: string[], control: AbstractControl, field: string): string | null{
       //  Validates individual fields and returns fetched value if it's an allowed value.
 
@@ -81,6 +88,8 @@ export class AddCapitalModalComponent implements OnInit {
     let currency: string = this.validateField(this.fundCcyOptions, control, 'fundCcy');
 
     let totalAmount: number = control.get('totalAmount').value;
+    let fxRate: number  = control.get('fxRate').value;
+    let localAmount: number = control.get('localAmount').value;
 
     let CD: boolean = (callDate !== null && callDate !== 'Invalid date')
     let VD: boolean = (valueDate !== null && valueDate !== 'Invalid date')
@@ -94,7 +103,10 @@ export class AddCapitalModalComponent implements OnInit {
     let AS: boolean = (asset !== null && asset !== '');
     let NR: boolean = (narrative !== null && narrative !== '');
         
-    return ((CD && VD && FH && CT && CST && CCY && TA && ((ISN && AS) || NR))) ? { validated : true }: { validated : false};
+    let FX: boolean = (fxRate !== null)
+    let LA: boolean = (localAmount !== null)
+
+    return ((CD && VD && FH && CT && CST && CCY && TA && ((ISN && AS)|| NR || ISN) && FX && LA)) ? { validated : true }: { validated : false};
   }
 
   capitalActivityForm= new FormGroup({
@@ -108,6 +120,10 @@ export class AddCapitalModalComponent implements OnInit {
     fundHedging: new FormControl(null, Validators.required),
     issuerShortName: new FormControl(null),
     asset: new FormControl(null),
+
+
+    localAmount: new FormControl(null, Validators.required),
+    fxRate: new FormControl(null, Validators.required)
   },{
     validators: this.capitalValidator
   }
@@ -264,6 +280,20 @@ export class AddCapitalModalComponent implements OnInit {
   }
 
   changeListeners(): void{
+
+    /** For LINK-ADD, update Total Amount, based on changes in FX RATE, LOCAL AMOUNT */
+      this.capitalActivityForm.get('localAmount').valueChanges.subscribe(LA => {
+        this.capitalActivityForm.patchValue({
+          totalAmount: LA * this.capitalActivityForm.get('fxRate').value
+        })
+      })
+
+      this.capitalActivityForm.get('fxRate').valueChanges.subscribe(GIR => {
+        this.capitalActivityForm.patchValue({
+          totalAmount: GIR * this.capitalActivityForm.get('localAmount').value
+        })
+      })
+
     /** _ since statusChanges returns INVALID form even when it is valid. Hence, using custom cross field validator: `capitalValidator` */
 
     this.capitalActivityForm.statusChanges.subscribe(_ => {
@@ -308,6 +338,17 @@ export class AddCapitalModalComponent implements OnInit {
       map(value => this._filter(this.capitalSubTypeOptions, value))
     )
   }
+
+  linkColumnDefs: ColDef[] = [
+    {field: 'positionID', headerName: 'Position ID'},
+    {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    {field: 'positionCcy', headerName: 'Position Ccy'},
+    {field: 'portfolio', headerName: 'Portfolio'},
+    {field: 'issuerShortName', headerName: 'Issuer'},
+    {field: 'asset', headerName: 'Asset'},
+  ]
+
   ngOnInit(): void {
     this.setDynamicOptions();
 
@@ -330,14 +371,54 @@ export class AddCapitalModalComponent implements OnInit {
     this.fundHedgingOptions = [...new Set(this.fundHedgingOptions)]
     this.fundCcyOptions = [...new Set(this.fundCcyOptions)]
 
-    if(this.data.actionType === 'EDIT')
+    if(this.data.actionType === 'LINK-ADD'){
+      this.header = 'Link Investment';
+      this.buttontext = 'Submit';
+
+      this.gridData = this.data.rowData;
+
+      let FH: string = this.data.rowData[0].fundHedging;
+      let ISN: string = this.data.rowData[0].issuerShortName;
+      let FundCcy: string = this.data.rowData[0].fundCcy;
+      let cashDate: Date = this.data.rowData[0].cashDate; 
+
+      let posCcy: string = this.data.rowData[0].positionCcy;
+
+      this.setDynamicOptions(FH, null, null); // This line sets Issuer options.
+      this.setDynamicOptions(FH, ISN, null);  // This only sets asset options.
+
+    
+      let localAmount: number = 0;
+      for(let i = 0; i < this.data.rowData.length; i+= 1)
+        localAmount += this.data.rowData[i].amount;
+
+
+      this.capitalActivityForm.patchValue({
+        valueDate: cashDate,
+        callDate: cashDate,
+        narrative: null,
+        capitalType: null,
+        capitalSubType: null,
+        fundCcy: FundCcy,
+        totalAmount: null,
+        fundHedging: FH,
+        issuerShortName: ISN,
+        asset: null,
+
+        localAmount: localAmount,
+        fxRate: posCcy === FundCcy ? 1 : null
+      })
+
+    }
+    else if(this.data.actionType === 'EDIT')
     {
       this.header = 'Edit Capital';
       this.buttontext = 'Update';
 
+      this.gridData = this.data.gridData;
+
       // Dynamic options for EDIT
       this.setDynamicOptions(this.data.rowData.fundHedging, this.data.rowData.issuerShortName, this.data.rowData.asset);
-      
       this.capitalActivityForm.patchValue({
         valueDate: this.data.rowData.valueDate,
         callDate: this.data.rowData.callDate,
@@ -348,9 +429,14 @@ export class AddCapitalModalComponent implements OnInit {
         totalAmount: this.data.rowData.totalAmount,
         fundHedging: this.data.rowData.fundHedging,
         issuerShortName: this.data.rowData.issuerShortName,
-        asset: this.data.rowData.asset
+        asset: this.data.rowData.asset,
+
+        localAmount: this.data.rowData.localAmount,
+        fxRate: this.data.rowData.fxRate
       })
 
+        /* totalAmount wasn't getting set from the above patch statement. Hence, manually setting it up */
+      this.capitalActivityForm.patchValue({totalAmount: this.data.rowData.totalAmount})
     }
     else{
       this.header = 'Add Capital';
@@ -360,14 +446,9 @@ export class AddCapitalModalComponent implements OnInit {
 
   }
 
-  ngOnDestroy(): void{
-    this.subscriptions.forEach(subscription => subscription.unsubscribe());
-  }
+  getFormCapitalAct(): void{
 
-  performSubmit() {
-    this.isSuccessMsgAvailable = this.isFailureMsgAvailable = false;
     this.capitalAct = <CapitalActivityModel>{};
-    this.disableSubmit = true;
     this.capitalAct.valueDate = this.capitalActivityForm.get('valueDate').value;
     this.capitalAct.callDate = this.capitalActivityForm.get('callDate').value;
     this.capitalAct.narrative = this.capitalActivityForm.get('narrative').value;
@@ -381,6 +462,20 @@ export class AddCapitalModalComponent implements OnInit {
 
     this.capitalAct.valueDate = new Date(moment(this.capitalAct.valueDate).format('YYYY-MM-DD'));
     this.capitalAct.callDate = new Date(moment(this.capitalAct.callDate).format('YYYY-MM-DD'));
+
+    this.capitalAct.localAmount = this.capitalActivityForm.get('localAmount').value;
+    this.capitalAct.fxRate = this.capitalActivityForm.get('fxRate').value;
+  }
+
+  ngOnDestroy(): void{
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
+
+  performSubmit() {
+    this.isSuccessMsgAvailable = this.isFailureMsgAvailable = false;
+    this.disableSubmit = true;
+
+    this.getFormCapitalAct();
 
     // Setting up audit columns.
     if(this.data.actionType === 'EDIT'){
@@ -396,10 +491,8 @@ export class AddCapitalModalComponent implements OnInit {
     }
     else{
       this.capitalAct.capitalID = null;
-      this.capitalAct.createdOn = new Date();
-      this.capitalAct.createdBy = this.msalService.getUserName();  
-
-      this.capitalAct.modifiedBy = this.capitalAct.modifiedOn = null;
+      this.capitalAct.createdOn = this.capitalAct.modifiedOn = new Date();
+      this.capitalAct.createdBy = this.capitalAct.modifiedBy =this.msalService.getUserName();  
 
       this.capitalAct.source = null;
       this.capitalAct.sourceID = null;
@@ -419,18 +512,17 @@ export class AddCapitalModalComponent implements OnInit {
           this.disableSubmit = true;
           this.updateMsg = 'Capital activity successfully added';
           this.data.adapTableApi.gridApi.addGridData([this.capitalAct]);
-
+          
           this.capitalActivityForm.reset(); // Resets form to invalid state
           this.capitalActivityForm.markAsPristine();
           this.capitalActivityForm.enable();
         }
-        else{
+        else if(this.data.actionType === 'EDIT'){
           this.disableSubmit = true;
           this.capitalActivityForm.disable();
           this.updateMsg = 'Capital activity successfully updated';
           this.data.adapTableApi.gridApi.updateGridData([this.capitalAct]);
         }
-
       },
       error: error => {
         this.isFailureMsgAvailable = true;
@@ -438,7 +530,8 @@ export class AddCapitalModalComponent implements OnInit {
 
         if(this.data.actionType === 'ADD')
           this.updateMsg = 'Insert failed';
-        else this.updateMsg = 'Update failed';
+        else if(this.data.actionType === 'EDIT')
+          this.updateMsg = 'Update failed';
 
         this.disableSubmit = false;   // To Enable submit again, if previous submit failed.
         this.capitalActivityForm.enable();
@@ -462,6 +555,38 @@ export class AddCapitalModalComponent implements OnInit {
     }
     else if(this.data.actionType === 'ADD'){
       this.performSubmit();
+    }
+    else if(this.data.actionType === 'LINK-ADD'){
+      /** Handles Association or Add logic */
+
+      this.getFormCapitalAct();
+
+      this.disableSubmit = true;
+
+      this.capitalAct.createdOn = new Date();
+      this.capitalAct.createdBy = this.msalService.getUserName();
+  
+      const linkDialog = this.dialog.open(LinkInvestorModalComponent,{ 
+        data: {
+          actionType: 'LINK-ADD',
+          capitalAct: this.capitalAct,
+          investmentData: this.data.rowData
+      }});
+      this.subscriptions.push(linkDialog.afterClosed().subscribe(result => {
+
+        if(result.source === 'Linked Close'){
+
+          this.data.adapTableApiInvstmnt.gridApi.deleteGridData(this.data.rowData);
+          if(result.newCapital){
+            
+            this.data.adapTableApi.gridApi.addGridData([result.capitalAct]);
+          }
+
+          this.dialogRef.close();
+        }
+        else if(result.source === 'Empty Close')
+          this.disableSubmit = false;
+      }));  
     }
   }
 

@@ -1,0 +1,32 @@
+<ng-container *ngIf="receivedCapitalAct">
+    <div class="found-text" >
+        Found {{ receivedCapitalAct.length }} capital entries
+    </div>
+
+    <div *ngIf="isSuccess" class="success-msg">
+        {{ updateMsg }}
+    </div>
+
+    <div *ngIf="isFailure" class="failure-msg">
+        {{ updateMsg }}
+    </div>
+
+    <!-- #lookupgrid to detect clicks outside the grid to toggle the button text: 'Create New'/'Link' -->
+    <ag-grid-angular
+     #lookupgrid
+     *ngIf="receivedCapitalAct.length !== 0"
+        style="height: 200px; width: 1000px;"
+        [adaptableOptions]="adaptableOptions"
+        [gridOptions]="gridOptions"
+        [defaultColDef]="defaultColDef"
+        [modules]="[]"
+        [rowData]="receivedCapitalAct"
+        (adaptableReady)="onAdaptableReady($event)"
+        class="ag-theme-alpine"
+    ></ag-grid-angular>
+</ng-container>
+
+    <mat-dialog-actions align="end">
+        <button mat-raised-button color="primary" [disabled]="receivedCapitalID !== null" (click)="action(buttonText)"> {{buttonText}} </button>
+        <button mat-raised-button (click)="closeDialog()">Close</button>
+    </mat-dialog-actions>

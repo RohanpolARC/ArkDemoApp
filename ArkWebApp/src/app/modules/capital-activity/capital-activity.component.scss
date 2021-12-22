@@ -28,7 +28,6 @@
   }
   
   .capital-header {
-    padding-top: 25px;
     padding-left: 25px;
     display: flex;
     justify-content: space-between;
@@ -48,6 +47,54 @@
   }
 
   .ag-grid{
-      height: calc(100% - 40px);
+      height: calc(100% - 1rem);
       font-size: 0.8rem;
+  }
+
+  .grid{
+    height: 50%;
+    font-size: 0.8rem;
+  }
+
+  .grid-title{
+    font-size: 0.8rem;
+  }
+
+  .grid-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .header-icons{
+    font-size: 1.4rem;
+  }
+
+  .grid-full{
+    height: 100%;
+    font-size: 0.8rem;
+  }
+
+  .grid-zero{
+    height: 0%;
+  }
+
+  mat-panel-title{
+    font-size: 1rem;
+    padding-left: 1rem;
+  }
+
+  mat-panel-description{
+    font-size: 1rem;
+  }
+
+  // To fix starting position of Expansion panel description, if it exists
+  .accordion-headers .mat-expansion-panel-header-title,
+  .accordion-headers .mat-expansion-panel-header-description {
+    flex-basis: 0;
+  }
+  
+  .accordion-headers .mat-expansion-panel-header-description {
+    justify-content: space-between;
+    align-items: center;
   }

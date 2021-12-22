@@ -10,20 +10,71 @@
 
     </div>
 </div>
+
 <div class="content">
     <mat-card class="mat-content">
-        <ag-grid-angular
-            [adaptableOptions]="adaptableOptions"
-            [gridOptions]="gridOptions"
-            [defaultColDef]="defaultColDef"
-            [rowGroupPanelShow]="rowGroupPanelShow"
-            [modules]="agGridModules"
-            [rowData]="rowData"
-            [sideBar]="'columns'"
-            (adaptableReady)="onAdaptableReady($event)"
-            class="ag-theme-alpine ag-grid"
-        >
-        </ag-grid-angular>
+        <mat-accordion class="accordion-headers" multi [hideToggle]="false">
+            <mat-expansion-panel (opened)="invstmntPanelOpenState = true" (closed)="invstmntPanelOpenState = false">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Investment Cashflows
+                    </mat-panel-title>
+                    <mat-panel-description>  
+                        <div>
+                            
+                        </div>
+                        <mat-icon *ngIf="!invstmntPanelOpenState" class="header-icons">expand_more</mat-icon>
+                        <mat-icon *ngIf="invstmntPanelOpenState" class="header-icons">expand_less</mat-icon>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+
+                <ag-grid-angular style="height: 700px;"
+                [adaptableOptions]="adaptableOptionsInvstmnt"
+                [gridOptions]="gridOptionsInvstmnt"
+                [rowGroupPanelShow]="rowGroupPanelShow"
+                [defaultColDef]="defaultColDef"
+                [modules]="agGridModules"
+                [rowData]="rowDataInvstmnt"
+                [sideBar]="'columns'"
+                (adaptableReady)="onAdaptableInvstmntReady($event)"
+                class="ag-theme-alpine ag-grid"
+            ></ag-grid-angular>
+        
+
+            </mat-expansion-panel>
+
+            <mat-expansion-panel (opened)="investorPanelOpenState = true" (closed)="investorPanelOpenState = false">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Investor Cashflows
+                    </mat-panel-title>
+                    <mat-panel-description> 
+                        <div>
+                            
+                        </div>
+                        <mat-icon *ngIf="!investorPanelOpenState" class="header-icons">expand_more</mat-icon>
+                        <mat-icon *ngIf="investorPanelOpenState" class="header-icons">expand_less</mat-icon>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+
+                <ag-grid-angular style="height: 700px;"
+                [adaptableOptions]="adaptableOptions"
+                [gridOptions]="gridOptions"
+                [rowGroupPanelShow]="rowGroupPanelShow"
+                [defaultColDef]="defaultColDef"
+                [modules]="agGridModules"
+                [rowData]="rowData"
+                [sideBar]="'columns'"
+                (adaptableReady)="onAdaptableReady($event)"
+                class="ag-theme-alpine ag-grid"
+            ></ag-grid-angular>
+        
+
+            </mat-expansion-panel>
+
+        </mat-accordion> 
+        
     </mat-card>
 </div>
+
 </div>
