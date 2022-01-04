@@ -310,8 +310,8 @@ export class CapitalActivityComponent implements OnInit {
                   })
                   return;
                 }
-                  /* Gets LAST LEAF DATA or INDIVIDUAL ROW DATA */
-                let linkData = getNodes(context);
+
+                let linkData = getNodes(context.rowNode);
                 this.openDialog(linkData, 'LINK-ADD');
               },
               icon: {
