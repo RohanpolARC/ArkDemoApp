@@ -227,8 +227,17 @@ export class LinkInvestorModalComponent implements OnInit {
       }
       else investment.capitalID = null;
 
-      investment.createdBy = this.msalService.getUserName()
-      investment.createdOn = new Date();
+      investment.createdBy = investment.modifiedBy = this.msalService.getUserName()
+      investment.createdOn = investment.modifiedOn = new Date();
+
+      if(this.data.capitalAct.totalAmount < 0){
+        // Investment's GIR to be inserted into AssetGIR table.
+        investment.valueDate = this.data.capitalAct.valueDate;  
+        investment.fxRate = this.data.capitalAct.fxRate;  
+      }
+      else 
+        investment.valueDate = investment.fxRate = null;
+
       models.push(investment);
     }
 

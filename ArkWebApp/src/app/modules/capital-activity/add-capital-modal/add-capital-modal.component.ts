@@ -55,6 +55,8 @@ export class AddCapitalModalComponent implements OnInit {
   netISS: [string, string][] = []; // [ issuer, issuerShortName] []
 
   gridData: any[] = [];
+  
+  placeHolderGIR: string = null;
 
   validateField(options: string[], control: AbstractControl, field: string): string | null{
       //  Validates individual fields and returns fetched value if it's an allowed value.
@@ -297,6 +299,9 @@ export class AddCapitalModalComponent implements OnInit {
     /** _ since statusChanges returns INVALID form even when it is valid. Hence, using custom cross field validator: `capitalValidator` */
 
     this.capitalActivityForm.statusChanges.subscribe(_ => {
+
+      if(this.data.actionType === 'LINK-ADD')
+        this.placeHolderGIR = `${this.data.rowData[0].positionCcy} -> ${this.capitalActivityForm.get('fundCcy').value}`;
 
       if(this.capitalActivityForm.errors?.['validated'] && this.capitalActivityForm.touched)
         this.disableSubmit = false;

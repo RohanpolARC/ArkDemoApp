@@ -158,7 +158,7 @@
 
       <mat-form-field appearance="outline" class="edit">
         <mat-label> FX Rate / Going In Rate </mat-label>
-        <input type="number" required matInput formControlName="fxRate" />
+        <input type="number" required matInput placeholder="{{placeHolderGIR}}" formControlName="fxRate" />
         <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('fxRate').reset()">
             <mat-icon>close</mat-icon>
         </button>

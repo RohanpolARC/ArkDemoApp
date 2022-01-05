@@ -36,7 +36,9 @@ export interface CapitalInvestment{
     totalEur: number;
 
     capitalID?: number;
-
+    valueDate?: Date;   /* For inserting/updating AssetGIR (To be populated as AsOfDate) */
+    fxRate?: number;    /* For inserting/updating AssetGIR (To be populated as FxRate/GIR) */
+    
     createdOn: Date;
     createdBy: string;
     modifiedOn: Date;

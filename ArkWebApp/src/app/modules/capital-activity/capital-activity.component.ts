@@ -61,6 +61,7 @@ export class CapitalActivityComponent implements OnInit {
     {field: 'portfolio', headerName: 'Portfolio'},
     {field: 'issuerShortName', headerName: 'Issuer'},
     {field: 'asset', headerName: 'Asset'},
+    {field: 'assetID', headerName: 'AssetID'},
     {field: 'fundCcy', headerName: 'Fund Ccy'},
     {field: 'positionCcy', headerName: 'Position Ccy'},
     {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
@@ -117,30 +118,8 @@ export class CapitalActivityComponent implements OnInit {
 
   refData = [];
 
-  fullscreen: string = null;
-  maximize: boolean = false;
-
   invstmntPanelOpenState = false;
   investorPanelOpenState = false;
-
-  maximize_grid(grid: string, maximize: boolean){
-    if(grid === 'Investment' && maximize === true){
-      this.fullscreen = 'Investment';
-      this.maximize = true;
-    }
-    else if(grid === 'Investment' && maximize === false){
-      this.fullscreen = '-Investment';
-      this.maximize = false;
-    }
-    else if(grid === 'Investor' && maximize === true){
-      this.fullscreen = 'Investor';
-      this.maximize = true;
-    }
-    else if(grid === 'Investor' && maximize === false){
-      this.fullscreen = '-Investor';
-      this.maximize = false;
-    }
-  }
 
   fetchData(): void{
 
