@@ -53,6 +53,7 @@ export class LinkInvestorModalComponent implements OnInit {
     { field: 'asset', headerName: 'Asset', type:'abColDefString'},
     { field: 'narrative', headerName: 'Narrative', type:'abColDefString'},
     { field: 'source', headerName: 'Source', type:'abColDefString'},
+    { field: 'resultCategory', headerName: 'ResultCategory', type:'abColDefString'},
   ]
 
   buttonText: string = 'Create New';
@@ -157,7 +158,9 @@ export class LinkInvestorModalComponent implements OnInit {
                *  jumpToCell jumps to the current cell as loading grid changes the selected row position.
                */
             this.adapTableApi.gridApi.loadGridData(this.receivedCapitalAct);
+            this.adapTableApi.gridApi.expandRowGroupsForValues([context.rowNode.data.resultCategory]);
             this.adapTableApi.gridApi.jumpToCell(context.primaryKeyValue, 'ActionAssociate');
+            
           },
           icon:{
             src:
@@ -203,6 +206,7 @@ export class LinkInvestorModalComponent implements OnInit {
           ColumnWidthMap:{
             ActionAssociate: 30,
           },
+          RowGroupedColumns: ['resultCategory']
         }]
       }
     }
