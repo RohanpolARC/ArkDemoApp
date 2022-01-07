@@ -18,7 +18,9 @@ export interface CapitalActivityModel{
     modifiedBy: string;
 
     localAmount: number;
-    fxRate: number
+    fxRate: number;
+    
+    posCcy: string;
 }
 
 export interface CapitalInvestment{
@@ -35,10 +37,10 @@ export interface CapitalInvestment{
     totalBase: number;
     totalEur: number;
 
-    capitalID?: number;
+    capitalIDs?: number[];
     valueDate?: Date;   /* For inserting/updating AssetGIR (To be populated as AsOfDate) */
     fxRate?: number;    /* For inserting/updating AssetGIR (To be populated as FxRate/GIR) */
-    
+
     createdOn: Date;
     createdBy: string;
     modifiedOn: Date;

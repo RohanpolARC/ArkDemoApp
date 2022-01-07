@@ -195,6 +195,9 @@
   </div>
 
   <ng-container *ngIf="data.actionType === 'EDIT' || data.actionType === 'LINK-ADD'">
+      <div *ngIf="data.actionType === 'LINK-ADD'">
+        Investments
+      </div>
         <ng-container *ngIf="gridData.length > 0">
             <ag-grid-angular style="height: 200px; margin-top: 5px;"
                 [rowData]="gridData"
@@ -204,23 +207,34 @@
         </ng-container>
   </ng-container>
 
+  <ng-container *ngIf="data.actionType === 'LINK-ADD'">
+    <app-link-investor-modal [message]="{ 
+        actionType: 'LINK-ADD',
+        capitalAct: capitalAct,
+        investmentData: data.rowData
+    }"
+    [disableCreateNew]="isFormPurelyNotValid"
+    (closePopUpEvent)=closeFromLink($event)></app-link-investor-modal>
+  </ng-container>
 
 </mat-dialog-content>
 </form>
 
-<mat-dialog-actions align="end"> 
-    <div class="action">
-        <button
-        mat-raised-button
-        color="primary"
-        type="submit"
-        (click)="onSubmit()"
-        [disabled]="disableSubmit"
-        >
-        {{ buttontext }}
-        </button>
-        
-        <button class="close-button" type="button" mat-raised-button (click)="closeDialog(capitalAct)" >Close</button>
+<ng-container *ngIf="data.actionType !== 'LINK-ADD'">
+  <mat-dialog-actions align="end"> 
+      <div class="action">
+          <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          (click)="onSubmit()"
+          [disabled]="disableSubmit"
+          >
+          {{ buttontext }}
+          </button>
+          
+          <button class="close-button" type="button" mat-raised-button (click)="closeDialog(capitalAct)" >Close</button>
 
-    </div>
-</mat-dialog-actions>
+      </div>
+  </mat-dialog-actions>
+</ng-container>

@@ -58,6 +58,8 @@ export class AddCapitalModalComponent implements OnInit {
   
   placeHolderGIR: string = null;
 
+  isFormPurelyNotValid: boolean = true; // To be sent to link investor component.
+
   validateField(options: string[], control: AbstractControl, field: string): string | null{
       //  Validates individual fields and returns fetched value if it's an allowed value.
 
@@ -300,8 +302,12 @@ export class AddCapitalModalComponent implements OnInit {
 
     this.capitalActivityForm.statusChanges.subscribe(_ => {
 
-      if(this.data.actionType === 'LINK-ADD')
+      if(this.data.actionType === 'LINK-ADD'){
         this.placeHolderGIR = `${this.data.rowData[0].positionCcy} -> ${this.capitalActivityForm.get('fundCcy').value}`;
+        this.getFormCapitalAct();
+      }
+
+      this.isFormPurelyNotValid = !this.capitalActivityForm.errors?.['validated']
 
       if(this.capitalActivityForm.errors?.['validated'] && this.capitalActivityForm.touched)
         this.disableSubmit = false;
@@ -413,6 +419,9 @@ export class AddCapitalModalComponent implements OnInit {
         localAmount: localAmount,
         fxRate: posCcy === FundCcy ? 1 : null
       })
+
+      /* Initialises capitalAct for sending it to linking grid component */
+      this.getFormCapitalAct(); 
 
     }
     else if(this.data.actionType === 'EDIT')
@@ -544,6 +553,19 @@ export class AddCapitalModalComponent implements OnInit {
     }));
 
   }
+
+  closeFromLink(outcome){
+
+    if(outcome.event === 'Linked Close'){      
+      this.data.adapTableApiInvstmnt.gridApi.deleteGridData(this.data.rowData);
+      
+      if(outcome.isNewCapital){
+        this.data.adapTableApi.gridApi.addGridData([outcome.capitalAct]);
+      }
+    }
+    this.dialogRef.close();
+  }
+
   onSubmit(): void {
     this.disableSubmit = true;
     if(this.data.actionType === 'EDIT'){
@@ -560,38 +582,6 @@ export class AddCapitalModalComponent implements OnInit {
     }
     else if(this.data.actionType === 'ADD'){
       this.performSubmit();
-    }
-    else if(this.data.actionType === 'LINK-ADD'){
-      /** Handles Association or Add logic */
-
-      this.getFormCapitalAct();
-
-      this.disableSubmit = true;
-
-      this.capitalAct.createdOn = new Date();
-      this.capitalAct.createdBy = this.msalService.getUserName();
-  
-      const linkDialog = this.dialog.open(LinkInvestorModalComponent,{ 
-        data: {
-          actionType: 'LINK-ADD',
-          capitalAct: this.capitalAct,
-          investmentData: this.data.rowData
-      }});
-      this.subscriptions.push(linkDialog.afterClosed().subscribe(result => {
-
-        if(result.source === 'Linked Close'){
-
-          this.data.adapTableApiInvstmnt.gridApi.deleteGridData(this.data.rowData);
-          if(result.newCapital){
-            
-            this.data.adapTableApi.gridApi.addGridData([result.capitalAct]);
-          }
-
-          this.dialogRef.close();
-        }
-        else if(result.source === 'Empty Close')
-          this.disableSubmit = false;
-      }));  
     }
   }
 
