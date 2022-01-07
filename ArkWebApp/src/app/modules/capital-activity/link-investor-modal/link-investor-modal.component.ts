@@ -80,13 +80,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     enableRangeSelection: true,
     sideBar: false,
     suppressMenuHide: true,
-    singleClickEdit: true,
-    statusBar: {
-      statusPanels: [
-        { statusPanel: 'agTotalRowCountComponent', align: 'left' },
-        { statusPanel: 'agFilteredRowCountComponent' },
-      ],
-    },
+    singleClickEdit: false,
     components: {
       AdaptableToolPanel: AdaptableToolPanelAgGridComponent
     },
@@ -98,6 +92,8 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   adaptableOptions: AdaptableOptions = {
     primaryKey: 'capitalID',
     userName: 'TestUser',
+    adaptableId: '',
+    adaptableStateKey: 'Linking Key',
     predefinedConfig: {
       Dashboard: {
         ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
@@ -147,6 +143,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
       }
     }
   };
+
 
   closePopUp(){
     if(this.isSuccess)
@@ -281,6 +278,8 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
           this.checkedCapitalIDs = this.checkedCapitalIDs.filter(cID => cID !== info.rowData.capitalID)
         else
           this.checkedCapitalIDs.push(info.rowData.capitalID)
+
+        this.checkedCapitalIDs = this.checkedCapitalIDs.filter(cID => cID !== null && cID !== undefined)
 
         this.buttonText = (this.checkedCapitalIDs.length === 0) ? 'Create New' : 'Link';
 
