@@ -162,6 +162,10 @@ export class CapitalActivityComponent implements OnInit {
     this.gridOptionsInvstmnt = JSON.parse(JSON.stringify(this.gridOptions));
     this.gridOptionsInvstmnt.columnDefs = this.columnDefsInvstmnt;
 
+    this.gridOptionsInvstmnt.components = {
+      AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+    },
+
     this.adaptableOptions = {
       primaryKey: 'capitalID',
       userName: 'TestUser',
