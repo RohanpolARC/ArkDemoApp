@@ -207,18 +207,19 @@
         </ng-container>
   </ng-container>
 
-  <ng-container *ngIf="data.actionType === 'LINK-ADD'">
-    <app-link-investor-modal [message]="{ 
-        actionType: 'LINK-ADD',
-        capitalAct: capitalAct,
-        investmentData: data.rowData
-    }"
-    [disableCreateNew]="isFormPurelyNotValid"
-    (closePopUpEvent)=closeFromLink($event)></app-link-investor-modal>
-  </ng-container>
-
 </mat-dialog-content>
 </form>
+
+<ng-container *ngIf="data.actionType === 'LINK-ADD'">
+  <app-link-investor-modal [message]="{ 
+      actionType: 'LINK-ADD',
+      capitalAct: capitalAct,
+      investmentData: data.rowData
+  }"
+  [disableCreateNew]="isFormPurelyNotValid"
+  (closePopUpEvent)=closeFromLink($event)></app-link-investor-modal>
+</ng-container>
+
 
 <ng-container *ngIf="data.actionType !== 'LINK-ADD'">
   <mat-dialog-actions align="end"> 
