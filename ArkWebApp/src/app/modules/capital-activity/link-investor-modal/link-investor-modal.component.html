@@ -4,8 +4,13 @@
             Capital Activities ({{ receivedCapitalAct.length }})
         </div>
         <div>
-            <!-- .refresh-tooltip class is defined in styles.scss (Global Styles) -->
-            <button mat-icon-button (click)="searchCapitalActivities()" matTooltip="Refresh searched capital activities" matTooltipClass="refresh-tooltip">
+            <!-- .link-tooltip class is defined in styles.scss (Global Styles) -->
+
+            <button mat-icon-button (click)="clearFilter()" matTooltip="Clear Filter" matTooltipClass="link-tooltip">
+                <mat-icon class="material-icons-outlined">filter_alt_off</mat-icon>
+            </button>
+
+            <button mat-icon-button (click)="searchCapitalActivities()" matTooltip="Refresh Search" matTooltipClass="link-tooltip">
                 <mat-icon class="material-icons-outlined">refresh</mat-icon>
             </button>
         </div>

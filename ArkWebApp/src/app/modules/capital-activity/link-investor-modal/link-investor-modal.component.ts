@@ -31,7 +31,7 @@ import { Subscription } from 'rxjs';
 export class LinkInvestorModalComponent implements OnInit, OnChanges {
 
   @Input() message: any;
-
+  
   @Input() disableCreateNew: boolean = false;
 
   @Output() closePopUpEvent = new EventEmitter<any>();
@@ -276,6 +276,8 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
       // do stuff
     });
 
+    this.clearFilter();
+
     this.adapTableApi.eventApi.on(
       'CheckboxColumnClicked',
       (info: CheckboxColumnClickedInfo) => {
@@ -300,6 +302,10 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     private msalService: MsalUserService,
 ) { }
 
+  clearFilter(): void{
+    this.adapTableApi.filterApi.clearAllColumnFilter();
+  }
+
   searchCapitalActivities(){
     this.message.capitalAct.posCcy = this.message.investmentData[0].positionCcy;
 
@@ -321,7 +327,6 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges){
-    
   }
 
   checkedCapitalIDs: number[] = [];

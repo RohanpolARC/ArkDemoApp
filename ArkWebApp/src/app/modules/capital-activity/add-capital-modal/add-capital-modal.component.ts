@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { ViewEncapsulation } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -22,7 +22,10 @@ import { LinkInvestorModalComponent } from '../link-investor-modal/link-investor
   styleUrls: ['./add-capital-modal.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class AddCapitalModalComponent implements OnInit {
+export class AddCapitalModalComponent implements OnInit{
+
+  @ViewChild('linkComponent')
+  private childLinkComponent: LinkInvestorModalComponent;
 
   capitalAct: CapitalActivityModel = null;
 
@@ -552,6 +555,10 @@ export class AddCapitalModalComponent implements OnInit {
       }
     }));
 
+  }
+
+  onBlurForLink(){
+    this.childLinkComponent.searchCapitalActivities();
   }
 
   closeFromLink(outcome){
