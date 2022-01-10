@@ -18,7 +18,7 @@ import {
   CheckboxColumnClickedInfo,
 } from '@adaptabletools/adaptable/types';
 import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
-import { CapitalInvestment } from 'src/app/shared/models/CapitalActivityModel';
+import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/CapitalActivityModel';
 import { Subscription } from 'rxjs';
 
 
@@ -45,6 +45,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   isFailure: boolean = false;
 
   isCreateNew: boolean = false;
+  newCapitalAct: CapitalActivityModel = null;
 
   rowContext: ActionColumnButtonContext = null;
   columnDefs: ColDef[] = [
@@ -117,18 +118,18 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
         Layouts:[{
           Name: 'Associate Grid layout',
           Columns:[
-            'capitalID',
+            'fundCcy',
+            'totalAmount',
             'callDate',
             'valueDate',
             'capitalType',
             'capitalSubType',
             'fundHedging',
-            'fundCcy',
-            'totalAmount',
             'issuerShortName',
             'asset',
             'narrative',
             'source',
+            'capitalID',
             'Link'
 
           ],
@@ -147,7 +148,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
 
   closePopUp(){
     if(this.isSuccess)
-      this.closePopUpEvent.emit({event: 'Linked Close', capitalAct: this.message.capitalAct, isNewCapital: this.isCreateNew});
+      this.closePopUpEvent.emit({event: 'Linked Close', capitalAct: this.newCapitalAct, isNewCapital: this.isCreateNew});
     else
       this.closePopUpEvent.emit({event: 'Empty Close', capitalAct: null});
   }
@@ -189,7 +190,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     if(action === 'ASSOCIATE'){
       this.subscriptions.push(this.capitalActivityService.associateCapitalInvestments(models).subscribe({
         next: received => {
-          this.receivedCapitalID = received.data;
+          this.receivedCapitalID = received.data; //GroupID is received
 
           this.isSuccess = true;
           this.isFailure = false;
@@ -221,18 +222,23 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
         next: received => {
 
           // Step 2
+          let newCapitalID: number = received.data;
+
           for(let i =0; i < models.length; i+= 1)
             models[i].capitalIDs = [received.data];
             
           this.subscriptions.push(this.capitalActivityService.associateCapitalInvestments(models).subscribe({
             next: received => {
               console.log(`Successfully associated investments to group ID [${received.data}]`);
-              this.receivedCapitalID = received.data;
+              this.receivedCapitalID = newCapitalID;
               this.isCreateNew = true;
 
               this.isSuccess = true;
               this.isFailure = false;
               this.updateMsg = `Successfully associated investment to group ID [${received.data}]`;
+
+              this.newCapitalAct = JSON.parse(JSON.stringify(this.message.capitalAct));
+              this.newCapitalAct.capitalID = newCapitalID;
             },
             error: error => {
               console.error("Association failed");
@@ -315,6 +321,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges){
+    
   }
 
   checkedCapitalIDs: number[] = [];

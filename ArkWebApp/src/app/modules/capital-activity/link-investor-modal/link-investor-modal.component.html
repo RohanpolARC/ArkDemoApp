@@ -1,6 +1,14 @@
 <ng-container *ngIf="receivedCapitalAct">
-    <div class="found-text" >
-        Capital Activities ({{ receivedCapitalAct.length }})
+     <div class="search">
+        <div class="found-text" >
+            Capital Activities ({{ receivedCapitalAct.length }})
+        </div>
+        <div>
+            <!-- .refresh-tooltip class is defined in styles.scss (Global Styles) -->
+            <button mat-icon-button (click)="searchCapitalActivities()" matTooltip="Refresh searched capital activities" matTooltipClass="refresh-tooltip">
+                <mat-icon class="material-icons-outlined">refresh</mat-icon>
+            </button>
+        </div>
     </div>
 
     <div *ngIf="isSuccess" class="success-msg">
@@ -11,9 +19,7 @@
         {{ updateMsg }}
     </div>
 
-    <!-- #lookupgrid to detect clicks outside the grid to toggle the button text: 'Create New'/'Link' -->
     <ag-grid-angular
-     #lookupgrid
      *ngIf="receivedCapitalAct.length !== 0"
         style="height: 250px;"
         [adaptableOptions]="adaptableOptions"
@@ -29,6 +35,5 @@
         <button mat-raised-button color="primary" 
         [disabled]="(receivedCapitalID !== null) ? true : (buttonText === 'Create New' ? disableCreateNew : false)"
         (click)="action(buttonText)"> {{buttonText}} </button>
-        <!-- <button mat-raised-button (click)="searchCapitalActivities()">Search</button> -->
         <button mat-raised-button (click)="closePopUp()">Close</button>
     </mat-dialog-actions>

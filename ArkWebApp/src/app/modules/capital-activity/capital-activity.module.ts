@@ -20,6 +20,7 @@ import { UpdateConfirmComponent } from './update-confirm/update-confirm.componen
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { LinkInvestorModalComponent } from './link-investor-modal/link-investor-modal.component';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import { LinkInvestorModalComponent } from './link-investor-modal/link-investor-
     AdaptableAngularAgGridModule,
     AgGridModule,
     MatAutocompleteModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatTooltipModule
   ],
   exports:[CapitalActivityComponent]
 })
