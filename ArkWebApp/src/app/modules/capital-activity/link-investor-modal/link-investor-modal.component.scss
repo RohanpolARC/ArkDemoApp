@@ -1,7 +1,7 @@
-*{
-    font-size: 16px;
-}
 
+.found-text{
+    font-weight: 500;
+}
 .success-msg{
     color: rgb(8, 204, 90);
     padding: 5px
@@ -12,10 +12,6 @@
     padding: 5px;
 }
 
-.found-text{
-    padding: 5px
-}
-
 .material-icons-outlined{
     color: #0590ca;
     font-size: 24px;
@@ -24,8 +20,5 @@
 .search{
     display: flex;
     justify-content: space-between;
-}
-
-.refresh-tooltip{
-    font-size: 20px !important;
+    align-items: center;
 }
