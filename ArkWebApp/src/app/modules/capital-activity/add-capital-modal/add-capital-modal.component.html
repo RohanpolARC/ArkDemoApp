@@ -214,8 +214,7 @@
   <app-link-investor-modal #linkComponent [message]="{ 
       actionType: 'LINK-ADD',
       capitalAct: capitalAct,
-      investmentData: data.rowData,
-      isFxRateBlurred: isFxRateBlurred
+      investmentData: data.rowData
   }"
   [disableCreateNew]="isFormPurelyNotValid"
   (closePopUpEvent)=closeFromLink($event)></app-link-investor-modal>
