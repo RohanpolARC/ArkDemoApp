@@ -81,7 +81,10 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     enableRangeSelection: true,
     sideBar: false,
     suppressMenuHide: true,
+    suppressClickEdit: true,
     singleClickEdit: false,
+    groupSelectsFiltered: true,
+    enableGroupEdit: false,
     components: {
       AdaptableToolPanel: AdaptableToolPanelAgGridComponent
     },
@@ -91,7 +94,8 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   };
   adapTableApi: AdaptableApi;
   adaptableOptions: AdaptableOptions = {
-    primaryKey: 'capitalID',
+    primaryKey: '',
+    autogeneratePrimaryKey: true,
     userName: 'TestUser',
     adaptableId: '',
     adaptableStateKey: 'Linking Key',
@@ -110,7 +114,8 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
             },
             ColumnStyle: {
               CheckBoxStyle: true,
-            }
+            },
+            IncludeGroupedRows: false
           }
         ]
       },
@@ -281,17 +286,22 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     this.adapTableApi.eventApi.on(
       'CheckboxColumnClicked',
       (info: CheckboxColumnClickedInfo) => {
+        
+        this.checkedCapitalIDs = [];
+        let gridData = this.adapTableApi.gridApi.getVendorGrid().rowData;
 
-        if(this.checkedCapitalIDs.includes(info.rowData.capitalID))
-          this.checkedCapitalIDs = this.checkedCapitalIDs.filter(cID => cID !== info.rowData.capitalID)
-        else
-          this.checkedCapitalIDs.push(info.rowData.capitalID)
+        for(let i:number = 0; i < gridData.length; i+=1){
+          if(gridData[i].Link === true){
+            if(this.checkedCapitalIDs.includes(gridData[i].capitalID))
+              continue;
+            else this.checkedCapitalIDs.push(gridData[i].capitalID);
+          }
+        }
 
         this.checkedCapitalIDs = this.checkedCapitalIDs.filter(cID => cID !== null && cID !== undefined)
 
         this.buttonText = (this.checkedCapitalIDs.length === 0) ? 'Create New' : 'Link';
 
-        console.log(this.checkedCapitalIDs);
       }
     )
 
@@ -307,6 +317,9 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   }
 
   searchCapitalActivities(){
+    this.checkedCapitalIDs = [];
+    this.buttonText = 'Create New';
+
     this.message.capitalAct.posCcy = this.message.investmentData[0].positionCcy;
 
     this.subscriptions.push(this.capitalActivityService.lookUpCapitalActivity(this.message.capitalAct).subscribe({
@@ -335,6 +348,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
 
     this.isSuccess = this.isFailure = false;
     this.searchCapitalActivities();
+
   }
 
   ngOnDestroy(): void{
