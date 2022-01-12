@@ -53,7 +53,7 @@ export class CashBalanceComponent implements OnInit {
     {field: 'currency', headerName: 'Currency', type: 'abColDefString'},
     {field: 'pbClosingBalance', headerName: 'PB Closing Balance', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'fundCcy', headerName: 'Fund Ccy', type: 'abColDefString'},
-    {field: 'accountBalance', headerName: 'Account Balance', type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    {field: 'accountBalance', headerName: 'Account Balance', type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', valueFormatter: amountFormatter},
     {field: 'accountBalanceBase', headerName: 'Account Balance Base', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'portfolioName', headerName: 'Portfolio', type: 'abColDefString'},
     {field: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
