@@ -113,7 +113,22 @@ export class AddCapitalModalComponent implements OnInit{
     let FX: boolean = (fxRate !== null)
     let LA: boolean = (localAmount !== null)
 
-    return ((CD && VD && FH && CT && CST && CCY && TA && ((ISN && AS)|| NR || ISN) && FX && LA)) ? { validated : true }: { validated : false};
+    if(this.data.actionType === 'LINK-ADD')
+      return ((CD && VD && FH && CT && CST && CCY && TA && ((ISN && AS)|| NR || ISN) && FX && LA)) ? { 
+        validated : true 
+      }: { 
+        validated : false
+      };
+    else if(this.data.actionType === 'ADD' || this.data.actionType === 'EDIT')
+      return (CD && VD && FH && CT && CST && CCY && TA && ((ISN && AS)|| NR || ISN)) ? { 
+        validated : true 
+      }: { 
+        validated : false
+      };
+
+    return {
+      validated: false
+    }
   }
 
   capitalActivityForm= new FormGroup({

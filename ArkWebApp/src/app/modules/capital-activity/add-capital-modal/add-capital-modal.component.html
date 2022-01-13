@@ -156,23 +156,25 @@
 
     <div class="last-col">
 
-      <mat-form-field appearance="outline" class="edit">
-        <mat-label> FX Rate / Going In Rate </mat-label>
-        <input type="number" (blur)=onBlurForLink() required matInput placeholder="{{placeHolderGIR}}" formControlName="fxRate" />
-        <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('fxRate').reset()">
-            <mat-icon>close</mat-icon>
-        </button>
+      
+      <ng-container *ngIf="data.actionType === 'LINK-ADD'">
 
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="edit">
-        <mat-label>Local Amount </mat-label>
-        <input type="number" required matInput formControlName="localAmount" />
-        <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('localAmount').reset()">
-            <mat-icon>close</mat-icon>
-        </button>
-
-      </mat-form-field>
+        <mat-form-field appearance="outline" class="edit">
+          <mat-label> FX Rate / Going In Rate </mat-label>
+          <input type="number" (blur)=onBlurForLink() required matInput placeholder="{{placeHolderGIR}}" formControlName="fxRate" />
+          <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('fxRate').reset()">
+              <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="edit">
+          <mat-label>Local Amount </mat-label>
+          <input type="number" required matInput formControlName="localAmount" />
+          <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('localAmount').reset()">
+              <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+        
+      </ng-container>
 
       <mat-form-field appearance="outline" class="edit">
         <mat-label> Total Amount </mat-label>

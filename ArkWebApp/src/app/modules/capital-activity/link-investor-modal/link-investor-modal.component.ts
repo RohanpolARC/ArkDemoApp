@@ -240,7 +240,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
 
               this.isSuccess = true;
               this.isFailure = false;
-              this.updateMsg = `Successfully associated investment to group ID [${received.data}]`;
+              this.updateMsg = `Successfully associated investments to capital activities`;
 
               this.newCapitalAct = JSON.parse(JSON.stringify(this.message.capitalAct));
               this.newCapitalAct.capitalID = newCapitalID;
