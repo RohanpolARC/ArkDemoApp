@@ -88,8 +88,6 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
     { field: 'modifiedBy', headerName: 'Modified By', type:'abColDefString'},
 
-    { field: 'localAmount', headerName: 'Local Amount', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    { field: 'fxRate', headerName: 'FX Rate', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
   ]
 
   defaultColDef = {
