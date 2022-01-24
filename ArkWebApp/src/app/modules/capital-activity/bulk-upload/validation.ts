@@ -55,11 +55,6 @@ export function validateRowValueRange(row: any): {isValid: boolean, remark?: str
             remark: 'Amount cannot be 0'
         };
 
-    if((refOptions.issuerShortNames.indexOf(String(row['Issuer Short Name(optional)']).trim()) === -1)){
-        // console.log(refOptions.i);
-        console.log(String(row['Issuer Short Name(optional)']).trim())
-    }
-
     if((['', 'null', 'undefined'].indexOf(String(row['Fund Hedging']).trim()) === -1) && (refOptions.fundHedgings.indexOf(String(row['Fund Hedging']).trim()) === -1)){
         return {
             isValid: false,

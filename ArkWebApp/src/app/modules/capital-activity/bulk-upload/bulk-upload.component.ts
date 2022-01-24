@@ -272,7 +272,6 @@ export class BulkUploadComponent implements OnInit {
    }
 
    onGridReady(params) {
-    console.log('GRID INITIED');
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
 
@@ -288,7 +287,6 @@ export class BulkUploadComponent implements OnInit {
       
     }
   ) {
-    console.log(`ADAPTABLE INITED`);
     adaptableApi.eventApi.on('SelectionChanged', selection => {
       // do stuff
     });
@@ -360,8 +358,6 @@ export class BulkUploadComponent implements OnInit {
           jsonRowData[i]['_COLUMN_TITLE'] = getColumnTitle(i+2);
         }
 
-        console.log(jsonRowData)
-
         let validationResult: {isValid: boolean, invalidRows?: {row: any, remark: string}[]} = validateExcelRows(jsonRowData, {
           capitalTypes: this.data.capitalTypes,
           capitalSubTypes: this.data.capitalSubTypes,
@@ -370,17 +366,11 @@ export class BulkUploadComponent implements OnInit {
 
         this.isValid = validationResult.isValid;
 
-        console.log(validationResult)
-
-        console.log(this.adapTableApi);
-
         if(this.isValid){
-          console.log("I m VALID")
           this.bulkRowData = jsonRowData.filter(row => row['Cash Flow Date'] !== undefined && row['Cash Flow Date'] !== null)
           this.invalidRowData = [];
           this.isValid = true;  
           this.disableSubmit = false;
-          console.log(this.disableSubmit);
           this.adapTableApi.layoutApi.setLayout('Bulk Grid');
         }
         else{
@@ -396,7 +386,6 @@ export class BulkUploadComponent implements OnInit {
           this.invalidRowData = invalidRows;
           this.disableSubmit = true;
 
-          console.log(this.disableSubmit)
           this.adapTableApi.layoutApi.setLayout('Invalid Excel Grid')
         }
       }
@@ -407,9 +396,7 @@ export class BulkUploadComponent implements OnInit {
         this.validationErrorMsg = `Invalid column found "${validateColumns(extractedCols).col}"`;
         this.disableSubmit = true;
       }
-      console.log(this.disableSubmit)
     }
-    console.log(this.disableSubmit)
   }
 
   fileUpload(event){

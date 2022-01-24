@@ -37,7 +37,6 @@ export function addToGrid(adaptableApi: AdaptableApi, newRowData: any[], ID: any
         for(let i:number = 0; i < ID.length; i+= 1){
             newRowData[i][idName] = ID[i];
         }
-        console.log(newRowData);
         adaptableApi.gridApi.addGridData(newRowData);  
     }
 }
