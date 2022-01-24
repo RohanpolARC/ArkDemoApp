@@ -1,0 +1,82 @@
+:root{
+    font-size: 20px;
+    --header-height: 1.2rem;
+    --mat-dailog-actions-height: 68px;
+    --update-msg-height: 0.8rem;
+}
+
+.update-msg{
+    padding: 5px;
+    font-size: 0.8rem;
+}
+
+.success{
+    color: rgb(8, 204, 90);
+}
+
+.failure{
+    color: red;
+}
+.bulk-update{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    font-size: 10px;
+}
+
+.header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+h2{
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+mat-dialog-content{
+    height: 100%;
+}
+
+.action-header{
+    width: 100%;
+    height:90%;
+}
+
+.dropzone { 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column; 
+
+    font-size: 1rem;
+    font-weight: 200;
+    border: 2px solid #0590ca;
+    border-radius: 5px;
+    background: white;
+    margin: 10px 0;
+    width: 100%;
+    height: 100%;
+
+    &.hovering {
+        border: 2px solid #3f51b5;
+        color: #dadada !important;
+    }
+  
+}
+
+.dropzone p{
+    padding: 0 1em 0 1em;
+}
+
+.icon-color{
+    color: #0590ca;
+}
+
+.ag-grid{
+    height: calc(100% - 40px);
+    width: 100%;
+}

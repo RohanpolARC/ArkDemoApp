@@ -1,11 +1,18 @@
 import * as moment from 'moment';
 
 export function dateFormatter(params) {
-    if(params.value!=undefined)
-    return moment(params.value).format('DD/MM/YYYY');
+    let formattedDate = moment(params.value).format('DD/MM/YYYY');
+
+        // For capital acitivity bulk update, date read from excel might be invalid, hence format supplied. 
+    if(formattedDate === 'Invalid date')
+        formattedDate = moment(params.value, 'DD/MM/YYYY').format('DD/MM/YYYY')
+
+    if(formattedDate!=undefined)
+        return formattedDate;
     else{
-        return ""}
+        return ""
     }
+}
     
 export function dateTimeFormatter(params) {
     if(params.value==undefined || params.value=="0001-01-01T00:00:00")

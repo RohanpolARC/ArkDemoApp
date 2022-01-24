@@ -19,6 +19,7 @@ export class CapitalActivityService {
   private CAPITAL_INVESTMENT_ASSOCIATE_API: string = APIConfig.CAPITAL_INVESTMENT_ASSOCIATE_API;
 
   private CAPITAL_ACTIVITY_LOOKUP_API: string = APIConfig.CAPITAL_ACTIVITY_LOOKUP_API;
+  private CAPITAL_ACTIVITY_BULK_PUT_API: string = APIConfig.CAPITAL_ACTIVITY_BULK_PUT_API;
 
   httpOptions = {  
     headers: new HttpHeaders({  
@@ -33,6 +34,10 @@ export class CapitalActivityService {
 
     return this.http.post<any>(this.CAPITAL_ACTIVITY_PUT_API, capitalAct, this.httpOptions).pipe(
       catchError((ex) => throwError(ex)));
+  }
+
+  public bulkPutCapitalActivity(bulkCapitalAct: CapitalActivityModel[]){
+    return this.http.post<any>(this.CAPITAL_ACTIVITY_BULK_PUT_API, bulkCapitalAct, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
   }
 
   public lookUpCapitalActivity(capitalAct: CapitalActivityModel){

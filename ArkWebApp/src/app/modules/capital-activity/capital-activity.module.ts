@@ -21,16 +21,20 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { LinkInvestorModalComponent } from './link-investor-modal/link-investor-modal.component';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
+import { DropzoneDirective } from './bulk-upload/dropzone.directive';
 
 @NgModule({
   declarations: [
     CapitalActivityComponent,
     AddCapitalModalComponent,
     UpdateConfirmComponent,
-    LinkInvestorModalComponent
+    LinkInvestorModalComponent,
+    BulkUploadComponent,
+    DropzoneDirective,
   ],
   /** Add all pop-up modal components here, for this module */
-  entryComponents: [AddCapitalModalComponent, UpdateConfirmComponent],
+  entryComponents: [AddCapitalModalComponent, UpdateConfirmComponent, BulkUploadComponent],
   imports: [
     CommonModule,
     BrowserAnimationsModule,
@@ -48,7 +52,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
     AgGridModule,
     MatAutocompleteModule,
     MatExpansionModule,
-    MatTooltipModule
+    MatTooltipModule,
   ],
   exports:[CapitalActivityComponent]
 })

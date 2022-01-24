@@ -27,8 +27,10 @@ import { Subscription } from 'rxjs';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
 import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
 
-import { getNodes, validateLinkSelect }from '../capital-activity/functions';
+import { getNodes, validateLinkSelect }from './utilities/functions';
 import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
+
+import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
 
 @Component({
   selector: 'app-capital-activity',
@@ -78,6 +80,7 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
     { field: 'fundCcy', headerName: 'Currency', type:'abColDefString'},
     { field: 'totalAmount', headerName: 'Total Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    {field: 'wsoIssuerID', headerName: 'WSO Issuer ID'},
     { field: 'issuerShortName', headerName: 'Issuer Short Name', type:'abColDefString'},
     { field: 'asset', headerName: 'Asset', type:'abColDefString'},
     { field: 'narrative', headerName: 'Narrative', type:'abColDefString'},
@@ -232,6 +235,7 @@ export class CapitalActivityComponent implements OnInit {
               'totalAmount',
               'localAmount',
               'fxRate',
+              'wsoIssuerID',
               'issuerShortName',
               'asset',
               'narrative',
@@ -367,6 +371,25 @@ export class CapitalActivityComponent implements OnInit {
 
   ngOnDestroy(): void{
     this.subscriptions.forEach(subscription => subscription.unsubscribe())
+  }
+
+  openBulkUploadDialog(): void {
+    const dialogRef = this.dialog.open(BulkUploadComponent, {
+      data: {
+        adaptableApiInvestor: this.adapTableApi,
+        capitalTypes: this.capitalTypeOptions,
+        capitalSubTypes: this.capitalSubTypeOptions,
+        refData: this.refData
+
+      },
+      width: '80vw',
+      maxWidth: '90vw',
+      height: '80vh',
+      hasBackdrop: false,
+    })
+    this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
+      // Bulk Upload Dialog Closed.
+    }))
   }
 
   openDialog(data? , actionType = 'ADD', gridData = null):void{

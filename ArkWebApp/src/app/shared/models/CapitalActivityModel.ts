@@ -17,6 +17,7 @@ export interface CapitalActivityModel{
     modifiedOn: Date;
     modifiedBy: string;
 
+    wsoIssuerID: number;
     localAmount: number;
     fxRate: number;
     
