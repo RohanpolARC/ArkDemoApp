@@ -28,6 +28,7 @@ import { ExcelExportModule } from '@ag-grid-enterprise/excel-export';
 import {
   AdaptableOptions,
   AdaptableApi,
+  PredicateDefHandlerParams,
 } from '@adaptabletools/adaptable/types';
 import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 
@@ -109,7 +110,7 @@ export class BulkUploadComponent implements OnInit {
     {field: 'Narative (optional)', maxWidth: 150, headerName: 'Narrative'},
     {field: 'remark', maxWidth: 500},
     {field: '_COLUMN_TITLE', headerName: 'Column', maxWidth: 300},
-    {field: 'Action', maxWidth: 150}
+    // {field: 'Action', maxWidth: 150}
   ]
    
   bulkRowData = [];
@@ -165,7 +166,7 @@ export class BulkUploadComponent implements OnInit {
     model.asset = obj['Asset (optional)'];
     model.fundCcy = obj['Fund Currency'];
     model.wsoIssuerID = obj['Wso Issuer ID'];
-    model.action = obj['Action'];
+//    model.action = obj['Action'];
 
     model.createdBy = model.modifiedBy = this.msalService.getUserName();
     model.createdOn = model.modifiedOn = new Date();
@@ -201,7 +202,8 @@ export class BulkUploadComponent implements OnInit {
      toolPanelOptions: {
        toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
      },
- 
+     
+
      predefinedConfig: {
        Dashboard: {
          ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
@@ -215,10 +217,11 @@ export class BulkUploadComponent implements OnInit {
               ColumnIds: ['remark'],
             },
             Style: {
-              BackColor: '#FFFFFF',
               ForeColor: '#FF0000',
             },
-          }]},
+          }
+        ]
+      },
        Layout: {
          CurrentLayout: 'Bulk Grid',
          Layouts: [{
@@ -235,7 +238,6 @@ export class BulkUploadComponent implements OnInit {
              'Asset (optional)',
              'Narative (optional)',
              '_COLUMN_TITLE',
-             'Action'
            ],
            PinnedColumnsMap: {
             _COLUMN_TITLE: 'left'
@@ -260,7 +262,6 @@ export class BulkUploadComponent implements OnInit {
             'Narative (optional)',
             'remark',
             '_COLUMN_TITLE',
-            'Action'
            ],
            PinnedColumnsMap: {
              _COLUMN_TITLE: 'left',
@@ -270,6 +271,7 @@ export class BulkUploadComponent implements OnInit {
              _COLUMN_TITLE: 5,
              remark: 300
            }
+          
          }
         ]
        }
@@ -298,7 +300,7 @@ export class BulkUploadComponent implements OnInit {
 
     this.adapTableApi = adaptableApi;
 /* Closes right sidebar on start */
-
+   
     this.readFile(this.selectedFile);
     adaptableApi.toolPanelApi.closeAdapTableToolPanel();
 

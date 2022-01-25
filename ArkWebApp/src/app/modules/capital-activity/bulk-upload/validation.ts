@@ -12,7 +12,7 @@ let actualCols: string[] = [
     'Issuer Short Name(optional)',
     'Asset (optional)',
     'Narative (optional)',
-    'Action'
+    // 'Action'
 ]
 
 let refOptions;
@@ -32,7 +32,11 @@ export function validateColumns(fileColumns: string[]): {isValid: boolean, col?:
 export function validateRowForEmptiness(row: any): {isValid: boolean, remark?: string}{
     
     for(let i:number = 0; i < actualCols.length; i+=1){
-        if((row[actualCols[i]] === null || row[actualCols[i]] === undefined) && ['Issuer Short Name(optional)', 'Asset (optional)','Narative (optional)'].indexOf(actualCols[i]) === -1)
+        if((row[actualCols[i]] === null || row[actualCols[i]] === undefined) && 
+        [
+            'Issuer Short Name(optional)', 'Asset (optional)','Narative (optional)', 
+            'Wso Issuer ID'
+        ].indexOf(actualCols[i]) === -1)
             return {
                 isValid: false,
                 remark: `${actualCols[i]} cannot be empty`
@@ -84,14 +88,17 @@ export function validateRowValueRange(row: any): {isValid: boolean, remark?: str
         };
     }
 
-    if((['', 'null', 'undefined'].indexOf(String(row['Wso Issuer ID']).trim()) === -1) && (refOptions.wsoIssuerIDs.indexOf(parseInt(row['Wso Issuer ID'])) === -1)){
-        
-        return {
-            isValid: false,
-            remark: `Wso Issuer ID '${String(row['Wso Issuer ID'])}' not in range`
-        };
-    }
 
+    if((['', 'null', 'undefined'].indexOf(String(row['Wso Issuer ID']).trim()) !== -1)){
+        if(['Investment', 'Income'].indexOf(String(row['Capital Subtype']).trim()) !== -1){
+            // Subtype is 'Investment', 'Income' && WSOIssuerID is null
+            return {
+                isValid: false,
+                remark: `WSOIssuerID cannot be empty for subtype '${String(row['Capital Subtype'])}'`
+            };  
+        }
+    }
+    
     if((['', 'null', 'undefined'].indexOf(String(row['Action']).trim()) === -1) && (['ADD', 'UPDATE'].indexOf(String(row['Action']).trim()) === -1)){
         return {
             isValid: false,
