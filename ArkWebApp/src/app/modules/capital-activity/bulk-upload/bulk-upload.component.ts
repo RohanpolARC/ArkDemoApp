@@ -6,7 +6,8 @@ import * as XLSX from 'xlsx';
 import { ColDef } from '@ag-grid-community/core';
 import { HttpClient } from '@angular/common/http';
 
-import { dateFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
+import { amountFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter } from '../utilities/utility';
 import { CapitalActivityModel } from 'src/app/shared/models/CapitalActivityModel';
 import * as moment from 'moment';
 import { Subscription } from 'rxjs';
@@ -107,7 +108,8 @@ export class BulkUploadComponent implements OnInit {
     {field: 'Asset (optional)', maxWidth: 150, headerName: 'Asset'},
     {field: 'Narative (optional)', maxWidth: 150, headerName: 'Narrative'},
     {field: 'remark', maxWidth: 500},
-    {field: '_COLUMN_TITLE', headerName: 'Column', maxWidth: 300}
+    {field: '_COLUMN_TITLE', headerName: 'Column', maxWidth: 300},
+    {field: 'Action', maxWidth: 150}
   ]
    
   bulkRowData = [];
@@ -163,6 +165,7 @@ export class BulkUploadComponent implements OnInit {
     model.asset = obj['Asset (optional)'];
     model.fundCcy = obj['Fund Currency'];
     model.wsoIssuerID = obj['Wso Issuer ID'];
+    model.action = obj['Action'];
 
     model.createdBy = model.modifiedBy = this.msalService.getUserName();
     model.createdOn = model.modifiedOn = new Date();
@@ -231,10 +234,11 @@ export class BulkUploadComponent implements OnInit {
              'Issuer Short Name(optional)',
              'Asset (optional)',
              'Narative (optional)',
-             '_COLUMN_TITLE'
+             '_COLUMN_TITLE',
+             'Action'
            ],
            PinnedColumnsMap: {
-            _COLUMN_TITLE: 'right'
+            _COLUMN_TITLE: 'left'
           },
           ColumnWidthMap: {
             _COLUMN_TITLE: 5
@@ -255,10 +259,11 @@ export class BulkUploadComponent implements OnInit {
             'Asset (optional)',
             'Narative (optional)',
             'remark',
-            '_COLUMN_TITLE'
+            '_COLUMN_TITLE',
+            'Action'
            ],
            PinnedColumnsMap: {
-             _COLUMN_TITLE: 'right',
+             _COLUMN_TITLE: 'left',
              remark: 'right'
            },
            ColumnWidthMap: {

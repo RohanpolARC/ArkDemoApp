@@ -1,5 +1,6 @@
 import { AdaptableApi } from "@adaptabletools/adaptable/types";
 import * as XLSX from 'xlsx';
+import * as moment from 'moment';
 
 export function readExcelFromDrop(selectedFile: File){
     const fileReader = new FileReader();
@@ -47,23 +48,27 @@ export function getUniqueOptions(ref: {capitalTypes: string[], capitalSubTypes: 
     let fundHedgings: string[] = [];
     let fundCcys: string[] = [];
     let issuerShortNames: string[] = [];
-    let assets: string[] = []
+    let assets: string[] = [];
+    let wsoIssuerIDs: number[] = [];
 
     for(let i:number = 0; i < ref.refData.length; i+=1){
         fundHedgings.push(ref.refData[i].fundHedging);
         fundCcys.push(ref.refData[i].fundCcy);
         issuerShortNames.push(ref.refData[i].issuerShortName);
         assets.push(ref.refData[i].asset);
+        wsoIssuerIDs.push(ref.refData[i].wsoIssuerID);
     }
 
     fundHedgings = getUniqueOptionsFor(fundHedgings);
     fundCcys = getUniqueOptionsFor(fundCcys);
     issuerShortNames = getUniqueOptionsFor(issuerShortNames);
     assets = getUniqueOptionsFor(assets);    
-    return {capitalTypes, capitalSubTypes, fundHedgings, issuerShortNames, assets, fundCcys};
+    wsoIssuerIDs = getUniqueOptionsFor(wsoIssuerIDs);
+    
+    return {capitalTypes, capitalSubTypes, fundHedgings, issuerShortNames, assets, fundCcys, wsoIssuerIDs};
 }
 
-export function getUniqueOptionsFor(options: string[]): string[] {
+export function getUniqueOptionsFor(options: any[]): any[] {
     return [... new Set(options)];
 }
 
@@ -82,4 +87,18 @@ export function getColumnTitle(idx: number): string | null{
         idx = n_digits
     }
     return col.split('').reverse().join('');
+}
+
+export function dateFormatter(params){
+    let formattedDate = moment(params.value).format('DD/MM/YYYY');
+
+        // For capital acitivity bulk update, date read from excel might be invalid, hence format supplied. 
+    if(formattedDate === 'Invalid date')
+        formattedDate = moment(params.value, 'DD/MM/YYYY').format('DD/MM/YYYY')
+
+    if(formattedDate!=undefined)
+        return formattedDate;
+    else{
+        return ""
+    }
 }

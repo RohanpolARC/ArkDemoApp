@@ -12,6 +12,7 @@ let actualCols: string[] = [
     'Issuer Short Name(optional)',
     'Asset (optional)',
     'Narative (optional)',
+    'Action'
 ]
 
 let refOptions;
@@ -83,12 +84,22 @@ export function validateRowValueRange(row: any): {isValid: boolean, remark?: str
         };
     }
 
-    if((['', 'null', 'undefined'].indexOf(String(row['Issuer Short Name(optional)']).trim()) === -1) && (refOptions.issuerShortNames.indexOf(String(row['Issuer Short Name(optional)']).trim()) === -1)){
+    if((['', 'null', 'undefined'].indexOf(String(row['Wso Issuer ID']).trim()) === -1) && (refOptions.wsoIssuerIDs.indexOf(parseInt(row['Wso Issuer ID'])) === -1)){
+        
         return {
             isValid: false,
-            remark: `Issuer '${String(row['Issuer Short Name(optional)'])}' not in range`
+            remark: `Wso Issuer ID '${String(row['Wso Issuer ID'])}' not in range`
         };
     }
+
+    if((['', 'null', 'undefined'].indexOf(String(row['Action']).trim()) === -1) && (['ADD', 'UPDATE'].indexOf(String(row['Action']).trim()) === -1)){
+        return {
+            isValid: false,
+            remark: `Action '${String(row['Action'])}' not in range`
+        };
+    }
+
+
 
     return {
         isValid: true
@@ -112,7 +123,7 @@ export function validateRow(row: any): {isValid: boolean, remark?: string} {
 export function validateExcelRows(rows: any[], ref: {capitalTypes: string[], capitalSubTypes: string[], refData: any}): {isValid: boolean, invalidRows?: {row: any, remark: string}[]} {
 
     refOptions = getUniqueOptions(ref);
-
+    
     let invalidRows: any[] = [];
 
     for(let i:number = 0; i < rows.length; i+=1){
