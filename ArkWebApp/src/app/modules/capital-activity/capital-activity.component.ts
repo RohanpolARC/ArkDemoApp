@@ -382,7 +382,7 @@ export class CapitalActivityComponent implements OnInit {
         refData: this.refData
 
       },
-      width: '80vw',
+      width: '90vw',
       maxWidth: '90vw',
       height: '80vh',
       hasBackdrop: false,
