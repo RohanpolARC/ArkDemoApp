@@ -40,17 +40,15 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
-        working-directory: ArkWebApp
+        cache-dependency-path: ArkWebApp
         
         
     - name: npm clean install
       run: npm ci
-      working-directory: ArkWebApp
       
 
     - name: npm build
       run: npm run ng build -- --configuration=uat --source-map=false
-      working-directory: ArkWebApp
       
 
     - name: Upload artifact for deployment job
