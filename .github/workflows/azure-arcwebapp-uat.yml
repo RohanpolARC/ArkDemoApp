@@ -26,30 +26,38 @@ env:
   AZURE_WEBAPP_NAME: arcwebuat    # set this to your application's name
   AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '14.x'                # set this to the node version to use
+  
+  
 
 jobs:
   build:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2      
 
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
+        working-directory: ArkWebApp
+        
         
     - name: npm clean install
       run: npm ci
+      working-directory: ArkWebApp
+      
 
     - name: npm build
       run: npm run ng build -- --configuration=uat --source-map=false
+      working-directory: ArkWebApp
+      
 
     - name: Upload artifact for deployment job
       uses: actions/upload-artifact@v2
       with:
         name: node-app
-        path: .
+        path: ./ArkWebApp
 
   deploy:
     runs-on: windows-latest
