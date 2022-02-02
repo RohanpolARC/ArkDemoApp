@@ -53,6 +53,7 @@ export class AppComponent {
 
   GIREditorStyle: any = {};
   CashBalanceStyle: any = {};
+  CapitalActivityStyle: any = {};
 
   constructor(private http: HttpClient,private dataService: DataService,public dialog: MatDialog,iconRegistry:MatIconRegistry, private location:Location) {
 
@@ -91,11 +92,19 @@ getLastBusinessDay(){
       this.filterPane.AsOfDate = true;
       this.CashBalanceStyle = this.selectedElement;
       this.GIREditorStyle = this.notSelectedElement;
+      this.CapitalActivityStyle = this.notSelectedElement;
     }
       /** If GIR Editor screen is directly loaded */
     else if(this.location.path() === ''){
       this.filterPane.AsOfDate = false;
       this.GIREditorStyle = this.selectedElement;
+      this.CashBalanceStyle = this.notSelectedElement;
+      this.CapitalActivityStyle = this.notSelectedElement;
+    }
+    else if(this.location.path() === '/capital-activity'){
+      this.filterPane.AsOfDate = false;
+      this.CapitalActivityStyle = this.selectedElement;
+      this.GIREditorStyle = this.notSelectedElement;
       this.CashBalanceStyle = this.notSelectedElement;
     }
   }  
@@ -128,11 +137,19 @@ getLastBusinessDay(){
       this.filterPane.AsOfDate = false;
       this.GIREditorStyle = this.selectedElement;
       this.CashBalanceStyle = this.notSelectedElement;
+      this.CapitalActivityStyle = this.notSelectedElement;
     }
     else if(screen === 'Cash Balance'){
       this.filterPane.AsOfDate = true;
       this.CashBalanceStyle = this.selectedElement;
       this.GIREditorStyle = this.notSelectedElement;
+      this.CapitalActivityStyle = this.notSelectedElement;
+    }
+    else if(screen === 'Capital Activity'){
+      this.filterPane.AsOfDate = false;
+      this.CashBalanceStyle = this.notSelectedElement;
+      this.GIREditorStyle = this.notSelectedElement;
+      this.CapitalActivityStyle = this.selectedElement;
     }
   }
 

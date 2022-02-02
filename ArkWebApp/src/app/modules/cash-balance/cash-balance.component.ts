@@ -20,8 +20,8 @@ import {
 } from '@adaptabletools/adaptable/types';
 import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 
-import * as moment from 'moment'
 import { AsOfDate } from 'src/app/shared/models/FilterPaneModel';
+import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
 
 
 @Component({
@@ -46,23 +46,24 @@ export class CashBalanceComponent implements OnInit {
   agGridModules: Module[] = [ClientSideRowModelModule,RowGroupingModule,SetFilterModule,ColumnsToolPanelModule,MenuModule, ExcelExportModule];
 
   columnDefs = [
-    {field: 'asofDate', headerName: 'As of Date', type: 'abColDefDate', valueFormatter: this.dateFormatter},
+    {field: 'asofDate', headerName: 'As of Date', type: 'abColDefDate', valueFormatter: dateFormatter},
     {field: 'pbName', headerName: 'Prime Broker', type: 'abColDefString'},
     {field: 'mapName', headerName: 'Map', type: 'abColDefString'},
     {field: 'account', headerName: 'Account', type:'abColDefNumber'},
     {field: 'currency', headerName: 'Currency', type: 'abColDefString'},
-    {field: 'pbClosingBalance', headerName: 'Account Balance', type:'abColDefNumber', valueFormatter: this.amountFormatter},
+    {field: 'pbClosingBalance', headerName: 'PB Closing Balance', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'fundCcy', headerName: 'Fund Ccy', type: 'abColDefString'},
-    {field: 'accountBalanceBase', headerName: 'Account Balance Base', type:'abColDefNumber', valueFormatter: this.amountFormatter},
+    {field: 'accountBalance', headerName: 'Account Balance', type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', valueFormatter: amountFormatter},
+    {field: 'accountBalanceBase', headerName: 'Account Balance Base', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'portfolioName', headerName: 'Portfolio', type: 'abColDefString'},
     {field: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
     {field: 'fundLegalEntity', headerName: 'Fund Legal Entity', type: 'abColDefString'},
     {field: 'fund', headerName: 'Fund', type: 'abColDefString'},
     {field: 'fundStrategy', headerName: 'Fund Strategy', type: 'abColDefString'},
-    {field: 'marketValueFactor', headerName: 'MV Factor', type:'abColDefNumber'},
-    {field: 'accountBalanceEur', headerName: 'Account Balance Eur', type:'abColDefNumber', valueFormatter: this.amountFormatter},
-    {field: 'mvFundHedging', headerName: 'MV FundHedging', type:'abColDefNumber', valueFormatter: this.amountFormatter},
-    {field: 'mvLegalEntity', headerName: 'MV FundLegalEntity', type:'abColDefNumber', valueFormatter: this.amountFormatter},
+    {field: 'marketValueFactor', headerName: 'MV Factor', type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    {field: 'accountBalanceEur', headerName: 'Account Balance Eur', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    {field: 'mvFundHedging', headerName: 'MV FundHedging', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    {field: 'mvLegalEntity', headerName: 'MV FundLegalEntity', type:'abColDefNumber', valueFormatter: amountFormatter},
     {field: 'isSplited', headerName: 'IsSplited', type:'abColDefBoolean'},
   ];
 
@@ -144,6 +145,7 @@ export class CashBalanceComponent implements OnInit {
             'currency',
             'pbClosingBalance',
             'fundCcy',
+            'accountBalance',
             'accountBalanceBase',
             'accountBalanceEur',
             'portfolioName',
@@ -181,29 +183,4 @@ export class CashBalanceComponent implements OnInit {
 /* Closes right sidebar on start */
     adaptableApi.toolPanelApi.closeAdapTableToolPanel();
   }
-
-  dateFormatter(params) {
-    if(params.value!=undefined)
-    return moment(params.value).format('DD/MM/YYYY');
-    else{
-      return ""
-    }
-  }
-
-  amountFormatter(params){
-    if(params.value!=undefined&&Number(params.value)!=0)
-    return Number(params.value).toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-    else if(Number(params.value)==0) {
-      return "-"
-    } else{
-      return ""
-    }
-
-  }
-
-
-  
 }

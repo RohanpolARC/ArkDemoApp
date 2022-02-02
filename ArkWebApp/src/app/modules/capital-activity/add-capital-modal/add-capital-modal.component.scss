@@ -1,0 +1,69 @@
+
+.input-field {
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    max-width: 500px;
+}
+  
+// .input-field > * {
+// width: 100%;
+// }
+
+.edit{
+    width: 250px;
+    margin-right: 17px;
+}
+  
+.edit .mat-form-field-wrapper{
+    padding: 10px;
+}
+
+.title{
+    padding-bottom: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #1e2a46;
+}
+
+.action{
+    margin: 0 13px 10px 0;   
+}
+
+.close-button{
+    margin-left: 10px;
+}
+
+.success-msg{
+    color: rgb(8, 204, 90);
+    padding: 5px
+}
+
+.failure-msg{
+    color: red;
+    padding: 5px;
+}
+
+.last-col{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.main-content{
+    min-height: 325px;
+}
+.mat-option{
+    font-size: 13px !important;
+}
+
+.mat-error{
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+#header-investment{
+    font-weight: 500;
+}
+// capital-autocomplete-panel defined in styles.scss.  

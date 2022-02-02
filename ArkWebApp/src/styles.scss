@@ -64,3 +64,17 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   color: #fff;
 }
 
+// Autocomplete panel in Capital Activity screen (add-capital-modal.component.html)
+// Defined here, since autocomplete panel is in the overlay.
+.capital-autocomplete-panel{
+  max-height: 150px !important;
+}
+
+.associate-button{
+    filter: invert(56%) sepia(74%) saturate(3986%) hue-rotate(87deg) brightness(124%) contrast(124%) !important;
+}
+
+// Capital Activity -> Link investor modal
+.link-tooltip{
+  font-size: 15px !important;
+}
