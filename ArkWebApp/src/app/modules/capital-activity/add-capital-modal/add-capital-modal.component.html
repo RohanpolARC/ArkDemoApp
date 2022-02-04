@@ -67,15 +67,17 @@
         <mat-label>Issuer</mat-label>
         <input type="text" matInput formControlName="issuerShortName" [matAutocomplete]="autoissuer" matAutocompletePosition="below">
         <mat-error *ngIf="capitalActivityForm.get('issuerShortName').invalid">Please select issuer from the list</mat-error>
-        <mat-autocomplete autoActiveFirstOption #autoissuer="matAutocomplete" (optionSelected)='issuerSelect($event)'  panelWidth="auto" class="capital-autocomplete-panel" classList="capital-autocomplete-panel">
+        <mat-autocomplete #autoissuer="matAutocomplete" (optionSelected)='issuerSelect($event)'  panelWidth="auto" class="capital-autocomplete-panel" classList="capital-autocomplete-panel">
           <mat-option
             *ngFor="let ISS of issuerFilteredOptions | async"
             [value]="ISS[1]"
+            (click)="setIssuerID(ISS)"
           >
             {{ISS[0]}}
           </mat-option>
         </mat-autocomplete>
-        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('issuerShortName').reset()">
+        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('issuerShortName').reset();
+        selectedIssuerID = null">
             <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>

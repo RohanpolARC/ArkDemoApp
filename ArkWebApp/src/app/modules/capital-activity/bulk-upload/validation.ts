@@ -32,7 +32,7 @@ export function validateColumns(fileColumns: string[]): {isValid: boolean, col?:
 export function validateRowForEmptiness(row: any): {isValid: boolean, remark?: string}{
     
     for(let i:number = 0; i < actualCols.length; i+=1){
-        if((row[actualCols[i]] === null || row[actualCols[i]] === undefined) && 
+        if(!row[actualCols[i]] && 
         [
             'Issuer Short Name(optional)', 'Asset (optional)','Narative (optional)', 
             'Wso Issuer ID'
@@ -60,53 +60,51 @@ export function validateRowValueRange(row: any): {isValid: boolean, remark?: str
             remark: 'Amount cannot be 0'
         };
 
-    if((['', 'null', 'undefined'].indexOf(String(row['Fund Hedging']).trim()) === -1) && (refOptions.fundHedgings.indexOf(String(row['Fund Hedging']).trim()) === -1)){
+    if(!!row['Fund Hedging'] && (refOptions.fundHedgings.indexOf(String(row['Fund Hedging']).trim()) === -1)){
         return {
             isValid: false,
             remark: `Fund Hedging '${String(row['Fund Hedging'])}' not in range`
         };
     }
 
-    if((['', 'null', 'undefined'].indexOf(String(row['Fund Currency']).trim()) === -1) && (refOptions.fundCcys.indexOf(String(row['Fund Currency']).trim()) === -1)){
+    if(!!row['Fund Currency'] && (refOptions.fundCcys.indexOf(String(row['Fund Currency']).trim()) === -1)){
         return {
             isValid: false,
             remark: `Fund Currency '${String(row['Fund Currency'])}' not in range`
         };
     }
 
-    if((['', 'null', 'undefined'].indexOf(String(row['Capital Type']).trim()) === -1) && (refOptions.capitalTypes.indexOf(String(row['Capital Type']).trim()) === -1)){
+    if(!!row['Capital Type'] && (refOptions.capitalTypes.indexOf(String(row['Capital Type']).trim()) === -1)){
         return {
             isValid: false,
             remark: `Capital Type '${String(row['Capital Type'])}' not in range`
         };
     }
 
-    if((['', 'null', 'undefined'].indexOf(String(row['Capital Subtype']).trim()) === -1) && (refOptions.capitalSubTypes.indexOf(String(row['Capital Subtype']).trim()) === -1)){
+    if(!!row['Capital Subtype'] && (refOptions.capitalSubTypes.indexOf(String(row['Capital Subtype']).trim()) === -1)){
         return {
             isValid: false,
             remark: `Capital Subtype '${String(row['Capital Subtype'])}' not in range`
         };
     }
 
-
-    if((['', 'null', 'undefined'].indexOf(String(row['Wso Issuer ID']).trim()) !== -1)){
-        if(['Investment', 'Income'].indexOf(String(row['Capital Subtype']).trim()) !== -1){
-            // Subtype is 'Investment', 'Income' && WSOIssuerID is null
-            return {
-                isValid: false,
-                remark: `WSOIssuerID cannot be empty for subtype '${String(row['Capital Subtype'])}'`
-            };  
-        }
-    }
-    
-    if((['', 'null', 'undefined'].indexOf(String(row['Action']).trim()) === -1) && (['ADD', 'UPDATE'].indexOf(String(row['Action']).trim()) === -1)){
+    if(!!row['Wso Issuer ID'] && (refOptions.wsoIssuerIDs.indexOf(parseInt(row['Wso Issuer ID'])) === -1)){
         return {
             isValid: false,
-            remark: `Action '${String(row['Action'])}' not in range`
+            remark: `Wso Issuer ID '${String(row['Wso Issuer ID'])}' not in range`
         };
     }
 
 
+    if(!row['Wso Issuer ID']){
+        if(['Investment', 'Income'].indexOf(String(row['Capital Subtype']).trim()) !== -1){
+            // Subtype is 'Investment', 'Income' && WsoIssuerID is null
+            return {
+                isValid: false,
+                remark: `Wso Issuer ID cannot be empty for subtype '${String(row['Capital Subtype'])}'`
+            };  
+        }
+    }
 
     return {
         isValid: true

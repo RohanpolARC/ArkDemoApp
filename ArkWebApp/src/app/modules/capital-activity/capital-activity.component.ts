@@ -122,7 +122,7 @@ export class CapitalActivityComponent implements OnInit {
   invstmntPanelOpenState = false;
   investorPanelOpenState = false;
 
-  fetchData(): void{
+  fetchInvestmentData(): void{
 
     this.subscriptions.push(this.capitalActivityService.getCapitalInvestment().subscribe({
       next: data => {
@@ -134,7 +134,9 @@ export class CapitalActivityComponent implements OnInit {
         console.error("Capital Investment Data fetch failed");
       }
     }))
+  }
 
+  fetchCapitalActivityData(): void{
     this.subscriptions.push(this.capitalActivityService.getCapitalActivity().subscribe({
       next: data => {
         this.rowData = data;
@@ -143,6 +145,20 @@ export class CapitalActivityComponent implements OnInit {
       error: error => {
         this.rowData = [];
         console.error("Capital Activity Data fetch failed");
+      }
+    }));
+  }
+
+  fetchCapitalRefData(): void{
+    this.subscriptions.push(this.capitalActivityService.getCapitalRefData().subscribe({
+      next: data => {
+        data.capitalType.forEach(x => { this.capitalTypeOptions.push(x) });
+        data.capitalSubType.forEach(x => { this.capitalSubTypeOptions.push(x) });
+
+        this.refData = data.portfolio_Info;
+      },
+      error: error => {
+        console.error("Couldn't fetch refData. Form dropdown fields not available");
       }
     }));
   }
@@ -352,20 +368,9 @@ export class CapitalActivityComponent implements OnInit {
       }
     }
 
-    this.fetchData();
-
-    
-    this.subscriptions.push(this.capitalActivityService.getCapitalRefData().subscribe({
-      next: data => {
-        data.capitalType.forEach(x => { this.capitalTypeOptions.push(x) });
-        data.capitalSubType.forEach(x => { this.capitalSubTypeOptions.push(x) });
-
-        this.refData = data.portfolio_Info;
-      },
-      error: error => {
-        console.error("Couldn't fetch refData. Form dropdown fields not available");
-      }
-    }));
+    this.fetchCapitalActivityData();
+    this.fetchInvestmentData();
+    this.fetchCapitalRefData();
 
   }
 
@@ -389,6 +394,9 @@ export class CapitalActivityComponent implements OnInit {
     })
     this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
       // Bulk Upload Dialog Closed.
+      if(result.isSuccess){
+        this.fetchCapitalActivityData();
+      }
     }))
   }
 

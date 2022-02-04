@@ -27,7 +27,7 @@ export class AddCapitalModalComponent implements OnInit{
   @ViewChild('linkComponent')
   private childLinkComponent: LinkInvestorModalComponent;
 
-  capitalAct: CapitalActivityModel = null;
+  capitalAct: CapitalActivityModel = <CapitalActivityModel>{};
 
   subscriptions: Subscription[] = [];
   capitalTypeOptions: string[] = [];
@@ -35,6 +35,7 @@ export class AddCapitalModalComponent implements OnInit{
   fundHedgingOptions = [];
   issuerOptions = []; 
   issuerSNOptions = [];
+  wsoIssuerIDOptions = [];
   assetOptions = [];
   fundCcyOptions = [];
 
@@ -52,10 +53,11 @@ export class AddCapitalModalComponent implements OnInit{
   
   fundHedgingFilteredOptions: Observable<string[]>;
   assetFilteredOptions: Observable<string[]>;
-  issuerFilteredOptions: Observable<[string, string][]>;
+  issuerFilteredOptions: Observable<[string, string, number][]>;
   fundCcyFilteredOptions: Observable<string[]>;
   
-  netISS: [string, string][] = []; // [ issuer, issuerShortName] []
+  netISS: [string, string, number][] = []; // [ issuer, issuerShortName, wsoIssuerID] []
+  selectedIssuerID: number = null;
 
   gridData: any[] = [];
   
@@ -157,13 +159,13 @@ export class AddCapitalModalComponent implements OnInit{
     private capitalActivityService: CapitalActivityService, 
     private msalService: MsalUserService) { }
 
-  createNetISS(issuers, issuerSN){
+  createNetISS(issuers, issuerSN, issuerIDs){
     this.netISS = [];
     let seen = new Map();
     for(let i = 0; i < issuers.length; i+= 1){
       if(seen.has(issuers[i]) === null || seen.has(issuers[i]) === false){
         seen.set(issuers[i],true)
-        this.netISS.push([issuers[i], issuerSN[i]])
+        this.netISS.push([issuers[i], issuerSN[i], issuerIDs[i]])
       }
     }
   }
@@ -175,32 +177,22 @@ export class AddCapitalModalComponent implements OnInit{
               Options: Get ISSUERS & ASSETS for selected FundHedging.
            */
         let issuers = []; 
-        let issuerSN = [];  
+        let issuerSN = [];
+        let issuerIDs = [];  
         let assets = [];     
         this.data.refData.forEach(row => {
           if(row.fundHedging === FH){
             issuers.push(row.issuer);
-            issuerSN.push(row.issuerShortName)
+            issuerSN.push(row.issuerShortName);
+            issuerIDs.push(row.wsoIssuerID);
             assets.push(row.asset);
           }
         });
 
         this.assetOptions = [...new Set(assets)];
-        this.createNetISS(issuers, issuerSN);
+        this.createNetISS(issuers, issuerSN, issuerIDs);
       }
-      else if(FH && IssuerSN && !Asset){
-          /**
-              Options: Get ASSETS for selected FundHedging && Issuer.
-           */
-        let assets = [];
-        this.data.refData.forEach(row => {
-          if(row.fundHedging === FH && row.issuerShortName === IssuerSN){
-            assets.push(row.asset);
-          }
-        });
-        this.assetOptions = [...new Set(assets)];
-      }
-      else if(FH && IssuerSN && Asset){
+      else if(FH && IssuerSN){
         /** 
          * GET
          *      ISSUERS for selected FundHedging.
@@ -209,19 +201,21 @@ export class AddCapitalModalComponent implements OnInit{
          *  Invoked during initial load for EDIT. 
          */
         let issuers = [];  
-        let issuerSN = []; 
+        let issuerSN = [];
+        let issuerIDs = []; 
         let assets = [];
         this.data.refData.forEach(row => {
           if(row.fundHedging === FH){
             issuers.push(row.issuer)
             issuerSN.push(row.issuerShortName)
+            issuerIDs.push(row.wsoIssuerID)
             if(row.issuerShortName === IssuerSN)
               assets.push(row.asset);
           }
         });
         this.assetOptions = [...new Set(assets)]
 
-        this.createNetISS(issuers, issuerSN);
+        this.createNetISS(issuers, issuerSN, issuerIDs);
 
       }
 
@@ -235,12 +229,13 @@ export class AddCapitalModalComponent implements OnInit{
       for(let i = 0; i < this.data.refData.length; i+= 1){
         this.issuerOptions.push(this.data.refData[i].issuer);
         this.issuerSNOptions.push(this.data.refData[i].issuerShortName)
+        this.wsoIssuerIDOptions.push(this.data.refData[i].wsoIssuerID)
         this.assetOptions.push(this.data.refData[i].asset);
       }
 
       this.assetOptions = [...new Set(this.assetOptions)] 
 
-      this.createNetISS(this.issuerOptions, this.issuerSNOptions);      
+      this.createNetISS(this.issuerOptions, this.issuerSNOptions, this.wsoIssuerIDOptions);      
 
     }
   }   
@@ -254,12 +249,12 @@ export class AddCapitalModalComponent implements OnInit{
     });
   }
 
-  _filterIS(value?: string): [string, string][]{
+  _filterIS(value?: string): [string, string, number][]{
     if(value === null)
       return this.netISS; 
     const filterValue = value.toLowerCase();
     return this.netISS.filter(op => 
-      op[1].toLowerCase().includes(filterValue))  // op = [issuer,issuerShortName]
+      op[1].toLowerCase().includes(filterValue))  // op = [issuer,issuerShortName, wsoIssuerID]
   }
 
   _filter(options: string[],value:string): string []{
@@ -267,6 +262,11 @@ export class AddCapitalModalComponent implements OnInit{
       return options;
     const filterValue = value.toLowerCase();
     return options.filter(op => op.toLowerCase().includes(filterValue));
+  }
+
+  setIssuerID(ISS: [string, string, number]){
+    //ISS: [Issuer + IssuerShortName, IssuerShortName, wsoIssuerID]
+    this.selectedIssuerID = ISS[2];
   }
  
 /** Listening for changing the autocomplete options, based on selected values */  
@@ -449,6 +449,8 @@ export class AddCapitalModalComponent implements OnInit{
 
       this.gridData = this.data.gridData;
 
+      this.selectedIssuerID = this.data.rowData.wsoIssuerID;  // Issuer ID for the EDIT row;
+
       // Dynamic options for EDIT
       this.setDynamicOptions(this.data.rowData.fundHedging, this.data.rowData.issuerShortName, this.data.rowData.asset);
       this.capitalActivityForm.patchValue({
@@ -497,6 +499,12 @@ export class AddCapitalModalComponent implements OnInit{
 
     this.capitalAct.localAmount = this.capitalActivityForm.get('localAmount').value;
     this.capitalAct.fxRate = this.capitalActivityForm.get('fxRate').value;
+
+    this.capitalAct.wsoIssuerID = this.selectedIssuerID;  // selectedIssuerID is set at everypoint for every actionType
+
+      // If issuerShortName is NULL and wsoIssuerID isn't; then set it to null (can occur when issuerShortName was set previously, but wsoIssuerID wasn't cleared);
+    if(this.capitalAct.issuerShortName === null)
+      this.capitalAct.wsoIssuerID = this.selectedIssuerID = null;
   }
 
   ngOnDestroy(): void{
@@ -542,17 +550,26 @@ export class AddCapitalModalComponent implements OnInit{
             this.capitalAct.capitalID = data.data;
 
           this.disableSubmit = true;
-          this.updateMsg = 'Capital activity successfully added';
+          this.updateMsg = `Capital activity successfully added`;
           this.data.adapTableApi.gridApi.addGridData([this.capitalAct]);
           
           this.capitalActivityForm.reset(); // Resets form to invalid state
           this.capitalActivityForm.markAsPristine();
           this.capitalActivityForm.enable();
+
+        // reset() sets number based fields to 0;
+        // Set all numeric fields to NULL here
+          this.capitalActivityForm.patchValue({
+            totalAmount: null
+          })
+
+          
+          this.selectedIssuerID = null; // Reset wsoIssuerID for a new capital activity
         }
         else if(this.data.actionType === 'EDIT'){
           this.disableSubmit = true;
           this.capitalActivityForm.disable();
-          this.updateMsg = 'Capital activity successfully updated';
+          this.updateMsg = `Capital activity successfully updated`;
           this.data.adapTableApi.gridApi.updateGridData([this.capitalAct]);
         }
       },

@@ -122,19 +122,18 @@ export class BulkUploadComponent implements OnInit {
     let bulkUploadData: CapitalActivityModel[] = this.makeBulkCapitalActivity();
     this.subscriptions.push(this.capitalActivityService.bulkPutCapitalActivity(bulkUploadData).subscribe({
       next : response =>{
-        this.disableSubmit = true;
-        this.updateMsg = "Capital Activity(s) added";
-        this.isSuccess = true;
-        this.isFailure = false;
-
         if(response.isSuccess){
-          addToGrid(this.data.adaptableApiInvestor, bulkUploadData, response.data, 'capitalID');
+          this.disableSubmit = true;
+          this.updateMsg = `Capital Activity(s) Inserted (${response.data[0].value}), Updated (${response.data[1].value})`;
+          this.isSuccess = true;
+          this.isFailure = false;
+          return;
         }
-        else console.error("Failed to add capital activities");
+        else console.error("Failed to add/update capital activities");
       },
       error: error => {
         this.disableSubmit = false;
-        this.updateMsg = "Failed to bulk add capital activities";
+        this.updateMsg = "Failed to bulk add/update capital activities";
         this.isSuccess = false;
         this.isFailure = true;
 
@@ -419,6 +418,10 @@ export class BulkUploadComponent implements OnInit {
       this.readFile(this.selectedFile);
     }
       
+  }
+
+  closeDialog(): any{
+    this.dialogRef.close({isSuccess: this.isSuccess})
   }
 
 }
