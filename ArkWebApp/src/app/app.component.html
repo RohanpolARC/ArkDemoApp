@@ -18,15 +18,9 @@
 <mat-sidenav-container [hasBackdrop]="false">
 <mat-sidenav mode="side" class="left-sidenav" [(opened)]="leftSIdebarOpened" position="start">
 
-  <mat-list>
-    <mat-list-item routerLink="/" (click)= "leftSIdebarOpened = false; updateFilterPane('Portfolio')" [ngStyle]="GIREditorStyle">
-      Going In Rates Editor
-    </mat-list-item>
-  </mat-list>
-
   <mat-accordion class="example-headers-align" multi>
     <mat-expansion-panel [expanded]="false" >
-      <mat-expansion-panel-header>
+      <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
         <mat-panel-title>
           
          Liquidity
@@ -35,19 +29,36 @@
 
       <mat-list>
         <mat-list-item routerLink="/cash-balance" (click)= "leftSIdebarOpened = false; updateFilterPane('Cash Balance');" [ngStyle]="CashBalanceStyle">
-            Cash Balance
+          <div class="list-item-text"> Cash Balance </div>
           </mat-list-item>
         </mat-list>
 
       <mat-list>
         <mat-list-item routerLink="/capital-activity" (click)= "leftSIdebarOpened = false; updateFilterPane('Capital Activity');" [ngStyle]="CapitalActivityStyle">
-            Capital Activity
+          <div class="list-item-text">Capital Activity</div>
         </mat-list-item>
       </mat-list>
   
   
     </mat-expansion-panel>
+</mat-accordion>
+<mat-accordion>
+    <mat-expansion-panel [expanded]="false" >
+      <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
+        <mat-panel-title>          
+         Misc.
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <mat-list>
+        <mat-list-item routerLink="/" (click)= "leftSIdebarOpened = false; updateFilterPane('Portfolio')" [ngStyle]="GIREditorStyle">
+          <div class="list-item-text">Going In Rates Editor</div>
+        </mat-list-item>
+      </mat-list>
+    
+    </mat-expansion-panel>
   </mat-accordion>
+
 
 </mat-sidenav>
 <mat-sidenav  class="right-sidenav" #right [(opened)]="rightSidebarOpened" position="end">

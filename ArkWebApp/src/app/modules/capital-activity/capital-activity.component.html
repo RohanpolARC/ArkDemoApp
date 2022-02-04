@@ -4,11 +4,15 @@
     <br>
     <div class="capital-action">
 
-        <button mat-icon-button (click)="openBulkUploadDialog()">
+        <button mat-icon-button (click)="openBulkUploadDialog()"
+        matTooltip="Bulk Upload"
+        matTooltipClass="tooltip-capital">
             <mat-icon class="material-icons-outlined">file_upload</mat-icon>
         </button>
             
-        <button mat-icon-button (click)="openDialog()">
+        <button mat-icon-button (click)="openDialog()"
+        matTooltip="Add"
+        matTooltipClass="tooltip-capital">
             <mat-icon class="material-icons-outlined">add_circle_outline</mat-icon>
         </button>
 

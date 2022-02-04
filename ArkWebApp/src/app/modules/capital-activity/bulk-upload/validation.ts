@@ -35,7 +35,7 @@ export function validateRowForEmptiness(row: any): {isValid: boolean, remark?: s
         if(!row[actualCols[i]] && 
         [
             'Issuer Short Name(optional)', 'Asset (optional)','Narative (optional)', 
-            'Wso Issuer ID'
+            'Wso Issuer ID', 'Fund Currency'
         ].indexOf(actualCols[i]) === -1)
             return {
                 isValid: false,
