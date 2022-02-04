@@ -47,7 +47,7 @@ export class CashBalanceComponent implements OnInit {
 
   columnDefs = [
     {field: 'asofDate', headerName: 'As of Date', type: 'abColDefDate', valueFormatter: dateFormatter},
-    {field: 'pbName', headerName: 'Prime Broker', type: 'abColDefString'},
+    {field: 'pbName', headerName: 'Fund Accounting', type: 'abColDefString'},
     {field: 'mapName', headerName: 'Map', type: 'abColDefString'},
     {field: 'account', headerName: 'Account', type:'abColDefNumber'},
     {field: 'currency', headerName: 'Currency', type: 'abColDefString'},
