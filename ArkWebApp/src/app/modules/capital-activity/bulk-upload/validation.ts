@@ -4,10 +4,11 @@ import { getUniqueOptions } from '../utilities/utility';
 let actualCols: string[] = [         
     'Fund Hedging',
     'Fund Currency',
+    'Call Date',
     'Cash Flow Date',
     'Capital Type',
     'Capital Subtype',
-    'Amount (fund ccy)',
+    'Amount',
     'Wso Issuer ID',
     'Issuer Short Name(optional)',
     'Asset (optional)',
@@ -54,7 +55,13 @@ export function validateRowValueRange(row: any): {isValid: boolean, remark?: str
             remark: 'Cash Flow Date cannot be < 2012'
         };
 
-    if(Number(row['Amount (fund ccy)']) === 0)
+    if(Number(new Date(moment(row['Call Date']).format('YYYY-MM-DD')).getFullYear) < 2012)
+        return {
+            isValid: false,
+            remark: 'Call Date cannot be < 2012'
+        };
+
+    if(Number(row['Amount']) === 0)
         return {
             isValid: false,
             remark: 'Amount cannot be 0'
@@ -91,7 +98,7 @@ export function validateRowValueRange(row: any): {isValid: boolean, remark?: str
     if(!!row['Wso Issuer ID'] && (refOptions.wsoIssuerIDs.indexOf(parseInt(row['Wso Issuer ID'])) === -1)){
         return {
             isValid: false,
-            remark: `Wso Issuer ID '${String(row['Wso Issuer ID'])}' not in range`
+            remark: `Wso Issuer ID '${String(row['Wso Issuer ID'])}' doesn't exist.`
         };
     }
 

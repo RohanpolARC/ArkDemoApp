@@ -100,10 +100,11 @@ export class BulkUploadComponent implements OnInit {
   columnDefs: ColDef[] = [
     {field: 'Fund Hedging', maxWidth: 150},
     {field: 'Cash Flow Date', maxWidth: 150, valueFormatter: dateFormatter},
+    {field: 'Call Date', maxWidth: 150, valueFormatter: dateFormatter},
     {field: 'Capital Type', maxWidth: 150},
     {field: 'Capital Subtype', maxWidth: 150},
     {field: 'Fund Currency', maxWidth: 100},
-    {field: 'Amount (fund ccy)', headerName: 'Amount', maxWidth: 150, cellClass: 'ag-right-aligned-cell', valueFormatter: amountFormatter},
+    {field: 'Amount', headerName: 'Amount', maxWidth: 150, cellClass: 'ag-right-aligned-cell', valueFormatter: amountFormatter},
     {field: 'Wso Issuer ID', headerName: 'WSO Issuer ID'},
     {field: 'Issuer Short Name(optional)', headerName: 'Issuer Short Name'},
     {field: 'Asset (optional)', maxWidth: 150, headerName: 'Asset'},
@@ -155,12 +156,12 @@ export class BulkUploadComponent implements OnInit {
 
     let model = <CapitalActivityModel>{};
     model.valueDate = new Date(moment(obj['Cash Flow Date'], 'DD/MM/YYYY').format('YYYY-MM-DD'))
-    model.callDate = new Date(moment(obj['Cash Flow Date'], 'DD/MM/YYYY').format('YYYY-MM-DD'))
+    model.callDate = new Date(moment(obj['Call Date'], 'DD/MM/YYYY').format('YYYY-MM-DD'))
     model.narrative = obj['Narative (optional)'];
     model.capitalType = obj['Capital Type'];
     model.capitalSubType = obj['Capital Subtype'];
     model.fundHedging = obj['Fund Hedging'];
-    model.totalAmount = Number(obj['Amount (fund ccy)']);
+    model.totalAmount = Number(obj['Amount']);
     model.issuerShortName = obj['Issuer Short Name(optional)'];
     model.asset = obj['Asset (optional)'];
     model.fundCcy = obj['Fund Currency'];
@@ -227,6 +228,7 @@ export class BulkUploadComponent implements OnInit {
            Name: 'Bulk Grid',
            Columns: [
              'Fund Hedging',
+             'Call Date',
              'Cash Flow Date',
              'Capital Type',
              'Capital Subtype',
@@ -250,6 +252,7 @@ export class BulkUploadComponent implements OnInit {
            Name: 'Invalid Excel Grid',
            Columns: [
             'Fund Hedging',
+            'Call Date',
             'Cash Flow Date',
             'Capital Type',
             'Capital Subtype',
