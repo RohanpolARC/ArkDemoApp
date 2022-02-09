@@ -50,6 +50,7 @@ export class CashBalanceComponent implements OnInit {
     {field: 'pbName', headerName: 'Fund Accounting', type: 'abColDefString'},
     {field: 'mapName', headerName: 'Map', type: 'abColDefString'},
     {field: 'account', headerName: 'Account', type:'abColDefNumber'},
+    {field: 'accountDescription', headerName: 'Account Description', type:'abColDefString'},
     {field: 'currency', headerName: 'Currency', type: 'abColDefString'},
     {field: 'pbClosingBalance', headerName: 'PB Closing Balance', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'fundCcy', headerName: 'Fund Ccy', type: 'abColDefString'},
@@ -63,7 +64,7 @@ export class CashBalanceComponent implements OnInit {
     {field: 'marketValueFactor', headerName: 'MV Factor', type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
     {field: 'accountBalanceEur', headerName: 'Account Balance Eur', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'mvFundHedging', headerName: 'MV FundHedging', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'mvLegalEntity', headerName: 'MV FundLegalEntity', type:'abColDefNumber', valueFormatter: amountFormatter},
+    {field: 'mvLegalEntity', headerName: 'MV FundLegalEntity', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'isSplited', headerName: 'IsSplited', type:'abColDefBoolean'},
   ];
 
@@ -140,6 +141,7 @@ export class CashBalanceComponent implements OnInit {
           Columns: [
             'asofDate',
             'account',
+            'accountDescription',
             'pbName',
             'mapName',
             'currency',
