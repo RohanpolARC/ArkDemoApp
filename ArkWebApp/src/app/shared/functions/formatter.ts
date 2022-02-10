@@ -26,8 +26,9 @@ export function amountFormatter(params){
     }
 }
 
-export function zeroFormatter(params){
-    if(params.value == undefined || Number(params.value) == 0)
-        return null;
-    else return Number(params.value)
+export function nullOrZeroFormatter(params){
+    if(params.value == null || Number(params.value) == 0)
+        return "";
+    else return Number(params.value).toLocaleString(undefined, {
+    });
 }

@@ -98,19 +98,22 @@ export class BulkUploadComponent implements OnInit {
     private httpClient: HttpClient) { }
 
   columnDefs: ColDef[] = [
-    {field: 'Fund Hedging', maxWidth: 150},
     {field: 'Cash Flow Date', maxWidth: 150, valueFormatter: dateFormatter},
     {field: 'Call Date', maxWidth: 150, valueFormatter: dateFormatter},
-    {field: 'Capital Type', maxWidth: 150},
-    {field: 'Capital Subtype', maxWidth: 150},
-    {field: 'Fund Currency', maxWidth: 100},
+    {field: 'Fund Hedging', maxWidth: 150},
+    {field: 'Fund Currency', headerName: 'Fund Ccy', maxWidth: 150},
+    {field: 'Position Currency', headerName: 'Position Ccy', maxWidth: 150},
+    {field: 'GIR (Pos - Fund ccy)', headerName: 'GIR (Pos -> Fund)', maxWidth: 300},    
     {field: 'Amount', headerName: 'Amount', maxWidth: 150, cellClass: 'ag-right-aligned-cell', valueFormatter: amountFormatter},
-    {field: 'Wso Issuer ID', headerName: 'WSO Issuer ID'},
-    {field: 'Issuer Short Name(optional)', headerName: 'Issuer Short Name'},
+    {field: 'Capital Type', maxWidth: 150},
+    {field: 'Capital Subtype', maxWidth: 170},
+    // {field: 'Wso Issuer ID', headerName: 'WSO Issuer ID'},
+    // {field: 'Issuer Short Name(optional)', headerName: 'Issuer Short Name'},
+    {field: 'Wso Asset ID', headerName: 'WSO Asset ID'},
     {field: 'Asset (optional)', maxWidth: 150, headerName: 'Asset'},
     {field: 'Narative (optional)', maxWidth: 150, headerName: 'Narrative'},
     {field: 'remark', maxWidth: 500},
-    {field: '_COLUMN_TITLE', headerName: 'Column', maxWidth: 300},
+    {field: '_COLUMN_TITLE', headerName: 'Col', maxWidth: 100},
     // {field: 'Action', maxWidth: 150}
   ]
    
@@ -162,14 +165,18 @@ export class BulkUploadComponent implements OnInit {
     model.capitalSubType = obj['Capital Subtype'];
     model.fundHedging = obj['Fund Hedging'];
     model.totalAmount = Number(obj['Amount']);
-    model.issuerShortName = obj['Issuer Short Name(optional)'];
+    // model.issuerShortName = obj['Issuer Short Name(optional)'];
     model.asset = obj['Asset (optional)'];
     model.fundCcy = obj['Fund Currency'];
-    model.wsoIssuerID = obj['Wso Issuer ID'];
-//    model.action = obj['Action'];
+    // model.wsoIssuerID = Number(obj['Wso Issuer ID']);
+    // model.action = obj['Action'];
 
+    model.wsoAssetID = Number(obj['Wso Asset ID']);
+    model.posCcy = obj['Position Currency'];
+    model.fxRate = Number(obj['GIR (Pos - Fund ccy)']);
     model.createdBy = model.modifiedBy = this.msalService.getUserName();
     model.createdOn = model.modifiedOn = new Date();
+    model.source = 'ArkUI';
     return model;    
   }
 
@@ -227,18 +234,21 @@ export class BulkUploadComponent implements OnInit {
          Layouts: [{
            Name: 'Bulk Grid',
            Columns: [
-             'Fund Hedging',
-             'Call Date',
-             'Cash Flow Date',
-             'Capital Type',
-             'Capital Subtype',
-             'Fund Currency',
-             'Amount (fund ccy)',
-             'Wso Issuer ID',
-             'Issuer Short Name(optional)',
-             'Asset (optional)',
-             'Narative (optional)',
-             '_COLUMN_TITLE',
+            'Cash Flow Date',
+            'Call Date',
+            'Fund Hedging',
+            'Fund Currency',
+            'Position Currency',
+            'GIR (Pos - Fund ccy)',
+            'Amount',
+            'Capital Type',
+            'Capital Subtype',
+          //  'Wso Issuer ID',
+          //  'Issuer Short Name(optional)',
+            'Wso Asset ID',
+            'Asset (optional)',
+            'Narative (optional)',
+            '_COLUMN_TITLE',
            ],
            PinnedColumnsMap: {
             _COLUMN_TITLE: 'left'
@@ -251,15 +261,18 @@ export class BulkUploadComponent implements OnInit {
          {
            Name: 'Invalid Excel Grid',
            Columns: [
-            'Fund Hedging',
-            'Call Date',
             'Cash Flow Date',
+            'Call Date',
+            'Fund Hedging',
+            'Fund Currency',
+            'Position Currency',
+            'GIR (Pos - Fund ccy)',
+            'Amount',
             'Capital Type',
             'Capital Subtype',
-            'Fund Currency',
-            'Amount (fund ccy)',
-            'Wso Issuer ID',
-            'Issuer Short Name(optional)',
+          //  'Wso Issuer ID',
+          //  'Issuer Short Name(optional)',
+            'Wso Asset ID',
             'Asset (optional)',
             'Narative (optional)',
             'remark',

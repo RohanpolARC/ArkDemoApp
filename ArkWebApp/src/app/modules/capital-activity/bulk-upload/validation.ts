@@ -2,15 +2,18 @@ import * as moment from 'moment';
 import { getUniqueOptions } from '../utilities/utility';
 
 let actualCols: string[] = [         
+    'Cash Flow Date',
+    'Call Date',
     'Fund Hedging',
     'Fund Currency',
-    'Call Date',
-    'Cash Flow Date',
+    'Position Currency',
+    'GIR (Pos - Fund ccy)',
+    'Amount',
     'Capital Type',
     'Capital Subtype',
-    'Amount',
-    'Wso Issuer ID',
-    'Issuer Short Name(optional)',
+    // 'Wso Issuer ID',
+    // 'Issuer Short Name(optional)',
+    'Wso Asset ID',
     'Asset (optional)',
     'Narative (optional)',
     // 'Action'
@@ -24,7 +27,7 @@ export function validateColumns(fileColumns: string[]): {isValid: boolean, col?:
         if(actualCols.indexOf(fileColumns[i]) !== -1 || fileColumns[i] === '_COLUMN_TITLE')
             continue;
         else 
-            return {isValid: false, col: fileColumns[i]};   // Mismatch col found
+            return {isValid: false, col: fileColumns[i]};   // Invalid col found
     }
 
     return {isValid: true} // No mismatch col found 
@@ -35,8 +38,12 @@ export function validateRowForEmptiness(row: any): {isValid: boolean, remark?: s
     for(let i:number = 0; i < actualCols.length; i+=1){
         if(!row[actualCols[i]] && 
         [
-            'Issuer Short Name(optional)', 'Asset (optional)','Narative (optional)', 
-            'Wso Issuer ID', 'Fund Currency'
+            // 'Issuer Short Name(optional)', 
+            'Asset (optional)',
+            'Narative (optional)', 
+            // 'Wso Issuer ID', 
+            'Wso Asset ID',
+            'Fund Currency'
         ].indexOf(actualCols[i]) === -1)
             return {
                 isValid: false,
@@ -67,6 +74,12 @@ export function validateRowValueRange(row: any): {isValid: boolean, remark?: str
             remark: 'Amount cannot be 0'
         };
 
+    if(Number(row['GIR (Pos - Fund ccy)']) === 0)
+        return {
+            isValid: false,
+            remark: 'GIR cannot be 0'
+        };
+        
     if(!!row['Fund Hedging'] && (refOptions.fundHedgings.indexOf(String(row['Fund Hedging']).trim()) === -1)){
         return {
             isValid: false,
@@ -78,6 +91,14 @@ export function validateRowValueRange(row: any): {isValid: boolean, remark?: str
         return {
             isValid: false,
             remark: `Fund Currency '${String(row['Fund Currency'])}' not in range`
+        };
+    }
+
+    // Set(posCcy) = Set(fundCcy)
+    if(!!row['Position Currency'] && (refOptions.fundCcys.indexOf(String(row['Position Currency']).trim()) === -1)){
+        return {
+            isValid: false,
+            remark: `Position Currency '${String(row['Position Currency'])}' not in range`
         };
     }
 
@@ -95,23 +116,31 @@ export function validateRowValueRange(row: any): {isValid: boolean, remark?: str
         };
     }
 
-    if(!!row['Wso Issuer ID'] && (refOptions.wsoIssuerIDs.indexOf(parseInt(row['Wso Issuer ID'])) === -1)){
+    // if(!!row['Wso Issuer ID'] && (refOptions.wsoIssuerIDs.indexOf(parseInt(row['Wso Issuer ID'])) === -1)){
+    //     return {
+    //         isValid: false,
+    //         remark: `Wso Issuer ID '${String(row['Wso Issuer ID'])}' doesn't exist.`
+    //     };
+    // }
+
+    if(!!row['Wso Asset ID'] && (refOptions.wsoAssetIDs.indexOf(parseInt(row['Wso Asset ID'])) === -1)){
         return {
             isValid: false,
-            remark: `Wso Issuer ID '${String(row['Wso Issuer ID'])}' doesn't exist.`
+            remark: `Wso Asset ID '${String(row['Wso Asset ID'])}' doesn't exist.`
         };
     }
 
+    // Subtype is 'Investment', 'Income' && WsoIssuerID is null
+    
+    // if(!row['Wso Issuer ID']){
+    //     if(['Investment', 'Income'].indexOf(String(row['Capital Subtype']).trim()) !== -1){
+    //         return {
+    //             isValid: false,
+    //             remark: `Wso Issuer ID cannot be empty for subtype '${String(row['Capital Subtype'])}'`
+    //         };  
+    //     }
+    // }
 
-    if(!row['Wso Issuer ID']){
-        if(['Investment', 'Income'].indexOf(String(row['Capital Subtype']).trim()) !== -1){
-            // Subtype is 'Investment', 'Income' && WsoIssuerID is null
-            return {
-                isValid: false,
-                remark: `Wso Issuer ID cannot be empty for subtype '${String(row['Capital Subtype'])}'`
-            };  
-        }
-    }
 
     return {
         isValid: true

@@ -25,7 +25,7 @@ import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/C
 
 import { Subscription } from 'rxjs';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
-import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, dateTimeFormatter, amountFormatter, nullOrZeroFormatter } from 'src/app/shared/functions/formatter';
 
 import { getNodes, validateLinkSelect }from './utilities/functions';
 import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
@@ -68,7 +68,7 @@ export class CapitalActivityComponent implements OnInit {
     {field: 'positionCcy', headerName: 'Position Ccy'},
     {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'totalEur', headerName: 'Total Eur', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'}
+    {field: 'totalEur', headerName: 'Total Eur', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
   ]
 
   columnDefs: ColDef[] = [
@@ -78,10 +78,13 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'capitalType', headerName: 'Capital Type', type:'abColDefString'},
     { field: 'capitalSubType', headerName: 'Capital Subtype', type:'abColDefString'},
     { field: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
-    { field: 'fundCcy', headerName: 'Currency', type:'abColDefString'},
+    { field: 'fundCcy', headerName: 'Fund Ccy', type:'abColDefString'},
+    { field: 'posCcy', headerName: 'Position Ccy', type: 'abColDefString'},
+    { field: 'fxRate', headerName: 'FXRate', valueFormatter: nullOrZeroFormatter},
     { field: 'totalAmount', headerName: 'Total Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'wsoIssuerID', headerName: 'WSO Issuer ID'},
+    {field: 'wsoIssuerID', headerName: 'WSO Issuer ID', valueFormatter: nullOrZeroFormatter},
     { field: 'issuerShortName', headerName: 'Issuer Short Name', type:'abColDefString'},
+    {field: 'wsoAssetID', headerName: 'WSO Asset ID', valueFormatter: nullOrZeroFormatter},
     { field: 'asset', headerName: 'Asset', type:'abColDefString'},
     { field: 'narrative', headerName: 'Narrative', type:'abColDefString'},
     { field: 'source', headerName: 'Source', type:'abColDefString'},
@@ -248,11 +251,13 @@ export class CapitalActivityComponent implements OnInit {
               'capitalSubType',
               'fundHedging',
               'fundCcy',
+              'posCcy',
               'totalAmount',
               'localAmount',
               'fxRate',
-              'wsoIssuerID',
-              'issuerShortName',
+              // 'wsoIssuerID',
+              // 'issuerShortName',
+              'wsoAssetID',
               'asset',
               'narrative',
               'source',
@@ -390,7 +395,6 @@ export class CapitalActivityComponent implements OnInit {
       width: '90vw',
       maxWidth: '90vw',
       height: '80vh',
-      hasBackdrop: false,
     })
     this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
       // Bulk Upload Dialog Closed.

@@ -13,23 +13,23 @@
         </div>
     </div>
 
-    
+    <div *ngIf="isSuccess"
+    class="update-msg success"
+    >
+        {{ updateMsg }}
+    </div>
+    <div *ngIf="isFailure"
+    class="update-msg failure"
+    >
+        {{ updateMsg }}
+    </div>
+    <div *ngIf="!isValid"
+    class="update-msg failure"
+    >
+        {{validationErrorMsg}}
+    </div>
+
     <mat-dialog-content>
-            <div *ngIf="isSuccess"
-            class="update-msg success"
-            >
-                {{ updateMsg }}
-            </div>
-            <div *ngIf="isFailure"
-            class="update-msg failure"
-            >
-                {{ updateMsg }}
-            </div>
-            <div *ngIf="!isValid"
-            class="update-msg failure"
-            >
-                {{validationErrorMsg}}
-            </div>
 
         <div class="action-header" *ngIf="(invalidRowData.length + bulkRowData.length) === 0">
             <div 

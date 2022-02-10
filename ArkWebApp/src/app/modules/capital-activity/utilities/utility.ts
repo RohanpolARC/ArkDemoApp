@@ -50,6 +50,7 @@ export function getUniqueOptions(ref: {capitalTypes: string[], capitalSubTypes: 
     let issuerShortNames: string[] = [];
     let assets: string[] = [];
     let wsoIssuerIDs: number[] = [];
+    let wsoAssetIDs: number[] = [];
 
     for(let i:number = 0; i < ref.refData.length; i+=1){
         fundHedgings.push(ref.refData[i].fundHedging);
@@ -57,6 +58,7 @@ export function getUniqueOptions(ref: {capitalTypes: string[], capitalSubTypes: 
         issuerShortNames.push(ref.refData[i].issuerShortName);
         assets.push(ref.refData[i].asset);
         wsoIssuerIDs.push(ref.refData[i].wsoIssuerID);
+        wsoAssetIDs.push(ref.refData[i].wsoAssetID);
     }
 
     fundHedgings = getUniqueOptionsFor(fundHedgings);
@@ -64,8 +66,9 @@ export function getUniqueOptions(ref: {capitalTypes: string[], capitalSubTypes: 
     issuerShortNames = getUniqueOptionsFor(issuerShortNames);
     assets = getUniqueOptionsFor(assets);    
     wsoIssuerIDs = getUniqueOptionsFor(wsoIssuerIDs);
-    
-    return {capitalTypes, capitalSubTypes, fundHedgings, issuerShortNames, assets, fundCcys, wsoIssuerIDs};
+    wsoAssetIDs = getUniqueOptionsFor(wsoAssetIDs);
+
+    return {capitalTypes, capitalSubTypes, fundHedgings, issuerShortNames, assets, fundCcys, wsoIssuerIDs, wsoAssetIDs};
 }
 
 export function getUniqueOptionsFor(options: any[]): any[] {
