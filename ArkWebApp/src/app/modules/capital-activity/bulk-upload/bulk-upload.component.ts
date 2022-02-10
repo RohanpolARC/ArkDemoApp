@@ -112,7 +112,7 @@ export class BulkUploadComponent implements OnInit {
     {field: 'Wso Asset ID', headerName: 'WSO Asset ID'},
     {field: 'Asset (optional)', maxWidth: 150, headerName: 'Asset'},
     {field: 'Narative (optional)', maxWidth: 150, headerName: 'Narrative'},
-    {field: 'remark', maxWidth: 500},
+    {field: 'remark', width: 500, tooltipField: 'remark'},
     {field: '_COLUMN_TITLE', headerName: 'Col', maxWidth: 100},
     // {field: 'Action', maxWidth: 150}
   ]
