@@ -62,6 +62,7 @@
                 [modules]="agGridModules"
                 [columnDefs]="columnDefs"
                 [rowData]="!isValid ? invalidRowData : bulkRowData"
+                [tooltipShowDelay]="tooltipShowDelay"
                 [sideBar]="'columns'"
                 (adaptableReady)="onAdaptableReady($event)"
             >

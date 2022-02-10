@@ -90,6 +90,8 @@ export class BulkUploadComponent implements OnInit {
   isFailure: boolean;
   disableSubmit: boolean;
 
+  tooltipShowDelay:number = 0;
+  
   constructor(public dialogRef: MatDialogRef<BulkUploadComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialog: MatDialog,
