@@ -31,6 +31,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { CapitalActivityModule } from './modules/capital-activity/capital-activity.module';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 export const protectedResourceMap: any =  
   [  
@@ -75,7 +76,8 @@ export const protectedResourceMap: any =
   MatDatepickerModule,
   MatNativeDateModule,
   MatInputModule,
-  CapitalActivityModule
+  CapitalActivityModule,
+  MatTooltipModule
   ],  
   providers: [  
     HttpClient,  
