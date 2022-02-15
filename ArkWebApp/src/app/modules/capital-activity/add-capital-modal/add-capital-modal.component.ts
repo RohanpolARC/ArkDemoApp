@@ -37,6 +37,7 @@ export class AddCapitalModalComponent implements OnInit{
   issuerSNOptions = [];
   wsoIssuerIDOptions = [];
   assetOptions = [];
+  assetIDOptions = [];
   fundCcyOptions = [];
 
   header: string;
@@ -52,12 +53,15 @@ export class AddCapitalModalComponent implements OnInit{
   capitalSubTypeFilteredOptions: Observable<string[]>;
   
   fundHedgingFilteredOptions: Observable<string[]>;
-  assetFilteredOptions: Observable<string[]>;
+  assetFilteredOptions: Observable<[string, number][]>;
   issuerFilteredOptions: Observable<[string, string, number][]>;
   fundCcyFilteredOptions: Observable<string[]>;
-  
+  posCcyFilteredOptions: Observable<string[]>;
+
   netISS: [string, string, number][] = []; // [ issuer, issuerShortName, wsoIssuerID] []
+  netAssets: [string, number][] = [] // [asset, assetID] []
   selectedIssuerID: number = null;
+  selectedAssetID: number = null;
 
   gridData: any[] = [];
   
@@ -95,6 +99,7 @@ export class AddCapitalModalComponent implements OnInit{
     let capitalType: string = this.validateField(this.capitalTypeOptions, control, 'capitalType');
     let capitalSubType: string = this.validateField(this.capitalSubTypeOptions, control, 'capitalSubType');
     let currency: string = this.validateField(this.fundCcyOptions, control, 'fundCcy');
+    let posCcy: string = this.validateField(this.fundCcyOptions, control, 'posCcy');
 
     let totalAmount: number = control.get('totalAmount').value;
     let fxRate: number  = control.get('fxRate').value;
@@ -112,6 +117,7 @@ export class AddCapitalModalComponent implements OnInit{
     let AS: boolean = (asset !== null && asset !== '');
     let NR: boolean = (narrative !== null && narrative !== '');
         
+    let POSCcy: boolean = (posCcy !== null && posCcy !== '');
     let FX: boolean = (fxRate !== null)
     let LA: boolean = (localAmount !== null)
 
@@ -122,7 +128,7 @@ export class AddCapitalModalComponent implements OnInit{
         validated : false
       };
     else if(this.data.actionType === 'ADD' || this.data.actionType === 'EDIT')
-      return (CD && VD && FH && CT && CST && CCY && TA && ((ISN && AS)|| NR || ISN)) ? { 
+      return (CD && VD && FH && CT && CST && CCY && TA && POSCcy && ((ISN && AS)|| NR || ISN)) ? { 
         validated : true 
       }: { 
         validated : false
@@ -147,7 +153,8 @@ export class AddCapitalModalComponent implements OnInit{
 
 
     localAmount: new FormControl(null, Validators.required),
-    fxRate: new FormControl(null, Validators.required)
+    fxRate: new FormControl(null, Validators.required),
+    posCcy: new FormControl(null, Validators.required),
   },{
     validators: this.capitalValidator
   }
@@ -159,7 +166,7 @@ export class AddCapitalModalComponent implements OnInit{
     private capitalActivityService: CapitalActivityService, 
     private msalService: MsalUserService) { }
 
-  createNetISS(issuers, issuerSN, issuerIDs){
+  createNetISS(issuers: string[], issuerSN: string[], issuerIDs: number[]){
     this.netISS = [];
     let seen = new Map();
     for(let i = 0; i < issuers.length; i+= 1){
@@ -170,26 +177,44 @@ export class AddCapitalModalComponent implements OnInit{
     }
   }
 
+  createNetAssets(assets: string[], assetIDs: number[]){
+    this.netAssets = [];
+    let seen = new Map();
+    for(let i: number = 0; i<assets.length; i+=1){
+      if(!seen.has(assets[i])){
+        seen.set(assets[i], true);
+        this.netAssets.push([assets[i], assetIDs[i]])
+      }
+    }    
+  }
+
+  setDynamicOptions_(FH?: string, IssuerSN?: string, Asset?: string): void{
+    // if(FH)
+  }
+
   setDynamicOptions(FH?: string, IssuerSN?: string, Asset?: string): void {
     if(FH || IssuerSN || Asset){
       if(FH && !IssuerSN && !Asset){
           /**
               Options: Get ISSUERS & ASSETS for selected FundHedging.
            */
-        let issuers = []; 
-        let issuerSN = [];
-        let issuerIDs = [];  
-        let assets = [];     
+        let issuers: string[] = []; 
+        let issuerSN: string[] = [];
+        let issuerIDs: number[] = [];  
+        let assets: string[] = []; 
+        let assetIDs: number[] = [];    
         this.data.refData.forEach(row => {
           if(row.fundHedging === FH){
-            issuers.push(row.issuer);
-            issuerSN.push(row.issuerShortName);
-            issuerIDs.push(row.wsoIssuerID);
-            assets.push(row.asset);
+            issuers.push(<string>row.issuer);
+            issuerSN.push(<string>row.issuerShortName);
+            issuerIDs.push(<number>row.wsoIssuerID);
+            assets.push(<string>row.asset);
+            assetIDs.push(<number>row.wsoAssetID);
           }
         });
 
-        this.assetOptions = [...new Set(assets)];
+        // this.assetOptions = [...new Set(assets)];
+        this.createNetAssets(assets, assetIDs);
         this.createNetISS(issuers, issuerSN, issuerIDs);
       }
       else if(FH && IssuerSN){
@@ -204,21 +229,22 @@ export class AddCapitalModalComponent implements OnInit{
         let issuerSN = [];
         let issuerIDs = []; 
         let assets = [];
+        let assetIDs: number[] = [];
         this.data.refData.forEach(row => {
           if(row.fundHedging === FH){
-            issuers.push(row.issuer)
-            issuerSN.push(row.issuerShortName)
-            issuerIDs.push(row.wsoIssuerID)
-            if(row.issuerShortName === IssuerSN)
-              assets.push(row.asset);
+            issuers.push(<string> row.issuer)
+            issuerSN.push(<string>row.issuerShortName)
+            issuerIDs.push(<number> row.wsoIssuerID)
+            if(row.issuerShortName === IssuerSN){
+              assets.push(<string> row.asset);
+              assetIDs.push(<number> row.wsoAssetID);
+            }
           }
         });
-        this.assetOptions = [...new Set(assets)]
 
+        this.createNetAssets(assets, assetIDs);
         this.createNetISS(issuers, issuerSN, issuerIDs);
-
       }
-
     }
     else{    
         /**
@@ -231,10 +257,12 @@ export class AddCapitalModalComponent implements OnInit{
         this.issuerSNOptions.push(this.data.refData[i].issuerShortName)
         this.wsoIssuerIDOptions.push(this.data.refData[i].wsoIssuerID)
         this.assetOptions.push(this.data.refData[i].asset);
+        this.assetIDOptions.push(<number>this.data.refData[i].wsoAssetID);
       }
 
-      this.assetOptions = [...new Set(this.assetOptions)] 
+      // this.assetOptions = [...new Set(this.assetOptions)] 
 
+      this.createNetAssets(this.assetOptions, this.assetIDOptions);
       this.createNetISS(this.issuerOptions, this.issuerSNOptions, this.wsoIssuerIDOptions);      
 
     }
@@ -257,6 +285,14 @@ export class AddCapitalModalComponent implements OnInit{
       op[1].toLowerCase().includes(filterValue))  // op = [issuer,issuerShortName, wsoIssuerID]
   }
 
+  _filterAsset(value?: string): [string, number][] {
+    if(value === null)
+      return this.netAssets;
+    const filterValue = value.toLowerCase();
+    return this.netAssets.filter(op => 
+      op[0].toLowerCase().includes(filterValue))  // op = [asset, wsoAssetID]  
+  }
+
   _filter(options: string[],value:string): string []{
     if(value === null)
       return options;
@@ -267,8 +303,13 @@ export class AddCapitalModalComponent implements OnInit{
   setIssuerID(ISS: [string, string, number]){
     //ISS: [Issuer + IssuerShortName, IssuerShortName, wsoIssuerID]
     this.selectedIssuerID = ISS[2];
+    this.getFormCapitalAct();   // getFormCapitalAct() on statusChanges() gets called before setting selectedIssuerID
   }
  
+  setAssetID(asset: [string, number]){
+    this.selectedAssetID = asset[1];
+    this.getFormCapitalAct();   // getFormCapitalAct() on statusChanges() gets called before setting selectedAssetID
+  }
 /** Listening for changing the autocomplete options, based on selected values */  
 
   issuerSelect(event: MatAutocompleteSelectedEvent){
@@ -304,6 +345,7 @@ export class AddCapitalModalComponent implements OnInit{
   changeListeners(): void{
 
     /** For LINK-ADD, update Total Amount, based on changes in FX RATE, LOCAL AMOUNT */
+    if(this.data.actionType === 'LINK-ADD'){
       this.capitalActivityForm.get('localAmount').valueChanges.subscribe(LA => {
         this.capitalActivityForm.patchValue({
           totalAmount: LA * this.capitalActivityForm.get('fxRate').value
@@ -315,6 +357,7 @@ export class AddCapitalModalComponent implements OnInit{
           totalAmount: GIR * this.capitalActivityForm.get('localAmount').value
         })
       })
+    }
 
     /** _ since statusChanges returns INVALID form even when it is valid. Hence, using custom cross field validator: `capitalValidator` */
 
@@ -323,6 +366,11 @@ export class AddCapitalModalComponent implements OnInit{
       if(this.data.actionType === 'LINK-ADD'){
         this.placeHolderGIR = `${this.data.rowData[0].positionCcy} -> ${this.capitalActivityForm.get('fundCcy').value}`;
         this.getFormCapitalAct();
+      }
+      else{
+        this.placeHolderGIR = `${this.capitalActivityForm.get('posCcy').value} -> ${this.capitalActivityForm.get('fundCcy').value}`;
+        if(!this.capitalActivityForm.get('posCcy').value || !this.capitalActivityForm.get('fundCcy').value)
+          this.placeHolderGIR = 'Pos ccy -> Fund ccy'
       }
 
       this.isFormPurelyNotValid = !this.capitalActivityForm.errors?.['validated']
@@ -350,7 +398,7 @@ export class AddCapitalModalComponent implements OnInit{
     this.assetFilteredOptions = this.capitalActivityForm.get('asset').valueChanges.pipe(
       startWith(''),
       map(value => {
-        return (this._filter(this.assetOptions, value))
+        return (this._filterAsset(value))
       })
     )
     
@@ -359,6 +407,11 @@ export class AddCapitalModalComponent implements OnInit{
       map(value => this._filter(this.fundCcyOptions, value))
     )
       
+    this.posCcyFilteredOptions = this.capitalActivityForm.get('posCcy').valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(this.fundCcyOptions, value))
+    )
+
     this.capitalTypeFilteredOptions = this.capitalActivityForm.get('capitalType').valueChanges.pipe( startWith(''), 
       map(value => this._filter(this.capitalTypeOptions, value))
     )
@@ -413,6 +466,8 @@ export class AddCapitalModalComponent implements OnInit{
 
       let posCcy: string = this.data.rowData[0].positionCcy;
 
+      this.selectedIssuerID = this.data.rowData[0].issuerID;
+      
       this.setDynamicOptions(FH, null, null); // This line sets Issuer options.
       this.setDynamicOptions(FH, ISN, null);  // This only sets asset options.
 
@@ -450,6 +505,7 @@ export class AddCapitalModalComponent implements OnInit{
       this.gridData = this.data.gridData;
 
       this.selectedIssuerID = this.data.rowData.wsoIssuerID;  // Issuer ID for the EDIT row;
+      this.selectedAssetID = this.data.rowData.wsoAssetID;
 
       // Dynamic options for EDIT
       this.setDynamicOptions(this.data.rowData.fundHedging, this.data.rowData.issuerShortName, this.data.rowData.asset);
@@ -464,6 +520,7 @@ export class AddCapitalModalComponent implements OnInit{
         fundHedging: this.data.rowData.fundHedging,
         issuerShortName: this.data.rowData.issuerShortName,
         asset: this.data.rowData.asset,
+        posCcy: this.data.rowData.posCcy,
 
         localAmount: this.data.rowData.localAmount,
         fxRate: this.data.rowData.fxRate
@@ -500,11 +557,21 @@ export class AddCapitalModalComponent implements OnInit{
     this.capitalAct.localAmount = this.capitalActivityForm.get('localAmount').value;
     this.capitalAct.fxRate = this.capitalActivityForm.get('fxRate').value;
 
+    this.capitalAct.posCcy = (this.data.actionType === 'LINK-ADD') 
+                              ? this.data.rowData[0].positionCcy 
+                              : this.capitalActivityForm.get('posCcy').value;
+
     this.capitalAct.wsoIssuerID = this.selectedIssuerID;  // selectedIssuerID is set at everypoint for every actionType
 
+    this.capitalAct.wsoAssetID = this.selectedAssetID;    // selectedAssetID is set at everypoint for every actionType
       // If issuerShortName is NULL and wsoIssuerID isn't; then set it to null (can occur when issuerShortName was set previously, but wsoIssuerID wasn't cleared);
     if(this.capitalAct.issuerShortName === null)
       this.capitalAct.wsoIssuerID = this.selectedIssuerID = null;
+
+    if(this.capitalAct.asset === null)
+      this.capitalAct.wsoAssetID = this.selectedAssetID = null;
+
+    this.capitalAct.source = 'ArkUI';
   }
 
   ngOnDestroy(): void{
@@ -526,16 +593,11 @@ export class AddCapitalModalComponent implements OnInit{
       this.capitalAct.createdBy = this.data.rowData.createdBy;
       this.capitalAct.createdOn = this.data.rowData.createdOn;
 
-      this.capitalAct.source = this.data.rowData.source;
-      this.capitalAct.sourceID = this.data.rowData.sourceID;  
     }
     else{
       this.capitalAct.capitalID = null;
       this.capitalAct.createdOn = this.capitalAct.modifiedOn = new Date();
       this.capitalAct.createdBy = this.capitalAct.modifiedBy =this.msalService.getUserName();  
-
-      this.capitalAct.source = null;
-      this.capitalAct.sourceID = null;
   
     }
 
@@ -551,6 +613,7 @@ export class AddCapitalModalComponent implements OnInit{
 
           this.disableSubmit = true;
           this.updateMsg = `Capital activity successfully added`;
+
           this.data.adapTableApi.gridApi.addGridData([this.capitalAct]);
           
           this.capitalActivityForm.reset(); // Resets form to invalid state
@@ -565,6 +628,7 @@ export class AddCapitalModalComponent implements OnInit{
 
           
           this.selectedIssuerID = null; // Reset wsoIssuerID for a new capital activity
+          this.selectedAssetID = null; // Reset wsoAssetID for a new capital activity
         }
         else if(this.data.actionType === 'EDIT'){
           this.disableSubmit = true;

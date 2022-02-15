@@ -62,6 +62,7 @@ export class CapitalActivityComponent implements OnInit {
     {field: 'fundHedging', headerName: 'Fund Hedging'},
     {field: 'portfolio', headerName: 'Portfolio'},
     {field: 'issuerShortName', headerName: 'Issuer'},
+    {field: 'issuerID', headerName: 'Issuer ID'},
     {field: 'asset', headerName: 'Asset'},
     {field: 'assetID', headerName: 'AssetID'},
     {field: 'fundCcy', headerName: 'Fund Ccy'},
@@ -88,7 +89,7 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'asset', headerName: 'Asset', type:'abColDefString'},
     { field: 'narrative', headerName: 'Narrative', type:'abColDefString'},
     { field: 'source', headerName: 'Source', type:'abColDefString'},
-    { field: 'sourceID', headerName: 'Source ID', type:'abColDefNumber'},
+    { field: 'sourceID', headerName: 'Source ID', type:'abColDefNumber', valueFormatter: nullOrZeroFormatter},
     { field: 'createdOn', headerName: 'Created On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
     { field: 'createdBy', headerName: 'Created By', type:'abColDefString'},
     { field: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
@@ -418,9 +419,15 @@ export class CapitalActivityComponent implements OnInit {
         gridData: gridData
       },
       minWidth: (actionType === 'LINK-ADD') ? '1500px' : '830px',
+      // width: '95vw',
+      maxHeight: '95vh'
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
       /** ADD Rows to Investor Grid */
+      if(result.event === 'Close with Success' && actionType !== 'EDIT'){
+        this.fetchCapitalActivityData();
+      }
+
     }));
   }
 

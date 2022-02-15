@@ -113,17 +113,13 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="edit">
-        <mat-label *ngIf="data.actionType === 'LINK-ADD'">
+        <mat-label>
           Fund Currency
         </mat-label>
-
-        <mat-label *ngIf="data.actionType !== 'LINK-ADD'">
-          Currency
-        </mat-label>
         
-        <input type="text" matInput required formControlName="fundCcy" [matAutocomplete]="autoCcy" matAutocompletePosition="below">
+        <input type="text" matInput required formControlName="fundCcy" [matAutocomplete]="autoFundCcy" matAutocompletePosition="below">
         <mat-error *ngIf="capitalActivityForm.get('fundCcy').invalid">Please select currency from the list</mat-error>
-        <mat-autocomplete autoActiveFirstOption #autoCcy="matAutocomplete" panelWidth="auto">
+        <mat-autocomplete autoActiveFirstOption #autoFundCcy="matAutocomplete" panelWidth="auto">
           <mat-option
             *ngFor="let ccy of fundCcyFilteredOptions | async"
             [value]="ccy"
@@ -144,30 +140,22 @@
         <mat-autocomplete autoActiveFirstOption #autoAsset="matAutocomplete" class="capital-autocomplete-panel" classList="capital-autocomplete-panel"  panelWidth="auto">
           <mat-option
             *ngFor="let asset of assetFilteredOptions | async"
-            [value]="asset"
+            [value]="asset[0]"
+            (click)="setAssetID(asset)"
           >
-            {{asset}}
+            {{ asset[0] }}
           </mat-option>
         </mat-autocomplete>
-        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('asset').reset()">
+        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('asset').reset(); selectedAssetID = null;">
             <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
 
     </div>
 
-    <div class="last-col">
-
-      
+    <div class="last-col">      
       <ng-container *ngIf="data.actionType === 'LINK-ADD'">
 
-        <mat-form-field appearance="outline" class="edit">
-          <mat-label> FX Rate / Going In Rate </mat-label>
-          <input type="number" (blur)=onBlurForLink() required matInput placeholder="{{placeHolderGIR}}" formControlName="fxRate" />
-          <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('fxRate').reset()">
-              <mat-icon>close</mat-icon>
-          </button>
-        </mat-form-field>
         <mat-form-field appearance="outline" class="edit">
           <mat-label>Local Amount </mat-label>
           <input type="number" required matInput formControlName="localAmount" />
@@ -177,6 +165,38 @@
         </mat-form-field>
         
       </ng-container>
+
+      <ng-container *ngIf="data.actionType !== 'LINK-ADD'">
+
+        <mat-form-field appearance="outline" class="edit">
+          <mat-label>
+            Position Currency
+          </mat-label>
+        
+          <input type="text" matInput required formControlName="posCcy" [matAutocomplete]="autoPosCcy" matAutocompletePosition="below">
+          <mat-error *ngIf="capitalActivityForm.get('posCcy').invalid">Please select currency from the list</mat-error>
+          <mat-autocomplete autoActiveFirstOption #autoPosCcy="matAutocomplete" panelWidth="auto">
+            <mat-option
+              *ngFor="let ccy of posCcyFilteredOptions | async"
+              [value]="ccy"
+            >
+              {{ccy}}
+            </mat-option>
+          </mat-autocomplete>
+          <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('posCcy').reset()">
+              <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+
+      </ng-container>
+
+      <mat-form-field appearance="outline" class="edit">
+        <mat-label> FX Rate / Going In Rate </mat-label>
+        <input type="number" (blur)=onBlurForLink() matInput placeholder="{{placeHolderGIR}}" formControlName="fxRate" />
+        <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('fxRate').reset()">
+            <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
 
       <mat-form-field appearance="outline" class="edit">
         <mat-label> Total Amount </mat-label>
@@ -198,6 +218,7 @@
     </div>
   </div>
 
+  
   <ng-container *ngIf="data.actionType === 'EDIT' || data.actionType === 'LINK-ADD'">
       <div *ngIf="data.actionType === 'LINK-ADD'" id="header-investment">
         Investments
