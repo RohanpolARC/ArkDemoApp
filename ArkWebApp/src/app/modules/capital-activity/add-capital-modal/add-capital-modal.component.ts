@@ -666,7 +666,7 @@ export class AddCapitalModalComponent implements OnInit{
         this.data.adapTableApi.gridApi.addGridData([outcome.capitalAct]);
       }
     }
-    this.dialogRef.close();
+    this.dialogRef.close({event: outcome.isNewCapital ? 'Close with Success' : 'Close'});
   }
 
   onSubmit(): void {

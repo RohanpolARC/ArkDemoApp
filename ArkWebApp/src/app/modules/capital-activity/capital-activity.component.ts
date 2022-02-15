@@ -420,7 +420,7 @@ export class CapitalActivityComponent implements OnInit {
       },
       minWidth: (actionType === 'LINK-ADD') ? '1500px' : '830px',
       // width: '95vw',
-      maxHeight: '95vh'
+      maxHeight: '99vh'
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
       /** ADD Rows to Investor Grid */
