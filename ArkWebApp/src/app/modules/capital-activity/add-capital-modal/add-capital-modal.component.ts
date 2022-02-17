@@ -571,7 +571,10 @@ export class AddCapitalModalComponent implements OnInit{
     if(this.capitalAct.asset === null)
       this.capitalAct.wsoAssetID = this.selectedAssetID = null;
 
-    this.capitalAct.source = 'ArkUI';
+    if(['ADD', 'EDIT'].includes(this.data.actionType)){
+      this.capitalAct.source = 'ArkUI - manual';
+      this.capitalAct.sourceID = 1;
+    }
   }
 
   ngOnDestroy(): void{

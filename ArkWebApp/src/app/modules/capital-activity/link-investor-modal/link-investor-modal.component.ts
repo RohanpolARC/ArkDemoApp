@@ -212,8 +212,8 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
       this.message.capitalAct.createdOn = this.message.capitalAct.modifiedOn = new Date();
       this.message.capitalAct.createdBy = this.message.capitalAct.modifiedBy =this.msalService.getUserName();  
 
-      this.message.capitalAct.source = 'ArkUI';
-      this.message.capitalAct.sourceID = null;
+      this.message.capitalAct.source = 'ArkUI - link';
+      this.message.capitalAct.sourceID = 4;
 
       
       this.subscriptions.push(this.capitalActivityService.putCapitalActivity(this.message.capitalAct).subscribe({

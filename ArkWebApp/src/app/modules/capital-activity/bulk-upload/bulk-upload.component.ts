@@ -178,7 +178,8 @@ export class BulkUploadComponent implements OnInit {
     model.fxRate = Number(obj['GIR (Pos - Fund ccy)']);
     model.createdBy = model.modifiedBy = this.msalService.getUserName();
     model.createdOn = model.modifiedOn = new Date();
-    model.source = 'ArkUI';
+    model.source = 'ArkUI - template';
+    model.sourceID = 3;
     return model;    
   }
 
