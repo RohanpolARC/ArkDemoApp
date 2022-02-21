@@ -80,7 +80,6 @@ getLastBusinessDay(){
   }
 
   ngOnInit(): void { 
-    console.log("Inside app.component")
     this.fetchTabs();
     this.userName=this.dataService.getCurrentUserName();
 

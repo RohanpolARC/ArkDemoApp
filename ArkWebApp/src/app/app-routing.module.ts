@@ -7,6 +7,7 @@ import { CapitalActivityComponent } from './modules/capital-activity/capital-act
 import { RoleGuard } from './role.guard';
 import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized.component';
 import { HomeComponent } from './home-component/home.component';
+//import { GridAccessComponent } from './modules/grid-access-test/grid-access/grid-access.component';
   
   
 const routes: Routes = [
@@ -52,7 +53,14 @@ const routes: Routes = [
     canActivate: [
       MsalGuard
     ]
-  }
+  },
+  // {
+  //   path: 'grid-access',
+  //   component: GridAccessComponent,
+  //   canActivate: [
+  //     MsalGuard
+  //   ]
+  // }
 ];  
   
 @NgModule({  
@@ -61,6 +69,5 @@ const routes: Routes = [
 })
 export class AppRoutingModule {
   constructor(){
-    console.log("Inside App Routing module")
   }
 }
