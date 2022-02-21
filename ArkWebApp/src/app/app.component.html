@@ -2,10 +2,11 @@
    <button mat-icon-button class="menu-icon"  (click)="leftSIdebarOpened=!leftSIdebarOpened" aria-label="Example icon-button with menu icon">
             <mat-icon>menu</mat-icon>
           </button> 
-  <div>
+  <div routerLink="/" (click)="leftSIdebarOpened = false; updateSelection('')">
     <img class="logo-img" src="../assets/img/arc-logo2.png" />
+  
+    <span>ARK</span>
   </div>
-  <span>ARK</span>
   <span class="example-spacer"></span>
 
   <a target="_blank"
@@ -37,13 +38,13 @@
       </mat-expansion-panel-header>
 
       <mat-list>
-        <mat-list-item routerLink="/cash-balance" (click)= "leftSIdebarOpened = false; updateFilterPane('Cash Balance');" [ngStyle]="CashBalanceStyle">
+        <mat-list-item routerLink="/cash-balance" (click)= "leftSIdebarOpened = false; updateSelection('Cash Balance');" [ngStyle]="CashBalanceStyle">
           <div class="list-item-text"> Cash Balance </div>
           </mat-list-item>
         </mat-list>
 
       <mat-list>
-        <mat-list-item routerLink="/capital-activity" (click)= "leftSIdebarOpened = false; updateFilterPane('Capital Activity');" [ngStyle]="CapitalActivityStyle">
+        <mat-list-item routerLink="/capital-activity" (click)= "leftSIdebarOpened = false; updateSelection('Capital Activity');" [ngStyle]="CapitalActivityStyle">
           <div class="list-item-text">Capital Activity</div>
         </mat-list-item>
       </mat-list>
@@ -60,7 +61,7 @@
       </mat-expansion-panel-header>
 
       <mat-list>
-        <mat-list-item routerLink="/" (click)= "leftSIdebarOpened = false; updateFilterPane('Portfolio')" [ngStyle]="GIREditorStyle">
+        <mat-list-item routerLink="/portfolio-history" (click)= "leftSIdebarOpened = false; updateSelection('Portfolio')" [ngStyle]="GIREditorStyle">
           <div class="list-item-text">Going In Rates Editor</div>
         </mat-list-item>
       </mat-list>

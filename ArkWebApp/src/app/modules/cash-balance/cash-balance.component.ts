@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { CashBalanceService } from 'src/app/core/services/CashBalance/cash-balance.service';
@@ -28,8 +28,6 @@ import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/share
   selector: 'app-cash-balance',
   templateUrl: './cash-balance.component.html',
   styleUrls: ['./cash-balance.component.scss'],
-
-  encapsulation: ViewEncapsulation.None,
 })
 export class CashBalanceComponent implements OnInit {
 

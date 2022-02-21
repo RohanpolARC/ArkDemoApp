@@ -8,6 +8,7 @@ import { FilterPane } from './shared/models/FilterPaneModel';
 import { Location } from '@angular/common';
 import {FormGroup, FormControl} from '@angular/forms';
 import { AsOfDate } from './shared/models/FilterPaneModel';
+import { AccessService } from './core/services/Auth/access.service';
 
 @Component({  
   selector: 'app-root',  
@@ -55,7 +56,12 @@ export class AppComponent {
   CashBalanceStyle: any = {};
   CapitalActivityStyle: any = {};
 
-  constructor(private http: HttpClient,private dataService: DataService,public dialog: MatDialog,iconRegistry:MatIconRegistry, private location:Location) {
+  constructor(private http: HttpClient,
+    private dataService: DataService,
+    public dialog: MatDialog,
+    iconRegistry:MatIconRegistry, 
+    private location:Location,
+    private accessService: AccessService) {
 
 }   
 
@@ -69,7 +75,13 @@ getLastBusinessDay(){
   return workday.subtract(diff, 'days').toDate();
 }
 
+  async fetchTabs(){
+    this.accessService.accessibleTabs = await this.accessService.getTabs();
+  }
+
   ngOnInit(): void { 
+    console.log("Inside app.component")
+    this.fetchTabs();
     this.userName=this.dataService.getCurrentUserName();
 
     this.filterPane.AsOfDate = false;
@@ -89,24 +101,16 @@ getLastBusinessDay(){
       /** On Initial Load */
       /** If Cash Balance screen is directly loaded */
     if(this.location.path() === '/cash-balance'){
-      this.filterPane.AsOfDate = true;
-      this.CashBalanceStyle = this.selectedElement;
-      this.GIREditorStyle = this.notSelectedElement;
-      this.CapitalActivityStyle = this.notSelectedElement;
+      this.updateSelection('Cash Balance')
     }
       /** If GIR Editor screen is directly loaded */
-    else if(this.location.path() === ''){
-      this.filterPane.AsOfDate = false;
-      this.GIREditorStyle = this.selectedElement;
-      this.CashBalanceStyle = this.notSelectedElement;
-      this.CapitalActivityStyle = this.notSelectedElement;
+    else if(this.location.path() === '/portfolio-history'){
+      this.updateSelection('Portfolio')
     }
     else if(this.location.path() === '/capital-activity'){
-      this.filterPane.AsOfDate = false;
-      this.CapitalActivityStyle = this.selectedElement;
-      this.GIREditorStyle = this.notSelectedElement;
-      this.CashBalanceStyle = this.notSelectedElement;
+      this.updateSelection('Capital Activity')
     }
+    else this.updateSelection('')
   }  
 
   logout(){  
@@ -129,27 +133,28 @@ getLastBusinessDay(){
     this.dataService.changeSearchDate(this.range);
   }
 
-  updateFilterPane(screen: string): void{
+  updateSelection(screen: string): void{
 
       /** On Subsequent Load (Dynamic) */
 
     if(screen === 'Portfolio'){
       this.filterPane.AsOfDate = false;
       this.GIREditorStyle = this.selectedElement;
-      this.CashBalanceStyle = this.notSelectedElement;
-      this.CapitalActivityStyle = this.notSelectedElement;
+      this.CashBalanceStyle = this.CapitalActivityStyle = this.notSelectedElement;
     }
     else if(screen === 'Cash Balance'){
       this.filterPane.AsOfDate = true;
       this.CashBalanceStyle = this.selectedElement;
-      this.GIREditorStyle = this.notSelectedElement;
-      this.CapitalActivityStyle = this.notSelectedElement;
+      this.GIREditorStyle = this.CapitalActivityStyle = this.notSelectedElement;
     }
     else if(screen === 'Capital Activity'){
       this.filterPane.AsOfDate = false;
-      this.CashBalanceStyle = this.notSelectedElement;
-      this.GIREditorStyle = this.notSelectedElement;
+      this.CashBalanceStyle = this.GIREditorStyle = this.notSelectedElement;
       this.CapitalActivityStyle = this.selectedElement;
+    }
+    else{
+      this.filterPane.AsOfDate = false;
+      this.CashBalanceStyle = this.GIREditorStyle = this.CapitalActivityStyle = this.notSelectedElement;
     }
   }
 

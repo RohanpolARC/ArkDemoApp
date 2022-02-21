@@ -1,6 +1,5 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
-import { ViewEncapsulation } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CapitalActivityModel } from 'src/app/shared/models/CapitalActivityModel';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
@@ -20,7 +19,6 @@ import { LinkInvestorModalComponent } from '../link-investor-modal/link-investor
   selector: 'app-add-capital-modal',
   templateUrl: './add-capital-modal.component.html',
   styleUrls: ['./add-capital-modal.component.scss'],
-  encapsulation: ViewEncapsulation.None,
 })
 export class AddCapitalModalComponent implements OnInit{
 

@@ -16,6 +16,7 @@ export class MsalUserService {
                 storeAuthStateInCookie: true,  
                 //cacheLocation: 'localStorage' ,  
             });  
+        console.log("Inside MSAL")
     }  
   
     public GetAccessToken(): Observable<any> {  
