@@ -78,3 +78,11 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .link-tooltip{
   font-size: 15px !important;
 }
+
+.ark-theme-snackbar{
+  background-color: #FFBF00;
+  color: rgb(17, 1, 1);
+  .mat-simple-snackbar-action{
+    color: black;
+  }
+}

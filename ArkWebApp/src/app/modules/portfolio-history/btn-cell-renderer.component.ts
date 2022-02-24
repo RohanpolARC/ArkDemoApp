@@ -7,13 +7,13 @@ import {UpdateGirModalComponent} from './update-gir-modal/update-gir-modal.compo
   selector: 'btn-cell-renderer',
   template: `
  
- <span [hidden]="editable" (click)="openUpdateGirModal()">
+ <span  (click)="openUpdateGirModal()">
   <mat-icon [ngStyle]="{color:'#285170','cursor':'pointer'}" >edit</mat-icon>
   </span>
-  <span [hidden]="!editable" (click)="btnFlickedHandler()">
+  <span  (click)="btnFlickedHandler()">
   <mat-icon [ngStyle]="{color:'#0590ca','cursor':'pointer'}">save</mat-icon>
   </span>
-  <span [hidden]="!editable" (click)="btnTickedHandler()">
+  <span  (click)="btnTickedHandler()">
   <mat-icon [ngStyle]="{'margin-left':'15px',color:'#102439','cursor':'pointer'}">undo</mat-icon>
   </span>
  

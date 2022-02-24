@@ -1,7 +1,7 @@
 import * as moment from 'moment';
 
 export function dateFormatter(params) {
-    if(params.value != undefined)
+    if(params.value != undefined && params.value != '0001-01-01T00:00:00')
         return moment(params.value).format('DD/MM/YYYY')
     else return ""
 }

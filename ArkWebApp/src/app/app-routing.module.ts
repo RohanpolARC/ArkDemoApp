@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';  
 import { Routes, RouterModule } from '@angular/router';  
 import { MsalGuard } from '@azure/msal-angular'; 
-import {PortfolioHistoryComponent} from '../app/modules/portfolio-history/portfolio-history.component' 
+import { PortfolioHistoryComponent } from '../app/modules/portfolio-history/portfolio-history.component' 
 import { CashBalanceComponent } from './modules/cash-balance/cash-balance.component';
 import { CapitalActivityComponent } from './modules/capital-activity/capital-activity.component';
 import { RoleGuard } from './role.guard';
 import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized.component';
 import { HomeComponent } from './home-component/home.component';
-//import { GridAccessComponent } from './modules/grid-access-test/grid-access/grid-access.component';
+import { FacilityDetailComponent } from './modules/facility-detail/facility-detail.component';
   
   
 const routes: Routes = [
@@ -22,7 +22,7 @@ const routes: Routes = [
     component: PortfolioHistoryComponent,  
     canActivate: [
       MsalGuard,
-      RoleGuard
+      // RoleGuard
     ],
     data: {
       tab: 'Going in Rates Editor'
@@ -32,7 +32,7 @@ const routes: Routes = [
     component: CashBalanceComponent, 
     canActivate: [
       MsalGuard, 
-      RoleGuard
+      // RoleGuard
     ],
     data: {
       tab: 'Cash Balance'
@@ -42,25 +42,30 @@ const routes: Routes = [
     component: CapitalActivityComponent, 
     canActivate: [
       MsalGuard, 
-      RoleGuard
+      // RoleGuard
     ], 
     data: {
       tab: 'Capital Activity'
     }
   },
-  { path: 'unauthorized', 
+  {
+    path: 'facility-detail',
+    component: FacilityDetailComponent,
+    canActivate: [
+      MsalGuard,
+      // RoleGuard
+    ],
+    data: {
+      tab: 'Facility Detail'
+    }
+  },
+  { path: 'accessibility', 
     component: UnauthorizedComponent,
     canActivate: [
       MsalGuard
     ]
   },
-  // {
-  //   path: 'grid-access',
-  //   component: GridAccessComponent,
-  //   canActivate: [
-  //     MsalGuard
-  //   ]
-  // }
+ 
 ];  
   
 @NgModule({  

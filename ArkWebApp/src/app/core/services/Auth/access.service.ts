@@ -10,7 +10,7 @@ import { MsalUserService } from './msaluser.service';
 })
 export class AccessService {
 
-  accessibleTabs: string[] = null;
+  accessibleTabs: {tab: string, isWrite: boolean}[] = null;
   
   private httpOptions = {  
     headers: new HttpHeaders({  
@@ -23,30 +23,10 @@ export class AccessService {
               private msalService: MsalUserService) {
   }
 
-  // public getAccessibleTabs(): Promise<any>{
-  //   let userRole: string = this.msalService.getUserRole();
-  //   console.log(userRole);
-
-  //   return this.http.get<any[]>(`${APIConfig.ARKWEB_ACCESSIBLE_TABS_GET_API}/?userRole=${userRole}`, this.httpOptions).pipe(catchError((ex) => throwError(ex)))
-  //     .do(result => {
-  //       console.log(result);
-  //       this.accessibleTabs = result;
-  //       console.log(this.accessibleTabs);
-  //     })
-  //     .toPromise();
-  // } 
-
-  public getAccessibleTabs(): Observable<any>{
-
-    // let userRole: string = this.msalService.getUserRole()
-
-    let userRole: string = 'Finance';
-
-    return this.http.get<any[]>(`${APIConfig.ARKWEB_ACCESSIBLE_TABS_GET_API}/?userRole=${userRole}`, this.httpOptions);
-  }
-
   public getTabs(){
-    let userRole: string = 'Finance';
+    let userRole: string[] = this.msalService.getCurrentUserInfo().idToken['roles'];
+    // let userRole: string[] = ['Operation.Read','Finance.Read']
+
     return this.http.get<any[]>(`${APIConfig.ARKWEB_ACCESSIBLE_TABS_GET_API}/?userRole=${userRole}`, this.httpOptions).toPromise();
   }
 }

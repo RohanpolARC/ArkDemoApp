@@ -19,14 +19,13 @@ export class RoleGuard implements CanActivate{
   ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
 
 
-    let tabs: string[] = this.accessService.accessibleTabs;
+    let tabs: {tab: string, isWrite: boolean}[] = this.accessService.accessibleTabs;
 
-    if(tabs?.includes(route?.data?.tab)){
-      return true;
-    }
-    else{
-      this.router.navigate(['/unauthorized'])
-      return false;
-    }
+    for(let i:number = 0; i < tabs.length; i+= 1){
+      if(tabs[i].tab === route?.data?.tab)
+        return true;
+    } 
+    this.router.navigate(['/accessibility'])
+    return false;
   }  
 }

@@ -33,11 +33,8 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { CapitalActivityModule } from './modules/capital-activity/capital-activity.module';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized.component';
-import { AccessService } from './core/services/Auth/access.service';
-
-import { APP_INITIALIZER } from '@angular/core';
-import { Observable } from 'rxjs';
 import {HomeComponent} from '../app/home-component/home.component'
+import { FacilityDetailModule } from './modules/facility-detail/facility-detail.module';
 
 export const protectedResourceMap: any =  
   [  
@@ -83,7 +80,8 @@ export const protectedResourceMap: any =
   MatNativeDateModule,
   MatInputModule,
   CapitalActivityModule,
-  MatTooltipModule
+  MatTooltipModule,
+  FacilityDetailModule
   ],  
   providers: [  
     HttpClient,  

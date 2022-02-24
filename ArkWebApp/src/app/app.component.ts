@@ -9,6 +9,7 @@ import { Location } from '@angular/common';
 import {FormGroup, FormControl} from '@angular/forms';
 import { AsOfDate } from './shared/models/FilterPaneModel';
 import { AccessService } from './core/services/Auth/access.service';
+import { Router } from '@angular/router';
 
 @Component({  
   selector: 'app-root',  
@@ -55,15 +56,21 @@ export class AppComponent {
   GIREditorStyle: any = {};
   CashBalanceStyle: any = {};
   CapitalActivityStyle: any = {};
+  FacilityDetailStyle: any = {};
 
   constructor(private http: HttpClient,
     private dataService: DataService,
     public dialog: MatDialog,
     iconRegistry:MatIconRegistry, 
     private location:Location,
-    private accessService: AccessService) {
+    public accessService: AccessService,
+    private router:Router) {
 
 }   
+
+get getAccessibleTabs(){
+  return this.accessService.accessibleTabs;
+}
 
 getLastBusinessDay(){
   let workday = moment();
@@ -77,9 +84,13 @@ getLastBusinessDay(){
 
   async fetchTabs(){
     this.accessService.accessibleTabs = await this.accessService.getTabs();
+    this.router.navigate([this.lastClickedTabRoute]);
   }
 
+  lastClickedTabRoute: string = '/accessibility';
+
   ngOnInit(): void { 
+    this.lastClickedTabRoute = this.location.path();
     this.fetchTabs();
     this.userName=this.dataService.getCurrentUserName();
 
@@ -136,24 +147,22 @@ getLastBusinessDay(){
 
       /** On Subsequent Load (Dynamic) */
 
+    this.filterPane.AsOfDate = false;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.notSelectedElement;
+    this.lastClickedTabRoute = this.location.path();
+
     if(screen === 'Portfolio'){
-      this.filterPane.AsOfDate = false;
       this.GIREditorStyle = this.selectedElement;
-      this.CashBalanceStyle = this.CapitalActivityStyle = this.notSelectedElement;
     }
     else if(screen === 'Cash Balance'){
       this.filterPane.AsOfDate = true;
       this.CashBalanceStyle = this.selectedElement;
-      this.GIREditorStyle = this.CapitalActivityStyle = this.notSelectedElement;
     }
     else if(screen === 'Capital Activity'){
-      this.filterPane.AsOfDate = false;
-      this.CashBalanceStyle = this.GIREditorStyle = this.notSelectedElement;
       this.CapitalActivityStyle = this.selectedElement;
     }
-    else{
-      this.filterPane.AsOfDate = false;
-      this.CashBalanceStyle = this.GIREditorStyle = this.CapitalActivityStyle = this.notSelectedElement;
+    else if(screen === 'Facility Detail'){
+      this.FacilityDetailStyle = this.selectedElement
     }
   }
 
