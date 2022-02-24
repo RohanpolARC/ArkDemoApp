@@ -6,8 +6,8 @@
 </mat-form-field> -->
 
 
-<mat-form-field color="accent" appearance="fill">
-    <input matInput  [(ngModel)]="inputDate" [matDatepicker]="picker">
+<mat-form-field color="primary" style="width: 200px;" class="date-field">
+    <input matInput  [(ngModel)]="inputDate" [matDatepicker]="picker" (click)="onDateClick()">
     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
     <mat-datepicker #picker color="primary"></mat-datepicker>
   </mat-form-field>

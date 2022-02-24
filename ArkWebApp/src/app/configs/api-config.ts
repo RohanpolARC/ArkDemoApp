@@ -29,5 +29,7 @@ export class APIConfig {
 
     public static CAPITAL_ACTIVITY_BULK_PUT_API: string = APIConfig.BASEURL + "/api/CapitalActivity/bulkput";
 
-    public static FACILITY_DETAILS_GET_API: string = APIConfig.BASEURL + "/api/FacilityDetails/Get"
+    public static FACILITY_DETAILS_GET_API: string = APIConfig.BASEURL + "/api/FacilityDetails/Get";
+    public static FACILITY_DETAILS_PUT_API: string = APIConfig.BASEURL + "/api/FacilityDetails/Put";
+
 }

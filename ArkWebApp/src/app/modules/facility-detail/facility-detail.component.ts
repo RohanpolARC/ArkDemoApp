@@ -55,6 +55,8 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
     {field: 'unfundedMargin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'floorRate', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     { field: 'expectedDate', 
+      maxWidth: 200,
+      width: 200,
       valueFormatter: dateFormatter, 
       editable: (params: EditableCallbackParams) => {
         return params.node.rowIndex === this.actionClickedRowID;
@@ -102,6 +104,23 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
         };
       }
     },
+    {
+      headerName: 'Spread Discount',
+      field: 'spreadDiscount',
+      valueFormatter: amountFormatter,
+      editable:(params: EditableCallbackParams) => {
+        return params.node.rowIndex === this.actionClickedRowID;
+      }, 
+      cellStyle: (params) => {
+        console.log(this.actionClickedRowID)
+        return (params.rowIndex === this.actionClickedRowID) ? 
+        {
+          'border-color': '#0590ca',
+        } : {
+          'border-color': '#fff'
+        };
+      }
+    },
     { headerName: 'Action', 
       field: 'Action',
       width: 150,
@@ -109,13 +128,13 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
       pinnedRowCellRenderer: 'right',
       cellRenderer: 'actionCellRenderer',
       editable: false,
-    }
+    },
   ]
     
   defaultColDef = {
     resizable: true,
     enableValue: true,
-    enableRowGroup: true,
+    enableRowGroup: false,
     enablePivot: true,
     sortable: true,
     filter: true,
@@ -146,10 +165,10 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
   
   isWriteAccess: boolean = false;
 
-  setWarningMsg(message: string, action: string){
+  setWarningMsg(message: string, action: string, type: string = 'ark-theme-snackbar-normal'){
     this.warningMsgPopUp.open(message, action, {
       duration: 5000,
-      panelClass: ['ark-theme-snackbar']
+      panelClass: [type]
     });
   }
 
@@ -162,11 +181,16 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
     if(columnID === 'expectedPrice'){
       if((<number>newVal <  (0.75 * <number>rowData['costPrice']) 
       || <number>newVal > (1.5 * <number>rowData['costPrice'])) && rowData['assetTypeName'].toLowerCase().includes('loan')){
-        this.setWarningMsg(`Warning: Expected price not in range (Loan)`, 'Dismiss');
+        this.setWarningMsg(`Warning: Expected price not in range (Loan)`, 'Dismiss', 'ark-theme-snackbar-warning');
       }
       else if((<number>newVal <  (0.5 * <number>rowData['costPrice']) 
       || <number>newVal > (3.0 * <number>rowData['costPrice'])) && rowData['assetTypeName'].toLowerCase().includes('equity')){
-        this.setWarningMsg(`Expected price not in range (Equity)`, 'Dismiss');
+        this.setWarningMsg(`Expected price not in range (Equity)`, 'Dismiss', 'ark-theme-snackbar-warning');
+      }
+    }
+    if(columnID === 'expectedDate'){
+      if(<Date>rowData['maturityDate'] > <Date>newVal){
+        this.setWarningMsg(`Maturity Date > Expected Date not possible`, `Dismiss`, 'ark-theme-snackbar-warning')
       }
     }
   }

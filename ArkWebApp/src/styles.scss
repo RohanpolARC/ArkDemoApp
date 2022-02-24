@@ -79,10 +79,34 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   font-size: 15px !important;
 }
 
-.ark-theme-snackbar{
-  background-color: #FFBF00;
+
+.ark-theme-snackbar-normal{
+  background-color: #0590ca;
   color: rgb(17, 1, 1);
   .mat-simple-snackbar-action{
     color: black;
   }
+}
+
+.ark-theme-snackbar-success{
+  background-color: rgb(33, 216, 16);
+  color: rgb(17, 1, 1);
+  .mat-simple-snackbar-action{
+    color: black;
+  }
+}
+
+.ark-theme-snackbar-warning{
+  background-color: rgb(233, 155, 11);
+  color: rgb(17, 1, 1);
+  .mat-simple-snackbar-action{
+    color: black;
+  }
+}
+.ark-theme-snackbar-error{
+  background-color: rgb(255, 49, 49);
+  color: rgb(17, 1, 1);
+  .mat-simple-snackbar-action{
+    color: black;
+    }
 }

@@ -14,5 +14,12 @@ export interface FacilityDetailModel{
     unfundedMargin: number,
     floorRate: number,
     expectedDate?: Date,
-    expectedPrice?: number
+    expectedPrice?: number,
+    maturityPrice?: number,
+    spreadDiscount?: number,
+
+    createdOn?: Date,
+    createdBy?: string,
+    modifiedOn?: Date,
+    modifiedBy?: string
 }

@@ -1,7 +1,11 @@
-import { ApplicationRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
-import { ICellRendererParams, RowNode } from '@ag-grid-community/all-modules';
+import { ICellRendererParams } from '@ag-grid-community/all-modules';
 import { FacilityDetailComponent } from './facility-detail.component';
+import { FacilityDetailModel } from 'src/app/shared/models/FacilityDetailModel';
+import { Subscription } from 'rxjs';
+import { FacilityDetailService } from 'src/app/core/services/FacilityDetails/facility-detail.service';
+import {MsalUserService} from '../../core/services/Auth/msaluser.service'
 
 @Component({
   selector: 'app-action-cell-renderer',
@@ -10,11 +14,8 @@ import { FacilityDetailComponent } from './facility-detail.component';
 })
 export class ActionCellRendererComponent implements ICellRendererAngularComp,OnInit {
 
+  subscriptions: Subscription[] = [];
   params: ICellRendererParams;
-
-  editingCells
-  prevRow
-  rowDataEarlier
 
   componentParent: FacilityDetailComponent
 
@@ -24,20 +25,11 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp,OnI
   }
 
   refresh(){
-
-    this.editingCells = this.params.api.getEditingCells();
-    this.editable = this.editingCells.some((cell) => {
-      return cell.rowIndex === this.params.node.rowIndex;
-    });
-
-        return true
+    return true   // States that it needs to be refreshed
   }
 
-  constructor() { }
-
-  editable:boolean = false;
-
-  currentRowIndex:number = null;
+  constructor(private facilityDetailService: FacilityDetailService,
+              private msalUserService: MsalUserService) { }
 
   originalRowNodeData: any;
   originalRowNodeID: any;
@@ -46,14 +38,13 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp,OnI
     if(this.componentParent.isWriteAccess){
       this.startEditing();
     }
-    else{
-      this.componentParent.setWarningMsg('You have no write access', 'Dismiss')   
-    }
+    // else{
+    //   this.componentParent.setWarningMsg('You have no write access', 'Dismiss', 'ark-theme-snackbar-error')   
+    // }
   }
 
   startEditing(){
     if(this.componentParent.getSelectedRowID() === null){
-      console.log("Calling this")
       this.componentParent.setSelectedRowID(this.params.node.rowIndex);
 
             // getRowNode().data returns references to the cell, so update in grid gets reflected here, JSON.parse(JSON.stringify()) just creates the copy of the object data, instead of reference.
@@ -72,9 +63,13 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp,OnI
       this.params.api.startEditingCell({ 
         rowIndex: this.params.node.rowIndex, colKey: 'maturityPrice'
       });
+      this.params.api.startEditingCell({ 
+        rowIndex: this.params.node.rowIndex, colKey: 'spreadDiscount'
+      });
+
     }
     else{
-      this.componentParent.setWarningMsg('Please save the existing entry', 'Dismiss')   
+      this.componentParent.setWarningMsg('Please save the existing entry', 'Dismiss', 'ark-theme-snackbar-warning')   
     }
   }
 
@@ -86,38 +81,48 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp,OnI
     this.componentParent.setSelectedRowID(null);
     this.params.api.refreshCells({
       force: true,
-      columns: ['expectedDate', 'expectedPrice', 'maturityPrice'],
+      columns: ['expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount'],
       rowNodes: [this.params.api.getRowNode(this.params.node.id)]
     });
+  }
+
+  getModel(): FacilityDetailModel{
+    let model: FacilityDetailModel = <FacilityDetailModel>{};
+    let data = this.params.data;
+
+    model.assetID = <number> data.assetID;
+    model.expectedDate = <Date> data.expectedDate;
+    model.expectedPrice = <number> data.expectedPrice;
+    model.maturityPrice = <number> data.maturityPrice;
+    model.spreadDiscount = <number> data.spreadDiscount;
+
+    model.modifiedBy = this.msalUserService.getUserName();
+    return model;
   }
 
   onSave(){
     this.params.api.stopEditing(true);
+    this.subscriptions.push(this.facilityDetailService.putFacilityDetails(this.getModel()).subscribe({
+      next: data => {
 
-    this.originalRowNodeData = this.originalRowNodeID = null;
-    this.componentParent.setSelectedRowID(null);
-    this.params.api.refreshCells({
-      force: true,
-      columns: ['expectedDate', 'expectedPrice', 'maturityPrice'],
-      rowNodes: [this.params.api.getRowNode(this.params.node.id)]
-    });
-  }
-
-  stopEditing(){
-    const rowNode = this.params.api.getRowNode(this.params.node.id);
-    console.log(rowNode)
-     rowNode.setData(this.prevRow);
-
-     this.params.api.undoCellEditing();
-
-    // this.params.api.stopEditing(true);
-
-    this.editable=true
-    console.log("Undo Performed")
+        if(data.isSuccess){
+          this.originalRowNodeData = this.originalRowNodeID = null;
+          this.componentParent.setSelectedRowID(null);
+          this.params.api.refreshCells({
+            force: true,
+            columns: ['expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount'],
+            rowNodes: [this.params.api.getRowNode(this.params.node.id)]
+          });  
+          
+          this.componentParent.setWarningMsg(`Saved successfully`, 'Dismiss', 'ark-theme-snackbar-success');  
+        }
+      },
+      error: error => {
+        this.componentParent.setWarningMsg(`Failed to save`, 'Dismiss', 'ark-theme-snackbar-error'); 
+      }
+    }))
   }
 
   ngOnInit(): void {
-    console.log('Actioncell renderer called')
   }
-
 }
