@@ -194,7 +194,8 @@ export class BulkUploadComponent implements OnInit {
         AdaptableToolPanel: AdaptableToolPanelAgGridComponent
       },
       columnDefs: this.columnDefs,
-      allowContextMenuWithControlKey:true
+      allowContextMenuWithControlKey:true,
+      rowGroupPanelShow: 'always'
     }
 
     this.updateMsg = null;
@@ -378,6 +379,13 @@ export class BulkUploadComponent implements OnInit {
         XLSX.utils.book_append_sheet(wb, ws, "Capital Activity");
 
         let jsonRowData = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]).filter(row => row['Cash Flow Date'] !== undefined && row['Cash Flow Date'] !== null);
+
+        for(let i:number = 0; i < jsonRowData.length; i+=1){
+          jsonRowData[i]['Amount'] = parseFloat(jsonRowData[i]['Amount'])
+          jsonRowData[i]['Call Date'] = moment(jsonRowData[i]['Call Date'], 'DD/MM/YYYY').toDate()
+          jsonRowData[i]['Cash Flow Date'] = moment(jsonRowData[i]['Cash Flow Date'], 'DD/MM/YYYY').toDate()
+          jsonRowData[i]['GIR (Pos - Fund ccy)'] = parseFloat(jsonRowData[i]['GIR (Pos - Fund ccy)'])
+        }
 
         for(let i:number = 0; i < jsonRowData.length; i+=1){
           jsonRowData[i]['_COLUMN_TITLE'] = getColumnTitle(i+2);
