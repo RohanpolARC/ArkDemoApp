@@ -101,6 +101,6 @@ export function dateFormatter(params){
     if(formattedDate!=undefined)
         return formattedDate;
     else{
-        return ""
+        return null
     }
 }
