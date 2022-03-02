@@ -4,10 +4,10 @@ import { HttpClient } from '@angular/common/http';
 import {MatDialog} from '@angular/material/dialog';
 import { MatIconRegistry } from '@angular/material/icon';
 import * as moment from 'moment';
-import { FilterPane } from './shared/models/FilterPaneModel';
+import { FacilityDetailsFilter, FilterPane } from './shared/models/FilterPaneModel';
 import { Location } from '@angular/common';
 import {FormGroup, FormControl} from '@angular/forms';
-import { AsOfDate } from './shared/models/FilterPaneModel';
+import { AsOfDateRange } from './shared/models/FilterPaneModel';
 import { AccessService } from './core/services/Auth/access.service';
 import { Router } from '@angular/router';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
@@ -31,16 +31,20 @@ export class AppComponent {
   //Filter Pane 
   searchDate: Date = null;
   filterPane:FilterPane = {
-    AsOfDate: false,
-    Funds: false
+    AsOfDateRange: false,
+    Funds: false,
+    FacilityDetails: false
   };
+
   searchDateRange = new FormGroup({
     start: new FormControl(),
     end: new FormControl(),
   });
 
-  range:AsOfDate = null;
-  
+  range:AsOfDateRange = null;
+  asOfDate: string = null;
+  facilityFilter: FacilityDetailsFilter = <FacilityDetailsFilter>{};
+
   notSelectedElement = {
 
     'color':'white', 
@@ -104,7 +108,9 @@ getLastBusinessDay(){
     this.subscriptions.push(this.facilityDetailSvc.getFacilityFunds().subscribe({
       next: funds => {
         this.fundsDropdown = this.selectedFunds = funds;
-        this.dataService.changeSearchFunds(this.selectedFunds);
+
+          /**  Fetching details after getting funds*/
+        this.setFacilityFilter()
       },
       error: error => {
         console.error("Failed to get funds for filtering");
@@ -112,14 +118,11 @@ getLastBusinessDay(){
     }))
   }
 
-  onFundFilterApply(event){
-    this.dataService.changeSearchFunds(this.selectedFunds)
-    this.rightSidebarOpened = false
-  }
-
   filterApply(){
     if(this.location.path() === '/facility-detail'){
-      this.dataService.changeSearchFunds(this.selectedFunds)
+      // this.dataService.changeSearchFunds(this.selectedFunds)
+
+      this.setFacilityFilter();
     }
     this.rightSidebarOpened = false
   }
@@ -169,12 +172,21 @@ getLastBusinessDay(){
     this.dataService.changeSearchDate(this.range);
   }
 
+  setFacilityFilter(){
+    this.facilityFilter.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
+    this.facilityFilter.funds = this.selectedFunds;
+
+    this.dataService.changeFacilityFilter(this.facilityFilter);
+  }
+
   updateSelection(screen: string): void{
 
       /** On Subsequent Load (Dynamic) */
 
-    this.filterPane.AsOfDate = false;
+    this.filterPane.AsOfDateRange = false;
     this.filterPane.Funds = false;
+    this.filterPane.FacilityDetails = false;
+
     this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.notSelectedElement;
     this.lastClickedTabRoute = this.location.path();
 
@@ -182,7 +194,7 @@ getLastBusinessDay(){
       this.GIREditorStyle = this.selectedElement;
     }
     else if(screen === 'Cash Balance'){
-      this.filterPane.AsOfDate = true;
+      this.filterPane.AsOfDateRange = true;
       this.range = {
         start: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
         end: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
@@ -200,8 +212,11 @@ getLastBusinessDay(){
     }
     else if(screen === 'Facility Detail'){
 
+      this.filterPane.FacilityDetails = true;
       this.filterPane.Funds = true;
       this.FacilityDetailStyle = this.selectedElement
+
+      this.asOfDate = moment(this.getLastBusinessDay()).format('YYYY-MM-DD')
 
       this.fetchFacilityFunds();
 

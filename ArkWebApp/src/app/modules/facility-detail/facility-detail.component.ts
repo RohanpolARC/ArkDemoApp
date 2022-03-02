@@ -20,7 +20,7 @@ import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from 'src/app/core/services/FacilityDetails/facility-detail.service';
 
-import { dateFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, amountFormatter, removeDecimalFormatter } from 'src/app/shared/functions/formatter';
 import { ActionCellRendererComponent } from './action-cell-renderer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
@@ -41,23 +41,38 @@ export class FacilityDetailComponent implements OnInit {
   agGridModules: Module[] = [ClientSideRowModelModule,RowGroupingModule,SetFilterModule,ColumnsToolPanelModule,MenuModule, ExcelExportModule];
 
   columnDefs: ColDef[] = [
-    {field: 'issuerShortName'},
-    {field: 'asset'},
-    {field: 'assetID'},
-    {field: 'assetTypeName'},
-    {field: 'ccy'},
-    {field: 'faceValueIssue',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'costPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'maturityDate', valueFormatter: dateFormatter},
-    {field: 'benchMarkIndex'},
-    {field: 'spread', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'pikmargin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'unfundedMargin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'floorRate', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    {field: 'issuerShortName', pinned: 'left'},
+    {field: 'asset', pinned: 'left', width: 240},
+    {field: 'assetID', width: 120},
+    {field: 'assetTypeName', width: 180},
+    {field: 'ccy', width: 80},
+    {field: 'faceValueIssue',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 180},
+    {field: 'costPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 120},
+    {field: 'mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 90},
+    {field: 'maturityDate', valueFormatter: dateFormatter, width: 150},
+    {field: 'benchMarkIndex', width: 180},
+    { 
+      field: 'spread', 
+      width: 110,
+      cellClass: 'ag-right-aligned-cell', 
+      valueFormatter: removeDecimalFormatter
+    },
+    {
+      field: 'pikmargin', 
+      width: 130,
+      headerName: 'PIK Margin',
+      cellClass: 'ag-right-aligned-cell',
+      valueFormatter: removeDecimalFormatter
+    },
+    {field: 'unfundedMargin', 
+     width: 170,
+    valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    {field: 'floorRate', 
+    width: 140,
+    valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     { field: 'expectedDate', 
-      maxWidth: 200,
-      width: 200,
+      maxWidth: 150,
+      width: 150,
       valueFormatter: dateFormatter, 
       editable: (params: EditableCallbackParams) => {
         return params.node.rowIndex === this.actionClickedRowID;
@@ -73,6 +88,7 @@ export class FacilityDetailComponent implements OnInit {
       },
     },
     { field: 'expectedPrice', 
+      width: 160,
       valueFormatter: amountFormatter, 
       cellClass: 'ag-right-aligned-cell', 
       editable: (params: EditableCallbackParams) => {
@@ -88,6 +104,7 @@ export class FacilityDetailComponent implements OnInit {
       }
     },
     { field: 'maturityPrice', 
+      width: 160,
       valueFormatter: amountFormatter, 
       cellClass: 'ag-right-aligned-cell',
       editable: (params: EditableCallbackParams) => {
@@ -104,8 +121,8 @@ export class FacilityDetailComponent implements OnInit {
     },
     {
       headerName: 'Spread Discount',
+      width: 160,
       field: 'spreadDiscount',
-      valueFormatter: amountFormatter,
       editable:(params: EditableCallbackParams) => {
         return params.node.rowIndex === this.actionClickedRowID;
       }, 
@@ -116,15 +133,17 @@ export class FacilityDetailComponent implements OnInit {
         } : {
           'border-color': '#fff'
         };
-      }
+      },
+      valueFormatter: removeDecimalFormatter
     },
     { headerName: 'Action', 
       field: 'Action',
-      width: 150,
+      width: 130,
       pinned: 'right',
       pinnedRowCellRenderer: 'right',
       cellRenderer: 'actionCellRenderer',
       editable: false,
+      menuTabs: []
     },
   ]
     
@@ -179,8 +198,6 @@ export class FacilityDetailComponent implements OnInit {
       }
     }
     if(columnID === 'expectedDate'){
-      console.log(rowData['maturityDate'])
-      console.log(newVal);
       if(newVal != 'Invalid Date'){
         if(<Date>rowData['maturityDate'] < newVal?.toISOString()){
           this.setWarningMsg(`Expected date greator than Maturity date`, `Dismiss`, 'ark-theme-snackbar-warning')
@@ -228,19 +245,20 @@ export class FacilityDetailComponent implements OnInit {
       componentParent: this
     }
 
-    this.subscriptions.push(this.dataService.currentSearchFunds.subscribe(funds => {
-      
-      funds = funds?.map(k => { return k?.fund })
+    this.subscriptions.push(this.dataService.currentFacilityFilter.subscribe(filterData => {
 
-      if(funds != null && funds != []){
-        this.subscriptions.push(this.facilityDetailsService.getFacilityDetails(funds).subscribe({
+      let funds: string[] = filterData?.funds?.map(k => { return k?.fund })
+      let asOfDate: string = filterData?.asOfDate;
+
+      if(funds != null && asOfDate != null){
+        this.subscriptions.push(this.facilityDetailsService.getFacilityDetails(funds, asOfDate).subscribe({
           next: data => {
             this.rowData = data;
           },
           error: error => {
-            this.rowData = [];
+            this.rowData = null;
           }
-        }))
+        }))          
       }
     }))
 

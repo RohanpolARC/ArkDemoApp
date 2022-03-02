@@ -80,7 +80,6 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp,OnI
 
   undoEdit(){
     this.params.api?.getRowNode(this.originalRowNodeID)?.setData(this.originalRowNodeData);
-    console.log(this.originalRowNodeData);
     this.originalRowNodeData = this.originalRowNodeID = null;
     this.componentParent.setSelectedRowID(null);
     this.params.api.refreshCells({

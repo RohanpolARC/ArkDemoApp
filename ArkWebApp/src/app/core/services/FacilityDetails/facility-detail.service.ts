@@ -21,8 +21,8 @@ export class FacilityDetailService {
   constructor(private http: HttpClient,
               private msalService: MsalUserService) { }
 
-  public getFacilityDetails(funds: string[]){
-    return this.http.get<any[]>(`${APIConfig.FACILITY_DETAILS_GET_API}/?funds=${funds}`, this.httpOptions).pipe(
+  public getFacilityDetails(funds: string[], asOfDate?: string){
+    return this.http.get<any[]>(`${APIConfig.FACILITY_DETAILS_GET_API}/?funds=${funds}&asOfDate=${asOfDate}`, this.httpOptions).pipe(
       catchError((ex) => throwError(ex)));
   }
 

@@ -4,7 +4,7 @@ import { HttpClient, HttpParams,HttpHeaders } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { MsalUserService } from '../Auth/msaluser.service';  
-import { AsOfDate } from 'src/app/shared/models/FilterPaneModel';
+import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +21,7 @@ export class CashBalanceService {
 
   constructor(private http: HttpClient,private msalService: MsalUserService) { }
 
-  public getCashBalance(requestedDate: AsOfDate){
+  public getCashBalance(requestedDate: AsOfDateRange){
     this.httpOptions = {  
       headers: new HttpHeaders({  
           'Content-Type': 'application/json',  

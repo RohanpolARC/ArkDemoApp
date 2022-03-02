@@ -20,7 +20,7 @@ import {
 } from '@adaptabletools/adaptable/types';
 import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 
-import { AsOfDate } from 'src/app/shared/models/FilterPaneModel';
+import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
 
 
@@ -32,7 +32,7 @@ import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/share
 export class CashBalanceComponent implements OnInit {
 
   searchDate: Date = null;
-  sDate: AsOfDate = null;
+  sDate: AsOfDateRange = null;
 
   rowData: any[];
   rowGroupPanelShow:string = 'always';

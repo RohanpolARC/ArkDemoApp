@@ -448,8 +448,6 @@ export class BulkUploadComponent implements OnInit {
         this.validationErrorMsg = `Invalid column found "${validateColumns(extractedCols).col}"`;
         this.disableSubmit = true;
       }
-      console.log(this.bulkRowData)
-      console.log(this.invalidRowData)
     }
   }
 

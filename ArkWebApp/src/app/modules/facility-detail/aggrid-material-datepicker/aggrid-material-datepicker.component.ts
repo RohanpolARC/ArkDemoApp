@@ -23,13 +23,7 @@ export class AggridMaterialDatepickerComponent implements OnInit, ICellEditorAng
     this.params = params;  
     this.componentParent = params.context.componentParent;  
 
-    this.inputDate = new Date(<string> params.data['expectedDate']);
-    console.log(new Date(<string> params.data['expectedDate']))
-    console.log(<string> params.data['expectedDate'])
     this.inputDate = new Date(moment(params.data['expectedDate']).format('YYYY-MM-DD'))
-
-    console.log(moment(params.data['expectedDate']).format('YYYY-MM-DD'))
-    console.log(this.inputDate)
     if(moment(params.data['expectedDate']).format('YYYY-MM-DD') === 'Invalid Date')
       this.inputDate = null
 

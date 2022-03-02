@@ -24,8 +24,8 @@ export class AccessService {
   }
 
   public getTabs(){
-    // let userRole: string[] = this.msalService.getCurrentUserInfo().idToken['roles'];
-    let userRole: string[] = ['Operation.Read','Finance.Read']
+    let userRole: string[] = this.msalService.getCurrentUserInfo().idToken['roles'];
+    // let userRole: string[] = ['Operation.Read','Finance.Read']
 
     return this.http.get<any[]>(`${APIConfig.ARKWEB_ACCESSIBLE_TABS_GET_API}/?userRole=${userRole}`, this.httpOptions).toPromise();
   }

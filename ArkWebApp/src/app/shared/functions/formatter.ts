@@ -32,3 +32,13 @@ export function nullOrZeroFormatter(params){
     else return Number(params.value).toLocaleString(undefined, {
     });
 }
+
+export function removeDecimalFormatter(params){
+    if(params.value != null && Number(params.value)!= 0){
+        return String(parseInt(params.value));
+    }
+    else if(Number(params.value) == 0)
+        return "-"
+    else
+        return ""
+}

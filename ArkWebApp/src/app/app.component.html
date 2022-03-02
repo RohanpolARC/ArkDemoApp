@@ -83,20 +83,35 @@
   
     <div class="sidenav-right-heading right-cont">
       <span>FILTER PANE</span>
-        <button mat-raised-button *ngIf="location.path() === '/facility-detail'" (click)="filterApply()">Apply</button>
+      <button mat-raised-button *ngIf="location.path() === '/facility-detail'" (click)="filterApply()">Apply</button>
     </div>
   
-  <ng-container *ngIf="filterPane.Funds">
-    <ng-multiselect-dropdown
-      [placeholder]="'Select Funds'"
-      [settings]="fundDropdownSettings"
-      [data]="fundsDropdown"
-      [(ngModel)]="selectedFunds"
-    >
-    </ng-multiselect-dropdown>
-  </ng-container>
+    <ng-container *ngIf="filterPane.Funds">
+  
+      <div class="dropdown">
 
-  <div *ngIf="filterPane.AsOfDate">
+          <ng-multiselect-dropdown class="funds-dropdown"
+          [placeholder]="'Select Funds'"
+          [settings]="fundDropdownSettings"
+          [data]="fundsDropdown"
+          [(ngModel)]="selectedFunds"
+        >
+        </ng-multiselect-dropdown>
+    
+      </div>
+      
+      <div class="filter-options">
+        <mat-form-field appearance="outline">
+          <mat-label>As Of Date</mat-label>
+          <input matInput [matDatepicker]="Datepicker" [(ngModel)]="asOfDate">
+          <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+          <mat-datepicker #Datepicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+    </ng-container>
+
+  <div *ngIf="filterPane.AsOfDateRange">
     <div class="form-input">
   
       <mat-form-field appearance="outline" class="date-form-field" color="primary">
