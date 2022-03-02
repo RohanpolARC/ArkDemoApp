@@ -182,8 +182,8 @@ export class FacilityDetailComponent implements OnInit {
       console.log(rowData['maturityDate'])
       console.log(newVal);
       if(newVal != 'Invalid Date'){
-        if(<Date>rowData['maturityDate'] > newVal?.toISOString()){
-          this.setWarningMsg(`Maturity Date > Expected Date`, `Dismiss`, 'ark-theme-snackbar-warning')
+        if(<Date>rowData['maturityDate'] < newVal?.toISOString()){
+          this.setWarningMsg(`Expected date greator than Maturity date`, `Dismiss`, 'ark-theme-snackbar-warning')
         }  
       }
     }

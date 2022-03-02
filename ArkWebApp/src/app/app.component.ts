@@ -103,7 +103,7 @@ getLastBusinessDay(){
   fetchFacilityFunds(){
     this.subscriptions.push(this.facilityDetailSvc.getFacilityFunds().subscribe({
       next: funds => {
-        this.fundsDropdown = funds;
+        this.fundsDropdown = this.selectedFunds = funds;
         this.dataService.changeSearchFunds(this.selectedFunds);
       },
       error: error => {
