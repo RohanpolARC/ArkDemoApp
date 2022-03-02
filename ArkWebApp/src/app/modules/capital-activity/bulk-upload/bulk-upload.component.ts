@@ -100,13 +100,13 @@ export class BulkUploadComponent implements OnInit {
     private httpClient: HttpClient) { }
 
   columnDefs: ColDef[] = [
-    {field: 'Cash Flow Date', maxWidth: 150, valueFormatter: dateFormatter},
-    {field: 'Call Date', maxWidth: 150, valueFormatter: dateFormatter},
+    {field: 'Cash Flow Date', maxWidth: 150, valueFormatter: dateFormatter, allowedAggFuncs: ['Min', 'Max', 'first', 'last', 'count']},
+    {field: 'Call Date', maxWidth: 150, valueFormatter: dateFormatter, allowedAggFuncs: ['Min', 'Max', 'first', 'last', 'count']},
     {field: 'Fund Hedging', maxWidth: 150},
     {field: 'Fund Currency', headerName: 'Fund Ccy', maxWidth: 150},
     {field: 'Position Currency', headerName: 'Position Ccy', maxWidth: 150},
-    {field: 'GIR (Pos - Fund ccy)', headerName: 'GIR (Pos -> Fund)', maxWidth: 300},    
-    {field: 'Amount', headerName: 'Amount', maxWidth: 150, cellClass: 'ag-right-aligned-cell', valueFormatter: amountFormatter},
+    {field: 'GIR (Pos - Fund ccy)', headerName: 'GIR (Pos -> Fund)', maxWidth: 300,  allowedAggFuncs: ['sum', 'avg', 'first', 'last', 'count', 'min', 'max']},    
+    {field: 'Amount', headerName: 'Amount', maxWidth: 150, cellClass: 'ag-right-aligned-cell', valueFormatter: amountFormatter, allowedAggFuncs: [ 'sum', 'avg', 'first', 'last', 'count', 'min', 'max']},
     {field: 'Capital Type', maxWidth: 150},
     {field: 'Capital Subtype', maxWidth: 170},
     // {field: 'Wso Issuer ID', headerName: 'WSO Issuer ID'},
@@ -119,6 +119,24 @@ export class BulkUploadComponent implements OnInit {
     // {field: 'Action', maxWidth: 150}
   ]
    
+  aggFuncs = {
+    'Min': params => {
+      let minDate = new Date(8640000000000000);
+      params.values.forEach(value => {
+        if(value < minDate)
+          minDate = value
+      })
+      return minDate
+    },
+    'Max': params => {
+      let maxDate = new Date(-8640000000000000);
+      params.values.forEach(value => {
+        if(value > maxDate)
+          maxDate = value
+      })
+      return maxDate
+    } 
+  }
   bulkRowData = [];
   invalidRowData = [];
 
@@ -194,7 +212,9 @@ export class BulkUploadComponent implements OnInit {
         AdaptableToolPanel: AdaptableToolPanelAgGridComponent
       },
       columnDefs: this.columnDefs,
-      allowContextMenuWithControlKey:true
+      allowContextMenuWithControlKey:true,
+      rowGroupPanelShow: 'always',
+      aggFuncs: this.aggFuncs
     }
 
     this.updateMsg = null;
@@ -380,6 +400,13 @@ export class BulkUploadComponent implements OnInit {
         let jsonRowData = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]).filter(row => row['Cash Flow Date'] !== undefined && row['Cash Flow Date'] !== null);
 
         for(let i:number = 0; i < jsonRowData.length; i+=1){
+          jsonRowData[i]['Amount'] = parseFloat(jsonRowData[i]['Amount'])
+          jsonRowData[i]['Call Date'] = moment(jsonRowData[i]['Call Date'], 'DD/MM/YYYY').toDate()
+          jsonRowData[i]['Cash Flow Date'] = moment(jsonRowData[i]['Cash Flow Date'], 'DD/MM/YYYY').toDate()
+          jsonRowData[i]['GIR (Pos - Fund ccy)'] = parseFloat(jsonRowData[i]['GIR (Pos - Fund ccy)'])
+        }
+
+        for(let i:number = 0; i < jsonRowData.length; i+=1){
           jsonRowData[i]['_COLUMN_TITLE'] = getColumnTitle(i+2);
         }
 
@@ -421,6 +448,8 @@ export class BulkUploadComponent implements OnInit {
         this.validationErrorMsg = `Invalid column found "${validateColumns(extractedCols).col}"`;
         this.disableSubmit = true;
       }
+      console.log(this.bulkRowData)
+      console.log(this.invalidRowData)
     }
   }
 
