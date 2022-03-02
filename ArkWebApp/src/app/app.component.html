@@ -70,7 +70,7 @@
   
         <mat-list>
           <mat-list-item routerLink="/facility-detail" (click)= "leftSIdebarOpened = false; updateSelection('Facility Detail')" [ngStyle]="FacilityDetailStyle">
-            <div class="list-item-text">Facility Details</div>
+            <div class="list-item-text">Asset Browser</div>
           </mat-list-item>
         </mat-list>
   
@@ -81,10 +81,21 @@
   </mat-sidenav>
   <mat-sidenav  class="right-sidenav" #right [(opened)]="rightSidebarOpened" position="end">
   
-  <div class="sidenav-right-heading">
-    FILTER PANE
-  </div>
+    <div class="sidenav-right-heading right-cont">
+      <span>FILTER PANE</span>
+        <button mat-raised-button *ngIf="location.path() === '/facility-detail'" (click)="filterApply()">Apply</button>
+    </div>
   
+  <ng-container *ngIf="filterPane.Funds">
+    <ng-multiselect-dropdown
+      [placeholder]="'Select Funds'"
+      [settings]="fundDropdownSettings"
+      [data]="fundsDropdown"
+      [(ngModel)]="selectedFunds"
+    >
+    </ng-multiselect-dropdown>
+  </ng-container>
+
   <div *ngIf="filterPane.AsOfDate">
     <div class="form-input">
   

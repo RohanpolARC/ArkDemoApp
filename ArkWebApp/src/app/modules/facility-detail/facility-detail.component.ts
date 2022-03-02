@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewChildren, AfterViewInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CellClickedEvent, CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, RowNode } from '@ag-grid-community/all-modules';
 import {
   GridOptions,
@@ -25,6 +25,7 @@ import { ActionCellRendererComponent } from './action-cell-renderer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { AggridMaterialDatepickerComponent } from './aggrid-material-datepicker/aggrid-material-datepicker.component';
+import { DataService } from 'src/app/core/services/data.service';
 
 @Component({
   selector: 'app-facility-detail',
@@ -32,7 +33,7 @@ import { AggridMaterialDatepickerComponent } from './aggrid-material-datepicker/
   styleUrls: ['./facility-detail.component.scss']
 })
 
-export class FacilityDetailComponent implements OnInit, OnChanges {
+export class FacilityDetailComponent implements OnInit {
   @ViewChild(ActionCellRendererComponent) actionCell!: ActionCellRendererComponent;
 
   subscriptions: Subscription[] = [];
@@ -63,14 +64,13 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
       }, 
       cellEditor: 'agGridMaterialDatepicker',
       cellStyle: (params) => {
-        console.log(this.actionClickedRowID)
         return (params.rowIndex === this.actionClickedRowID) ? 
         {
           'border-color': '#0590ca',
         } : {
           'border-color': '#fff'
         };
-      }
+      },
     },
     { field: 'expectedPrice', 
       valueFormatter: amountFormatter, 
@@ -79,7 +79,6 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
         return params.node.rowIndex === this.actionClickedRowID;
       },
       cellStyle: (params) => {
-        console.log(this.actionClickedRowID)
         return (params.rowIndex === this.actionClickedRowID) ? 
         {
           'border-color': '#0590ca',
@@ -95,7 +94,6 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
         return params.node.rowIndex === this.actionClickedRowID;
       }, 
       cellStyle: (params) => {
-        console.log(this.actionClickedRowID)
         return (params.rowIndex === this.actionClickedRowID) ? 
         {
           'border-color': '#0590ca',
@@ -112,7 +110,6 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
         return params.node.rowIndex === this.actionClickedRowID;
       }, 
       cellStyle: (params) => {
-        console.log(this.actionClickedRowID)
         return (params.rowIndex === this.actionClickedRowID) ? 
         {
           'border-color': '#0590ca',
@@ -146,14 +143,11 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
   rowData: any[] = null;
   constructor(private facilityDetailsService: FacilityDetailService,
     private warningMsgPopUp: MatSnackBar,
-    private accessService: AccessService) { }
+    private accessService: AccessService,
+    private dataService: DataService) { }
 
   adaptableOptions: AdaptableOptions;
   adapTableApi: AdaptableApi;
-
-  modifiedCells: Map<string, any> = new Map();
-
-  // {pkey:{oldRow: any, newRow: any}}[] = [];
 
   context
 
@@ -172,10 +166,6 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
     });
   }
 
-  onCellEditingStarted(params){
-    console.log(params)
-  }
-
   checkValidation(newVal: any, columnID: string, rowData: any){
     // Expected Price
     if(columnID === 'expectedPrice'){
@@ -189,8 +179,12 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
       }
     }
     if(columnID === 'expectedDate'){
-      if(<Date>rowData['maturityDate'] > <Date>newVal){
-        this.setWarningMsg(`Maturity Date > Expected Date not possible`, `Dismiss`, 'ark-theme-snackbar-warning')
+      console.log(rowData['maturityDate'])
+      console.log(newVal);
+      if(newVal != 'Invalid Date'){
+        if(<Date>rowData['maturityDate'] > newVal?.toISOString()){
+          this.setWarningMsg(`Maturity Date > Expected Date`, `Dismiss`, 'ark-theme-snackbar-warning')
+        }  
       }
     }
   }
@@ -198,17 +192,11 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
   onCellValueChanged(params: CellValueChangedEvent){
     let newVal = params.newValue;
     let column: string = params.column.getColId();
+    
     this.checkValidation(newVal, column, params.data);
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    for(let prop in changes){
-      console.log(changes[prop])
-    }
   }
   
   setSelectedRowID(rowID: number){
-    console.log('Set row ID'+ rowID);
     this.actionClickedRowID = rowID;
     if(this.actionClickedRowID === null){
       this.gridApi.stopEditing(true);
@@ -219,34 +207,12 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
     return this.actionClickedRowID;
   }
 
-  onCellClicked(value: CellClickedEvent): void {
-    // if(value.colDef.field === 'Action'){
-    //   if(this.actionClickedRowID === null){
-    //     this.actionClickedRowID = value.rowIndex;
-    //   }
-    //   console.log(this.actionCell);
-    // }
-  }
-
   onGridReady(params) {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
     this.params = params;
 
-    this.fetchFacilityDetails();
-
-    // console.log(this.params);
-  }
-  fetchFacilityDetails(){
-    this.subscriptions.push(this.facilityDetailsService.getFacilityDetails().subscribe({
-      next: facilityDetailsData => {
-        this.rowData = facilityDetailsData;
-        // this.gridApi.loadGridData(this.rowData);
-      },
-      error: error => {
-        console.error("Failed to get facility details");
-      }
-    }))
+    this.gridApi.closeToolPanel();
   }
 
   frameworkComponents = {
@@ -255,9 +221,28 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+
+    /** Making this component available to child components in Ag-grid */
+    
     this.context = {
       componentParent: this
     }
+
+    this.subscriptions.push(this.dataService.currentSearchFunds.subscribe(funds => {
+      
+      funds = funds?.map(k => { return k?.fund })
+
+      if(funds != null && funds != []){
+        this.subscriptions.push(this.facilityDetailsService.getFacilityDetails(funds).subscribe({
+          next: data => {
+            this.rowData = data;
+          },
+          error: error => {
+            this.rowData = [];
+          }
+        }))
+      }
+    }))
 
     this.isWriteAccess = false;
     for(let i: number = 0; i < this.accessService.accessibleTabs.length; i+= 1){
@@ -308,8 +293,6 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
                 context: ActionColumnButtonContext
               ) => {
                 let rowData = context.rowNode?.data;
-                // console.log(rowData);
-                // console.log(context)
               },
               icon: {
                 src: '../assets/img/save_black_24dp.svg',
@@ -329,22 +312,7 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
                 context: ActionColumnButtonContext
               ) => {
                 let pkey = context.primaryKeyValue;
-                console.log(context);
-                console.log(pkey);
-                console.log(this.modifiedCells[pkey]);
-
                 this.gridOptions.api.undoCellEditing();
-
-
-                // let cell = this.modifiedCells[pkey];
-                // cell['column'] = this.adapTableApi.columnApi.getColumnFromId(cell['columnId']);
-                // delete cell['columnId'];
-
-                // console.log(cell)
-
-                // if(this.modifiedCells.has(pkey))
-                //   this.adapTableApi.gridApi.undoCellEdit(cell);
-
               },
               icon: {
                 src: '../assets/img/undo_black_24dp.svg',
@@ -388,13 +356,9 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
               'expectedPrice',
               'maturityPrice',
               'Action',
-              // 'Save',
-              // 'Undo'
             ],
             PinnedColumnsMap:{
               Action: 'right'
-              // Save: 'right',
-              // Undo: 'right'
             }
           }]
         }
@@ -416,15 +380,6 @@ export class FacilityDetailComponent implements OnInit, OnChanges {
     adaptableApi.eventApi.on('SelectionChanged', selection => {
       // do stuff
     });
-
-    adaptableApi.eventApi.on('CellChanged', cellChange => {
-      console.log(cellChange)
-      this.modifiedCells[cellChange.cellChange.primaryKeyValue] = cellChange.cellChange;
-
-      console.log(this.modifiedCells);
-
-      console.log(this.adapTableApi.gridApi.getVendorGrid().api)
-    })
 
 /* Closes right sidebar on start */
     adaptableApi.toolPanelApi.closeAdapTableToolPanel();

@@ -21,13 +21,18 @@ export class FacilityDetailService {
   constructor(private http: HttpClient,
               private msalService: MsalUserService) { }
 
-  public getFacilityDetails(){
-    return this.http.get<any[]>(`${APIConfig.FACILITY_DETAILS_GET_API}`, this.httpOptions).pipe(
+  public getFacilityDetails(funds: string[]){
+    return this.http.get<any[]>(`${APIConfig.FACILITY_DETAILS_GET_API}/?funds=${funds}`, this.httpOptions).pipe(
       catchError((ex) => throwError(ex)));
   }
 
   public putFacilityDetails(model: FacilityDetailModel){
     return this.http.post<any>(`${APIConfig.FACILITY_DETAILS_PUT_API}`, model, this.httpOptions).pipe(
+      catchError((ex) => throwError(ex)));
+  }
+
+  public getFacilityFunds(){
+    return this.http.get<any[]>(`${APIConfig.FACILITY_DETAILS_GET_FUNDS_API}`, this.httpOptions).pipe(
       catchError((ex) => throwError(ex)));
   }
 }

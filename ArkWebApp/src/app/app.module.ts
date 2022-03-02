@@ -35,6 +35,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized.component';
 import {HomeComponent} from '../app/home-component/home.component'
 import { FacilityDetailModule } from './modules/facility-detail/facility-detail.module';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 
 export const protectedResourceMap: any =  
   [  
@@ -81,7 +82,8 @@ export const protectedResourceMap: any =
   MatInputModule,
   CapitalActivityModule,
   MatTooltipModule,
-  FacilityDetailModule
+  FacilityDetailModule,
+  NgMultiSelectDropDownModule.forRoot()
   ],  
   providers: [  
     HttpClient,  

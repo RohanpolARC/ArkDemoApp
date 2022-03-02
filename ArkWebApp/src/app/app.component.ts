@@ -10,6 +10,9 @@ import {FormGroup, FormControl} from '@angular/forms';
 import { AsOfDate } from './shared/models/FilterPaneModel';
 import { AccessService } from './core/services/Auth/access.service';
 import { Router } from '@angular/router';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
+import { Subscription } from 'rxjs';
+import { FacilityDetailService } from './core/services/FacilityDetails/facility-detail.service';
 
 @Component({  
   selector: 'app-root',  
@@ -19,6 +22,8 @@ import { Router } from '@angular/router';
 export class AppComponent {  
   title = 'ARK';  
 
+  subscriptions: Subscription[] = [];
+
   public userName:string;
   public rightSidebarOpened:boolean=false;
   public leftSIdebarOpened:boolean=false;
@@ -27,6 +32,7 @@ export class AppComponent {
   searchDate: Date = null;
   filterPane:FilterPane = {
     AsOfDate: false,
+    Funds: false
   };
   searchDateRange = new FormGroup({
     start: new FormControl(),
@@ -62,9 +68,10 @@ export class AppComponent {
     private dataService: DataService,
     public dialog: MatDialog,
     iconRegistry:MatIconRegistry, 
-    private location:Location,
+    public location:Location,
     public accessService: AccessService,
-    private router:Router) {
+    private router:Router,
+    private facilityDetailSvc: FacilityDetailService) {
 
 }   
 
@@ -89,24 +96,38 @@ getLastBusinessDay(){
 
   lastClickedTabRoute: string = '/accessibility';
 
+  selectedFunds = [];
+  fundsDropdown = [];
+  fundDropdownSettings: IDropdownSettings = {};
+
+  fetchFacilityFunds(){
+    this.subscriptions.push(this.facilityDetailSvc.getFacilityFunds().subscribe({
+      next: funds => {
+        this.fundsDropdown = funds;
+        this.dataService.changeSearchFunds(this.selectedFunds);
+      },
+      error: error => {
+        console.error("Failed to get funds for filtering");
+      }
+    }))
+  }
+
+  onFundFilterApply(event){
+    this.dataService.changeSearchFunds(this.selectedFunds)
+    this.rightSidebarOpened = false
+  }
+
+  filterApply(){
+    if(this.location.path() === '/facility-detail'){
+      this.dataService.changeSearchFunds(this.selectedFunds)
+    }
+    this.rightSidebarOpened = false
+  }
+
   ngOnInit(): void { 
     this.lastClickedTabRoute = this.location.path();
     this.fetchTabs();
     this.userName=this.dataService.getCurrentUserName();
-
-    this.filterPane.AsOfDate = false;
-
-    this.range = {
-      start: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
-      end: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
-    }
-
-    this.searchDateRange.setValue({
-      start: this.range.start,
-      end: this.range.end,
-    })
-    
-    this.getSearchDateRange();
 
       /** On Initial Load */
       /** If Cash Balance screen is directly loaded */
@@ -117,8 +138,13 @@ getLastBusinessDay(){
     else if(this.location.path() === '/portfolio-history'){
       this.updateSelection('Portfolio')
     }
+      /** If Capital Activity is directly loaded */
     else if(this.location.path() === '/capital-activity'){
       this.updateSelection('Capital Activity')
+    }
+      /** If Facility Details is directly loaded */
+    else if(this.location.path() === '/facility-detail'){
+      this.updateSelection('Facility Detail')
     }
     else this.updateSelection('')
   }  
@@ -148,6 +174,7 @@ getLastBusinessDay(){
       /** On Subsequent Load (Dynamic) */
 
     this.filterPane.AsOfDate = false;
+    this.filterPane.Funds = false;
     this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.notSelectedElement;
     this.lastClickedTabRoute = this.location.path();
 
@@ -156,13 +183,38 @@ getLastBusinessDay(){
     }
     else if(screen === 'Cash Balance'){
       this.filterPane.AsOfDate = true;
+      this.range = {
+        start: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
+        end: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
+      }
+
+      this.searchDateRange.setValue({
+        start: this.range.start,
+        end: this.range.end,
+      })
+      this.getSearchDateRange();
       this.CashBalanceStyle = this.selectedElement;
     }
     else if(screen === 'Capital Activity'){
       this.CapitalActivityStyle = this.selectedElement;
     }
     else if(screen === 'Facility Detail'){
+
+      this.filterPane.Funds = true;
       this.FacilityDetailStyle = this.selectedElement
+
+      this.fetchFacilityFunds();
+
+      this.fundDropdownSettings = {
+        singleSelection: false,
+        idField: 'id',
+        textField: 'fund',
+        selectAllText: 'Select All',
+        unSelectAllText: 'Unselect All',
+        itemsShowLimit: 2,
+        allowSearchFilter: true,
+        
+      };  
     }
   }
 

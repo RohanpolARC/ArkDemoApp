@@ -26,6 +26,14 @@ export class DataService {
         this.searchDateMessage.next(range);
     }
 
+
+    private searchFundMessage = new BehaviorSubject<any>(null);
+    currentSearchFunds = this.searchFundMessage.asObservable();
+    
+    changeSearchFunds(funds: string[]){
+        this.searchFundMessage.next(funds);
+    }
+
     constructor(private http: HttpClient, private msalService: MsalUserService  
     ) { }  
   

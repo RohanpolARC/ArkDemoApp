@@ -35,13 +35,11 @@ export class MsalUserService {
   
     public getCurrentUserInfo():Msal.User  {  
         const user = this.clientApplication.getUser();  
-        console.log(user)
         return user; 
     }
     
     public  getUserName():string {  
         const user = this.clientApplication.getUser();  
-        console.log(user)
         return user.name;
     }
 

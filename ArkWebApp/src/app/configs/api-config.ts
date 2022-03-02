@@ -31,5 +31,5 @@ export class APIConfig {
 
     public static FACILITY_DETAILS_GET_API: string = APIConfig.BASEURL + "/api/FacilityDetails/Get";
     public static FACILITY_DETAILS_PUT_API: string = APIConfig.BASEURL + "/api/FacilityDetails/Put";
-
+    public static FACILITY_DETAILS_GET_FUNDS_API: string = APIConfig.BASEURL + "/api/FacilityDetails/GetFunds";
 }

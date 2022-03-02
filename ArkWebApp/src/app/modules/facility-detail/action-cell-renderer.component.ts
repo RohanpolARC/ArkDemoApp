@@ -6,6 +6,7 @@ import { FacilityDetailModel } from 'src/app/shared/models/FacilityDetailModel';
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from 'src/app/core/services/FacilityDetails/facility-detail.service';
 import {MsalUserService} from '../../core/services/Auth/msaluser.service'
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-action-cell-renderer',
@@ -35,9 +36,13 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp,OnI
   originalRowNodeID: any;
 
   onEditClick(){
-    if(this.componentParent.isWriteAccess){
-      this.startEditing();
-    }
+    this.startEditing();
+
+      // Uncomment to enable R/W access check
+
+    // if(this.componentParent.isWriteAccess){
+    //   this.startEditing();
+    // }
     // else{
     //   this.componentParent.setWarningMsg('You have no write access', 'Dismiss', 'ark-theme-snackbar-error')   
     // }
@@ -74,9 +79,8 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp,OnI
   }
 
   undoEdit(){
+    this.params.api?.getRowNode(this.originalRowNodeID)?.setData(this.originalRowNodeData);
     console.log(this.originalRowNodeData);
-    this.params.api.getRowNode(this.originalRowNodeID).setData(this.originalRowNodeData);
-
     this.originalRowNodeData = this.originalRowNodeID = null;
     this.componentParent.setSelectedRowID(null);
     this.params.api.refreshCells({
@@ -90,11 +94,11 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp,OnI
     let model: FacilityDetailModel = <FacilityDetailModel>{};
     let data = this.params.data;
 
-    model.assetID = <number> data.assetID;
-    model.expectedDate = <Date> data.expectedDate;
-    model.expectedPrice = <number> data.expectedPrice;
-    model.maturityPrice = <number> data.maturityPrice;
-    model.spreadDiscount = <number> data.spreadDiscount;
+    model.assetID = (data.assetID === null) ? null : parseInt(data.assetID);
+    model.expectedDate = (data.expectedDate === null) ? null : new Date(moment(data.expectedDate).format('YYYY-MM-DD'));
+    model.expectedPrice = (data.expectedPrice === null) ? null : parseFloat(data.expectedPrice);
+    model.maturityPrice = (data.maturityPrice === null) ? null : parseFloat(data.maturityPrice);
+    model.spreadDiscount = (data.spreadDiscount === null) ? null : parseFloat(data.spreadDiscount);
 
     model.modifiedBy = this.msalUserService.getUserName();
     return model;

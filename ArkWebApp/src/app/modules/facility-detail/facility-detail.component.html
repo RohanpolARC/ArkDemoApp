@@ -1,10 +1,8 @@
 <div class="parent">
     <div class="header">
         <div class="title">
-            Facility Details
+            Asset Browser            
             
-            <!-- {{gridOptions?.api?.getCurrentUndoSize() ?? 'Ites EMpty'}} -->
-    
         </div>
     </div>
 
@@ -17,10 +15,8 @@
             [rowData]="rowData"
             [sideBar]="'columns'"
             (gridReady)="onGridReady($event)"
-            (cellClicked)="onCellClicked($event)"
             [suppressClickEdit]="false"
             [frameworkComponents]="frameworkComponents"
-            (cellEditingStarted)="onCellEditingStarted($event)"
             (cellValueChanged)="onCellValueChanged($event)"
             class="ag-theme-alpine ag-grid"
             >
