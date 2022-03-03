@@ -22,7 +22,7 @@ const routes: Routes = [
     component: PortfolioHistoryComponent,  
     canActivate: [
       MsalGuard,
-      // RoleGuard
+      RoleGuard
     ],
     data: {
       tab: 'Going in Rates Editor'
@@ -32,7 +32,7 @@ const routes: Routes = [
     component: CashBalanceComponent, 
     canActivate: [
       MsalGuard, 
-      // RoleGuard
+      RoleGuard
     ],
     data: {
       tab: 'Cash Balance'
@@ -42,7 +42,7 @@ const routes: Routes = [
     component: CapitalActivityComponent, 
     canActivate: [
       MsalGuard, 
-      // RoleGuard
+      RoleGuard
     ], 
     data: {
       tab: 'Capital Activity'
@@ -53,7 +53,7 @@ const routes: Routes = [
     component: FacilityDetailComponent,
     canActivate: [
       MsalGuard,
-      // RoleGuard
+      RoleGuard
     ],
     data: {
       tab: 'Facility Detail'

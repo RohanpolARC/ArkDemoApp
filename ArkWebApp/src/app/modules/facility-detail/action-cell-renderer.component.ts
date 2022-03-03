@@ -36,16 +36,16 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp,OnI
   originalRowNodeID: any;
 
   onEditClick(){
-    this.startEditing();
+    // this.startEditing();           // No R/W access check
 
-      // Uncomment to enable R/W access check
+      // R/W access check
 
-    // if(this.componentParent.isWriteAccess){
-    //   this.startEditing();
-    // }
-    // else{
-    //   this.componentParent.setWarningMsg('You have no write access', 'Dismiss', 'ark-theme-snackbar-error')   
-    // }
+    if(this.componentParent.isWriteAccess){
+      this.startEditing();
+    }
+    else{
+      this.componentParent.setWarningMsg('Unauthorized', 'Dismiss', 'ark-theme-snackbar-error')   
+    }
   }
 
   startEditing(){
