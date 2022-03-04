@@ -56,7 +56,7 @@ const routes: Routes = [
       RoleGuard
     ],
     data: {
-      tab: 'Facility Detail'
+      tab: 'Asset Browser'
     }
   },
   { path: 'accessibility', 

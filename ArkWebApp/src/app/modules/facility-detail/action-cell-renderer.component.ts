@@ -63,13 +63,13 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp,OnI
         rowIndex: this.params.node.rowIndex, colKey: 'expectedPrice'
       });    
       this.params.api.startEditingCell({ 
-        rowIndex: this.params.node.rowIndex, colKey: 'expectedDate'
-      });
-      this.params.api.startEditingCell({ 
         rowIndex: this.params.node.rowIndex, colKey: 'maturityPrice'
       });
       this.params.api.startEditingCell({ 
         rowIndex: this.params.node.rowIndex, colKey: 'spreadDiscount'
+      });
+      this.params.api.startEditingCell({ 
+        rowIndex: this.params.node.rowIndex, colKey: 'expectedDate'
       });
 
     }

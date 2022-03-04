@@ -188,16 +188,20 @@ export class FacilityDetailComponent implements OnInit {
   checkValidation(newVal: any, columnID: string, rowData: any){
     // Expected Price
     if(columnID === 'expectedPrice'){
-      if((<number>newVal <  (0.75 * <number>rowData['costPrice']) 
+      if(<number>rowData['costPrice'] !== 0 &&
+        (<number>newVal <  (0.75 * <number>rowData['costPrice']) 
       || <number>newVal > (1.5 * <number>rowData['costPrice'])) && rowData['assetTypeName'].toLowerCase().includes('loan')){
         this.setWarningMsg(`Warning: Expected price not in range (Loan)`, 'Dismiss', 'ark-theme-snackbar-warning');
       }
-      else if((<number>newVal <  (0.5 * <number>rowData['costPrice']) 
+      else if(<number>rowData['costPrice'] !== 0 &&
+        (<number>newVal <  (0.5 * <number>rowData['costPrice']) 
       || <number>newVal > (3.0 * <number>rowData['costPrice'])) && rowData['assetTypeName'].toLowerCase().includes('equity')){
         this.setWarningMsg(`Expected price not in range (Equity)`, 'Dismiss', 'ark-theme-snackbar-warning');
       }
     }
     if(columnID === 'expectedDate'){
+      console.log(<Date>rowData['maturityDate'])
+      console.log(newVal?.toISOString())
       if(newVal != 'Invalid Date'){
         if(<Date>rowData['maturityDate'] < newVal?.toISOString()){
           this.setWarningMsg(`Expected date greator than Maturity date`, `Dismiss`, 'ark-theme-snackbar-warning')
@@ -264,7 +268,7 @@ export class FacilityDetailComponent implements OnInit {
 
     this.isWriteAccess = false;
     for(let i: number = 0; i < this.accessService.accessibleTabs.length; i+= 1){
-      if(this.accessService.accessibleTabs[i].tab === 'Facility Detail' && this.accessService.accessibleTabs[i].isWrite){
+      if(this.accessService.accessibleTabs[i].tab === 'Asset Browser' && this.accessService.accessibleTabs[i].isWrite){
         this.isWriteAccess = true;
         break;
       }        
@@ -274,7 +278,7 @@ export class FacilityDetailComponent implements OnInit {
       enableRangeSelection: true,
       sideBar: true,
       suppressMenuHide: true,
-      singleClickEdit: false,
+      singleClickEdit: true,
       undoRedoCellEditing: false,
       components: {
         AdaptableToolPanel: AdaptableToolPanelAgGridComponent

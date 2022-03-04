@@ -21,8 +21,8 @@ export class RoleGuard implements CanActivate{
 
     let tabs: {tab: string, isWrite: boolean}[] = this.accessService.accessibleTabs;
 
-    for(let i:number = 0; i < tabs.length; i+= 1){
-      if(tabs[i].tab === route?.data?.tab)
+    for(let i:number = 0; i < tabs?.length; i+= 1){
+      if(tabs[i]?.tab === route?.data?.tab)
         return true;
     } 
     this.router.navigate(['/accessibility'])
