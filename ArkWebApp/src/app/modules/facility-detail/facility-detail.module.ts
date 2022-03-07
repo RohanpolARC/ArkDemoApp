@@ -16,7 +16,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatNativeDateModule } from '@angular/material/core';
-
+import { ReactiveFormsModule } from '@angular/forms';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { InputDateAdapter } from 'src/app/shared/providers/date-adapter';
+import { Platform } from '@angular/cdk/platform';
+import { DateAdapter } from '@angular/material/core';
 
 @NgModule({
   declarations: [
@@ -42,7 +46,11 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatButtonModule,
     FormsModule,
     MatTooltipModule,
-
+    ReactiveFormsModule
+  ],
+  providers: [
+    {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  
+    {provide: DateAdapter, useClass: InputDateAdapter, deps: [MAT_DATE_LOCALE, Platform]}
   ]
 })
 export class FacilityDetailModule { }

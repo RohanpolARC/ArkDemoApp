@@ -100,8 +100,8 @@ export class BulkUploadComponent implements OnInit {
     private httpClient: HttpClient) { }
 
   columnDefs: ColDef[] = [
-    {field: 'Cash Flow Date', maxWidth: 150, valueFormatter: dateFormatter, allowedAggFuncs: ['Min', 'Max', 'first', 'last', 'count']},
-    {field: 'Call Date', maxWidth: 150, valueFormatter: dateFormatter, allowedAggFuncs: ['Min', 'Max', 'first', 'last', 'count']},
+    {field: 'Cash Flow Date', maxWidth: 150, valueFormatter: dateFormatter, allowedAggFuncs: ['min', 'max', 'first', 'last', 'count']},
+    {field: 'Call Date', maxWidth: 150, valueFormatter: dateFormatter, allowedAggFuncs: ['min', 'max', 'first', 'last', 'count']},
     {field: 'Fund Hedging', maxWidth: 150},
     {field: 'Fund Currency', headerName: 'Fund Ccy', maxWidth: 150},
     {field: 'Position Currency', headerName: 'Position Ccy', maxWidth: 150},

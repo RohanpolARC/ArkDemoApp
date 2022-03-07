@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { CellClickedEvent, CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, RowNode } from '@ag-grid-community/all-modules';
+import { CellClickedEvent, CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, RowNode, ValueParserParams } from '@ag-grid-community/all-modules';
 import {
   GridOptions,
   Module,
@@ -20,7 +20,7 @@ import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from 'src/app/core/services/FacilityDetails/facility-detail.service';
 
-import { dateFormatter, amountFormatter, removeDecimalFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, amountFormatter, removeDecimalFormatter, formatDate } from 'src/app/shared/functions/formatter';
 import { ActionCellRendererComponent } from './action-cell-renderer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
@@ -49,7 +49,8 @@ export class FacilityDetailComponent implements OnInit {
     {field: 'faceValueIssue',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 180},
     {field: 'costPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 120},
     {field: 'mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 90},
-    {field: 'maturityDate', valueFormatter: dateFormatter, width: 150},
+    {field: 'maturityDate', //valueFormatter: dateFormatter,
+     width: 150},
     {field: 'benchMarkIndex', width: 180},
     { 
       field: 'spread', 
@@ -73,7 +74,8 @@ export class FacilityDetailComponent implements OnInit {
     { field: 'expectedDate', 
       maxWidth: 150,
       width: 150,
-      valueFormatter: dateFormatter, 
+    //  valueFormatter: dateFormatter, 
+
       editable: (params: EditableCallbackParams) => {
         return params.node.rowIndex === this.actionClickedRowID;
       }, 
@@ -200,10 +202,8 @@ export class FacilityDetailComponent implements OnInit {
       }
     }
     if(columnID === 'expectedDate'){
-      console.log(<Date>rowData['maturityDate'])
-      console.log(newVal?.toISOString())
-      if(newVal != 'Invalid Date'){
-        if(<Date>rowData['maturityDate'] < newVal?.toISOString()){
+      if(newVal != 'Invalid Date' || formatDate(newVal) !== 'NaN/NaN/NaN'){
+        if(rowData['maturityDate'].split('/').reverse().join('/') < newVal.split('/').reverse().join('/')){
           this.setWarningMsg(`Expected date greator than Maturity date`, `Dismiss`, 'ark-theme-snackbar-warning')
         }  
       }
@@ -241,6 +241,10 @@ export class FacilityDetailComponent implements OnInit {
     agGridMaterialDatepicker: AggridMaterialDatepickerComponent
   }
 
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
+
   ngOnInit(): void {
 
     /** Making this component available to child components in Ag-grid */
@@ -257,6 +261,19 @@ export class FacilityDetailComponent implements OnInit {
       if(funds != null && asOfDate != null){
         this.subscriptions.push(this.facilityDetailsService.getFacilityDetails(funds, asOfDate).subscribe({
           next: data => {
+
+            for(let i: number = 0; i < data?.length; i+= 1){
+              data[i].expectedDate = formatDate(data[i]?.expectedDate)
+              if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].expectedDate)){
+                data[i].expectedDate = null;
+              }
+
+              data[i].maturityDate = formatDate(data[i]?.maturityDate)
+              if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].maturityDate)){
+                data[i].maturityDate = null;
+              }
+
+            }
             this.rowData = data;
           },
           error: error => {
@@ -284,7 +301,7 @@ export class FacilityDetailComponent implements OnInit {
         AdaptableToolPanel: AdaptableToolPanelAgGridComponent
       },
       columnDefs: this.columnDefs,
-      allowContextMenuWithControlKey:true,      
+      allowContextMenuWithControlKey:true, 
     }
 
     this.adaptableOptions = {

@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { ICellEditorAngularComp } from '@ag-grid-community/angular';
 import { ICellEditorParams } from '@ag-grid-community/all-modules';
 import { FacilityDetailComponent } from '../facility-detail.component';
-import * as moment from 'moment';
+import { formatDate } from 'src/app/shared/functions/formatter';
+import { FormControl } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-aggrid-material-datepicker',
@@ -17,31 +19,35 @@ export class AggridMaterialDatepickerComponent implements OnInit, ICellEditorAng
 
   rowNodeID;
 
-  inputDate: Date = null;
+  inputDate: string = null;
+  date = new FormControl(null)
+
+  value?: string = null;
+
+  datePipe: DatePipe;
 
   agInit(params: ICellEditorParams): void {
     this.params = params;  
     this.componentParent = params.context.componentParent;  
-
-    this.inputDate = new Date(moment(params.data['expectedDate']).format('YYYY-MM-DD'))
-    if(moment(params.data['expectedDate']).format('YYYY-MM-DD') === 'Invalid Date')
-      this.inputDate = null
-
-    if(<string> params.data['expectedDate'] === '0001-01-01T00:00:00'){
-      this.inputDate = null
-    }
+    this.value = String(params.data['expectedDate']) != 'null' ? String(params.data['expectedDate']) : null;
   }
 
   getValue() {
-    return this.inputDate;
+    return this.datePipe.transform(this.value, 'dd/MM/yyyy');
   }
 
-  onDateClick(){
-    this.rowNodeID = this.componentParent.getSelectedRowID();
-    this.params.api.getRowNode(this.rowNodeID).setDataValue('expectedDate', this.inputDate);
+  isCancelAfterEnd(): boolean {
+      if(['01/01/1970', '01/01/1', '01/01/2001', 'NaN/NaN/NaN', 'null'].includes(this.value)){
+        return true;
+      }
+      else return false;
   }
 
   ngOnInit(): void {
+
+    this.value = String(this.params.data['expectedDate']) != 'null' ? String(this.params.data['expectedDate']) : null;
+
+    this.datePipe = new DatePipe('en-GB');    
   }
 
 }

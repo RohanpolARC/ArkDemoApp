@@ -93,8 +93,13 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp,OnI
     let model: FacilityDetailModel = <FacilityDetailModel>{};
     let data = this.params.data;
 
+    let yr = data.expectedDate.split('/')[2];
+    let mon = data.expectedDate.split('/')[1] - 1;
+    let day = data.expectedDate.split('/')[0];
+    let hrs = 3;  // Temporary fixed (Due to time zone bouncing from GMT to BST)
+
     model.assetID = (data.assetID === null) ? null : parseInt(data.assetID);
-    model.expectedDate = (data.expectedDate === null) ? null : new Date(moment(data.expectedDate).format('YYYY-MM-DD'));
+    model.expectedDate = (data.expectedDate === null) ? null : new Date(yr, mon, day, hrs);
     model.expectedPrice = (data.expectedPrice === null) ? null : parseFloat(data.expectedPrice);
     model.maturityPrice = (data.maturityPrice === null) ? null : parseFloat(data.maturityPrice);
     model.spreadDiscount = (data.spreadDiscount === null) ? null : parseFloat(data.spreadDiscount);
