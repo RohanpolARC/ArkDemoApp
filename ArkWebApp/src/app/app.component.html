@@ -82,8 +82,8 @@
   <mat-sidenav  class="right-sidenav" #right [(opened)]="rightSidebarOpened" position="end">
   
     <div class="sidenav-right-heading right-cont">
-      <span>FILTER PANE</span>
-      <button mat-raised-button *ngIf="location.path() === '/facility-detail'" (click)="filterApply()">Apply</button>
+      <span>Filter Pane</span>
+      <button mat-raised-button id="apply-button"  *ngIf="location.path() === '/facility-detail'" (click)="filterApply()">Apply</button>
     </div>
   
     <ng-container *ngIf="filterPane.Funds">

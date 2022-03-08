@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { CellClickedEvent, CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, RowNode, ValueParserParams } from '@ag-grid-community/all-modules';
+import { CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi } from '@ag-grid-community/all-modules';
 import {
   GridOptions,
   Module,
@@ -41,35 +41,35 @@ export class FacilityDetailComponent implements OnInit {
   agGridModules: Module[] = [ClientSideRowModelModule,RowGroupingModule,SetFilterModule,ColumnsToolPanelModule,MenuModule, ExcelExportModule];
 
   columnDefs: ColDef[] = [
-    {field: 'issuerShortName', pinned: 'left'},
-    {field: 'asset', pinned: 'left', width: 240},
-    {field: 'assetID', width: 120},
-    {field: 'assetTypeName', width: 180},
+    {field: 'issuerShortName', pinned: 'left', width: 170, tooltipField: 'issuerShortName'},
+    {field: 'asset', pinned: 'left', width: 240, tooltipField: 'asset'},
+    {field: 'assetID', width: 103},
+    {field: 'assetTypeName', width: 153},
     {field: 'ccy', width: 80},
-    {field: 'faceValueIssue',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 180},
-    {field: 'costPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 120},
-    {field: 'mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 90},
+    {field: 'faceValueIssue',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 150},
+    {field: 'costPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 110},
+    {field: 'mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 86},
     {field: 'maturityDate', //valueFormatter: dateFormatter,
-     width: 150},
-    {field: 'benchMarkIndex', width: 180},
+     width: 135},
+    {field: 'benchMarkIndex', width: 161},
     { 
       field: 'spread', 
-      width: 110,
+      width: 94,
       cellClass: 'ag-right-aligned-cell', 
       valueFormatter: removeDecimalFormatter
     },
     {
       field: 'pikmargin', 
-      width: 130,
+      width: 120,
       headerName: 'PIK Margin',
       cellClass: 'ag-right-aligned-cell',
       valueFormatter: removeDecimalFormatter
     },
     {field: 'unfundedMargin', 
-     width: 170,
+     width: 160,
     valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'floorRate', 
-    width: 140,
+    width: 113,
     valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     { field: 'expectedDate', 
       maxWidth: 150,
@@ -90,7 +90,7 @@ export class FacilityDetailComponent implements OnInit {
       },
     },
     { field: 'expectedPrice', 
-      width: 160,
+      width: 140,
       valueFormatter: amountFormatter, 
       cellClass: 'ag-right-aligned-cell', 
       editable: (params: EditableCallbackParams) => {
@@ -106,7 +106,7 @@ export class FacilityDetailComponent implements OnInit {
       }
     },
     { field: 'maturityPrice', 
-      width: 160,
+      width: 136,
       valueFormatter: amountFormatter, 
       cellClass: 'ag-right-aligned-cell',
       editable: (params: EditableCallbackParams) => {
@@ -123,7 +123,7 @@ export class FacilityDetailComponent implements OnInit {
     },
     {
       headerName: 'Spread Discount',
-      width: 160,
+      width: 151,
       field: 'spreadDiscount',
       editable:(params: EditableCallbackParams) => {
         return params.node.rowIndex === this.actionClickedRowID;

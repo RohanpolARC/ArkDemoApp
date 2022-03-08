@@ -115,6 +115,7 @@ min-width: 120px;
 .sidenav-right-heading{
   padding: 10px;
   border-bottom: 1px solid #285170;
+  font-weight: 600;
 }
 
 .right-cont{
@@ -175,4 +176,9 @@ mat-list{
   width: 100% !important;
   flex: 1;
   min-width: 100% !important;  
+}
+
+#apply-button{
+  background: #0590ca;
+  color: #ffffff;
 }
