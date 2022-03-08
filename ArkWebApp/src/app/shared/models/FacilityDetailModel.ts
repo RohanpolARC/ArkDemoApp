@@ -13,7 +13,7 @@ export interface FacilityDetailModel{
     pikmargin: number,
     unfundedMargin: number,
     floorRate: number,
-    expectedDate?: Date,
+    expectedDate?: string,
     expectedPrice?: number,
     maturityPrice?: number,
     spreadDiscount?: number,

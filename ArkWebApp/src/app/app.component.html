@@ -103,7 +103,7 @@
       <div class="filter-options">
         <mat-form-field appearance="outline">
           <mat-label>As Of Date</mat-label>
-          <input matInput [matDatepicker]="Datepicker" [(ngModel)]="asOfDate">
+          <input autocomplete="off"  matInput [matDatepicker]="Datepicker" [(ngModel)]="asOfDate">
           <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
           <mat-datepicker #Datepicker></mat-datepicker>
         </mat-form-field>

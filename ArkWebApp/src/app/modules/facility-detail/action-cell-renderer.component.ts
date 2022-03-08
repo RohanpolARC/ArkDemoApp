@@ -93,17 +93,21 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp,OnI
     let model: FacilityDetailModel = <FacilityDetailModel>{};
     let data = this.params.data;
 
-    let yr = data.expectedDate.split('/')[2];
-    let mon = data.expectedDate.split('/')[1] - 1;
-    let day = data.expectedDate.split('/')[0];
-    let hrs = 3;  // Temporary fixed (Due to time zone bouncing from GMT to BST)
+    if(data.expectedDate != null){
+      let yr = data.expectedDate.split('/')[2];
+      let mon = data.expectedDate.split('/')[1] - 1;
+      let day = data.expectedDate.split('/')[0];
+      let hrs = 0;
+  
+      model.expectedDate = (data.expectedDate === null) ? null : data.expectedDate.split('/').reverse().join('/');  
+    }
+    else model.expectedDate = null
 
     model.assetID = (data.assetID === null) ? null : parseInt(data.assetID);
-    model.expectedDate = (data.expectedDate === null) ? null : new Date(yr, mon, day, hrs);
     model.expectedPrice = (data.expectedPrice === null) ? null : parseFloat(data.expectedPrice);
     model.maturityPrice = (data.maturityPrice === null) ? null : parseFloat(data.maturityPrice);
     model.spreadDiscount = (data.spreadDiscount === null) ? null : parseFloat(data.spreadDiscount);
-
+    model.modifiedOn = new Date();
     model.modifiedBy = this.msalUserService.getUserName();
     return model;
   }
@@ -116,9 +120,12 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp,OnI
         if(data.isSuccess){
           this.originalRowNodeData = this.originalRowNodeID = null;
           this.componentParent.setSelectedRowID(null);
+
+          this.params.api.getRowNode(this.params.node.id).setDataValue('modifiedBy', this.msalUserService.getUserName());
+          this.params.api.getRowNode(this.params.node.id).setDataValue('modifiedOn', new Date());
           this.params.api.refreshCells({
             force: true,
-            columns: ['expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount'],
+            columns: ['expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount', 'modifiedBy', 'modifiedOn'],
             rowNodes: [this.params.api.getRowNode(this.params.node.id)]
           });  
           

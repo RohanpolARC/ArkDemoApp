@@ -1,5 +1,5 @@
-<div>
+<mat-form-field style="width: 140px;" >
+    <input autocomplete="off" matInput [matDatepicker]="picker" [formControl]="dateControl" />
     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-    <input [matDatepicker]="picker" type="text" [(ngModel)]="value" #input autocomplete="off">
-    <mat-datepicker #picker color="primary"></mat-datepicker>
-</div>
+    <mat-datepicker #picker></mat-datepicker>
+</mat-form-field>

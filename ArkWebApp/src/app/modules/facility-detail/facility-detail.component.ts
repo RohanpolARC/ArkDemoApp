@@ -20,7 +20,7 @@ import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from 'src/app/core/services/FacilityDetails/facility-detail.service';
 
-import { dateFormatter, amountFormatter, removeDecimalFormatter, formatDate } from 'src/app/shared/functions/formatter';
+import { dateFormatter, amountFormatter, removeDecimalFormatter, formatDate, dateTimeFormatter } from 'src/app/shared/functions/formatter';
 import { ActionCellRendererComponent } from './action-cell-renderer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
@@ -147,6 +147,8 @@ export class FacilityDetailComponent implements OnInit {
       editable: false,
       menuTabs: []
     },
+    { field: 'modifiedBy', width: 145 },
+    { field: 'modifiedOn', width: 150, valueFormatter: dateTimeFormatter }
   ]
     
   defaultColDef = {
@@ -203,7 +205,7 @@ export class FacilityDetailComponent implements OnInit {
     }
     if(columnID === 'expectedDate'){
       if(newVal != 'Invalid Date' || formatDate(newVal) !== 'NaN/NaN/NaN'){
-        if(rowData['maturityDate'].split('/').reverse().join('/') < newVal.split('/').reverse().join('/')){
+        if(rowData['maturityDate']?.split('/')?.reverse()?.join('/') < newVal?.split('/')?.reverse()?.join('/')){
           this.setWarningMsg(`Expected date greator than Maturity date`, `Dismiss`, 'ark-theme-snackbar-warning')
         }  
       }
