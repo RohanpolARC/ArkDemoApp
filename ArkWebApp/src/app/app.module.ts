@@ -36,6 +36,7 @@ import { UnauthorizedComponent } from './shared/components/unauthorized/unauthor
 import {HomeComponent} from '../app/home-component/home.component'
 import { FacilityDetailModule } from './modules/facility-detail/facility-detail.module';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { LiquiditySummaryModule } from './modules/liquidity-summary/liquidity-summary.module';
 
 export const protectedResourceMap: any =  
   [  
@@ -83,7 +84,8 @@ export const protectedResourceMap: any =
   CapitalActivityModule,
   MatTooltipModule,
   FacilityDetailModule,
-  NgMultiSelectDropDownModule.forRoot()
+  NgMultiSelectDropDownModule.forRoot(),
+  LiquiditySummaryModule
   ],  
   providers: [  
     HttpClient,  

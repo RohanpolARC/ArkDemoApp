@@ -1,29 +1,53 @@
 import { Injectable } from '@angular/core';  
 import { HttpClient, HttpHeaders } from '@angular/common/http';  
-import { Observable } from 'rxjs';  
 import { environment } from 'src/environments/environment';  
 import { MsalUserService } from './Auth/msaluser.service';  
 
 import { BehaviorSubject } from 'rxjs';
 import { AsOfDateRange, FacilityDetailsFilter } from 'src/app/shared/models/FilterPaneModel';
+import { APIConfig } from 'src/app/configs/api-config';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
 
 @Injectable({  
     providedIn: 'root'  
 })  
 export class DataService {  
-    private url = environment.baseUrl + 'api/employee';  
-  
     httpOptions = {  
         headers: new HttpHeaders({  
             'Content-Type': 'application/json'  
         })  
     };  
   
-    private searchDateMessage = new BehaviorSubject<any>(null);
-    currentSearchDate = this.searchDateMessage.asObservable();
+    private filterApplyBtnHit = new BehaviorSubject<boolean>(null);
+    filterApplyBtnState = this.filterApplyBtnHit.asObservable();
+    changeFilterApplyBtnState(isHit: boolean){
+        this.filterApplyBtnHit.next(isHit);
 
-    changeSearchDate(range: AsOfDateRange){
-        this.searchDateMessage.next(range);
+            // Set to false after action taken.
+        this.filterApplyBtnHit.next(false);
+    }
+
+    private searchDateMessage = new BehaviorSubject<string>(null)
+    currentSearchDate = this.searchDateMessage.asObservable();
+    
+    changeSearchDate(asOfDate: string){
+        this.searchDateMessage.next(asOfDate);
+    }
+
+    private searchDateRangeMessage = new BehaviorSubject<any>(null);
+    currentSearchDateRange = this.searchDateRangeMessage.asObservable();
+
+    changeSearchDateRange(range: AsOfDateRange){
+        this.searchDateRangeMessage.next(range);
+    }
+
+    private searchTextValuesMessage = new BehaviorSubject<any>(null)
+    currentSearchTextValues = this.searchTextValuesMessage.asObservable();
+
+    changeSearchTextValues(values: string[]){
+        this.searchTextValuesMessage.next(values);
     }
 
     private facilityFilterMessage = new BehaviorSubject<FacilityDetailsFilter>(null);
@@ -35,22 +59,6 @@ export class DataService {
 
     constructor(private http: HttpClient, private msalService: MsalUserService  
     ) { }  
-  
-    getEmployees(): Observable<any[]> {  
-         
-        this.httpOptions = {  
-            headers: new HttpHeaders({  
-                'Content-Type': 'application/json',  
-                'Authorization': 'Bearer ' + this.msalService.GetAccessToken()  
-            })  
-  
-        };  
-  
-        return this.http.get(this.url, this.httpOptions)  
-            .pipe((response: any) => {  
-                return response;  
-            });  
-    }  
   
     getCurrentUserInfo(){  
        return this.msalService.getCurrentUserInfo();  
@@ -64,5 +72,10 @@ export class DataService {
 
     logout(){  
         this.msalService.logout();  
-    }  
+    }
+    
+    getFundHedgingsRef(){
+        return this.http.get<any[]>(`${APIConfig.REFDATA_GET_FUNDHEDGINGS_API}`, this.httpOptions).pipe(
+            catchError((ex) => throwError(ex)));      
+    }
 }    

@@ -8,6 +8,7 @@ import { RoleGuard } from './role.guard';
 import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized.component';
 import { HomeComponent } from './home-component/home.component';
 import { FacilityDetailComponent } from './modules/facility-detail/facility-detail.component';
+import { LiquiditySummaryComponent } from './modules/liquidity-summary/liquidity-summary.component';
   
   
 const routes: Routes = [
@@ -57,6 +58,17 @@ const routes: Routes = [
     ],
     data: {
       tab: 'Asset Browser'
+    }
+  },
+  {
+    path: 'liquidity-summary',
+    component: LiquiditySummaryComponent,
+    canActivate: [
+      MsalGuard,
+      // RoleGuard
+    ],
+    data: {
+      tab: 'Liquidity Summary'
     }
   },
   { path: 'accessibility', 

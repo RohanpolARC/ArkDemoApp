@@ -1,0 +1,23 @@
+<div class="parent">
+    <div class="header">
+        <div class="title">
+            Liquidity Summary
+            
+        </div>
+    </div>
+
+    <div class="content">
+        <mat-card class="mat-content">
+            <ag-grid-angular
+            [adaptableOptions]="adaptableOptions"
+            [gridOptions]="gridOptions"
+            [defaultColDef]="defaultColDef"
+            [modules]="agGridModules"
+            [rowData]="rowData"
+            [sideBar]="'columns'"
+            class="ag-theme-alpine ag-grid"
+            >
+            </ag-grid-angular>
+        </mat-card>
+    </div>
+</div>

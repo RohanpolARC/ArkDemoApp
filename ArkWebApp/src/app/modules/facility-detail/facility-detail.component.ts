@@ -247,6 +247,9 @@ export class FacilityDetailComponent implements OnInit {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
+  asOfDate: string = null;
+  funds: string[] = null;
+
   ngOnInit(): void {
 
     /** Making this component available to child components in Ag-grid */
@@ -255,35 +258,72 @@ export class FacilityDetailComponent implements OnInit {
       componentParent: this
     }
 
-    this.subscriptions.push(this.dataService.currentFacilityFilter.subscribe(filterData => {
+    this.subscriptions.push(this.dataService.currentSearchDate.subscribe(asOfDate => {
+      this.asOfDate = asOfDate
+    }))
 
-      let funds: string[] = filterData?.funds?.map(k => { return k?.fund })
-      let asOfDate: string = filterData?.asOfDate;
+    this.subscriptions.push(this.dataService.currentSearchTextValues.subscribe(funds => {
+      this.funds = funds
+    }))
 
-      if(funds != null && asOfDate != null){
-        this.subscriptions.push(this.facilityDetailsService.getFacilityDetails(funds, asOfDate).subscribe({
-          next: data => {
+    this.subscriptions.push(this.dataService.filterApplyBtnState.subscribe(isHit => {
+      if(isHit){
 
-            for(let i: number = 0; i < data?.length; i+= 1){
-              data[i].expectedDate = formatDate(data[i]?.expectedDate)
-              if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].expectedDate)){
-                data[i].expectedDate = null;
+        if(this.funds != null && this.asOfDate != null){
+          this.subscriptions.push(this.facilityDetailsService.getFacilityDetails(this.funds, this.asOfDate).subscribe({
+            next: data => {
+  
+              for(let i: number = 0; i < data?.length; i+= 1){
+                data[i].expectedDate = formatDate(data[i]?.expectedDate)
+                if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].expectedDate)){
+                  data[i].expectedDate = null;
+                }
+  
+                data[i].maturityDate = formatDate(data[i]?.maturityDate)
+                if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].maturityDate)){
+                  data[i].maturityDate = null;
+                }
+  
               }
-
-              data[i].maturityDate = formatDate(data[i]?.maturityDate)
-              if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].maturityDate)){
-                data[i].maturityDate = null;
-              }
-
+              this.rowData = data;
+            },
+            error: error => {
+              this.rowData = null;
             }
-            this.rowData = data;
-          },
-          error: error => {
-            this.rowData = null;
-          }
-        }))          
+          }))          
+        }  
       }
     }))
+
+    // this.subscriptions.push(this.dataService.currentFacilityFilter.subscribe(filterData => {
+
+    //   let funds: string[] = filterData?.funds?.map(k => { return k?.fund })
+    //   let asOfDate: string = filterData?.asOfDate;
+
+    //   if(funds != null && asOfDate != null){
+    //     this.subscriptions.push(this.facilityDetailsService.getFacilityDetails(funds, asOfDate).subscribe({
+    //       next: data => {
+
+    //         for(let i: number = 0; i < data?.length; i+= 1){
+    //           data[i].expectedDate = formatDate(data[i]?.expectedDate)
+    //           if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].expectedDate)){
+    //             data[i].expectedDate = null;
+    //           }
+
+    //           data[i].maturityDate = formatDate(data[i]?.maturityDate)
+    //           if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].maturityDate)){
+    //             data[i].maturityDate = null;
+    //           }
+
+    //         }
+    //         this.rowData = data;
+    //       },
+    //       error: error => {
+    //         this.rowData = null;
+    //       }
+    //     }))          
+    //   }
+    // }))
 
     this.isWriteAccess = false;
     for(let i: number = 0; i < this.accessService.accessibleTabs.length; i+= 1){

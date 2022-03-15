@@ -95,7 +95,7 @@ export class CashBalanceComponent implements OnInit {
   ngOnInit(): void {
     this.rowData = [];
 
-    this.subscriptions.push(this.dataService.currentSearchDate.subscribe(sDate => {
+    this.subscriptions.push(this.dataService.currentSearchDateRange.subscribe(sDate => {
       this.sDate = sDate;
       if(this.sDate !== null)
         this.subscriptions.push(this.cashBalanceService.getCashBalance(this.sDate).subscribe({

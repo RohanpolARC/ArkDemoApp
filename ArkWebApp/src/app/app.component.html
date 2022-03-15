@@ -40,6 +40,12 @@
         </mat-expansion-panel-header>
   
         <mat-list>
+          <mat-list-item routerLink="/liquidity-summary" (click)= "leftSIdebarOpened = false; updateSelection('Liquidity Summary');" [ngStyle]="LiquiditySummaryStyle">
+            <div class="list-item-text"> Liquidity Summary </div>
+            </mat-list-item>
+          </mat-list>
+
+        <mat-list>
           <mat-list-item routerLink="/cash-balance" (click)= "leftSIdebarOpened = false; updateSelection('Cash Balance');" [ngStyle]="CashBalanceStyle">
             <div class="list-item-text"> Cash Balance </div>
             </mat-list-item>
@@ -83,23 +89,27 @@
   
     <div class="sidenav-right-heading right-cont">
       <span>Filter Pane</span>
-      <button mat-raised-button id="apply-button"  *ngIf="location.path() === '/facility-detail'" (click)="filterApply()">Apply</button>
+      <button mat-raised-button id="apply-button"  *ngIf="['/facility-detail', '/liquidity-summary'].includes(location.path())" (click)="filterApply()">Apply</button>
     </div>
-  
-    <ng-container *ngIf="filterPane.Funds">
-  
+
+    <ng-container *ngIf="filterPane.TextValueSelect">
+      
       <div class="dropdown">
 
-          <ng-multiselect-dropdown class="funds-dropdown"
-          [placeholder]="'Select Funds'"
-          [settings]="fundDropdownSettings"
-          [data]="fundsDropdown"
-          [(ngModel)]="selectedFunds"
+        <ng-multiselect-dropdown class="funds-dropdown"
+        [placeholder]="multiSelectPlaceHolder"
+        [settings]="dropdownSettings"
+        [data]="dropdownData"
+        [(ngModel)]="selectedDropdownData"
         >
         </ng-multiselect-dropdown>
     
       </div>
-      
+
+    </ng-container>
+
+    <ng-container *ngIf="filterPane.AsOfDate">
+
       <div class="filter-options">
         <mat-form-field appearance="outline">
           <mat-label>As Of Date</mat-label>
@@ -124,7 +134,7 @@
         <mat-date-range-picker #picker>
           <mat-date-range-picker-actions>
             <button mat-button matDateRangePickerCancel>Cancel</button>
-            <button mat-raised-button color="primary" (click)="rightSidebarOpened=!rightSidebarOpened; getSearchDateRange();" matDateRangePickerApply>Apply</button>
+            <button mat-raised-button color="primary" (click)="getSearchDateRange();" matDateRangePickerApply>Apply</button>
           </mat-date-range-picker-actions>
         </mat-date-range-picker>
   

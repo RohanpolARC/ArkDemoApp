@@ -1,7 +1,9 @@
 export interface FilterPane{
     AsOfDateRange: boolean;
+    AsOfDate: boolean;
     Funds: boolean;
     FacilityDetails: boolean;
+    TextValueSelect: boolean;
 }
 
 export interface AsOfDateRange{

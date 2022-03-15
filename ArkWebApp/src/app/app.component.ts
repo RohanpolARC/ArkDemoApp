@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from './core/services/FacilityDetails/facility-detail.service';
+import { LiquiditySummaryService } from './core/services/LiquiditySummary/liquidity-summary.service';
 
 @Component({  
   selector: 'app-root',  
@@ -32,8 +33,10 @@ export class AppComponent {
   searchDate: Date = null;
   filterPane:FilterPane = {
     AsOfDateRange: false,
+    AsOfDate: false,
     Funds: false,
-    FacilityDetails: false
+    FacilityDetails: false,
+    TextValueSelect: false
   };
 
   searchDateRange = new FormGroup({
@@ -44,6 +47,11 @@ export class AppComponent {
   range:AsOfDateRange = null;
   asOfDate: string = null;
   facilityFilter: FacilityDetailsFilter = <FacilityDetailsFilter>{};
+
+  multiSelectPlaceHolder: string = null;
+  dropdownSettings: IDropdownSettings = null;
+  dropdownData: any = null;
+  selectedDropdownData: any = null;
 
   notSelectedElement = {
 
@@ -67,6 +75,7 @@ export class AppComponent {
   CashBalanceStyle: any = {};
   CapitalActivityStyle: any = {};
   FacilityDetailStyle: any = {};
+  LiquiditySummaryStyle: any = {};
 
   constructor(private http: HttpClient,
     private dataService: DataService,
@@ -75,7 +84,8 @@ export class AppComponent {
     public location:Location,
     public accessService: AccessService,
     private router:Router,
-    private facilityDetailSvc: FacilityDetailService) {
+    private facilityDetailSvc: FacilityDetailService,
+    private liquiditySummarySvc: LiquiditySummaryService) {
 
 }   
 
@@ -107,10 +117,14 @@ getLastBusinessDay(){
   fetchFacilityFunds(){
     this.subscriptions.push(this.facilityDetailSvc.getFacilityFunds().subscribe({
       next: funds => {
-        this.fundsDropdown = this.selectedFunds = funds;
+        // this.fundsDropdown = this.selectedFunds = funds;
+        this.dropdownData = this.selectedDropdownData = funds;
 
-          /**  Fetching details after getting funds*/
-        this.setFacilityFilter()
+
+        //   /**  Fetching details after getting funds*/
+                  // Apply on load
+      this.filterApply();
+
       },
       error: error => {
         console.error("Failed to get funds for filtering");
@@ -118,12 +132,44 @@ getLastBusinessDay(){
     }))
   }
 
+  fetchFundHedgingsRef(){
+    this.subscriptions.push(this.dataService.getFundHedgingsRef().subscribe({
+      next: fundHedgings => {
+        this.dropdownData = this.selectedDropdownData = fundHedgings;
+
+                  // Apply on load
+      this.filterApply();
+
+      },
+      error: error => {
+        console.error("Failed to get fund hedgings for filtering")
+      }
+    }))
+  }
+
   filterApply(){
     if(this.location.path() === '/facility-detail'){
-      // this.dataService.changeSearchFunds(this.selectedFunds)
+      // this.setFacilityFilter();
 
-      this.setFacilityFilter();
+      console.log(this.selectedDropdownData);
+      console.log(this.dropdownData)
+      console.log(this.asOfDate)
+
+      this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
+      this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['fund']))
+      this.dataService.changeSearchDate(this.asOfDate);
+
+      this.dataService.changeFilterApplyBtnState(true);
     }
+
+    if(this.location.path() === '/liquidity-summary'){
+
+      this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
+      this.dataService.changeSearchDate(this.asOfDate);
+      this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['fundHedging']))
+      this.dataService.changeFilterApplyBtnState(true);
+    }
+
     this.rightSidebarOpened = false
   }
 
@@ -149,6 +195,10 @@ getLastBusinessDay(){
     else if(this.location.path() === '/facility-detail'){
       this.updateSelection('Facility Detail')
     }
+    /** If Liquidity Summary is directly loaded */
+    else if(this.location.path() === '/liquidity-summary'){
+      this.updateSelection('Liquidity Summary')
+    }
     else this.updateSelection('')
   }  
 
@@ -169,14 +219,11 @@ getLastBusinessDay(){
       end: this.range.end,
     })
     
-    this.dataService.changeSearchDate(this.range);
-  }
+    this.dataService.changeSearchDateRange(this.range);
 
-  setFacilityFilter(){
-    this.facilityFilter.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
-    this.facilityFilter.funds = this.selectedFunds;
-
-    this.dataService.changeFacilityFilter(this.facilityFilter);
+    if(this.location.path() === '/cash-balance'){
+      this.rightSidebarOpened = false
+    }
   }
 
   updateSelection(screen: string): void{
@@ -184,10 +231,12 @@ getLastBusinessDay(){
       /** On Subsequent Load (Dynamic) */
 
     this.filterPane.AsOfDateRange = false;
+    this.filterPane.AsOfDate = false;
     this.filterPane.Funds = false;
     this.filterPane.FacilityDetails = false;
+    this.filterPane.TextValueSelect = false;
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.notSelectedElement;
     this.lastClickedTabRoute = this.location.path();
 
     if(screen === 'Portfolio'){
@@ -211,16 +260,18 @@ getLastBusinessDay(){
       this.CapitalActivityStyle = this.selectedElement;
     }
     else if(screen === 'Facility Detail'){
+      this.filterPane.AsOfDate = true;
+      this.filterPane.TextValueSelect = true;
 
-      this.filterPane.FacilityDetails = true;
-      this.filterPane.Funds = true;
       this.FacilityDetailStyle = this.selectedElement
 
-      this.asOfDate = moment(this.getLastBusinessDay()).format('YYYY-MM-DD')
+      this.multiSelectPlaceHolder = 'Select Fund(s)'
 
+      this.asOfDate = moment(this.getLastBusinessDay()).format('YYYY-MM-DD')
+      
       this.fetchFacilityFunds();
 
-      this.fundDropdownSettings = {
+      this.dropdownSettings = {
         singleSelection: false,
         idField: 'id',
         textField: 'fund',
@@ -229,7 +280,42 @@ getLastBusinessDay(){
         itemsShowLimit: 2,
         allowSearchFilter: true,
         
-      };  
+      };
+
+    }
+    else if(screen === 'Liquidity Summary'){
+
+      this.filterPane.AsOfDate = true;
+      this.filterPane.TextValueSelect = true;
+
+      this.LiquiditySummaryStyle = this.selectedElement;
+
+      this.multiSelectPlaceHolder = 'Select FundHedging(s)';
+      this.asOfDate = moment(this.getLastBusinessDay()).format('YYYY-MM-DD')
+
+      this.fetchFundHedgingsRef();
+
+      this.range = {
+        start: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
+        end: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
+      }
+
+      this.searchDateRange.setValue({
+        start: this.range.start,
+        end: this.range.end,
+      })
+
+      this.dropdownSettings = {
+        singleSelection: false,
+        idField: 'id',
+        textField: 'fundHedging',
+        selectAllText: 'Select All',
+        unSelectAllText: 'Unselect All',
+        itemsShowLimit: 2,
+        allowSearchFilter: true,
+        
+      };
+
     }
   }
 
