@@ -100,8 +100,8 @@ export class BulkUploadComponent implements OnInit {
     private httpClient: HttpClient) { }
 
   columnDefs: ColDef[] = [
-    {field: 'Cash Flow Date', maxWidth: 150, valueFormatter: dateFormatter, allowedAggFuncs: ['min', 'max', 'first', 'last', 'count']},
-    {field: 'Call Date', maxWidth: 150, valueFormatter: dateFormatter, allowedAggFuncs: ['min', 'max', 'first', 'last', 'count']},
+    {field: 'Cash Flow Date', maxWidth: 150, valueFormatter: dateFormatter, allowedAggFuncs: ['Min', 'Max']},
+    {field: 'Call Date', maxWidth: 150, valueFormatter: dateFormatter, allowedAggFuncs: ['Min', 'Max']},
     {field: 'Fund Hedging', maxWidth: 150},
     {field: 'Fund Currency', headerName: 'Fund Ccy', maxWidth: 150},
     {field: 'Position Currency', headerName: 'Position Ccy', maxWidth: 150},
@@ -390,6 +390,14 @@ export class BulkUploadComponent implements OnInit {
 
        let extractedCols: string[] = rawTransposed[0];
 
+       for(let i = 1; i < rawTransposed.length; i++){       // Skipping header's row
+         for(let j = 0; j < rawTransposed[i].length; j++){
+           if(['GIR (Pos - Fund ccy)', 'Amount'].includes(rawTransposed[0][j])){
+             rawTransposed[i][j] = parseFloat(String(rawTransposed[i][j]).replace(/,/g,''));      // Remove commas, blanks from number read from excel
+           }
+         }
+       }
+
       if(validateColumns(extractedCols).isValid){
         
         let wb = XLSX.utils.book_new()
@@ -423,7 +431,7 @@ export class BulkUploadComponent implements OnInit {
           this.invalidRowData = [];
           this.isValid = true;  
           this.disableSubmit = false;
-          this.adapTableApi.layoutApi.setLayout('Bulk Grid');
+          this.adapTableApi?.layoutApi.setLayout('Bulk Grid');
         }
         else{
           this.bulkRowData = [];
