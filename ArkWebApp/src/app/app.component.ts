@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import {MatDialog} from '@angular/material/dialog';
 import { MatIconRegistry } from '@angular/material/icon';
 import * as moment from 'moment';
-import { FacilityDetailsFilter, FilterPane } from './shared/models/FilterPaneModel';
+import { FilterPane } from './shared/models/FilterPaneModel';
 import { Location } from '@angular/common';
 import {FormGroup, FormControl} from '@angular/forms';
 import { AsOfDateRange } from './shared/models/FilterPaneModel';
@@ -34,8 +34,6 @@ export class AppComponent {
   filterPane:FilterPane = {
     AsOfDateRange: false,
     AsOfDate: false,
-    Funds: false,
-    FacilityDetails: false,
     TextValueSelect: false
   };
 
@@ -46,7 +44,6 @@ export class AppComponent {
 
   range:AsOfDateRange = null;
   asOfDate: string = null;
-  facilityFilter: FacilityDetailsFilter = <FacilityDetailsFilter>{};
 
   multiSelectPlaceHolder: string = null;
   dropdownSettings: IDropdownSettings = null;
@@ -84,10 +81,8 @@ export class AppComponent {
     public location:Location,
     public accessService: AccessService,
     private router:Router,
-    private facilityDetailSvc: FacilityDetailService,
-    private liquiditySummarySvc: LiquiditySummaryService) {
-
-}   
+    private facilityDetailSvc: FacilityDetailService
+  ) {}   
 
 get getAccessibleTabs(){
   return this.accessService.accessibleTabs;
@@ -110,14 +105,9 @@ getLastBusinessDay(){
 
   lastClickedTabRoute: string = '/accessibility';
 
-  selectedFunds = [];
-  fundsDropdown = [];
-  fundDropdownSettings: IDropdownSettings = {};
-
   fetchFacilityFunds(){
     this.subscriptions.push(this.facilityDetailSvc.getFacilityFunds().subscribe({
       next: funds => {
-        // this.fundsDropdown = this.selectedFunds = funds;
         this.dropdownData = this.selectedDropdownData = funds;
 
 
@@ -150,10 +140,6 @@ getLastBusinessDay(){
   filterApply(){
     if(this.location.path() === '/facility-detail'){
       // this.setFacilityFilter();
-
-      console.log(this.selectedDropdownData);
-      console.log(this.dropdownData)
-      console.log(this.asOfDate)
 
       this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
       this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['fund']))
@@ -232,8 +218,6 @@ getLastBusinessDay(){
 
     this.filterPane.AsOfDateRange = false;
     this.filterPane.AsOfDate = false;
-    this.filterPane.Funds = false;
-    this.filterPane.FacilityDetails = false;
     this.filterPane.TextValueSelect = false;
 
     this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.notSelectedElement;

@@ -11,16 +11,9 @@ import { MenuModule } from '@ag-grid-enterprise/menu';
 import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
 import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
 import { ExcelExportModule } from '@ag-grid-enterprise/excel-export';
-import {
-  AdaptableOptions,
-  AdaptableApi,
-  AdaptableButton,
-  ActionColumnButtonContext,
-} from '@adaptabletools/adaptable/types';
 import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 
 import { dateFormatter, amountFormatter, removeDecimalFormatter, formatDate, dateTimeFormatter } from 'src/app/shared/functions/formatter';
-import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { Subscription } from 'rxjs';
 import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/liquidity-summary.service';
 import { DataService } from 'src/app/core/services/data.service';
@@ -39,8 +32,6 @@ export class LiquiditySummaryComponent implements OnInit {
   agGridModules: Module[] = [ClientSideRowModelModule,RowGroupingModule,SetFilterModule,ColumnsToolPanelModule,MenuModule, ExcelExportModule];
 
   gridOptions: GridOptions;
-  adaptableOptions: AdaptableOptions;
-  adapTableApi: AdaptableApi;
   
   /** Filter Pane fields */
   asOfDate: string = null;
@@ -48,35 +39,14 @@ export class LiquiditySummaryComponent implements OnInit {
 
   rowData = null;
 
-  columnDefs: ColDef[] = [
-    {
-      field: 'date',
-      valueFormatter: dateFormatter
-    },
-    {
-      field: 'fundHedging',
-    },
-    {
-      field: 'attribute'
-    },
-    {
-      field: 'number',
-      valueFormatter: amountFormatter
-    },
-    {
-      field: 'NetCash',
-    },
-    {
-      field: 'CurrentCash'
-    }
-  ]
+  columnDefs: ColDef[]
 
   defaultColDef = {
     resizable: true,
-    enableValue: true,
+    enableValue: false,
     enableRowGroup: true,
-    enablePivot: true,
-    sortable: true,
+    enablePivot: false,
+    sortable: false,
     filter: true,
     autosize:true,
   }
@@ -87,17 +57,100 @@ export class LiquiditySummaryComponent implements OnInit {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  fetchLiquiditySummary(){
-    // Setting RowData for upper grid.
-    if(this.asOfDate !== null)
-    this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummary(this.asOfDate, this.fundHedgings).subscribe({
-      next: summary => {
-        for(let i:number = 0; i < summary?.length; i+= 1){
-          summary[i].NetCash = summary[i].CurrentCash = null;
-          summary[i].NetCash = 'Net Cash'
-          summary[i].CurrentCash = 'Current Cash'
+  parseFetchedSummary(summary: {date: Date, attr: string, fundHedgingAmount: { fundHedging: string, amount: number}[]}[] = null): any{
+    let parsedData = []
+    for(let i:number = 0; i < summary.length; i+= 1){
+      let row = {};
+      row['attr'] = summary[i]['attr'];
+      row['date'] = summary[i]['date'];
+      for(let j: number = 0; j < summary[i].fundHedgingAmount.length; j+= 1){
+        let FHAmountPair = summary[i].fundHedgingAmount[j]
+        row[FHAmountPair.fundHedging] = Number(FHAmountPair.amount);
+      }
+      parsedData.push(row);
+    }
+
+    return parsedData;
+  }
+
+  createColumnDefs(row: {date: Date, attr: string, fundHedgingAmount: { fundHedging: string, amount: number}[]} = null){
+    this.columnDefs = [
+      {
+        field: 'date',
+        valueFormatter: dateFormatter,
+        width: 115,
+        cellStyle: params => {
+          if(['Current Cash', 'Net Cash', 'Liquidity', 'Cash Post Known Outflows'].includes(params.data?.attr)){
+            return { 
+              'font-weight' : '600'
+            }
+          }
+          else {
+            return null;
+          }
         }
-        this.rowData = summary;
+      },
+      {
+        headerName: 'Attribute',
+        field: 'attr',
+        tooltipField: 'attr',
+        cellStyle: params => {
+          if(['Current Cash', 'Net Cash', 'Liquidity', 'Cash Post Known Outflows'].includes(params.value)){
+            return { 
+              'font-weight' : '600'
+            }
+          }
+          else {
+            return null;
+          }
+        }
+      }
+    ];
+
+    if(!row)
+      return;
+
+    for(let i:number = 0; i < row.fundHedgingAmount.length; i+= 1){
+      let FH: string = row.fundHedgingAmount[i].fundHedging;
+      let colDef: ColDef = {
+        field: FH,
+        headerName: FH,
+        valueFormatter: amountFormatter,
+        width: 133,
+        cellClass: 'ag-right-aligned-cell',
+        cellStyle: params => {
+          if(['Current Cash', 'Net Cash', 'Liquidity', 'Cash Post Known Outflows'].includes(params.data?.attr)){
+            return { 
+              'font-weight' : '600'
+            }
+          }
+          else {
+            return null;
+          }
+        }
+      }
+      
+      this.columnDefs.push(colDef);
+    }
+  }
+
+  fetchLiquiditySummary(){
+
+    if(this.asOfDate !== null)
+    this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryPivoted(this.asOfDate, this.fundHedgings).subscribe({
+      next: summary => {
+
+        if(summary.length > 0){
+          this.createColumnDefs(summary[0]);
+          this.rowData = this.parseFetchedSummary(summary);  
+
+          this.gridOptions.api.setColumnDefs(this.columnDefs);
+        }
+        else{
+          this.createColumnDefs();
+          this.rowData = null;
+        }
+        
       },
       error: error => {
         console.error("Error in fetching liquidity summary" + error);
@@ -107,65 +160,19 @@ export class LiquiditySummaryComponent implements OnInit {
       console.warn("Component loaded without setting date in filter pane");
   }
 
-  autoGroupColumnDef: ColDef = {
-    cellRendererParams: {
-      footerValueGetter: (params: any) => {
-        console.log(params)
-        const isRootLevel = params.node.level === -1;
-        if (isRootLevel) {
-          return 'Liquidity';
-        }
-        return params.value
-      },
-    },
-  };
+  onGridReady(params: any){
+    params.api.closeToolPanel();
+  }
 
   ngOnInit(): void {
     this.gridOptions = {
-      groupIncludeFooter: true,  // Footer for each group
-      groupIncludeTotalFooter: true,
-
       enableRangeSelection: true,
       sideBar: true,
       suppressMenuHide: true,
       singleClickEdit: true,
       undoRedoCellEditing: false,
-      components: {
-        AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      },
       columnDefs: this.columnDefs,
       defaultColDef: this.defaultColDef,
-      autoGroupColumnDef: this.autoGroupColumnDef
-    }
-
-    this.adaptableOptions = {
-      primaryKey: '',
-      autogeneratePrimaryKey: true,
-      adaptableId: "",
-      adaptableStateKey: `Liquidity Summary State Key`,
-      
-      predefinedConfig: {
-       Dashboard: {
-        ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
-        Tabs: []
-       },
-       Layout: {
-         CurrentLayout: 'Pivot Layout',
-         Layouts: [
-           {
-             Name: 'Pivot Layout',
-             EnablePivot: true,
-             PivotColumns: ['fundHedging'],
-             RowGroupedColumns: ['date', 'NetCash', 'CurrentCash', 'attribute'],
-             AggregationColumns: {
-               number: 'sum'
-             },
-             Columns: []
-           }
-         ]
-
-       }
-      }
     }
 
     this.subscriptions.push(this.dataSvc.currentSearchDate.subscribe(asOfDate => {

@@ -6,17 +6,15 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MatCardModule } from '@angular/material/card';
 
-
-
 @NgModule({
   declarations: [
-    LiquiditySummaryComponent
+    LiquiditySummaryComponent,
   ],
   imports: [
     BrowserAnimationsModule,
     CommonModule,
     AdaptableAngularAgGridModule,
-    AgGridModule,
+    AgGridModule.withComponents([]),
     MatCardModule
   ]
 })

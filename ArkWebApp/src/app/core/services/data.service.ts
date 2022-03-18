@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';  
 import { HttpClient, HttpHeaders } from '@angular/common/http';  
-import { environment } from 'src/environments/environment';  
 import { MsalUserService } from './Auth/msaluser.service';  
 
 import { BehaviorSubject } from 'rxjs';
-import { AsOfDateRange, FacilityDetailsFilter } from 'src/app/shared/models/FilterPaneModel';
+import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { APIConfig } from 'src/app/configs/api-config';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -48,13 +47,6 @@ export class DataService {
 
     changeSearchTextValues(values: string[]){
         this.searchTextValuesMessage.next(values);
-    }
-
-    private facilityFilterMessage = new BehaviorSubject<FacilityDetailsFilter>(null);
-    currentFacilityFilter = this.facilityFilterMessage.asObservable();
-
-    changeFacilityFilter(filter: FacilityDetailsFilter){
-        this.facilityFilterMessage.next(filter)
     }
 
     constructor(private http: HttpClient, private msalService: MsalUserService  
