@@ -1,0 +1,26 @@
+<div class="parent">
+    <div class="header">
+        <div class="title">
+            Asset Browser            
+            
+        </div>
+    </div>
+
+    <div class="content">
+        <mat-card class="mat-content">
+            <ag-grid-angular [context]="context"
+            [gridOptions]="gridOptions"
+            [defaultColDef]="defaultColDef"
+            [modules]="agGridModules"
+            [rowData]="rowData"
+            [sideBar]="'columns'"
+            (gridReady)="onGridReady($event)"
+            [suppressClickEdit]="false"
+            [frameworkComponents]="frameworkComponents"
+            (cellValueChanged)="onCellValueChanged($event)"
+            class="ag-theme-alpine ag-grid"
+            >
+            </ag-grid-angular>
+        </mat-card>
+    </div>
+</div>

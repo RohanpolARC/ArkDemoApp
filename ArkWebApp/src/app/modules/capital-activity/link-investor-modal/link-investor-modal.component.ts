@@ -180,14 +180,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
 
       investment.createdBy = investment.modifiedBy = this.msalService.getUserName()
       investment.createdOn = investment.modifiedOn = new Date();
-
-      if(this.message.capitalAct.totalAmount < 0){
-        // Investment's GIR to be inserted into AssetGIR table.
-        investment.valueDate = this.message.capitalAct.valueDate;  
-        investment.fxRate = this.message.capitalAct.fxRate;  
-      }
-      else 
-        investment.valueDate = investment.fxRate = null;
+      investment.valueDate = investment.fxRate = null;
 
       models.push(investment);
     }
@@ -219,8 +212,8 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
       this.message.capitalAct.createdOn = this.message.capitalAct.modifiedOn = new Date();
       this.message.capitalAct.createdBy = this.message.capitalAct.modifiedBy =this.msalService.getUserName();  
 
-      this.message.capitalAct.source = null;
-      this.message.capitalAct.sourceID = null;
+      this.message.capitalAct.source = 'ArkUI - link';
+      this.message.capitalAct.sourceID = 4;
 
       
       this.subscriptions.push(this.capitalActivityService.putCapitalActivity(this.message.capitalAct).subscribe({

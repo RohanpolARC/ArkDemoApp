@@ -1,8 +1,15 @@
 export interface FilterPane{
-    AsOfDate: boolean;
+    AsOfDateRange: boolean;
+    Funds: boolean;
+    FacilityDetails: boolean;
 }
 
-export interface AsOfDate{
+export interface AsOfDateRange{
     start: string;
     end: string;
+}
+
+export interface FacilityDetailsFilter{
+    asOfDate: string;
+    funds: {id: number, fund: string}[];
 }

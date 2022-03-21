@@ -4,11 +4,15 @@
     <br>
     <div class="capital-action">
 
-        <button mat-icon-button (click)="openBulkUploadDialog()">
+        <button mat-icon-button (click)="openBulkUploadDialog()"
+        matTooltip="Bulk Upload"
+        matTooltipClass="tooltip-capital">
             <mat-icon class="material-icons-outlined">file_upload</mat-icon>
         </button>
             
-        <button mat-icon-button (click)="openDialog()">
+        <button mat-icon-button (click)="openDialog()"
+        matTooltip="Add"
+        matTooltipClass="tooltip-capital">
             <mat-icon class="material-icons-outlined">add_circle_outline</mat-icon>
         </button>
 
@@ -42,11 +46,11 @@
                 [sideBar]="'columns'"
                 (adaptableReady)="onAdaptableInvstmntReady($event)"
                 class="ag-theme-alpine ag-grid"
-            ></ag-grid-angular>
-        
-
+                ></ag-grid-angular>
             </mat-expansion-panel>
+        </mat-accordion>
 
+        <mat-accordion class="accordion-headers" multi [hideToggle]="false">
             <mat-expansion-panel (opened)="investorPanelOpenState = true" (closed)="investorPanelOpenState = false">
                 <mat-expansion-panel-header>
                     <mat-panel-title>
@@ -71,11 +75,8 @@
                 [sideBar]="'columns'"
                 (adaptableReady)="onAdaptableReady($event)"
                 class="ag-theme-alpine ag-grid"
-            ></ag-grid-angular>
-        
-
+                ></ag-grid-angular>
             </mat-expansion-panel>
-
         </mat-accordion> 
         
     </mat-card>

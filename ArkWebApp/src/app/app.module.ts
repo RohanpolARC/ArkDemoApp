@@ -31,6 +31,11 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { CapitalActivityModule } from './modules/capital-activity/capital-activity.module';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized.component';
+import {HomeComponent} from '../app/home-component/home.component'
+import { FacilityDetailModule } from './modules/facility-detail/facility-detail.module';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 
 export const protectedResourceMap: any =  
   [  
@@ -40,7 +45,7 @@ export const protectedResourceMap: any =
   
 @NgModule({  
   declarations: [  
-    AppComponent
+    AppComponent, UnauthorizedComponent, HomeComponent
   ],  
   imports: [  
     MsalModule.forRoot({  
@@ -75,7 +80,10 @@ export const protectedResourceMap: any =
   MatDatepickerModule,
   MatNativeDateModule,
   MatInputModule,
-  CapitalActivityModule
+  CapitalActivityModule,
+  MatTooltipModule,
+  FacilityDetailModule,
+  NgMultiSelectDropDownModule.forRoot()
   ],  
   providers: [  
     HttpClient,  
@@ -84,12 +92,18 @@ export const protectedResourceMap: any =
       provide: HTTP_INTERCEPTORS, useClass: MsalInterceptor, multi: true  
     },
     /* 
+    Switched to: DD-MM-YYYY.
       Default locale is 'en-US' : MM-DD-YYYY
-      Switched to: DD-MM-YYYY.
       
       Applicable to all Ng Material fields for this module.
     */
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  
+    // {
+    //   provide: APP_INITIALIZER,
+    //   useFactory: () => AccessServiceFactory,
+    //   deps: [AccessService],
+    //   multi: true
+    // }
   ],  
   bootstrap: [AppComponent]  
 })  
