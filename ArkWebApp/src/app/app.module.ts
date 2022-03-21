@@ -100,12 +100,7 @@ export const protectedResourceMap: any =
       Applicable to all Ng Material fields for this module.
     */
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  
-    // {
-    //   provide: APP_INITIALIZER,
-    //   useFactory: () => AccessServiceFactory,
-    //   deps: [AccessService],
-    //   multi: true
-    // }
+    
   ],  
   bootstrap: [AppComponent]  
 })  

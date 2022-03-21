@@ -295,36 +295,6 @@ export class FacilityDetailComponent implements OnInit {
       }
     }))
 
-    // this.subscriptions.push(this.dataService.currentFacilityFilter.subscribe(filterData => {
-
-    //   let funds: string[] = filterData?.funds?.map(k => { return k?.fund })
-    //   let asOfDate: string = filterData?.asOfDate;
-
-    //   if(funds != null && asOfDate != null){
-    //     this.subscriptions.push(this.facilityDetailsService.getFacilityDetails(funds, asOfDate).subscribe({
-    //       next: data => {
-
-    //         for(let i: number = 0; i < data?.length; i+= 1){
-    //           data[i].expectedDate = formatDate(data[i]?.expectedDate)
-    //           if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].expectedDate)){
-    //             data[i].expectedDate = null;
-    //           }
-
-    //           data[i].maturityDate = formatDate(data[i]?.maturityDate)
-    //           if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].maturityDate)){
-    //             data[i].maturityDate = null;
-    //           }
-
-    //         }
-    //         this.rowData = data;
-    //       },
-    //       error: error => {
-    //         this.rowData = null;
-    //       }
-    //     }))          
-    //   }
-    // }))
-
     this.isWriteAccess = false;
     for(let i: number = 0; i < this.accessService.accessibleTabs.length; i+= 1){
       if(this.accessService.accessibleTabs[i].tab === 'Asset Browser' && this.accessService.accessibleTabs[i].isWrite){

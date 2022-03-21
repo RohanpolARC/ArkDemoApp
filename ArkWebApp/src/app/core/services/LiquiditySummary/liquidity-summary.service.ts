@@ -4,6 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
 import { MsalUserService } from '../Auth/msaluser.service';
+import { LiquiditySummaryModel } from '../../../shared/models/LiquiditySummaryModel';
 
 @Injectable({
   providedIn: 'root'
@@ -20,10 +21,18 @@ export class LiquiditySummaryService {
   constructor(private http: HttpClient,
               private msalService: MsalUserService) { }
 
-              public getLiquiditySummaryPivoted(requestedDate: string, fundHedgings?: string[]){
-    return this.http.get<any[]>(`${APIConfig.LIQUIDITY_SUMMARY_PIVOTED_GET_API}/?searchDate=${requestedDate}&fundHedgings=${fundHedgings}`, this.httpOptions).pipe(
-      catchError((ex) => throwError(ex))
-    )
+    public getLiquiditySummaryPivoted(requestedDate: string, fundHedgings?: string[]){
 
-  }
+      return this.http.get<any[]>(`${APIConfig.LIQUIDITY_SUMMARY_PIVOTED_GET_API}/?searchDate=${requestedDate}&fundHedgings=${fundHedgings}`, this.httpOptions).pipe(
+        catchError((ex) => throwError(ex))
+      )
+    }
+
+    public putLiquiditySummary(model: LiquiditySummaryModel){
+
+      return this.http.post<any>(APIConfig.LIQUIDITY_SUMMARY_PUT_API, model, this.httpOptions).pipe(
+        catchError((ex) => throwError(ex))
+      )
+    }
+
 }

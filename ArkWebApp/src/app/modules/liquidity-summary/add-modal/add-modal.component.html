@@ -1,0 +1,114 @@
+<h3 mat-dialog-title>Add</h3>
+
+<div>
+    <div class="success-msg" *ngIf="isSuccess">
+        {{ updateMsg }}
+    </div>
+    <div class="failure-msg" *ngIf="isFailure">
+        {{ updateMsg }}
+    </div>
+</div>
+
+<mat-dialog-content>
+
+    <form [formGroup]="liquidityForm" autocomplete="off" (ngSubmit)="onSubmit()">
+
+        <div class="container">
+
+            <div class="col">
+                <mat-form-field appearance="outline" class="edit">
+                    <mat-label> Date </mat-label>
+                    <input matInput required matInput formControlName="date" [matDatepicker]="datePicker"/>
+                    <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #datePicker></mat-datepicker>
+                    <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="liquidityForm.get('date').reset()">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="edit">
+                    <mat-label> Level </mat-label>
+                    <input type="text" required matInput formControlName="level" [matAutocomplete]="levelAutocomplete" matAutocompletePosition="below"/>
+                    <mat-error *ngIf="liquidityForm.get('level').invalid">Please select level from the list</mat-error>
+                    <mat-autocomplete autoActiveFirstOption #levelAutocomplete="matAutocomplete" panelWidth="auto">
+                        <mat-option
+                          *ngFor="let lvl of levelFilteredOptions | async"
+                          [value]="lvl"
+                        >
+                          {{ lvl }}
+                        </mat-option>
+                    </mat-autocomplete>
+                    <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="liquidityForm.get('level').reset()">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="edit">
+                    <mat-label> Fund Hedging </mat-label>
+                    <input type="text" required matInput formControlName="fundHedging" [matAutocomplete]="fundHedgingAutocomplete" matAutocompletePosition="below"/>
+                    <mat-error *ngIf="liquidityForm.get('fundHedging').invalid">Please select fund hedging from the list</mat-error>
+                    <mat-autocomplete autoActiveFirstOption #fundHedgingAutocomplete="matAutocomplete" panelWidth="auto">
+                        <mat-option
+                          *ngFor="let FH of fundHedgingFilteredOptions | async"
+                          [value]="FH"
+                        >
+                          {{ FH }}
+                        </mat-option>
+                    </mat-autocomplete>
+                    <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="liquidityForm.get('level').reset()">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+
+            </div>
+
+            <div class="col">
+
+                <mat-form-field appearance="outline" class="edit">
+                    <mat-label> Days </mat-label>
+                    <input type="number" required matInput formControlName="days" />
+                    <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="liquidityForm.get('days').reset()">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="edit">
+                    <mat-label> Attribute </mat-label>
+                    <input type="text" required matInput formControlName="attribute" />
+                    <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="liquidityForm.get('attribute').reset()">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+
+
+                <mat-form-field appearance="outline" class="edit">
+                    <mat-label> Amount </mat-label>
+                    <input type="number" required matInput formControlName="amount" />
+                    <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="liquidityForm.get('amount').reset()">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+
+        </div>
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <div class="action">
+        <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        (click)="onSubmit()"
+        [disabled]="disableSubmit"
+
+        >
+        Submit
+        </button>
+        
+        <button type="button" mat-raised-button>Close</button>
+
+    </div>
+</mat-dialog-actions>

@@ -13,7 +13,6 @@ import { Router } from '@angular/router';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from './core/services/FacilityDetails/facility-detail.service';
-import { LiquiditySummaryService } from './core/services/LiquiditySummary/liquidity-summary.service';
 
 @Component({  
   selector: 'app-root',  
@@ -139,7 +138,6 @@ getLastBusinessDay(){
 
   filterApply(){
     if(this.location.path() === '/facility-detail'){
-      // this.setFacilityFilter();
 
       this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
       this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['fund']))

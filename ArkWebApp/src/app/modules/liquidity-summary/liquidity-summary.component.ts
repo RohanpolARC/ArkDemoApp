@@ -3,6 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import {
   ColDef,
   GridOptions,
+  IAggFunc,
+  IAggFuncParams,
   Module,
 } from '@ag-grid-community/all-modules';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
@@ -11,12 +13,13 @@ import { MenuModule } from '@ag-grid-enterprise/menu';
 import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
 import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
 import { ExcelExportModule } from '@ag-grid-enterprise/excel-export';
-import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 
-import { dateFormatter, amountFormatter, removeDecimalFormatter, formatDate, dateTimeFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, amountFormatter, dateTimeFormatter } from 'src/app/shared/functions/formatter';
 import { Subscription } from 'rxjs';
 import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/liquidity-summary.service';
 import { DataService } from 'src/app/core/services/data.service';
+import { MatDialog }  from '@angular/material/dialog';
+import { AddModalComponent } from './add-modal/add-modal.component';
 
 @Component({
   selector: 'app-liquidity-summary',
@@ -27,7 +30,8 @@ export class LiquiditySummaryComponent implements OnInit {
 
   subscriptions: Subscription[] = [];
   constructor(private liquiditySummarySvc: LiquiditySummaryService,
-              private dataSvc: DataService) { }
+              private dataSvc: DataService,
+              public dialog: MatDialog) { }
 
   agGridModules: Module[] = [ClientSideRowModelModule,RowGroupingModule,SetFilterModule,ColumnsToolPanelModule,MenuModule, ExcelExportModule];
 
@@ -43,7 +47,7 @@ export class LiquiditySummaryComponent implements OnInit {
 
   defaultColDef = {
     resizable: true,
-    enableValue: false,
+    enableValue: true,
     enableRowGroup: true,
     enablePivot: false,
     sortable: false,
@@ -63,6 +67,7 @@ export class LiquiditySummaryComponent implements OnInit {
       let row = {};
       row['attr'] = summary[i]['attr'];
       row['date'] = summary[i]['date'];
+      row['attrType'] = summary[i]['attrType'];
       for(let j: number = 0; j < summary[i].fundHedgingAmount.length; j+= 1){
         let FHAmountPair = summary[i].fundHedgingAmount[j]
         row[FHAmountPair.fundHedging] = Number(FHAmountPair.amount);
@@ -73,37 +78,75 @@ export class LiquiditySummaryComponent implements OnInit {
     return parsedData;
   }
 
+  aggFuncs = {
+    'Sum': (params: IAggFuncParams )=> {
+      // console.log(params)
+
+      let sum: number = 0;
+      let colName: string = params.column.getColId();
+
+      if(params.rowNode.group){
+
+        if (params.rowNode.key === 'Current Cash') {
+
+          for(let i:number = 0; i < params.values.length; i+= 1){
+            sum += params.values[i];
+          }
+        }
+        else if(params.rowNode.key === 'Net Cash') {
+
+          for(let i: number = 0; i < this.rowData.length; i+= 1){
+
+            if(['Current Cash', 'Net Cash'].includes(this.rowData[i].attrType))
+              sum += this.rowData[i]?.[colName];
+          }
+        }
+        else if(params.rowNode.key === 'Liquidity'){
+
+          for(let i: number = 0; i < this.rowData.length; i+= 1){
+
+            if(['Current Cash', 'Net Cash', 'Liquidity'].includes(this.rowData[i].attrType))
+              sum += this.rowData[i]?.[colName];
+          }
+        }
+        else if(params.rowNode.key === 'Known Outflows'){
+
+          for(let i: number = 0; i < this.rowData.length; i+= 1){
+
+            if(['Known Outflows'].includes(this.rowData[i].attrType))
+              sum += this.rowData[i]?.[colName];
+          }
+        }
+        else if(params.rowNode.key === 'Cash Post Known Outflows'){
+
+          for(let i: number = 0; i < this.rowData.length; i+= 1){
+
+            if(['Current Cash', 'Net Cash', 'Liquidity', 'Known Outflows'].includes(this.rowData[i].attrType))
+              sum += this.rowData[i]?.[colName];
+          }
+        }
+      }
+      return sum;
+    }
+  }
+
   createColumnDefs(row: {date: Date, attr: string, fundHedgingAmount: { fundHedging: string, amount: number}[]} = null){
     this.columnDefs = [
       {
         field: 'date',
         valueFormatter: dateFormatter,
         width: 115,
-        cellStyle: params => {
-          if(['Current Cash', 'Net Cash', 'Liquidity', 'Cash Post Known Outflows'].includes(params.data?.attr)){
-            return { 
-              'font-weight' : '600'
-            }
-          }
-          else {
-            return null;
-          }
-        }
       },
       {
         headerName: 'Attribute',
         field: 'attr',
         tooltipField: 'attr',
-        cellStyle: params => {
-          if(['Current Cash', 'Net Cash', 'Liquidity', 'Cash Post Known Outflows'].includes(params.value)){
-            return { 
-              'font-weight' : '600'
-            }
-          }
-          else {
-            return null;
-          }
-        }
+      },
+      {
+        headerName: 'Attribute Type',
+        field: 'attrType',
+        rowGroup: true,
+        hide: true
       }
     ];
 
@@ -118,16 +161,8 @@ export class LiquiditySummaryComponent implements OnInit {
         valueFormatter: amountFormatter,
         width: 133,
         cellClass: 'ag-right-aligned-cell',
-        cellStyle: params => {
-          if(['Current Cash', 'Net Cash', 'Liquidity', 'Cash Post Known Outflows'].includes(params.data?.attr)){
-            return { 
-              'font-weight' : '600'
-            }
-          }
-          else {
-            return null;
-          }
-        }
+        allowedAggFuncs: ['Sum', 'min', 'max'],
+        aggFunc: 'Sum',
       }
       
       this.columnDefs.push(colDef);
@@ -164,8 +199,23 @@ export class LiquiditySummaryComponent implements OnInit {
     params.api.closeToolPanel();
   }
 
+  openDialog(actionType: string = 'ADD'): void {
+    const dialogRef = this.dialog.open(AddModalComponent,{
+      data: {
+        action: actionType,
+        fundHedgings: this.fundHedgings,
+        asOfDate: this.asOfDate
+      }
+    })
+
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
+      
+    }))
+  }
+  
   ngOnInit(): void {
     this.gridOptions = {
+      suppressAggFuncInHeader: true,
       enableRangeSelection: true,
       sideBar: true,
       suppressMenuHide: true,
@@ -173,6 +223,7 @@ export class LiquiditySummaryComponent implements OnInit {
       undoRedoCellEditing: false,
       columnDefs: this.columnDefs,
       defaultColDef: this.defaultColDef,
+      aggFuncs: this.aggFuncs
     }
 
     this.subscriptions.push(this.dataSvc.currentSearchDate.subscribe(asOfDate => {
