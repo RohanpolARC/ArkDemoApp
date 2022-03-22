@@ -74,9 +74,15 @@ export class AddModalComponent implements OnInit {
     }));
 
     this.subscriptions.push(this.liquidityForm.get('days').valueChanges.subscribe(days => {
+      /*
+      Adding days to date in JS.
+        https://stackoverflow.com/a/19691491/17121446      
+      */
+      let dt = new Date(this.asOfDate);
+      dt.setDate(dt.getDate() + (parseInt(days) >= 0 ? parseInt(days) : 0))
 
       this.liquidityForm.patchValue({
-        date: new Date((new Date()).setDate(this.asOfDate.getDate() + (parseInt(days) >= 0 ? parseInt(days) : 0)))
+        date: dt
       })
 
     }))
@@ -132,8 +138,6 @@ export class AddModalComponent implements OnInit {
 
   ngOnInit(): void {
     
-    console.log(this.data.asOfDate)
-
     this.asOfDate = new Date(parseInt(this.data.asOfDate.substring(0,4)),
       parseInt(this.data.asOfDate.substring(5,7)) - 1,
       parseInt(this.data.asOfDate.substring(8,10))
@@ -165,5 +169,11 @@ export class AddModalComponent implements OnInit {
 
   ngOnDestroy(){
     this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  onClose(){
+    this.dialogRef.close({
+      event: this.isSuccess ? 'Close with success' : 'Close'
+    })
   }
 }
