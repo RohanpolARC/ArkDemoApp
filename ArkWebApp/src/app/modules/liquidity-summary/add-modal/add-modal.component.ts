@@ -7,7 +7,6 @@ import * as moment from 'moment';
 import { LiquiditySummaryModel } from 'src/app/shared/models/LiquiditySummaryModel';
 import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/liquidity-summary.service';
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
-import { InputDateAdapter } from 'src/app/shared/providers/date-adapter';
 
 @Component({
   selector: 'app-add-modal',
@@ -77,7 +76,7 @@ export class AddModalComponent implements OnInit {
     this.subscriptions.push(this.liquidityForm.get('days').valueChanges.subscribe(days => {
 
       this.liquidityForm.patchValue({
-        date: new Date(this.asOfDate.setDate(this.asOfDate.getDate() + parseInt(days)))
+        date: new Date((new Date()).setDate(this.asOfDate.getDate() + (parseInt(days) >= 0 ? parseInt(days) : 0)))
       })
 
     }))
@@ -100,6 +99,7 @@ export class AddModalComponent implements OnInit {
     model.date = this.liquidityForm.get('date').value;
     model.level = this.liquidityForm.get('level').value;
     model.attribute = this.liquidityForm.get('attribute').value;
+    model.fundHedging = this.liquidityForm.get('fundHedging').value;
     model.amount = this.liquidityForm.get('amount').value;
 
     model.createdBy = this.msalUserSvc.getUserName();
@@ -150,7 +150,7 @@ export class AddModalComponent implements OnInit {
     this.fundHedgingOptions = this.data.fundHedgings;
   
     this.liquidityForm = new FormGroup({
-      date: new FormControl(this.asOfDate, Validators.required),
+      date: new FormControl(new Date(this.asOfDate), Validators.required),
       days: new FormControl(0, Validators.required),
       level: new FormControl(null, Validators.required),
       attribute: new FormControl(null, Validators.required),

@@ -3,6 +3,7 @@ export interface LiquiditySummaryModel{
     amount: number,
     level: string,
     attribute: string,
+    fundHedging: string,
     createdBy: string,
     modifiedBy: string
 }

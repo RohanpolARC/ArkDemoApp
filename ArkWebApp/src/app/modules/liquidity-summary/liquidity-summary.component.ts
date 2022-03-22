@@ -5,6 +5,7 @@ import {
   GridOptions,
   IAggFunc,
   IAggFuncParams,
+  IsGroupOpenByDefaultParams,
   Module,
 } from '@ag-grid-community/all-modules';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
@@ -223,7 +224,17 @@ export class LiquiditySummaryComponent implements OnInit {
       undoRedoCellEditing: false,
       columnDefs: this.columnDefs,
       defaultColDef: this.defaultColDef,
-      aggFuncs: this.aggFuncs
+      aggFuncs: this.aggFuncs,
+
+            // Expand groups
+      isGroupOpenByDefault: (params: IsGroupOpenByDefaultParams) => {
+        return params.rowNode.group && params.key !== 'Known Outflows';
+      },
+      autoGroupColumnDef: {
+        cellRendererParams: {
+          suppressCount: true     // Disable row count on group
+        }
+      }
     }
 
     this.subscriptions.push(this.dataSvc.currentSearchDate.subscribe(asOfDate => {
