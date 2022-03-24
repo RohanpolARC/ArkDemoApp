@@ -147,6 +147,11 @@ export class FacilityDetailComponent implements OnInit {
       editable: false,
       menuTabs: []
     },
+
+    { field: 'assetClass', width: 145 },
+    { field: 'capStructureTranche', width: 145 },
+    { field: 'securedUnsecured', width: 145 },
+    { field: 'seniority', width: 145 },
     { field: 'modifiedBy', width: 145 },
     { field: 'modifiedOn', width: 150, valueFormatter: dateTimeFormatter }
   ]
