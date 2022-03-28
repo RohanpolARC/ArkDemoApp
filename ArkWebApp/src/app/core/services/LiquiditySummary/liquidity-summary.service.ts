@@ -4,7 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
 import { MsalUserService } from '../Auth/msaluser.service';
-import { LiquiditySummaryModel } from '../../../shared/models/LiquiditySummaryModel';
+import { LiquiditySummaryAttributeModel, LiquiditySummaryUpdateModel } from '../../../shared/models/LiquiditySummaryModel';
 
 @Injectable({
   providedIn: 'root'
@@ -28,9 +28,23 @@ export class LiquiditySummaryService {
       )
     }
 
-    public putLiquiditySummary(model: LiquiditySummaryModel){
+    public getLiquiditySummaryRef(){
+
+      return this.http.get<any[]>(`${APIConfig.LIQUIDITY_SUMMARY_REF_GET_API}`, this.httpOptions).pipe(
+        catchError((ex) => throwError(ex))
+      )
+    }
+
+    public putLiquiditySummaryAttribute(model: LiquiditySummaryAttributeModel){
 
       return this.http.post<any>(APIConfig.LIQUIDITY_SUMMARY_PUT_API, model, this.httpOptions).pipe(
+        catchError((ex) => throwError(ex))
+      )
+    }
+
+    public updateLiquiditySummary(model: LiquiditySummaryUpdateModel){
+
+      return this.http.post<any>(APIConfig.LIQUIDITY_SUMMARY_PUT_UPDATE_API, model, this.httpOptions).pipe(
         catchError((ex) => throwError(ex))
       )
     }

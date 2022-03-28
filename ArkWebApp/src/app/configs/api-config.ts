@@ -35,6 +35,8 @@ export class APIConfig {
 
     public static LIQUIDITY_SUMMARY_PIVOTED_GET_API: string = APIConfig.BASEURL + "/api/LiquiditySummary/GetSummaryPivoted";
     public static LIQUIDITY_SUMMARY_PUT_API: string = APIConfig.BASEURL + "/api/LiquiditySummary/Put";
+    public static LIQUIDITY_SUMMARY_REF_GET_API: string = APIConfig.BASEURL + "/api/LiquiditySummary/GetRef";
+    public static LIQUIDITY_SUMMARY_PUT_UPDATE_API: string = APIConfig.BASEURL + "/api/LiquiditySummary/Update";
 
     public static REFDATA_GET_FUNDHEDGINGS_API: string = APIConfig.BASEURL + "/api/GetRef/GetFundHedgings";
 }

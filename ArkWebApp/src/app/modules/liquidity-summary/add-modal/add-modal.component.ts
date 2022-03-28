@@ -4,7 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { FormGroup, FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import * as moment from 'moment';
-import { LiquiditySummaryModel } from 'src/app/shared/models/LiquiditySummaryModel';
+import { LiquiditySummaryAttributeModel } from '../../../shared/models/LiquiditySummaryModel';
 import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/liquidity-summary.service';
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 
@@ -21,11 +21,12 @@ export class AddModalComponent implements OnInit {
   isSuccess: boolean = false;
   isFailure: boolean = false;
   liquidityForm: FormGroup;
+  submittedData;
+  
+  attributeID: number;      // To be set when attribute is being edited
 
   levelOptions : string[]; 
-  fundHedgingOptions : string[];
   levelFilteredOptions: Observable<string[]>;
-  fundHedgingFilteredOptions: Observable<string[]>;
 
   asOfDate: Date;
 
@@ -36,21 +37,48 @@ export class AddModalComponent implements OnInit {
     private msalUserSvc: MsalUserService
   ) { }
 
+  isNewAttribute(refData, attribute: string, level: string): boolean {
+
+    for(let i: number = 0; i < this.data.refData?.length; i+= 1){
+
+      if(this.data.refData[i]?.level === level && String(this.data.refData[i]?.attribute).toLowerCase().trim() === attribute?.toLowerCase().trim()){
+        return false;
+      }
+    }
+    return true;
+  }
+
   liquidityValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
 
-    let date: string = moment(control.get('date').value).format('YYYY-MM-DD');
-    let days: number = control.get('days').value;
+    let isRelative: boolean = control.get('isRelative').value;
+    let days: number, date: string;
+    
+    if(isRelative){
+      days = control.get('days').value;
+    }
+    else{
+      date = moment(control.get('date').value).format('YYYY-MM-DD');
+    }
     let level: string = control.get('level').value;
     let attribute: string = control.get('attribute').value;
-    let amount: number = control.get('amount').value;
 
     let Dt:boolean = date !== null && date !== 'Invalid date'
-    let Days: boolean = !!days;
+    let Days: boolean = days !== null && days >= 0;
     let Lvl:boolean = !!level && this.levelOptions.includes(level); 
-    let Att:boolean = !!attribute;
-    let Amt: boolean = !!amount;
 
-    return (Dt && Days && Lvl && Att && Amt) ? { validated: true } : { validated: false };
+    if(!this.levelOptions.includes(level)){
+      control.get('level').setErrors({invalid: true});
+    }
+    let Att:boolean = false;
+
+    if(this.data.action === 'EDIT'){
+      Att = !!attribute;
+    }
+    else if(this.data.action === 'ADD'){
+      Att = !!attribute && this.isNewAttribute(this.data.refData, attribute, level);
+    }
+
+    return ((isRelative ? Days : Dt) && Lvl && Att) ? { validated: true } : { validated: false };
   }
 
   _filter(options: string[],value:string): string []{
@@ -64,8 +92,7 @@ export class AddModalComponent implements OnInit {
 
     this.subscriptions.push(this.liquidityForm.valueChanges
       .subscribe(_ => {
-
-      if(this.liquidityForm.errors?.['validated'] && this.liquidityForm.touched){
+      if(this.liquidityForm.errors?.['validated'] && this.liquidityForm.touched && !this.isSuccess){
         this.disableSubmit = false;
       }
       else if(!this.liquidityForm.errors?.['validated']){
@@ -73,56 +100,68 @@ export class AddModalComponent implements OnInit {
       }
     }));
 
-    this.subscriptions.push(this.liquidityForm.get('days').valueChanges.subscribe(days => {
-      /*
-      Adding days to date in JS.
-        https://stackoverflow.com/a/19691491/17121446      
-      */
-      let dt = new Date(this.asOfDate);
-      dt.setDate(dt.getDate() + (parseInt(days) >= 0 ? parseInt(days) : 0))
+    this.subscriptions.push(this.liquidityForm.get('attribute').valueChanges.subscribe(attribute => {
+      if(!!attribute){
 
-      this.liquidityForm.patchValue({
-        date: dt
-      })
+        let level: string = this.liquidityForm.get('level').value;
+        if(!this.isNewAttribute(this.data.refData, attribute, level)){
 
+          this.liquidityForm.get('attribute').setErrors({invalid: true})
+        }
+      }
     }))
+
+
+    // this.subscriptions.push(this.liquidityForm.get('days').valueChanges.subscribe(days => {
+    //   /*
+    //   Adding days to date in JS.
+    //     https://stackoverflow.com/a/19691491/17121446      
+    //   */
+    //   let dt = new Date(this.asOfDate);
+    //   dt.setDate(dt.getDate() + (parseInt(days) >= 0 ? parseInt(days) : 0))
+
+    //   this.liquidityForm.patchValue({
+    //     date: dt
+    //   })
+
+    // }))
 
     this.levelFilteredOptions = this.liquidityForm.get('level').valueChanges.pipe(
       startWith(''),
       map(value => this._filter(this.levelOptions, value))
     );
-
-    this.fundHedgingFilteredOptions = this.liquidityForm.get('fundHedging').valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(this.fundHedgingOptions, value))
-    );
-
   }
 
-  getModel(): LiquiditySummaryModel {
+  getModel(): LiquiditySummaryAttributeModel {
 
-    let model: LiquiditySummaryModel = <LiquiditySummaryModel>{};
-    model.date = this.liquidityForm.get('date').value;
-    model.level = this.liquidityForm.get('level').value;
+    let model: LiquiditySummaryAttributeModel = <LiquiditySummaryAttributeModel>{};
+
+    model.id = this.attributeID              // Set to null, if action = ADD
     model.attribute = this.liquidityForm.get('attribute').value;
-    model.fundHedging = this.liquidityForm.get('fundHedging').value;
-    model.amount = this.liquidityForm.get('amount').value;
-
-    model.createdBy = this.msalUserSvc.getUserName();
-    model.modifiedBy = this.msalUserSvc.getUserName();
+    model.isRelative = this.liquidityForm.get('isRelative').value;
+    model.entryDate = (model.isRelative) 
+                      ? null 
+                      : new Date(moment(this.liquidityForm.get('date').value).format('YYYY-MM-DD'))
+    
+    
+    model.relativeDays = (model.isRelative) ? this.liquidityForm.get('days').value : null;
+    model.level = this.liquidityForm.get('level').value;
+    model.username = this.msalUserSvc.getUserName();
     return model;
   }
   
   onSubmit(){
     this.disableSubmit = true;
-    let model: LiquiditySummaryModel = this.getModel();
+    let model: LiquiditySummaryAttributeModel = this.getModel();
 
-    this.subscriptions.push(this.liquiditySummarySvc.putLiquiditySummary(model).subscribe({
+    this.subscriptions.push(this.liquiditySummarySvc.putLiquiditySummaryAttribute(model).subscribe({
       next: data => {
 
         if(data?.isSuccess){
+          this.submittedData = model;
+
           this.disableSubmit = true;
-          this.updateMsg = 'Successfully Inserted';
+          this.updateMsg = 'Successfully ' + data.returnMessage;
           this.isSuccess = true;
           this.isFailure = false;
         }
@@ -137,32 +176,41 @@ export class AddModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    
+
+    this.levelOptions = this.data.refData.map(x => x['level'])
+    this.levelOptions = [... new Set(this.levelOptions)]
+
+                        // this.data.asOfDate (string of type: 'YYYY-MM-DD')
     this.asOfDate = new Date(parseInt(this.data.asOfDate.substring(0,4)),
-      parseInt(this.data.asOfDate.substring(5,7)) - 1,
-      parseInt(this.data.asOfDate.substring(8,10))
-    );
+                             parseInt(this.data.asOfDate.substring(5,7)) - 1,
+                             parseInt(this.data.asOfDate.substring(8,10))
+  );
 
-    this.levelOptions = [
-      'Current Cash',
-      'Net Cash',
-      'RCF Commitment',
-      'Liquidity',
-      'Known Outflows'
-    ];
-
-    this.fundHedgingOptions = this.data.fundHedgings;
-  
     this.liquidityForm = new FormGroup({
       date: new FormControl(new Date(this.asOfDate), Validators.required),
       days: new FormControl(0, Validators.required),
-      level: new FormControl(null, Validators.required),
-      attribute: new FormControl(null, Validators.required),
-      amount: new FormControl(null, Validators.required),
-      fundHedging: new FormControl(null, Validators.required)
+      level: new FormControl(this.data.level, Validators.required),
+      attribute: new FormControl(this.data.attribute, Validators.required),
+      isRelative: new FormControl(false, Validators.required)
     },{
       validators: this.liquidityValidator
     })
+
+    if(this.data.action === 'EDIT'){
+
+      this.attributeID = this.data.rowRef?.id;
+      this.liquidityForm.patchValue({
+        level: this.data.rowRef.level,
+        attribute: this.data.rowRef.attribute,
+        isRelative: this.data.rowRef.isRelative,
+        days: (this.data.rowRef.isRelative) ? this.data.rowRef.relativeDays : null,
+        date: (this.data.rowRef.isRelative) ? null : this.asOfDate
+      })
+    }
+    else if(this.data.action === 'ADD'){
+      this.attributeID = null;
+
+    }
 
     this.changeListeners();
   }
@@ -173,7 +221,9 @@ export class AddModalComponent implements OnInit {
 
   onClose(){
     this.dialogRef.close({
-      event: this.isSuccess ? 'Close with success' : 'Close'
+      event: this.isSuccess ? 'Close with success' : 'Close',
+      data: this.isSuccess ? this.submittedData : null,
+      action: this.data.action 
     })
   }
 }

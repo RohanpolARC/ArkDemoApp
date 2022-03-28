@@ -227,7 +227,14 @@ export class FacilityDetailComponent implements OnInit {
   setSelectedRowID(rowID: number){
     this.actionClickedRowID = rowID;
     if(this.actionClickedRowID === null){
-      this.gridApi.stopEditing(true);
+
+      /** 
+       *     (gridApi can be null on initial load, hence adding ? to not call stopEditing())
+       * 
+       *  If not adding ?, can give error and wouldn't call getFacilityDetails in filterBtnApplyState listener.
+       * */
+
+      this.gridApi?.stopEditing(true);
     }
   }
 
@@ -273,6 +280,7 @@ export class FacilityDetailComponent implements OnInit {
 
     this.subscriptions.push(this.dataService.filterApplyBtnState.subscribe(isHit => {
       if(isHit){
+        this.setSelectedRowID(null);
 
         if(this.funds != null && this.asOfDate != null){
           this.subscriptions.push(this.facilityDetailsService.getFacilityDetails(this.funds, this.asOfDate).subscribe({

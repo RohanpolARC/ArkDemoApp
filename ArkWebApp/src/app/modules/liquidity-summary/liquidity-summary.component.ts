@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import {
   ColDef,
+  EditableCallbackParams,
   GridOptions,
   IAggFunc,
   IAggFuncParams,
@@ -21,6 +22,9 @@ import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/
 import { DataService } from 'src/app/core/services/data.service';
 import { MatDialog }  from '@angular/material/dialog';
 import { AddModalComponent } from './add-modal/add-modal.component';
+import { AddCellRendererComponent } from './add-cell-renderer/add-cell-renderer.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { AttributeCellRendererComponent } from './attribute-cell-renderer/attribute-cell-renderer.component';
 
 @Component({
   selector: 'app-liquidity-summary',
@@ -32,6 +36,7 @@ export class LiquiditySummaryComponent implements OnInit {
   subscriptions: Subscription[] = [];
   constructor(private liquiditySummarySvc: LiquiditySummaryService,
               private dataSvc: DataService,
+              private warningMsgPopUp: MatSnackBar,
               public dialog: MatDialog) { }
 
   agGridModules: Module[] = [ClientSideRowModelModule,RowGroupingModule,SetFilterModule,ColumnsToolPanelModule,MenuModule, ExcelExportModule];
@@ -43,9 +48,10 @@ export class LiquiditySummaryComponent implements OnInit {
   fundHedgings: string[] = null;
 
   rowData = null;
+  refData = null;
 
   columnDefs: ColDef[]
-
+  context
   defaultColDef = {
     resizable: true,
     enableValue: true,
@@ -56,11 +62,29 @@ export class LiquiditySummaryComponent implements OnInit {
     autosize:true,
   }
 
+  actionClickedRowID: number = null;
   isWriteAccess: boolean = false;
 
   ngOnDestroy(){
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
+
+  setSelectedRowID(rowID: number){
+    this.actionClickedRowID = rowID;
+    if(this.actionClickedRowID === null){
+      /** 
+       *    gridOptions.api (gridApi can be null on initial load, hence adding ? to not call    stopEditing())
+       * 
+       *  If not adding ?, can give error and wouldn't call getLiquiditySummaryPivoted() in filterBtnApplyState listener
+       */
+      this.gridOptions.api?.stopEditing(true);
+    }
+  }
+
+  getSelectedRowID(){
+    return this.actionClickedRowID;
+  }
+
 
   parseFetchedSummary(summary: {date: Date, attr: string, fundHedgingAmount: { fundHedging: string, amount: number}[]}[] = null): any{
     let parsedData = []
@@ -69,6 +93,7 @@ export class LiquiditySummaryComponent implements OnInit {
       row['attr'] = summary[i]['attr'];
       row['date'] = summary[i]['date'];
       row['attrType'] = summary[i]['attrType'];
+      row['isManual'] = summary[i]['isManual']
       for(let j: number = 0; j < summary[i].fundHedgingAmount.length; j+= 1){
         let FHAmountPair = summary[i].fundHedgingAmount[j]
         row[FHAmountPair.fundHedging] = Number(FHAmountPair.amount);
@@ -81,50 +106,51 @@ export class LiquiditySummaryComponent implements OnInit {
 
   aggFuncs = {
     'Sum': (params: IAggFuncParams )=> {
-      // console.log(params)
 
       let sum: number = 0;
       let colName: string = params.column.getColId();
-
       if(params.rowNode.group){
 
         if (params.rowNode.key === 'Current Cash') {
 
-          for(let i:number = 0; i < params.values.length; i+= 1){
-            sum += params.values[i];
-          }
-        }
+          this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+            if(rowNode.data?.['attrType'] === 'Current Cash'){
+              sum += Number(rowNode.data?.[colName]);
+            }
+          })
+                }
         else if(params.rowNode.key === 'Net Cash') {
 
-          for(let i: number = 0; i < this.rowData.length; i+= 1){
-
-            if(['Current Cash', 'Net Cash'].includes(this.rowData[i].attrType))
-              sum += this.rowData[i]?.[colName];
-          }
+          this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+            if(['Current Cash', 'Net Cash'].includes(rowNode.data?.['attrType'])){
+              sum += Number(rowNode.data?.[colName]);
+            }
+          })
         }
         else if(params.rowNode.key === 'Liquidity'){
 
-          for(let i: number = 0; i < this.rowData.length; i+= 1){
-
-            if(['Current Cash', 'Net Cash', 'Liquidity'].includes(this.rowData[i].attrType))
-              sum += this.rowData[i]?.[colName];
-          }
+          this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+            if(['Current Cash', 'Net Cash', 'Liquidity'].includes(rowNode.data?.['attrType'])){
+              sum += Number(rowNode.data?.[colName]);
+            }
+          })
         }
         else if(params.rowNode.key === 'Known Outflows'){
 
-          for(let i: number = 0; i < this.rowData.length; i+= 1){
-
-            if(['Known Outflows'].includes(this.rowData[i].attrType))
-              sum += this.rowData[i]?.[colName];
-          }
+          this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+            if(['Known Outflows'].includes(rowNode.data?.['attrType'])){
+              sum += Number(rowNode.data?.[colName]);
+            }
+          })
         }
         else if(params.rowNode.key === 'Cash Post Known Outflows'){
 
-          for(let i: number = 0; i < this.rowData.length; i+= 1){
+          this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+            if(['Current Cash', 'Net Cash', 'Liquidity','Known Outflows'].includes(rowNode.data?.['attrType'])){
+              sum += Number(rowNode.data?.[colName]);
+            }
+          })
 
-            if(['Current Cash', 'Net Cash', 'Liquidity', 'Known Outflows'].includes(this.rowData[i].attrType))
-              sum += this.rowData[i]?.[colName];
-          }
         }
       }
       return sum;
@@ -137,16 +163,27 @@ export class LiquiditySummaryComponent implements OnInit {
         field: 'date',
         valueFormatter: dateFormatter,
         width: 115,
+        pinned: 'left'
       },
       {
         headerName: 'Attribute',
         field: 'attr',
         tooltipField: 'attr',
+        cellRenderer: 'attributeCellRenderer',
+        width: 216,
+        pinned: 'left'
+
       },
       {
         headerName: 'Attribute Type',
         field: 'attrType',
         rowGroup: true,
+        hide: true,
+        pinned: 'left',
+      },
+      {
+        headerName: 'Is Manual',
+        field: 'isManual',
         hide: true
       }
     ];
@@ -164,13 +201,38 @@ export class LiquiditySummaryComponent implements OnInit {
         cellClass: 'ag-right-aligned-cell',
         allowedAggFuncs: ['Sum', 'min', 'max'],
         aggFunc: 'Sum',
+        editable: (params: EditableCallbackParams) => {
+          return params.node.rowIndex === this.actionClickedRowID;
+        },  
       }
       
       this.columnDefs.push(colDef);
     }
+
+    this.columnDefs.push(
+    {  
+        field: 'action',
+        cellRenderer: 'addCellRenderer',
+        pinned: 'right',
+        width: 117
+    })
+  }
+
+  fetchLiquiditySummaryRef(){
+
+    this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryRef().subscribe({
+      next: data => {
+        this.refData = data;
+      },
+      error: error => {
+        console.log("Failed to fetch Liquidity summary Ref data: " + error);
+      }
+    }))
   }
 
   fetchLiquiditySummary(){
+
+    this.setSelectedRowID(null);
 
     if(this.asOfDate !== null)
     this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryPivoted(this.asOfDate, this.fundHedgings).subscribe({
@@ -205,16 +267,32 @@ export class LiquiditySummaryComponent implements OnInit {
       data: {
         action: actionType,
         fundHedgings: this.fundHedgings,
-        asOfDate: this.asOfDate
+        asOfDate: this.asOfDate,
+        refData: this.refData
       }
     })
 
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
-      
+      if(result.event === 'Close with success'){
+
+        // Re-fetch attributes & IDs for newly added attributes
+        this.fetchLiquiditySummaryRef();
+
+          // Refresh the grid
+        this.fetchLiquiditySummary();
+      }
     }))
   }
   
   ngOnInit(): void {
+
+    this.fetchLiquiditySummaryRef();
+
+    /** Making this component available to child components in Ag-grid */
+
+    this.context = {
+      componentParent: this
+    }
     this.gridOptions = {
       suppressAggFuncInHeader: true,
       enableRangeSelection: true,
@@ -228,12 +306,18 @@ export class LiquiditySummaryComponent implements OnInit {
 
             // Expand groups
       isGroupOpenByDefault: (params: IsGroupOpenByDefaultParams) => {
-        return params.rowNode.group && params.key !== 'Known Outflows';
+        // return params.rowNode.group && params.key !== 'Known Outflows';
+        return true;
       },
       autoGroupColumnDef: {
+        pinned: 'left',
         cellRendererParams: {
           suppressCount: true     // Disable row count on group
         }
+      },
+      frameworkComponents:{
+        addCellRenderer: AddCellRendererComponent,
+        attributeCellRenderer: AttributeCellRendererComponent
       }
     }
 
@@ -254,4 +338,10 @@ export class LiquiditySummaryComponent implements OnInit {
 
   }
 
+  setWarningMsg(message: string, action: string, type: string = 'ark-theme-snackbar-normal'){
+    this.warningMsgPopUp.open(message, action, {
+      duration: 5000,
+      panelClass: [type]
+    });
+  }
 }

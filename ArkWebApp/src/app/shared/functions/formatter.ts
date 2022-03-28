@@ -57,6 +57,6 @@ export function formatDate(inputFormat, forCompare: boolean = false) {
     function pad(s) { return (s < 10) ? '0' + s : s; }
     var d = new Date(inputFormat)
     return forCompare 
-        ? [d.getFullYear(), pad(d.getMonth()+1), pad(d.getDate())].join('/') 
-        : [pad(d.getDate()), pad(d.getMonth()+1), d.getFullYear()].join('/')
+        ? [d.getFullYear(), pad(d.getMonth()+1), pad(d.getDate())].join('/') // YYYY-MM-DD
+        : [pad(d.getDate()), pad(d.getMonth()+1), d.getFullYear()].join('/')  // DD-MM_YYYY
 }

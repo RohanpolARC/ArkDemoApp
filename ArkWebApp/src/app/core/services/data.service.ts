@@ -24,8 +24,6 @@ export class DataService {
     changeFilterApplyBtnState(isHit: boolean){
         this.filterApplyBtnHit.next(isHit);
 
-            // Set to false after action taken.
-        this.filterApplyBtnHit.next(false);
     }
 
     private searchDateMessage = new BehaviorSubject<string>(null)

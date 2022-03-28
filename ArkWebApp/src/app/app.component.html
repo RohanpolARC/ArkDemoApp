@@ -1,10 +1,8 @@
-<ng-container *ngIf="getAccessibleTabs">
-
   <mat-toolbar color="#3dc3d6">
      <button mat-icon-button class="menu-icon"  (click)="leftSIdebarOpened=!leftSIdebarOpened" aria-label="Example icon-button with menu icon">
               <mat-icon>menu</mat-icon>
             </button>
-    <div routerLink="/" (click)="leftSIdebarOpened = false; updateSelection('')">
+    <div routerLink="/" (click)="leftSIdebarOpened = false; updateSelection('')" style="cursor: pointer;">
       <img class="logo-img" src="../assets/img/arc-logo2.png" />
   
       <span>ARK</span>
@@ -160,5 +158,3 @@
   
   
   </mat-sidenav-container>
-  
-</ng-container>

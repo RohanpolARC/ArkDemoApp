@@ -14,17 +14,23 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { AddCellRendererComponent } from './add-cell-renderer/add-cell-renderer.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { AttributeCellRendererComponent } from './attribute-cell-renderer/attribute-cell-renderer.component';
 
 @NgModule({
   declarations: [
     LiquiditySummaryComponent,
     AddModalComponent,
+    AddCellRendererComponent,
+    AttributeCellRendererComponent,
   ],
   imports: [
     BrowserAnimationsModule,
     CommonModule,
     MatDialogModule,
-    AgGridModule.withComponents([]),
+    AgGridModule.withComponents([AddCellRendererComponent, AttributeCellRendererComponent]),
     MatCardModule,
     MatIconModule,
     MatButtonModule,
@@ -33,7 +39,9 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     MatFormFieldModule,
     ReactiveFormsModule,
     MatDatepickerModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatSlideToggleModule,
+    MatSnackBarModule
   ]
 })
 export class LiquiditySummaryModule { }
