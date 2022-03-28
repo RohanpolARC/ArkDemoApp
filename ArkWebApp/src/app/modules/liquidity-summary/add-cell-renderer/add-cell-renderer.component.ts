@@ -49,16 +49,16 @@ export class AddCellRendererComponent implements OnInit, ICellRendererAngularCom
   }
 
   onEditClick(){
-    this.startEditing();           // No R/W access check
+    // this.startEditing();           // No R/W access check
 
       // R/W access check
 
-    // if(this.componentParent.isWriteAccess){
-    //   this.startEditing();
-    // }
-    // else{
-    //   this.componentParent.setWarningMsg('Unauthorized', 'Dismiss', 'ark-theme-snackbar-error')   
-    // }
+    if(this.componentParent.isWriteAccess){
+      this.startEditing();
+    }
+    else{
+      this.componentParent.setWarningMsg('Unauthorized', 'Dismiss', 'ark-theme-snackbar-error')   
+    }
   }
 
   startEditing(){

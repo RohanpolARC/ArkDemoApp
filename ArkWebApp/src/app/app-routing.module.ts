@@ -1,3 +1,4 @@
+
 import { NgModule } from '@angular/core';  
 import { Routes, RouterModule } from '@angular/router';  
 import { MsalGuard } from '@azure/msal-angular'; 
@@ -65,7 +66,7 @@ const routes: Routes = [
     component: LiquiditySummaryComponent,
     canActivate: [
       MsalGuard,
-      // RoleGuard
+      RoleGuard
     ],
     data: {
       tab: 'Liquidity Summary'

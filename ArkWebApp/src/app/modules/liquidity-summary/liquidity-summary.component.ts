@@ -25,6 +25,7 @@ import { AddModalComponent } from './add-modal/add-modal.component';
 import { AddCellRendererComponent } from './add-cell-renderer/add-cell-renderer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AttributeCellRendererComponent } from './attribute-cell-renderer/attribute-cell-renderer.component';
+import { AccessService } from 'src/app/core/services/Auth/access.service';
 
 @Component({
   selector: 'app-liquidity-summary',
@@ -36,6 +37,7 @@ export class LiquiditySummaryComponent implements OnInit {
   subscriptions: Subscription[] = [];
   constructor(private liquiditySummarySvc: LiquiditySummaryService,
               private dataSvc: DataService,
+              private accessSvc: AccessService,
               private warningMsgPopUp: MatSnackBar,
               public dialog: MatDialog) { }
 
@@ -285,6 +287,14 @@ export class LiquiditySummaryComponent implements OnInit {
   }
   
   ngOnInit(): void {
+
+    this.isWriteAccess = false;
+    for(let i: number = 0; i < this.accessSvc.accessibleTabs.length; i+= 1){
+      if(this.accessSvc.accessibleTabs[i].tab === 'Liquidity Summary' && this.accessSvc.accessibleTabs[i].isWrite){
+        this.isWriteAccess = true;
+        break;
+      }        
+    }
 
     this.fetchLiquiditySummaryRef();
 
