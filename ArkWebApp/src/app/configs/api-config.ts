@@ -8,6 +8,7 @@ export class APIConfig {
     public static BASEURL: string = (/^.*localhost.*/.test(window.location.host) && window.location.port == "4200") ? "https://localhost:44366" : environment.baseUrl;
 
     public static ARKWEB_ACCESSIBLE_TABS_GET_API: string = APIConfig.BASEURL + "/api/Access/GetTabs";
+    public static GET_DETAILED_VIEW: string = APIConfig.BASEURL + "/api/General/GetDetailedView";
 
     public static PORTFOLIO_HISTORY_GET_API: string = APIConfig.BASEURL + "/api/ParGIRHistory/getdata";
     public static PORTFOLIO_HISTORY_PUT_API: string = APIConfig.BASEURL + "/api/AssetGIR/put";
@@ -26,7 +27,6 @@ export class APIConfig {
     public static CAPITAL_ACTIVITY_GET_REF_API: string = APIConfig.BASEURL + "/api/CapitalActivity/getCapitalRef";
     public static CAPITAL_ACTIVITY_LOOKUP_API: string = APIConfig.BASEURL + "/api/CapitalActivity/lookUpCapitalActivity";
     public static CAPITAL_INVESTMENT_ASSOCIATE_API: string = APIConfig.BASEURL + "/api/CapitalActivity/associateInvestment";
-
     public static CAPITAL_ACTIVITY_BULK_PUT_API: string = APIConfig.BASEURL + "/api/CapitalActivity/bulkput";
 
     public static FACILITY_DETAILS_GET_API: string = APIConfig.BASEURL + "/api/FacilityDetails/Get";

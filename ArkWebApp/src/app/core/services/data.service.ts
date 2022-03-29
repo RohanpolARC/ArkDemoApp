@@ -7,6 +7,7 @@ import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { APIConfig } from 'src/app/configs/api-config';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { DetailedView } from 'src/app/shared/models/DetailedViewModel';
 
 
 @Injectable({  
@@ -66,6 +67,11 @@ export class DataService {
     
     getFundHedgingsRef(){
         return this.http.get<any[]>(`${APIConfig.REFDATA_GET_FUNDHEDGINGS_API}`, this.httpOptions).pipe(
+            catchError((ex) => throwError(ex)));      
+    }
+
+    getDetailedView(model: DetailedView){
+        return this.http.post<any[]>(`${APIConfig.GET_DETAILED_VIEW}`, model, this.httpOptions).pipe(
             catchError((ex) => throwError(ex)));      
     }
 }    

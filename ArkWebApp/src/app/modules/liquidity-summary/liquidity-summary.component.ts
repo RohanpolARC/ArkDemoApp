@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
+  CellClickedEvent,
   ColDef,
   EditableCallbackParams,
   GridOptions,
   IAggFunc,
   IAggFuncParams,
   IsGroupOpenByDefaultParams,
+  ITooltipParams,
   Module,
 } from '@ag-grid-community/all-modules';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
@@ -26,6 +28,8 @@ import { AddCellRendererComponent } from './add-cell-renderer/add-cell-renderer.
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AttributeCellRendererComponent } from './attribute-cell-renderer/attribute-cell-renderer.component';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
+import { DetailedView } from 'src/app/shared/models/DetailedViewModel';
+import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
 
 @Component({
   selector: 'app-liquidity-summary',
@@ -200,12 +204,34 @@ export class LiquiditySummaryComponent implements OnInit {
         headerName: FH,
         valueFormatter: amountFormatter,
         width: 133,
+        cellStyle: params => {
+          if(params.data?.['attr'] === 'Cash Balance'){
+            return {
+              color: '#0590ca'
+            }
+          }
+          return null;
+        },
         cellClass: 'ag-right-aligned-cell',
         allowedAggFuncs: ['Sum', 'min', 'max'],
         aggFunc: 'Sum',
         editable: (params: EditableCallbackParams) => {
           return params.node.rowIndex === this.actionClickedRowID;
-        },  
+        },
+        /**
+         
+        https://stackoverflow.com/questions/56681444/ag-grid-using-grid-event-cellclicked-for-specific-column-cannot-access-this
+
+        onCellClicked: this.onLiquidityCellClicked, has ag grid row context as `this`. In order to access original component inside the event callback, bind it with the actual context(LiquiditySummaryComponent), i.e. bind(this);  
+
+         */
+        onCellClicked: this.onLiquidityCellClicked.bind(this),
+        tooltipValueGetter: (params: ITooltipParams) => {
+          if(params.data?.['attr'] === 'Cash Balance'){
+            return "Detailed view";
+          }
+          else return null;
+        }
       }
       
       this.columnDefs.push(colDef);
@@ -285,7 +311,33 @@ export class LiquiditySummaryComponent implements OnInit {
       }
     }))
   }
-  
+
+  onLiquidityCellClicked(event: CellClickedEvent){
+    
+    if(!['ag-Grid-AutoColumn', 'date', 'attr', 'action', 'attrType' ,'isManual'].includes(event.column.getColId()) && !this.getSelectedRowID()){
+      // Open detailed view.
+
+      let model: DetailedView = <DetailedView>{};
+
+      model.screen = 'Liquidity Summary';
+      model.param1 = event.data?.['date'];
+      model.param2 = event.data?.['attr'];
+      model.param3 = event.data?.['attrType'];
+      model.param4 = event.column.getColId();
+      model.param5 = String(event.data?.[event.column.getColId()]);
+
+      if(event.data?.['attr'] === 'Cash Balance'){
+        const dialogRef = this.dialog.open(DetailedViewComponent,{
+          data: {
+            detailedViewRequest: model
+          },
+          width: '90vw',
+          height: '80vh'
+        })
+      }  
+      }
+  }
+
   ngOnInit(): void {
 
     this.isWriteAccess = false;
@@ -304,6 +356,7 @@ export class LiquiditySummaryComponent implements OnInit {
       componentParent: this
     }
     this.gridOptions = {
+      tooltipShowDelay: 0,
       suppressAggFuncInHeader: true,
       enableRangeSelection: true,
       sideBar: true,
@@ -328,7 +381,7 @@ export class LiquiditySummaryComponent implements OnInit {
       frameworkComponents:{
         addCellRenderer: AddCellRendererComponent,
         attributeCellRenderer: AttributeCellRendererComponent
-      }
+      },
     }
 
     this.subscriptions.push(this.dataSvc.currentSearchDate.subscribe(asOfDate => {

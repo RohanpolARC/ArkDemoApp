@@ -37,6 +37,7 @@ import {HomeComponent} from '../app/home-component/home.component'
 import { FacilityDetailModule } from './modules/facility-detail/facility-detail.module';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { LiquiditySummaryModule } from './modules/liquidity-summary/liquidity-summary.module';
+import { DetailedViewComponent } from './shared/components/detailed-view/detailed-view.component';
 
 export const protectedResourceMap: any =  
   [  
@@ -46,7 +47,7 @@ export const protectedResourceMap: any =
   
 @NgModule({  
   declarations: [  
-    AppComponent, UnauthorizedComponent, HomeComponent
+    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent
   ],  
   imports: [  
     MsalModule.forRoot({  
