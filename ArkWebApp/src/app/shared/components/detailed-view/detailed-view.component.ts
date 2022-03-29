@@ -51,14 +51,6 @@ export class DetailedViewComponent implements OnInit {
     this.subscriptions.push(this.dataSvc.getDetailedView(request).subscribe({
       next: detailedData => {
         this.rowData = detailedData;
-
-        if(!!detailedData){
-          this.createColumnDefs(detailedData[0].columnValues);
-          this.rowData = this.parseFetchedData(detailedData);  
-          this.gridOptions.api.setColumnDefs(this.columnDefs);
-
-          this.gridOptions.columnApi.autoSizeAllColumns(false);
-        }
       },
       error: error => {
         console.error("Failed to fetch detailed view "+ error);
@@ -109,6 +101,14 @@ export class DetailedViewComponent implements OnInit {
 
   onGridReady(params: GridReadyEvent){
     params.api.closeToolPanel();
+
+    if(!!this.rowData){
+      this.createColumnDefs(this.rowData[0].columnValues);
+      this.rowData = this.parseFetchedData(this.rowData);  
+      this.gridOptions.api.setColumnDefs(this.columnDefs);
+
+      this.gridOptions.columnApi.autoSizeAllColumns(false);
+    }
   }
 
   onClose(){

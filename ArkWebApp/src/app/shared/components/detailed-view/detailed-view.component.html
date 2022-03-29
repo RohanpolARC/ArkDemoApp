@@ -1,7 +1,7 @@
 <h3>Detailed View</h3>
 
 <div class="content">
-    <ng-container *ngIf="rowData.length > 0">
+    <ng-container *ngIf="rowData?.length > 0">
         <ag-grid-angular
         [gridOptions]="gridOptions"
         [defaultColDef]="defaultColDef"
@@ -14,7 +14,7 @@
         </ag-grid-angular>
     </ng-container>
     
-    <p *ngIf="rowData.length === 0" class="no-content">
+    <p *ngIf="rowData?.length === 0" class="no-content">
         No detailed view
     </p>
 </div>

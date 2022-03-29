@@ -253,7 +253,7 @@ export class LiquiditySummaryComponent implements OnInit {
         this.refData = data;
       },
       error: error => {
-        console.log("Failed to fetch Liquidity summary Ref data: " + error);
+        console.error("Failed to fetch Liquidity summary Ref data: " + error);
       }
     }))
   }
