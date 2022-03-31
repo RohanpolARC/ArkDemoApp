@@ -9,7 +9,7 @@ import {
   IAggFuncParams,
   IsGroupOpenByDefaultParams,
   ITooltipParams,
-  Module,
+  Module
 } from '@ag-grid-community/all-modules';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
@@ -48,6 +48,8 @@ export class LiquiditySummaryComponent implements OnInit {
   agGridModules: Module[] = [ClientSideRowModelModule,RowGroupingModule,SetFilterModule,ColumnsToolPanelModule,MenuModule, ExcelExportModule];
 
   gridOptions: GridOptions;
+
+   
   
   /** Filter Pane fields */
   asOfDate: string = null;
@@ -66,6 +68,7 @@ export class LiquiditySummaryComponent implements OnInit {
     sortable: false,
     filter: true,
     autosize:true,
+    showOpengroup:true,
   }
 
   actionClickedRowID: number = null;
@@ -99,6 +102,7 @@ export class LiquiditySummaryComponent implements OnInit {
       row['attr'] = summary[i]['attr'];
       row['date'] = summary[i]['date'];
       row['attrType'] = summary[i]['attrType'];
+      row['subAttr'] = summary[i]['subAttr'];
       row['isManual'] = summary[i]['isManual']
       for(let j: number = 0; j < summary[i].fundHedgingAmount.length; j+= 1){
         let FHAmountPair = summary[i].fundHedgingAmount[j]
@@ -141,10 +145,18 @@ export class LiquiditySummaryComponent implements OnInit {
             }
           })
         }
-        else if(params.rowNode.key === 'Known Outflows'){
+        else if(params.rowNode.key === 'Known Outflows Unsettled'){
 
           this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
-            if(['Known Outflows'].includes(rowNode.data?.['attrType'])){
+            if(['Known Outflows Unsettled'].includes(rowNode.data?.['attrType'])){
+              sum += Number(rowNode.data?.[colName]);
+            }
+          })
+        }
+        else if(params.rowNode.key === 'Known Outflows Pipeline'){
+
+          this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+            if(['Known Outflows Pipeline'].includes(rowNode.data?.['attrType'])){
               sum += Number(rowNode.data?.[colName]);
             }
           })
@@ -152,7 +164,7 @@ export class LiquiditySummaryComponent implements OnInit {
         else if(params.rowNode.key === 'Cash Post Known Outflows'){
 
           this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
-            if(['Current Cash', 'Net Cash', 'Liquidity','Known Outflows'].includes(rowNode.data?.['attrType'])){
+            if(['Current Cash', 'Net Cash', 'Liquidity','Known Outflows Unsettled','Known Outflows Pipeline'].includes(rowNode.data?.['attrType'])){
               sum += Number(rowNode.data?.[colName]);
             }
           })
@@ -171,21 +183,37 @@ export class LiquiditySummaryComponent implements OnInit {
         width: 115,
         pinned: 'left'
       },
-      {
-        headerName: 'Attribute',
-        field: 'attr',
-        tooltipField: 'attr',
-        cellRenderer: 'attributeCellRenderer',
-        width: 216,
-        pinned: 'left'
-
-      },
+      
       {
         headerName: 'Attribute Type',
         field: 'attrType',
         rowGroup: true,
         hide: true,
         pinned: 'left',
+      },
+      {
+        headerName: 'Attribute',
+        field: 'attr',
+        tooltipField: 'attr',
+        cellRenderer: 'attributeCellRenderer',
+        width: 200,
+        pinned: 'left'
+
+      },
+      {
+        headerName: 'Attr',
+        field: 'attr',
+        tooltipField: 'attr',
+        rowGroup: true,
+        hide:true
+      },
+      {
+        headerName: 'Sub Attribute',
+        field: 'subAttr',
+        tooltipField: 'subAttr',
+        width: 200,
+        pinned: 'left'
+
       },
       {
         headerName: 'Is Manual',
@@ -366,6 +394,7 @@ export class LiquiditySummaryComponent implements OnInit {
       columnDefs: this.columnDefs,
       defaultColDef: this.defaultColDef,
       aggFuncs: this.aggFuncs,
+      
 
             // Expand groups
       isGroupOpenByDefault: (params: IsGroupOpenByDefaultParams) => {
