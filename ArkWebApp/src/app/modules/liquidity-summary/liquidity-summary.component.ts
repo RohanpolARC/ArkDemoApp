@@ -117,61 +117,67 @@ export class LiquiditySummaryComponent implements OnInit {
   aggFuncs = {
     'Sum': (params: IAggFuncParams )=> {
 
-      let sum: number = 0;
-      let colName: string = params.column.getColId();
-      if(params.rowNode.group){
-
-        if (params.rowNode.key === 'Current Cash') {
-
-          this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
-            if(rowNode.data?.['attrType'] === 'Current Cash'){
-              sum += Number(rowNode.data?.[colName]);
-            }
-          })
-                }
-        else if(params.rowNode.key === 'Net Cash') {
-
-          this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
-            if(['Current Cash', 'Net Cash'].includes(rowNode.data?.['attrType'])){
-              sum += Number(rowNode.data?.[colName]);
-            }
-          })
-        }
-        else if(params.rowNode.key === 'Liquidity'){
-
-          this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
-            if(['Current Cash', 'Net Cash', 'Liquidity'].includes(rowNode.data?.['attrType'])){
-              sum += Number(rowNode.data?.[colName]);
-            }
-          })
-        }
-        else if(params.rowNode.key === 'Known Outflows Unsettled'){
-
-          this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
-            if(['Known Outflows Unsettled'].includes(rowNode.data?.['attrType'])){
-              sum += Number(rowNode.data?.[colName]);
-            }
-          })
-        }
-        else if(params.rowNode.key === 'Known Outflows Pipeline'){
-
-          this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
-            if(['Known Outflows Pipeline'].includes(rowNode.data?.['attrType'])){
-              sum += Number(rowNode.data?.[colName]);
-            }
-          })
-        }
-        else if(params.rowNode.key === 'Cash Post Known Outflows'){
-
-          this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
-            if(['Current Cash', 'Net Cash', 'Liquidity','Known Outflows Unsettled','Known Outflows Pipeline'].includes(rowNode.data?.['attrType'])){
-              sum += Number(rowNode.data?.[colName]);
-            }
-          })
-
-        }
+      if(params.rowNode.field === 'attr'){
+        return params.values.reduce((a, b) => Number(a) + Number(b), 0);
       }
-      return sum;
+
+      if(params.rowNode.field === 'attrType'){
+        let sum: number = 0;
+        let colName: string = params.column.getColId();
+        if(params.rowNode.group){
+  
+          if (params.rowNode.key === 'Current Cash') {
+  
+            this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+              if(rowNode.data?.['attrType'] === 'Current Cash'){
+                sum += Number(rowNode.data?.[colName]);
+              }
+            })
+          }
+          else if(params.rowNode.key === 'Net Cash') {
+  
+            this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+              if(['Current Cash', 'Net Cash'].includes(rowNode.data?.['attrType'])){
+                sum += Number(rowNode.data?.[colName]);
+              }
+            })
+          }
+          else if(params.rowNode.key === 'Liquidity'){
+  
+            this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+              if(['Current Cash', 'Net Cash', 'Liquidity'].includes(rowNode.data?.['attrType'])){
+                sum += Number(rowNode.data?.[colName]);
+              }
+            })
+          }
+          else if(params.rowNode.key === 'Known Outflows Unsettled'){
+  
+            this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+              if(['Known Outflows Unsettled'].includes(rowNode.data?.['attrType'])){
+                sum += Number(rowNode.data?.[colName]);
+              }
+            })
+          }
+          else if(params.rowNode.key === 'Known Outflows Pipeline'){
+  
+            this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+              if(['Known Outflows Pipeline'].includes(rowNode.data?.['attrType'])){
+                sum += Number(rowNode.data?.[colName]);
+              }
+            })
+          }
+          else if(params.rowNode.key === 'Cash Post Known Outflows'){
+  
+            this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+              if(['Current Cash', 'Net Cash', 'Liquidity','Known Outflows Unsettled','Known Outflows Pipeline'].includes(rowNode.data?.['attrType'])){
+                sum += Number(rowNode.data?.[colName]);
+              }
+            })
+  
+          }
+        }
+        return sum;  
+      }
     }
   }
 
