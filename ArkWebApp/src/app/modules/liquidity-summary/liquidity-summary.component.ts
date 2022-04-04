@@ -240,12 +240,13 @@ export class LiquiditySummaryComponent implements OnInit {
         valueFormatter: amountFormatter,
         width: 133,
         cellStyle: params => {
-          if(params.data?.['attr'] === 'Cash Balance'){
+  
+          if(params.node.group && params.node.field === 'attr' && params.node.key === 'Cash Balance'){
             return {
               color: '#0590ca'
             }
           }
-          return null;
+            return null;
         },
         cellClass: 'ag-right-aligned-cell',
         allowedAggFuncs: ['Sum', 'min', 'max'],
@@ -348,20 +349,19 @@ export class LiquiditySummaryComponent implements OnInit {
   }
 
   onLiquidityCellClicked(event: CellClickedEvent){
-    
-    if(!['ag-Grid-AutoColumn', 'date', 'attr', 'action', 'attrType' ,'isManual'].includes(event.column.getColId()) && !this.getSelectedRowID()){
+    if(!['ag-Grid-AutoColumn', 'date', 'attr', 'action', 'attrType' ,'isManual'].includes(event.column.getColId()) && event.node.group){
       // Open detailed view.
 
       let model: DetailedView = <DetailedView>{};
 
       model.screen = 'Liquidity Summary';
-      model.param1 = event.data?.['date'];
-      model.param2 = event.data?.['attr'];
-      model.param3 = event.data?.['attrType'];
-      model.param4 = event.column.getColId();
-      model.param5 = String(event.data?.[event.column.getColId()]);
+      model.param1 = this.asOfDate;           //date
+      model.param2 = (event.node.field === 'attr') ? event.node.key : null ;    //attribute
+      model.param3 = (event.node.parent.field === 'attrType') ? event.node.parent.key : null  //level
+      model.param4 = event.column.getColId();   //fund Hedging
+      model.param5 = String(event.node.aggData?.[event.column.getColId()]);   //amount
 
-      if(event.data?.['attr'] === 'Cash Balance'){
+      if(event.node.field === 'attr' && event.node.parent.field === 'attrType' && event.node.key === 'Cash Balance'){
         const dialogRef = this.dialog.open(DetailedViewComponent,{
           data: {
             detailedViewRequest: model

@@ -61,27 +61,34 @@ export class AttributeGroupRendererComponent implements ICellRendererAngularComp
 
     if(this.isManual){
 
-      const dialogRef = this.dialog.open(AddModalComponent,{
-        data: {
-          action: actionType,
-          fundHedgings: this.componentParent.fundHedgings,
-          asOfDate: formatDate(this.rowRef.entryDate, true),   // Convert to 'YYYY-MM-DD' string
-          refData: this.componentParent.refData,
-              // Passing only when editing
-          rowRef: this.rowRef     
-        }
-      })  
+      if(this.componentParent.isWriteAccess){
 
-      this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
-        if(result.event === 'Close with success'){
+        const dialogRef = this.dialog.open(AddModalComponent,{
+          data: {
+            action: actionType,
+            fundHedgings: this.componentParent.fundHedgings,
+            asOfDate: formatDate(this.rowRef.entryDate, true),   // Convert to 'YYYY-MM-DD' string
+            refData: this.componentParent.refData,
+                // Passing only when editing
+            rowRef: this.rowRef     
+          }
+        })  
   
-          // Re-fetch attributes & IDs for newly added attributes
-          this.componentParent.fetchLiquiditySummaryRef();
+        this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
+          if(result.event === 'Close with success'){
+    
+            // Re-fetch attributes & IDs for newly added attributes
+            this.componentParent.fetchLiquiditySummaryRef();
+    
+              // Refresh the grid
+            this.componentParent.fetchLiquiditySummary();
+          }
+        }))
   
-            // Refresh the grid
-          this.componentParent.fetchLiquiditySummary();
-        }
-      }))
+      }
+      else {
+        this.componentParent.setWarningMsg('Unauthorized', 'Dismiss', 'ark-theme-snackbar-error')   
+      }
     }
   }
 
