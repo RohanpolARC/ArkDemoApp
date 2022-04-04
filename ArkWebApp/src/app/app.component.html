@@ -38,19 +38,19 @@
         </mat-expansion-panel-header>
   
         <mat-list>
-          <mat-list-item routerLink="/liquidity-summary" (click)= "leftSIdebarOpened = false; updateSelection('Liquidity Summary');" [ngStyle]="LiquiditySummaryStyle">
+          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Liquidity Summary');" [ngStyle]="LiquiditySummaryStyle">
             <div class="list-item-text"> Liquidity Summary </div>
             </mat-list-item>
           </mat-list>
 
         <mat-list>
-          <mat-list-item routerLink="/cash-balance" (click)= "leftSIdebarOpened = false; updateSelection('Cash Balance');" [ngStyle]="CashBalanceStyle">
+          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Cash Balance');" [ngStyle]="CashBalanceStyle">
             <div class="list-item-text"> Cash Balance </div>
             </mat-list-item>
           </mat-list>
   
         <mat-list>
-          <mat-list-item routerLink="/capital-activity" (click)= "leftSIdebarOpened = false; updateSelection('Capital Activity');" [ngStyle]="CapitalActivityStyle">
+          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Capital Activity');" [ngStyle]="CapitalActivityStyle">
             <div class="list-item-text">Capital Activity</div>
           </mat-list-item>
         </mat-list>
@@ -67,13 +67,13 @@
         </mat-expansion-panel-header>
   
         <mat-list>
-          <mat-list-item routerLink="/portfolio-history" (click)= "leftSIdebarOpened = false; updateSelection('Portfolio')" [ngStyle]="GIREditorStyle">
+          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Portfolio')" [ngStyle]="GIREditorStyle">
             <div class="list-item-text">Going In Rates Editor</div>
           </mat-list-item>
         </mat-list>
   
         <mat-list>
-          <mat-list-item routerLink="/facility-detail" (click)= "leftSIdebarOpened = false; updateSelection('Facility Detail')" [ngStyle]="FacilityDetailStyle">
+          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Facility Detail')" [ngStyle]="FacilityDetailStyle">
             <div class="list-item-text">Asset Browser</div>
           </mat-list-item>
         </mat-list>

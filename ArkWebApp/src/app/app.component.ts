@@ -98,15 +98,17 @@ getLastBusinessDay(){
 }
 
   fetchTabs(){
-    this.subscriptions.push(this.accessService.getTabs().subscribe({
-      next: tabs => {
-        this.accessService.accessibleTabs = tabs;
-        this.router.navigate([this.lastClickedTabRoute]);
-      },
-      error: error => {
-        console.error("Failed to fetch accessible tabs " + error);
-      }
-    }))
+    if(!this.accessService.accessibleTabs){
+      this.subscriptions.push(this.accessService.getTabs().subscribe({
+        next: tabs => {
+          this.accessService.accessibleTabs = tabs;
+          this.router.navigate([this.lastClickedTabRoute]);
+        },
+        error: error => {
+          console.error("Failed to fetch accessible tabs " + error);
+        }
+      }))  
+    }    
   }
 
   lastClickedTabRoute: string = '/accessibility';
@@ -131,8 +133,14 @@ getLastBusinessDay(){
   fetchFundHedgingsRef(){
     this.subscriptions.push(this.dataService.getFundHedgingsRef().subscribe({
       next: fundHedgings => {
-        this.dropdownData = this.selectedDropdownData = fundHedgings;
+        this.dropdownData = fundHedgings;
 
+        this.selectedDropdownData = [];
+        for(let i: number = 0; i < fundHedgings.length; i+= 1){
+          if(String(fundHedgings[i]['fundHedging']).toUpperCase().includes('DL3')){
+            this.selectedDropdownData.push(fundHedgings[i]);
+          }
+        } 
                   // Apply on load
       this.filterApply();
 
@@ -225,11 +233,16 @@ getLastBusinessDay(){
     this.filterPane.AsOfDate = false;
     this.filterPane.TextValueSelect = false;
 
+    this.dataService.changeSearchDate(null);
+    this.dataService.changeSearchDateRange(null);
+    this.dataService.changeSearchTextValues(null);
+    
     this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.notSelectedElement;
     this.lastClickedTabRoute = this.location.path();
 
     if(screen === 'Portfolio'){
       this.GIREditorStyle = this.selectedElement;
+      this.router.navigate(['/portfolio-history']);
     }
     else if(screen === 'Cash Balance'){
       this.filterPane.AsOfDateRange = true;
@@ -244,9 +257,11 @@ getLastBusinessDay(){
       })
       this.getSearchDateRange();
       this.CashBalanceStyle = this.selectedElement;
+      this.router.navigate(['/cash-balance']);
     }
     else if(screen === 'Capital Activity'){
       this.CapitalActivityStyle = this.selectedElement;
+      this.router.navigate(['/capital-activity']);
     }
     else if(screen === 'Facility Detail'){
       this.filterPane.AsOfDate = true;
@@ -270,6 +285,7 @@ getLastBusinessDay(){
         allowSearchFilter: true,
         
       };
+      this.router.navigate(['/facility-detail']);
 
     }
     else if(screen === 'Liquidity Summary'){
@@ -304,7 +320,7 @@ getLastBusinessDay(){
         allowSearchFilter: true,
         
       };
-
+      this.router.navigate(['/liquidity-summary'])
     }
   }
 

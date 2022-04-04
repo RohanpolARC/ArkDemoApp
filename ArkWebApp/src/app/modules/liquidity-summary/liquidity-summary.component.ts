@@ -298,26 +298,32 @@ export class LiquiditySummaryComponent implements OnInit {
 
     this.setSelectedRowID(null);
 
-    if(this.asOfDate !== null)
-    this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryPivoted(this.asOfDate, this.fundHedgings).subscribe({
-      next: summary => {
+    if(this.asOfDate !== null){
 
-        if(summary.length > 0){
-          this.createColumnDefs(summary[0]);
-          this.rowData = this.parseFetchedSummary(summary);  
-
-          this.gridOptions.api.setColumnDefs(this.columnDefs);
+      this.gridOptions.api.showLoadingOverlay();
+      this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryPivoted(this.asOfDate, this.fundHedgings).subscribe({
+        next: summary => {
+  
+          this.gridOptions.api.showNoRowsOverlay();
+          if(summary.length > 0){
+            this.createColumnDefs(summary[0]);
+            this.rowData = this.parseFetchedSummary(summary);  
+  
+            this.gridOptions.api.setColumnDefs(this.columnDefs);
+          }
+          else{
+            this.createColumnDefs();
+            this.rowData = null;
+          }
+          
+        },
+        error: error => {
+          this.gridOptions.api.showNoRowsOverlay();
+          console.error("Error in fetching liquidity summary" + error);
+          this.rowData = [];
         }
-        else{
-          this.createColumnDefs();
-          this.rowData = null;
-        }
-        
-      },
-      error: error => {
-        console.error("Error in fetching liquidity summary" + error);
-      }
-    }));
+      }));  
+    }
     else
       console.warn("Component loaded without setting date in filter pane");
   }

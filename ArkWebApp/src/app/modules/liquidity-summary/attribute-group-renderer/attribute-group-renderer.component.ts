@@ -29,7 +29,6 @@ export class AttributeGroupRendererComponent implements ICellRendererAngularComp
   ) { }
 
   agInit(params: ICellRendererParams): void {
-    // console.log(params)
     this.params = params;
     this.componentParent = params.context.componentParent;
     this.rowRef = this.setRowRef(params, this.componentParent.refData);

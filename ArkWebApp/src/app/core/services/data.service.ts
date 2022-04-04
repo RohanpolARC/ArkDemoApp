@@ -20,7 +20,7 @@ export class DataService {
         })  
     };  
   
-    private filterApplyBtnHit = new BehaviorSubject<boolean>(null);
+    private filterApplyBtnHit = new BehaviorSubject<boolean>(false);
     filterApplyBtnState = this.filterApplyBtnHit.asObservable();
     changeFilterApplyBtnState(isHit: boolean){
         this.filterApplyBtnHit.next(isHit);
