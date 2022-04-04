@@ -103,7 +103,8 @@ export class AddCellRendererComponent implements OnInit, ICellRendererAngularCom
 
     for(let i = 0; i < this.componentParent.fundHedgings.length; i+= 1){
       if(Number(data?.[this.componentParent.fundHedgings[i]]) !== Number(this.originalRowNodeData?.[this.componentParent.fundHedgings[i]]))
-        FH_Amt_str += this.componentParent.fundHedgings[i] + '|' + String(data?.[this.componentParent.fundHedgings[i]]) + ',';
+        FH_Amt_str += this.componentParent.fundHedgings[i] + '|' + 
+        (!!String(data?.[this.componentParent.fundHedgings[i]]) ? String(data?.[this.componentParent.fundHedgings[i]]) : 0) + ',';
     }
     FH_Amt_str = FH_Amt_str.slice(0, -1)    // Remove last comma
 

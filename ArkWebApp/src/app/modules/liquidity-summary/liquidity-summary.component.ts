@@ -26,10 +26,10 @@ import { MatDialog }  from '@angular/material/dialog';
 import { AddModalComponent } from './add-modal/add-modal.component';
 import { AddCellRendererComponent } from './add-cell-renderer/add-cell-renderer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { AttributeCellRendererComponent } from './attribute-cell-renderer/attribute-cell-renderer.component';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DetailedView } from 'src/app/shared/models/DetailedViewModel';
 import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
+import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
 
 @Component({
   selector: 'app-liquidity-summary',
@@ -193,6 +193,7 @@ export class LiquiditySummaryComponent implements OnInit {
       {
         headerName: 'Attribute Type',
         field: 'attrType',
+        tooltipField: 'attrType',
         rowGroup: true,
         hide: true,
         pinned: 'left',
@@ -201,17 +202,17 @@ export class LiquiditySummaryComponent implements OnInit {
         headerName: 'Attribute',
         field: 'attr',
         tooltipField: 'attr',
-        cellRenderer: 'attributeCellRenderer',
+        cellRenderer: 'agGroupCellRenderer',
+        cellRendererParams: {
+          suppressCount: true,
+          innerRenderer: 'attributeGroupRenderer',
+          suppressDoubleClickExpand: true,
+        },
         width: 200,
-        pinned: 'left'
-
-      },
-      {
-        headerName: 'Attr',
-        field: 'attr',
-        tooltipField: 'attr',
+        pinned: 'left',
         rowGroup: true,
-        hide:true
+        hide: true
+
       },
       {
         headerName: 'Sub Attribute',
@@ -405,7 +406,10 @@ export class LiquiditySummaryComponent implements OnInit {
             // Expand groups
       isGroupOpenByDefault: (params: IsGroupOpenByDefaultParams) => {
         // return params.rowNode.group && params.key !== 'Known Outflows';
-        return true;
+        if(params.field === 'attrType')
+          return true;
+          
+        return false;
       },
       autoGroupColumnDef: {
         pinned: 'left',
@@ -415,8 +419,9 @@ export class LiquiditySummaryComponent implements OnInit {
       },
       frameworkComponents:{
         addCellRenderer: AddCellRendererComponent,
-        attributeCellRenderer: AttributeCellRendererComponent
+        attributeGroupRenderer: AttributeGroupRendererComponent
       },
+      groupMultiAutoColumn: true
     }
 
     this.subscriptions.push(this.dataSvc.currentSearchDate.subscribe(asOfDate => {

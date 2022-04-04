@@ -9,11 +9,11 @@ import { LiquiditySummaryAttributeModel } from 'src/app/shared/models/LiquidityS
 import { formatDate } from 'src/app/shared/functions/formatter';
 
 @Component({
-  selector: 'app-attribute-cell-renderer',
-  templateUrl: './attribute-cell-renderer.component.html',
-  styleUrls: ['./attribute-cell-renderer.component.scss']
+  selector: 'app-attribute-group-renderer',
+  templateUrl: './attribute-group-renderer.component.html',
+  styleUrls: ['./attribute-group-renderer.component.scss']
 })
-export class AttributeCellRendererComponent implements OnInit, ICellRendererAngularComp {
+export class AttributeGroupRendererComponent implements ICellRendererAngularComp, OnInit {
 
   subscriptions: Subscription[] = []
   params: ICellRendererParams
@@ -24,35 +24,37 @@ export class AttributeCellRendererComponent implements OnInit, ICellRendererAngu
   attribute: string;
   rowRef: LiquiditySummaryAttributeModel;     // Holds reference data for the row.
 
-  constructor(
+  constructor(    
     public dialog: MatDialog
   ) { }
 
+  agInit(params: ICellRendererParams): void {
+    // console.log(params)
+    this.params = params;
+    this.componentParent = params.context.componentParent;
+    this.rowRef = this.setRowRef(params, this.componentParent.refData);
+  }
+  refresh(params: ICellRendererParams): boolean {
+    return true;  
+  }
+
   setRowRef(params: ICellRendererParams, refData: any): LiquiditySummaryAttributeModel{
     let rowRef = <LiquiditySummaryAttributeModel>{};
-    rowRef.attribute = params.data?.['attr'];
-    rowRef.level = params.data?.['attrType'];
+    rowRef.attribute = params.value;
+    rowRef.level = params.node.childrenAfterFilter[0]?.data?.['attrType']
 
     for(let i: number = 0; i < refData.length; i+= 1){
-      if(refData[i].attribute === params.data?.['attr'] && refData[i].level === params.data?.['attrType']){
+      if(refData[i].attribute === rowRef.attribute && refData[i].level === rowRef.level){
         rowRef.id = refData[i].id;
         rowRef.isRelative = refData[i].isRelative;
         rowRef.entryDate = (rowRef.isRelative) ? null : refData[i].entryDate;
         rowRef.relativeDays = (rowRef.isRelative) ? refData[i].relativeDays : null;
+
+        this.isManual = refData[i].isManual;
+        break;
       }
     }
     return rowRef;
-  }
-
-  agInit(params: ICellRendererParams): void {
-    this.params = params;  
-    this.componentParent = params.context.componentParent;
-    this.rowRef = this.setRowRef(params, this.componentParent.refData);
-    this.isManual = params.data?.['isManual'];
-  }
-
-  refresh(params: ICellRendererParams): boolean {
-    return true;
   }
 
   openDialog(actionType: string = 'EDIT'): void {

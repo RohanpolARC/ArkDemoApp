@@ -17,20 +17,20 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { AddCellRendererComponent } from './add-cell-renderer/add-cell-renderer.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { AttributeCellRendererComponent } from './attribute-cell-renderer/attribute-cell-renderer.component';
+import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
 
 @NgModule({
   declarations: [
     LiquiditySummaryComponent,
     AddModalComponent,
     AddCellRendererComponent,
-    AttributeCellRendererComponent,
+    AttributeGroupRendererComponent,
   ],
   imports: [
     BrowserAnimationsModule,
     CommonModule,
     MatDialogModule,
-    AgGridModule.withComponents([AddCellRendererComponent, AttributeCellRendererComponent]),
+    AgGridModule.withComponents([AddCellRendererComponent, AttributeGroupRendererComponent]),
     MatCardModule,
     MatIconModule,
     MatButtonModule,

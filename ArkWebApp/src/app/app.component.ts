@@ -97,9 +97,16 @@ getLastBusinessDay(){
   return workday.subtract(diff, 'days').toDate();
 }
 
-  async fetchTabs(){
-    this.accessService.accessibleTabs = await this.accessService.getTabs();
-    this.router.navigate([this.lastClickedTabRoute]);
+  fetchTabs(){
+    this.subscriptions.push(this.accessService.getTabs().subscribe({
+      next: tabs => {
+        this.accessService.accessibleTabs = tabs;
+        this.router.navigate([this.lastClickedTabRoute]);
+      },
+      error: error => {
+        console.error("Failed to fetch accessible tabs " + error);
+      }
+    }))
   }
 
   lastClickedTabRoute: string = '/accessibility';

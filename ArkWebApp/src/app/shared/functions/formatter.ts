@@ -15,7 +15,7 @@ export function dateTimeFormatter(params) {
 
 export function amountFormatter(params){
     
-    if(params.value!=undefined && Number(params.value)!=0){
+    if(params.value!=undefined && Number(Number(params.value).toFixed(2))!=0    ){
         if(Number.isInteger(Number(Number(params.value).toFixed(2)))){         // Don't show trailing 0's if number rounded off to 2 decimals is an integer
             return Number(params.value).toLocaleString(undefined,{
                 minimumFractionDigits: 0,
@@ -29,7 +29,7 @@ export function amountFormatter(params){
             });    
         }
     }
-    else if(Number(params.value)==0) {
+    else if(Number(Number(params.value).toFixed(2))==0) {
         return "-"
     } else{
         return ""
