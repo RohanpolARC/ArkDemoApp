@@ -5,7 +5,6 @@ import {
   ColDef,
   EditableCallbackParams,
   GridOptions,
-  IAggFunc,
   IAggFuncParams,
   IsGroupOpenByDefaultParams,
   ITooltipParams,
@@ -18,7 +17,7 @@ import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
 import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
 import { ExcelExportModule } from '@ag-grid-enterprise/excel-export';
 
-import { dateFormatter, amountFormatter, dateTimeFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, noDecimalAmountFormatter } from 'src/app/shared/functions/formatter';
 import { Subscription } from 'rxjs';
 import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/liquidity-summary.service';
 import { DataService } from 'src/app/core/services/data.service';
@@ -237,7 +236,7 @@ export class LiquiditySummaryComponent implements OnInit {
       let colDef: ColDef = {
         field: FH,
         headerName: FH,
-        valueFormatter: amountFormatter,
+        valueFormatter: noDecimalAmountFormatter,
         width: 133,
         cellStyle: params => {
   
@@ -263,7 +262,7 @@ export class LiquiditySummaryComponent implements OnInit {
          */
         onCellClicked: this.onLiquidityCellClicked.bind(this),
         tooltipValueGetter: (params: ITooltipParams) => {
-          if(params.data?.['attr'] === 'Cash Balance'){
+          if(params.node.group && params.node.field === 'attr' && params.node.key === 'Cash Balance'){
             return "Detailed view";
           }
           else return null;
@@ -297,7 +296,6 @@ export class LiquiditySummaryComponent implements OnInit {
   fetchLiquiditySummary(){
 
     this.setSelectedRowID(null);
-
     if(this.asOfDate !== null){
 
       this.gridOptions.api.showLoadingOverlay();
@@ -313,7 +311,7 @@ export class LiquiditySummaryComponent implements OnInit {
           }
           else{
             this.createColumnDefs();
-            this.rowData = null;
+            this.rowData = [];
           }
           
         },

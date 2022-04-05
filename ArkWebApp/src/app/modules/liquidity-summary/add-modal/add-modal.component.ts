@@ -72,7 +72,17 @@ export class AddModalComponent implements OnInit {
     let Att:boolean = false;
 
     if(this.data.action === 'EDIT'){
-      Att = !!attribute;
+      if(!!attribute){
+        if(attribute === this.data.rowRef.attribute)
+          Att = true;
+        else if(this.isNewAttribute(this.data.refData, attribute, level))
+          Att = true
+        else{
+           Att = false
+           this.liquidityForm.get('attribute').setErrors({invalid: true})
+        }
+      }
+      else Att = false
     }
     else if(this.data.action === 'ADD'){
       Att = !!attribute && this.isNewAttribute(this.data.refData, attribute, level);
@@ -99,32 +109,6 @@ export class AddModalComponent implements OnInit {
         this.disableSubmit = true;
       }
     }));
-
-    this.subscriptions.push(this.liquidityForm.get('attribute').valueChanges.subscribe(attribute => {
-      if(!!attribute){
-
-        let level: string = this.liquidityForm.get('level').value;
-        if(!this.isNewAttribute(this.data.refData, attribute, level)){
-
-          this.liquidityForm.get('attribute').setErrors({invalid: true})
-        }
-      }
-    }))
-
-
-    // this.subscriptions.push(this.liquidityForm.get('days').valueChanges.subscribe(days => {
-    //   /*
-    //   Adding days to date in JS.
-    //     https://stackoverflow.com/a/19691491/17121446      
-    //   */
-    //   let dt = new Date(this.asOfDate);
-    //   dt.setDate(dt.getDate() + (parseInt(days) >= 0 ? parseInt(days) : 0))
-
-    //   this.liquidityForm.patchValue({
-    //     date: dt
-    //   })
-
-    // }))
 
     this.levelFilteredOptions = this.liquidityForm.get('level').valueChanges.pipe(
       startWith(''),
@@ -189,8 +173,8 @@ export class AddModalComponent implements OnInit {
     this.liquidityForm = new FormGroup({
       date: new FormControl(new Date(this.asOfDate), Validators.required),
       days: new FormControl(0, Validators.required),
-      level: new FormControl(this.data.level, Validators.required),
-      attribute: new FormControl(this.data.attribute, Validators.required),
+      level: new FormControl(null, Validators.required),
+      attribute: new FormControl(null, Validators.required),
       isRelative: new FormControl(false, Validators.required)
     },{
       validators: this.liquidityValidator

@@ -154,6 +154,7 @@ export class AddCellRendererComponent implements OnInit, ICellRendererAngularCom
       columns: this.componentParent.fundHedgings,
       rowNodes: [this.params.api.getRowNode(this.params.node.id)]
     });
+    this.params.api.recomputeAggregates();
 
   }
 

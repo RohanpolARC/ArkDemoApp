@@ -36,6 +36,21 @@ export function amountFormatter(params){
     }
 }
 
+export function noDecimalAmountFormatter(params){
+    
+    if(params.value!=undefined && Number(Number(params.value).toFixed(0))!=0){
+        return Number(params.value).toLocaleString(undefined,{
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        })
+    }
+    else if(Number(Number(params.value).toFixed(0))==0) {
+        return "-"
+    } else{
+        return ""
+    }
+}
+
 export function nullOrZeroFormatter(params){
     if(params.value == null || Number(params.value) == 0)
         return "";
