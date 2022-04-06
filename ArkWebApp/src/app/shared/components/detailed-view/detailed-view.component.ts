@@ -1,10 +1,10 @@
-import { ClientSideRowModelModule, ColDef, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/all-modules';
+import { ClientSideRowModelModule, ColDef, GridOptions, GridReadyEvent, Module, ValueFormatterParams } from '@ag-grid-community/all-modules';
 import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule } from '@ag-grid-enterprise/all-modules';
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
-import { amountFormatter, dateFormatter } from '../../functions/formatter';
+import { amountFormatter, dateFormatter, dateTimeFormatter } from '../../functions/formatter';
 import { DetailedView } from '../../models/DetailedViewModel';
 
 @Component({
@@ -66,16 +66,31 @@ export class DetailedViewComponent implements OnInit {
       let col: string = row[i].column;
       let colDef: ColDef = {
         field: col,
+        tooltipField: col,
+        valueFormatter: (params: ValueFormatterParams) => {
+          if(!params.value)
+            return ""
+          return String(params.value)
+        }
       }
       if(col.toLowerCase().includes('date')){
         colDef = {
           field: col,
+          tooltipField: col,
           valueFormatter: dateFormatter
+        }
+      }
+      else if(['createdon','created on','modified on', 'modifiedon'].includes(col.toLowerCase())){
+        colDef = {
+          field: col,
+          tooltipField: col,
+          valueFormatter: dateTimeFormatter
         }
       }
       else if(!isNaN(parseFloat(row[i].value))){
         colDef = {
           field: col,
+          tooltipField: col,
           valueFormatter: amountFormatter
         }
       }
@@ -89,13 +104,16 @@ export class DetailedViewComponent implements OnInit {
     this.fetchDetailedView(this.request);
 
     this.defaultColDef = {
+      resizable: true,
       enableValue: true,
-      enableRowGroup: true      
+      enableRowGroup: true,
+      sortable: true,
+      filter: true,
     }
     this.gridOptions = {
       columnDefs: this.columnDefs,
       defaultColDef: this.defaultColDef,
-      
+      tooltipShowDelay: 0
     }
   }
 

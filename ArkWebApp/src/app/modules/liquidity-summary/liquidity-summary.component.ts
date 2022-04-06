@@ -186,7 +186,8 @@ export class LiquiditySummaryComponent implements OnInit {
         field: 'date',
         valueFormatter: dateFormatter,
         width: 115,
-        pinned: 'left'
+        pinned: 'left',
+        sortable: true
       },
       
       {
@@ -239,8 +240,8 @@ export class LiquiditySummaryComponent implements OnInit {
         valueFormatter: noDecimalAmountFormatter,
         width: 133,
         cellStyle: params => {
-  
-          if(params.node.group && params.node.field === 'attr' && params.node.key === 'Cash Balance'){
+
+          if(params.node.group && params.node.field === 'attr' && !params.node.allLeafChildren[0].data?.['isManual'] && !(params.node.key === 'Cash Post Known Outflows')){
             return {
               color: '#0590ca'
             }
@@ -262,7 +263,7 @@ export class LiquiditySummaryComponent implements OnInit {
          */
         onCellClicked: this.onLiquidityCellClicked.bind(this),
         tooltipValueGetter: (params: ITooltipParams) => {
-          if(params.node.group && params.node.field === 'attr' && params.node.key === 'Cash Balance'){
+          if(params.node.group && params.node.field === 'attr' && !params.node.allLeafChildren[0].data?.['isManual']){
             return "Detailed view";
           }
           else return null;
@@ -308,6 +309,17 @@ export class LiquiditySummaryComponent implements OnInit {
             this.rowData = this.parseFetchedSummary(summary);  
   
             this.gridOptions.api.setColumnDefs(this.columnDefs);
+
+            this.gridOptions.columnApi.applyColumnState(
+              {
+                state: [
+                  {
+                  colId: 'date',
+                  sort: 'asc'
+                  }
+                ]
+              }
+            )
           }
           else{
             this.createColumnDefs();
@@ -353,7 +365,7 @@ export class LiquiditySummaryComponent implements OnInit {
   }
 
   onLiquidityCellClicked(event: CellClickedEvent){
-    if(!['ag-Grid-AutoColumn', 'date', 'attr', 'action', 'attrType' ,'isManual'].includes(event.column.getColId()) && event.node.group){
+    if(!['ag-Grid-AutoColumn', 'date', 'attr', 'action', 'attrType' ,'isManual'].includes(event.column.getColId()) && event.node.group && !(event.node.key === 'Cash Post Known Outflows')){
       // Open detailed view.
 
       let model: DetailedView = <DetailedView>{};
@@ -365,7 +377,7 @@ export class LiquiditySummaryComponent implements OnInit {
       model.param4 = event.column.getColId();   //fund Hedging
       model.param5 = String(event.node.aggData?.[event.column.getColId()]);   //amount
 
-      if(event.node.field === 'attr' && event.node.parent.field === 'attrType' && event.node.key === 'Cash Balance'){
+      if(event.node.field === 'attr' && event.node.parent.field === 'attrType' && !event.node.allLeafChildren[0].data?.['isManual']){
         const dialogRef = this.dialog.open(DetailedViewComponent,{
           data: {
             detailedViewRequest: model
