@@ -100,8 +100,6 @@ export class AppComponent {
   }
 
   fetchTabs(){
-    console.log("Called fetch tabs")
-    console.log(this.accessService.accessibleTabs)
     if(!this.accessService.accessibleTabs){
       this.subscriptions.push(this.accessService.getTabs().subscribe({
         next: tabs => {
@@ -178,7 +176,6 @@ export class AppComponent {
   }
 
   ngOnInit(): void { 
-    console.log("App component ngOnInit() called")
     this.lastClickedTabRoute = this.location.path();
     this.fetchTabs();
     this.userName=this.dataService.getCurrentUserName();
@@ -206,7 +203,6 @@ export class AppComponent {
     }
     else this.updateSelection('')
 
-    console.log("EO ngoninit")
   }  
 
   logout(){  
