@@ -29,23 +29,26 @@ export class DataService {
 
     private searchDateMessage = new BehaviorSubject<string>(null)
     currentSearchDate = this.searchDateMessage.asObservable();
-    
     changeSearchDate(asOfDate: string){
         this.searchDateMessage.next(asOfDate);
     }
 
     private searchDateRangeMessage = new BehaviorSubject<any>(null);
     currentSearchDateRange = this.searchDateRangeMessage.asObservable();
-
     changeSearchDateRange(range: AsOfDateRange){
         this.searchDateRangeMessage.next(range);
     }
 
     private searchTextValuesMessage = new BehaviorSubject<any>(null)
     currentSearchTextValues = this.searchTextValuesMessage.asObservable();
-
     changeSearchTextValues(values: string[]){
         this.searchTextValuesMessage.next(values);
+    }
+
+    private numberFieldMessage = new BehaviorSubject<number>(null)
+    currentNumberField = this.numberFieldMessage.asObservable();
+    changeNumberField(value: number){
+        this.numberFieldMessage.next(value);
     }
 
     constructor(private http: HttpClient, private msalService: MsalUserService  

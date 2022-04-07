@@ -33,7 +33,8 @@ export class AppComponent {
   filterPane:FilterPane = {
     AsOfDateRange: false,
     AsOfDate: false,
-    TextValueSelect: false
+    TextValueSelect: false,
+    NumberField: false
   };
 
   searchDateRange = new FormGroup({
@@ -43,6 +44,7 @@ export class AppComponent {
 
   range:AsOfDateRange = null;
   asOfDate: string = null;
+  numberField: number = null;
 
   multiSelectPlaceHolder: string = null;
   dropdownSettings: IDropdownSettings = null;
@@ -83,21 +85,23 @@ export class AppComponent {
     private facilityDetailSvc: FacilityDetailService
   ) {}   
 
-get getAccessibleTabs(){
-  return this.accessService.accessibleTabs;
-}
-
-getLastBusinessDay(){
-  let workday = moment();
-  let day = workday.day();
-  let diff = 1;  // returns yesterday
-  if (day == 0 || day == 1){  // is Sunday or Monday
-    diff = day + 2;  // returns Friday
+  get getAccessibleTabs(){
+    return this.accessService.accessibleTabs;
   }
-  return workday.subtract(diff, 'days').toDate();
-}
+
+  getLastBusinessDay(){
+    let workday = moment();
+    let day = workday.day();
+    let diff = 1;  // returns yesterday
+    if (day == 0 || day == 1){  // is Sunday or Monday
+      diff = day + 2;  // returns Friday
+    }
+    return workday.subtract(diff, 'days').toDate();
+  }
 
   fetchTabs(){
+    console.log("Called fetch tabs")
+    console.log(this.accessService.accessibleTabs)
     if(!this.accessService.accessibleTabs){
       this.subscriptions.push(this.accessService.getTabs().subscribe({
         next: tabs => {
@@ -166,6 +170,7 @@ getLastBusinessDay(){
       this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
       this.dataService.changeSearchDate(this.asOfDate);
       this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['fundHedging']))
+      this.dataService.changeNumberField(this.numberField)
       this.dataService.changeFilterApplyBtnState(true);
     }
 
@@ -173,6 +178,7 @@ getLastBusinessDay(){
   }
 
   ngOnInit(): void { 
+    console.log("App component ngOnInit() called")
     this.lastClickedTabRoute = this.location.path();
     this.fetchTabs();
     this.userName=this.dataService.getCurrentUserName();
@@ -199,6 +205,8 @@ getLastBusinessDay(){
       this.updateSelection('Liquidity Summary')
     }
     else this.updateSelection('')
+
+    console.log("EO ngoninit")
   }  
 
   logout(){  
@@ -232,10 +240,12 @@ getLastBusinessDay(){
     this.filterPane.AsOfDateRange = false;
     this.filterPane.AsOfDate = false;
     this.filterPane.TextValueSelect = false;
+    this.filterPane.NumberField = false;
 
     this.dataService.changeSearchDate(null);
     this.dataService.changeSearchDateRange(null);
     this.dataService.changeSearchTextValues(null);
+    this.dataService.changeNumberField(null);
     
     this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.notSelectedElement;
     this.lastClickedTabRoute = this.location.path();
@@ -292,23 +302,15 @@ getLastBusinessDay(){
 
       this.filterPane.AsOfDate = true;
       this.filterPane.TextValueSelect = true;
+      this.filterPane.NumberField = true;
 
       this.LiquiditySummaryStyle = this.selectedElement;
 
       this.multiSelectPlaceHolder = 'Select FundHedging(s)';
       this.asOfDate = moment(this.getLastBusinessDay()).format('YYYY-MM-DD')
+      this.numberField = 10;
 
       this.fetchFundHedgingsRef();
-
-      this.range = {
-        start: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
-        end: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
-      }
-
-      this.searchDateRange.setValue({
-        start: this.range.start,
-        end: this.range.end,
-      })
 
       this.dropdownSettings = {
         singleSelection: false,

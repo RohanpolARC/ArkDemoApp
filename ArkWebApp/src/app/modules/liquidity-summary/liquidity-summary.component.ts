@@ -53,6 +53,7 @@ export class LiquiditySummaryComponent implements OnInit {
   /** Filter Pane fields */
   asOfDate: string = null;
   fundHedgings: string[] = null;
+  days: number = null;
 
   rowData = null;
   refData = null;
@@ -219,8 +220,7 @@ export class LiquiditySummaryComponent implements OnInit {
         field: 'subAttr',
         tooltipField: 'subAttr',
         width: 200,
-        pinned: 'left'
-
+        hide: true
       },
       {
         headerName: 'Is Manual',
@@ -300,7 +300,7 @@ export class LiquiditySummaryComponent implements OnInit {
     if(this.asOfDate !== null){
 
       this.gridOptions.api.showLoadingOverlay();
-      this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryPivoted(this.asOfDate, this.fundHedgings).subscribe({
+      this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryPivoted(this.asOfDate, this.fundHedgings, this.days).subscribe({
         next: summary => {
   
           this.gridOptions.api.showNoRowsOverlay();
@@ -447,6 +447,10 @@ export class LiquiditySummaryComponent implements OnInit {
 
     this.subscriptions.push(this.dataSvc.currentSearchTextValues.subscribe(fundHedgings => {
       this.fundHedgings = fundHedgings;
+    }))
+
+    this.subscriptions.push(this.dataSvc.currentNumberField.subscribe(days => {
+      this.days = days;
     }))
 
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {

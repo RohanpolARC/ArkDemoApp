@@ -119,6 +119,17 @@
 
     </ng-container>
 
+    <ng-container *ngIf="filterPane.NumberField">
+
+      <div class="filter-options">
+        <mat-form-field appearance="outline">
+          <mat-label>Days</mat-label>
+          <input type="number" autocomplete="off" matInput [(ngModel)]="numberField">
+        </mat-form-field>
+      </div>
+
+    </ng-container>
+
   <div *ngIf="filterPane.AsOfDateRange">
     <div class="form-input">
   

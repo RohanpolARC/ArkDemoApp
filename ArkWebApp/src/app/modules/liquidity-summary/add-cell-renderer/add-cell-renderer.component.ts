@@ -139,6 +139,7 @@ export class AddCellRendererComponent implements OnInit, ICellRendererAngularCom
       },
       error: error => {
         this.componentParent.setWarningMsg(`Failed to update`, 'Dismiss', 'ark-theme-snackbar-error'); 
+
       }
     }))
 

@@ -21,9 +21,9 @@ export class LiquiditySummaryService {
   constructor(private http: HttpClient,
               private msalService: MsalUserService) { }
 
-    public getLiquiditySummaryPivoted(requestedDate: string, fundHedgings?: string[]){
+    public getLiquiditySummaryPivoted(requestedDate: string, fundHedgings: string[], days: number){
 
-      return this.http.get<any[]>(`${APIConfig.LIQUIDITY_SUMMARY_PIVOTED_GET_API}/?searchDate=${requestedDate}&fundHedgings=${fundHedgings}`, this.httpOptions).pipe(
+      return this.http.get<any[]>(`${APIConfig.LIQUIDITY_SUMMARY_PIVOTED_GET_API}/?searchDate=${requestedDate}&fundHedgings=${fundHedgings}&days=${days}`, this.httpOptions).pipe(
         catchError((ex) => throwError(ex))
       )
     }
