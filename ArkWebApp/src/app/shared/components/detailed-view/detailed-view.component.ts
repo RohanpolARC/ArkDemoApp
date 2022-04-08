@@ -74,25 +74,16 @@ export class DetailedViewComponent implements OnInit {
         }
       }
       if(col.toLowerCase().includes('date')){
-        colDef = {
-          field: col,
-          tooltipField: col,
-          valueFormatter: dateFormatter
-        }
+        colDef.valueFormatter = dateFormatter
       }
       else if(['createdon','created on','modified on', 'modifiedon'].includes(col.toLowerCase())){
-        colDef = {
-          field: col,
-          tooltipField: col,
-          valueFormatter: dateTimeFormatter
-        }
+        colDef.valueFormatter = dateTimeFormatter
+      }
+      else if(['account', 'accountid', 'account id'].includes(col.toLocaleLowerCase())){
+        continue; // Skipping amountFormatter
       }
       else if(!isNaN(parseFloat(row[i].value))){
-        colDef = {
-          field: col,
-          tooltipField: col,
-          valueFormatter: amountFormatter
-        }
+        colDef.valueFormatter = amountFormatter
       }
 
       this.columnDefs.push(colDef);
@@ -123,9 +114,9 @@ export class DetailedViewComponent implements OnInit {
     if(!!this.rowData){
       this.createColumnDefs(this.rowData[0].columnValues);
       this.rowData = this.parseFetchedData(this.rowData);  
-      this.gridOptions.api.setColumnDefs(this.columnDefs);
+      params.api.setColumnDefs(this.columnDefs);
 
-      this.gridOptions.columnApi.autoSizeAllColumns(false);
+      params.columnApi.autoSizeAllColumns(false);
     }
   }
 

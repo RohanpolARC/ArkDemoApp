@@ -270,6 +270,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     }
   ) {
     this.adapTableApi = adaptableApi;
+    adaptableApi.columnApi.autosizeAllColumns()
     adaptableApi.eventApi.on('SelectionChanged', selection => {
       // do stuff
     });

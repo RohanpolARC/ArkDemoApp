@@ -418,7 +418,9 @@ export class CapitalActivityComponent implements OnInit {
         refData: this.refData,
         gridData: gridData
       },
-      minWidth: (actionType === 'LINK-ADD') ? '1500px' : '830px',
+      // minWidth: (actionType === 'LINK-ADD') ? '1500px' : '830px',
+      width: '90vw',
+      maxWidth: '2000px',
       // width: '95vw',
       maxHeight: '99vh'
     });

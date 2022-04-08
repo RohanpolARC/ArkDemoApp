@@ -13,9 +13,8 @@
          <!-- Don't add any dynamic content here. It introduces scrollbar as it overshoots mat-dialog-content size. -->
 <form [formGroup]="capitalActivityForm" autocomplete="off" (ngSubmit)="onSubmit()">
 
-<mat-dialog-content class="main-content">   
   <div class="input-field">
-    <div [ngStyle]="data.actionType === 'LINK-ADD' ? {'margin-right' : '325px'} : {'margin-right' : '0px'}">
+    <div>
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Call Date</mat-label>
         <input matInput formControlName="callDate" [matDatepicker]="callDatePicker" required />
@@ -84,7 +83,7 @@
 
     </div>
 
-    <div [ngStyle]="data.actionType === 'LINK-ADD' ? {'margin-right' : '325px'} : {'margin-right' : '0px'}">
+    <div>
       <mat-form-field appearance="outline" class="edit">
         <mat-label>Value Date</mat-label>
         <input matInput required formControlName="valueDate" [matDatepicker]="valueDatePicker" />
@@ -226,13 +225,13 @@
         <ng-container *ngIf="gridData.length > 0">
             <ag-grid-angular style="height: 200px; margin-top: 5px;"
                 [rowData]="gridData"
-                [columnDefs]="linkColumnDefs"
+                [gridOptions]="gridOptions"
                 class="ag-theme-alpine"
+                (gridReady)="onGridReady($event)"
             ></ag-grid-angular>
         </ng-container>
   </ng-container>
 
-</mat-dialog-content>
 </form>
 
 <ng-container *ngIf="data.actionType === 'LINK-ADD'">

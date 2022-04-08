@@ -10,7 +10,7 @@ import { UpdateConfirmComponent } from '../update-confirm/update-confirm.compone
 import {Observable} from 'rxjs';
 import {startWith, map} from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { ColDef } from '@ag-grid-community/core';
+import { ColDef, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 
 import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
 import { LinkInvestorModalComponent } from '../link-investor-modal/link-investor-modal.component';
@@ -419,15 +419,36 @@ export class AddCapitalModalComponent implements OnInit{
     )
   }
 
-  linkColumnDefs: ColDef[] = [
-    {field: 'positionID', headerName: 'Position ID'},
-    {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'positionCcy', headerName: 'Position Ccy'},
-    {field: 'portfolio', headerName: 'Portfolio'},
-    {field: 'issuerShortName', headerName: 'Issuer'},
-    {field: 'asset', headerName: 'Asset'},
+  columnDefs: ColDef[] = [
+    {field: 'positionID', headerName: 'Position ID', tooltipField: 'positionID'},
+    {field: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter, tooltipField: 'cashDate'},
+    {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'amount'},
+    {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'totalBase'},
+    {field: 'positionCcy', headerName: 'Position Ccy', tooltipField: 'positionCcy'},
+    {field: 'portfolio', headerName: 'Portfolio', tooltipField: 'portfolio'},
+    {field: 'issuerShortName', headerName: 'Issuer', tooltipField: 'issuerShortName'},
+    {field: 'asset', headerName: 'Asset', tooltipField: 'asset'},
   ]
+
+  defaultColDef = {
+    resizable: true,
+    enableValue: true,
+    enableRowGroup: true,
+    enablePivot: false,
+    sortable: false,
+    filter: true,
+    autosize:true
+  }
+
+  gridOptions: GridOptions = {
+    tooltipShowDelay: 0,
+    columnDefs: this.columnDefs,
+    defaultColDef: this.defaultColDef
+  }
+
+  onGridReady(params: GridReadyEvent){
+    params.columnApi.autoSizeAllColumns(false)
+  }
 
   ngOnInit(): void {
     this.setDynamicOptions();

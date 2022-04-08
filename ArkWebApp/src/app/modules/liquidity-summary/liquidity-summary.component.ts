@@ -220,7 +220,7 @@ export class LiquiditySummaryComponent implements OnInit {
         field: 'subAttr',
         tooltipField: 'subAttr',
         width: 200,
-        hide: true
+        pinned: 'left'
       },
       {
         headerName: 'Is Manual',
@@ -375,7 +375,7 @@ export class LiquiditySummaryComponent implements OnInit {
       model.param2 = (event.node.field === 'attr') ? event.node.key : null ;    //attribute
       model.param3 = (event.node.parent.field === 'attrType') ? event.node.parent.key : null  //level
       model.param4 = event.column.getColId();   //fund Hedging
-      model.param5 = String(event.node.aggData?.[event.column.getColId()]);   //amount
+      model.param5 = String(this.days);   //days
 
       if(event.node.field === 'attr' && event.node.parent.field === 'attrType' && !event.node.allLeafChildren[0].data?.['isManual']){
         const dialogRef = this.dialog.open(DetailedViewComponent,{
