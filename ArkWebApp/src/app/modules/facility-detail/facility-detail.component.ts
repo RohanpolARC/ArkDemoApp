@@ -283,9 +283,10 @@ export class FacilityDetailComponent implements OnInit {
         this.setSelectedRowID(null);
 
         if(this.funds != null && this.asOfDate != null){
+          this.gridOptions.api.showLoadingOverlay();
           this.subscriptions.push(this.facilityDetailsService.getFacilityDetails(this.funds, this.asOfDate).subscribe({
             next: data => {
-  
+              this.gridOptions.api.hideOverlay();
               for(let i: number = 0; i < data?.length; i+= 1){
                 data[i].expectedDate = formatDate(data[i]?.expectedDate)
                 if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].expectedDate)){
@@ -301,6 +302,7 @@ export class FacilityDetailComponent implements OnInit {
               this.rowData = data;
             },
             error: error => {
+              this.gridOptions.api.showNoRowsOverlay();
               this.rowData = null;
             }
           }))          

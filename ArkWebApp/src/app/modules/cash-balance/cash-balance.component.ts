@@ -130,7 +130,10 @@ export class CashBalanceComponent implements OnInit {
       Dashboard: {
         ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
         IsCollapsed: true,
-        Tabs: [],
+        Tabs: [{
+          Name:'Layout',
+          Toolbars: ['Layout']
+        }],
       },
       Layout: {
         CurrentLayout: 'Basic Cash Flow',

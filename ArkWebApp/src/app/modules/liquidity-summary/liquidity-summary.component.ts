@@ -188,7 +188,8 @@ export class LiquiditySummaryComponent implements OnInit {
         valueFormatter: dateFormatter,
         width: 115,
         pinned: 'left',
-        sortable: true
+        sortable: true,
+      
       },
       
       {
@@ -232,6 +233,8 @@ export class LiquiditySummaryComponent implements OnInit {
     if(!row)
       return;
 
+    let FHColDefs = [];
+
     for(let i:number = 0; i < row.fundHedgingAmount.length; i+= 1){
       let FH: string = row.fundHedgingAmount[i].fundHedging;
       let colDef: ColDef = {
@@ -270,8 +273,20 @@ export class LiquiditySummaryComponent implements OnInit {
         }
       }
       
-      this.columnDefs.push(colDef);
+      FHColDefs.push(colDef);
     }
+
+    FHColDefs.sort((a,b) => {
+      let FH_1: string = a['field'];
+      let FH_2: string = b['field'];
+      if(FH_1 < FH_2)
+          return -1;
+      else if(FH_1 > FH_2)
+          return 1;
+      else return 0;
+    })
+
+    FHColDefs.forEach(fhColDef => this.columnDefs.push(fhColDef));
 
     this.columnDefs.push(
     {  
@@ -303,11 +318,11 @@ export class LiquiditySummaryComponent implements OnInit {
       this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryPivoted(this.asOfDate, this.fundHedgings, this.days).subscribe({
         next: summary => {
   
-          this.gridOptions.api.showNoRowsOverlay();
+          this.gridOptions.api.hideOverlay();
+          
           if(summary.length > 0){
             this.createColumnDefs(summary[0]);
-            this.rowData = this.parseFetchedSummary(summary);  
-  
+            this.rowData = this.parseFetchedSummary(summary); 
             this.gridOptions.api.setColumnDefs(this.columnDefs);
 
             this.gridOptions.columnApi.applyColumnState(
@@ -322,6 +337,7 @@ export class LiquiditySummaryComponent implements OnInit {
             )
           }
           else{
+            this.gridOptions.api.showNoRowsOverlay();
             this.createColumnDefs();
             this.rowData = [];
           }
@@ -455,6 +471,9 @@ export class LiquiditySummaryComponent implements OnInit {
 
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if(isHit){
+        this.columnDefs = null;
+          /** Removes previous column order state, else new order of columnDefs is not persisted. (e.g. Sorting of FH columns))  */
+        this.gridOptions.api.setColumnDefs(null)
         this.fetchLiquiditySummary();
       }
     }))

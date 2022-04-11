@@ -238,7 +238,10 @@ export class CapitalActivityComponent implements OnInit {
         Dashboard: {
           ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
           IsCollapsed: true,
-          Tabs: [],
+          Tabs: [{
+            Name:'Layout',
+            Toolbars: ['Layout']
+          }],  
           IsHidden: false
         },
         Layout: {
@@ -337,7 +340,10 @@ export class CapitalActivityComponent implements OnInit {
         Dashboard: {
           ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
           IsCollapsed: true,
-          Tabs: [],
+          Tabs: [{
+            Name:'Layout',
+            Toolbars: ['Layout']
+          }],
           IsHidden: false
         },
         Layout: {

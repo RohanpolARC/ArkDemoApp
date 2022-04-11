@@ -231,7 +231,10 @@ export class PortfolioHistoryComponent implements OnInit {
       Dashboard: {
         ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
         IsCollapsed: true,
-        Tabs: [],
+        Tabs: [{
+          Name:'Layout',
+          Toolbars: ['Layout']
+        }]
       },
       Filter:{
         ColumnFilters: [{
