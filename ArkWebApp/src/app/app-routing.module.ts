@@ -10,6 +10,7 @@ import { UnauthorizedComponent } from './shared/components/unauthorized/unauthor
 import { HomeComponent } from './home-component/home.component';
 import { FacilityDetailComponent } from './modules/facility-detail/facility-detail.component';
 import { LiquiditySummaryComponent } from './modules/liquidity-summary/liquidity-summary.component';
+import { RoleTabAssociationEditorComponent } from './shared/components/role-tab-association-editor/role-tab-association-editor.component';
   
   
 const routes: Routes = [
@@ -70,6 +71,16 @@ const routes: Routes = [
     ],
     data: {
       tab: 'Liquidity Summary'
+    }
+  },
+  {
+    path: 'access-editor',
+    component: RoleTabAssociationEditorComponent,
+    canActivate: [
+      MsalGuard
+    ],
+    data: {
+      tab: 'Access Editor'
     }
   },
   { path: 'accessibility', 

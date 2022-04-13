@@ -28,4 +28,8 @@ export class AccessService {
 
     return this.http.get<any[]>(`${APIConfig.ARKWEB_ACCESSIBLE_TABS_GET_API}/?userRole=${userRole}`, this.httpOptions);
   }
+
+  public getRolesTabs(){
+    return this.http.get<any[]>(`${APIConfig.ARKWEB_TABROLE_ASSOCIATION_GET_API}`, this.httpOptions);
+  }
 }

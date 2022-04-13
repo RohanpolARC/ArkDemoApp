@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from './core/services/FacilityDetails/facility-detail.service';
+import { RoleTabAssociationEditorComponent } from '../app/shared/components/role-tab-association-editor/role-tab-association-editor.component'
 
 @Component({  
   selector: 'app-root',  
@@ -74,6 +75,7 @@ export class AppComponent {
   CapitalActivityStyle: any = {};
   FacilityDetailStyle: any = {};
   LiquiditySummaryStyle: any = {};
+  AccessEditorStyle: any = {};
 
   constructor(private http: HttpClient,
     private dataService: DataService,
@@ -173,6 +175,10 @@ export class AppComponent {
     }
 
     this.rightSidebarOpened = false
+  }
+
+  openDialog(){
+    const dialogRef = this.dialog.open(RoleTabAssociationEditorComponent)
   }
 
   ngOnInit(): void { 
@@ -319,6 +325,10 @@ export class AppComponent {
         
       };
       this.router.navigate(['/liquidity-summary'])
+    }
+    else if(screen === 'Access Editor'){
+      this.AccessEditorStyle = this.selectedElement;
+      this.router.navigate(['/access-editor'])
     }
   }
 
