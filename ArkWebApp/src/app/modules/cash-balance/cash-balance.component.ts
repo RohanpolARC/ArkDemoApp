@@ -114,26 +114,65 @@ export class CashBalanceComponent implements OnInit {
   ngOnDestroy(): void{
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
+  
+  async getSharedEntities(adaptableId){
+    return new Promise(resolve => {
+      this.subscriptions.push(this.dataService.getAdaptableState(adaptableId).subscribe({
+        next: state => {
+          try {
+
+            state = state.split('|').join('"')
+            resolve(JSON.parse(state) ||'[]')
+          } catch (e) {
+            console.log("Failed to parse")
+            resolve([])
+          }
+        }
+      }));
+    })
+  }
+
+  async setSharedEntities(adaptableId, sharedEntities): Promise<void>{
+
+    return new Promise(resolve => {
+      this.subscriptions.push(
+        this.dataService.saveAdaptableState(adaptableId, JSON.stringify(sharedEntities).replace(/"/g,'|')).subscribe({
+        next: data => {
+          console.log("Saved sharedEntities");
+          resolve();
+        }
+      }));
+    })
+  }
+
 
   public adaptableOptions: AdaptableOptions = {
    autogeneratePrimaryKey: true,
     primaryKey:'',
-    userName: 'TestUser',
-    adaptableId: "",
+    userName: this.dataService.getCurrentUserName(),
+    adaptableId: "Cash Balance",
     adaptableStateKey: `Cash Balance Key`,
-
+    
     toolPanelOptions: {
       toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
     },
 
+    teamSharingOptions: {
+      enableTeamSharing: true,
+      setSharedEntities: this.setSharedEntities.bind(this),
+      getSharedEntities: this.getSharedEntities.bind(this)
+
+    },
+
     predefinedConfig: {
       Dashboard: {
-        ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
+        ModuleButtons: ['TeamSharing','Export', 'Layout','ConditionalStyle'],
         IsCollapsed: true,
         Tabs: [{
           Name:'Layout',
           Toolbars: ['Layout']
         }],
+        DashboardTitle: ' '
       },
       Layout: {
         CurrentLayout: 'Basic Cash Flow',

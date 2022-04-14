@@ -15,9 +15,8 @@ export class APIConfig {
     public static PORTFOLIO_HISTORY_BULK_PUT_API: string = APIConfig.BASEURL + "/api/AssetGIR/putbulk";
     public static PORTFOLIO_HISTORY_DELETE_API: string = APIConfig.BASEURL + "/api/AssetGIR/delete";
 
-    public static SAVE_LAYOUT_API: string = APIConfig.BASEURL + "/api/Layout/save";
-    public static GET_LAYOUT_API: string = APIConfig.BASEURL + "/api/layout/get";
-    public static DELETE_LAYOUT_API: string = APIConfig.BASEURL + "/api/layout/delete";
+    public static SAVE_ADAPTABLE_STATE_API: string = APIConfig.BASEURL + "/api/General/SaveAdaptableState";
+    public static GET_ADAPTABLE_STATE_API: string = APIConfig.BASEURL + "/api/General/GetAdaptableState";
 
     public static CASH_BALANCE_GET_API: string = APIConfig.BASEURL + "/api/CashBalance/GetData";
 

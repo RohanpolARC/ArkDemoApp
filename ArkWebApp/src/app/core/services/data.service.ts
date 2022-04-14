@@ -77,4 +77,16 @@ export class DataService {
         return this.http.post<any[]>(`${APIConfig.GET_DETAILED_VIEW}`, model, this.httpOptions).pipe(
             catchError((ex) => throwError(ex)));      
     }
-}    
+
+    saveAdaptableState(adaptableID: string, state: string){
+        return this.http.post<any[]>(`${APIConfig.SAVE_ADAPTABLE_STATE_API}`, {'adaptableID': adaptableID, 'adaptableState': state}, this.httpOptions).pipe(
+            catchError((ex) => throwError(ex))
+        );
+    }
+
+    getAdaptableState(adaptableID: string){
+        return this.http.get<string>(`${APIConfig.GET_ADAPTABLE_STATE_API}/?adaptableID=${adaptableID}`, this.httpOptions).pipe(
+            catchError((ex) => throwError(ex))
+        );
+    }
+}
