@@ -31,6 +31,7 @@ import { getNodes, validateLinkSelect }from './utilities/functions';
 import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
 
 import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
+import { DataService } from 'src/app/core/services/data.service';
 
 @Component({
   selector: 'app-capital-activity',
@@ -114,7 +115,9 @@ export class CapitalActivityComponent implements OnInit {
   adapTableApiInvstmnt: AdaptableApi;
   adaptableOptionsInvstmnt: AdaptableOptions;
 
-  constructor(public dialog:MatDialog, private capitalActivityService: CapitalActivityService) { 
+  constructor(public dialog:MatDialog, 
+    private capitalActivityService: CapitalActivityService,
+    private dataService: DataService) { 
   }
 
 
@@ -167,6 +170,35 @@ export class CapitalActivityComponent implements OnInit {
     }));
   }
 
+  async getSharedEntities(adaptableId){
+    return new Promise(resolve => {
+      this.subscriptions.push(this.dataService.getAdaptableState(adaptableId).subscribe({
+        next: state => {
+          try {
+
+            state = state.split('|').join('"')
+            resolve(JSON.parse(state) ||'[]')
+          } catch (e) {
+            console.log("Failed to parse")
+            resolve([])
+          }
+        }
+      }));
+    })
+  }
+
+  async setSharedEntities(adaptableId, sharedEntities): Promise<void>{
+
+    return new Promise(resolve => {
+      this.subscriptions.push(
+        this.dataService.saveAdaptableState(adaptableId, JSON.stringify(sharedEntities).replace(/"/g,'|')).subscribe({
+        next: data => {
+          resolve();
+        }
+      }));
+    })
+  }
+
   ngOnInit(): void {
     this.gridOptions = {
       enableRangeSelection: false,
@@ -189,12 +221,19 @@ export class CapitalActivityComponent implements OnInit {
 
     this.adaptableOptions = {
       primaryKey: 'capitalID',
-      userName: 'TestUser',
-      adaptableId: '',
+      userName: this.dataService.getCurrentUserName(),
+      adaptableId: 'Capital Activity - Investor Cashflows',
       adaptableStateKey: `Capital Activity Key`,
       
       layoutOptions: {
         autoSaveLayouts: false
+      },
+  
+      teamSharingOptions: {
+        enableTeamSharing: true,
+        setSharedEntities: this.setSharedEntities.bind(this),
+        getSharedEntities: this.getSharedEntities.bind(this)
+  
       },
   
       toolPanelOptions: {
@@ -236,13 +275,14 @@ export class CapitalActivityComponent implements OnInit {
   
       predefinedConfig: {
         Dashboard: {
-          ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
+          ModuleButtons: ['TeamSharing','Export', 'Layout','ConditionalStyle'],
           IsCollapsed: true,
           Tabs: [{
             Name:'Layout',
             Toolbars: ['Layout']
           }],  
-          IsHidden: false
+          IsHidden: false,
+          DashboardTitle: ' '
         },
         Layout: {
           CurrentLayout: 'Basic Capital Activity',
@@ -287,8 +327,8 @@ export class CapitalActivityComponent implements OnInit {
     this.adaptableOptionsInvstmnt = {
       primaryKey: '',
       autogeneratePrimaryKey: true,
-      userName: 'TestUser',
-      adaptableId: '',
+      userName: this.dataService.getCurrentUserName(),
+      adaptableId: 'Capital Activity - Investment Cashflows',
       adaptableStateKey: `Investment CashFlow Key`,
       
       layoutOptions: {
@@ -299,6 +339,13 @@ export class CapitalActivityComponent implements OnInit {
         toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
       },
 
+      teamSharingOptions: {
+        enableTeamSharing: true,
+        setSharedEntities: this.setSharedEntities.bind(this),
+        getSharedEntities: this.getSharedEntities.bind(this)
+  
+      },
+  
       userInterfaceOptions: {
         actionColumns: [
           {
@@ -338,13 +385,14 @@ export class CapitalActivityComponent implements OnInit {
   
       predefinedConfig: {
         Dashboard: {
-          ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
+          ModuleButtons: ['TeamSharing', 'Export', 'Layout','ConditionalStyle'],
           IsCollapsed: true,
           Tabs: [{
             Name:'Layout',
             Toolbars: ['Layout']
           }],
-          IsHidden: false
+          IsHidden: false,
+          DashboardTitle: ' '
         },
         Layout: {
           Layouts:[{

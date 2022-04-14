@@ -79,7 +79,7 @@ export class DataService {
     }
 
     saveAdaptableState(adaptableID: string, state: string){
-        return this.http.post<any[]>(`${APIConfig.SAVE_ADAPTABLE_STATE_API}`, {'adaptableID': adaptableID, 'adaptableState': state}, this.httpOptions).pipe(
+        return this.http.post<any[]>(`${APIConfig.SAVE_ADAPTABLE_STATE_API}`, {'adaptableID': adaptableID, 'adaptableState': state, 'username': this.getCurrentUserName()}, this.httpOptions).pipe(
             catchError((ex) => throwError(ex))
         );
     }

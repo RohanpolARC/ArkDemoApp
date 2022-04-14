@@ -33,6 +33,7 @@ import {
 import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 
 import { validateColumns, validateExcelRows } from './validation';
+import { DataService } from 'src/app/core/services/data.service';
 
 @Component({
   selector: 'app-bulk-upload',
@@ -96,7 +97,7 @@ export class BulkUploadComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialog: MatDialog,
     private capitalActivityService: CapitalActivityService, 
-    private msalService: MsalUserService,
+    private dataService: DataService,
     private httpClient: HttpClient) { }
 
   columnDefs: ColDef[] = [
@@ -194,7 +195,7 @@ export class BulkUploadComponent implements OnInit {
     model.wsoAssetID = Number(obj['Wso Asset ID']);
     model.posCcy = obj['Position Currency'];
     model.fxRate = Number(obj['GIR (Pos - Fund ccy)']);
-    model.createdBy = model.modifiedBy = this.msalService.getUserName();
+    model.createdBy = model.modifiedBy = this.dataService.getCurrentUserName();
     model.createdOn = model.modifiedOn = new Date();
     model.source = 'ArkUI - template';
     model.sourceID = 3;
@@ -222,23 +223,59 @@ export class BulkUploadComponent implements OnInit {
     this.disableSubmit = true;
   }
 
+  async getSharedEntities(adaptableId){
+    return new Promise(resolve => {
+      this.subscriptions.push(this.dataService.getAdaptableState(adaptableId).subscribe({
+        next: state => {
+          try {
+
+            state = state.split('|').join('"')
+            resolve(JSON.parse(state) ||'[]')
+          } catch (e) {
+            console.log("Failed to parse")
+            resolve([])
+          }
+        }
+      }));
+    })
+  }
+
+  async setSharedEntities(adaptableId, sharedEntities): Promise<void>{
+
+    return new Promise(resolve => {
+      this.subscriptions.push(
+        this.dataService.saveAdaptableState(adaptableId, JSON.stringify(sharedEntities).replace(/"/g,'|')).subscribe({
+        next: data => {
+          resolve();
+        }
+      }));
+    })
+  }
+
   public adaptableOptions: AdaptableOptions = {
     autogeneratePrimaryKey: true,
      primaryKey:'',
-     userName: 'TestUser',
-     adaptableId: "",
-     adaptableStateKey: `Bulk Update Key`,
+     userName: this.dataService.getCurrentUserName(),
+     adaptableId: "Capital Activity - Bulk Upload",
+     adaptableStateKey: `Bulk Upload Key`,
  
      toolPanelOptions: {
        toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
      },
      
+     teamSharingOptions: {
+      enableTeamSharing: true,
+      setSharedEntities: this.setSharedEntities.bind(this),
+      getSharedEntities: this.getSharedEntities.bind(this)
+
+    },
 
      predefinedConfig: {
        Dashboard: {
-         ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
+         ModuleButtons: ['TeamSharing', 'Export', 'Layout','ConditionalStyle'],
          IsCollapsed: true,
          Tabs: [],
+         DashboardTitle: ' '
        },
        FormatColumn: {
         FormatColumns: [

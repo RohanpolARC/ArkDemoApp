@@ -138,7 +138,6 @@ export class CashBalanceComponent implements OnInit {
       this.subscriptions.push(
         this.dataService.saveAdaptableState(adaptableId, JSON.stringify(sharedEntities).replace(/"/g,'|')).subscribe({
         next: data => {
-          console.log("Saved sharedEntities");
           resolve();
         }
       }));
