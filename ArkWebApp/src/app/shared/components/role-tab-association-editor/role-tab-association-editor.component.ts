@@ -3,6 +3,9 @@ import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { FormBuilder } from '@angular/forms';
+import { PutAccessModel } from '../../models/GeneralModel';
+import { DataService } from 'src/app/core/services/data.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-role-tab-association-editor',
@@ -15,34 +18,25 @@ export class RoleTabAssociationEditorComponent implements OnInit {
   allRoles
   subscriptions: Subscription[] = []
   tabRoles
-  selectedTabs = new FormControl();
-  selectedRoles: FormGroup;
-
   originalAssociation;
-  tabRoleForm;
+  tabRoleForm: FormArray;
   form: FormGroup;
-
-  data = [
-    {
-      tab: 'Going in Rates Editor',
-      'Finance.Read': 0,
-      'Finance.Write': 1,
-      'Operation.Read': 0,
-      'Operation.Write': 1
-    },
-    {
-      tab: 'Cash Balance',
-      'Finance.Read': 1,
-      'Finance.Write': 0,
-      'Operation.Read': 1,
-      'Operation.Write': 0
-    }
-  ]
+  isFormReady: boolean = false;
+  data
 
   constructor(
     private accessService: AccessService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private dataService: DataService,
+    private warningMsgPopUp: MatSnackBar
   ) { }
+
+  setWarningMsg(message: string, action: string, type: string = 'ark-theme-snackbar-normal'){
+    this.warningMsgPopUp.open(message, action, {
+      duration: 5000,
+      panelClass: [type]
+    });
+  }
 
   parseFetchedAssociation(data: {
     tabID: number,
@@ -87,31 +81,12 @@ export class RoleTabAssociationEditorComponent implements OnInit {
         })
             // To send only the changed associations.
         this.originalAssociation = this.form.value?.['association'];    
+        this.isFormReady = true;
       },
       error: error => {
         console.error("Failed to fetch accessible tabs " + error);
       }
     }))  
-  }
-
-  onTabSelect(event){
-    let tab = this.selectedTabs.value[0];
-    let associatedRoles = []
-    for(let i = 0; i < this.tabRoles.length; i++){
-      if(tab === this.tabRoles[i].tab){
-        associatedRoles.push(this.tabRoles[i].role);
-      }
-    }
-
-    let formObj = {}
-    for(let i =0; i < this.allRoles.length; i+= 1){
-      if(associatedRoles.includes(this.allRoles[i])){
-        formObj[this.allRoles[i]] = true;
-      }
-      else formObj[this.allRoles[i]] = false;
-    }
-
-    this.formBuilder.group(formObj);
   }
 
   buildFormArray(row: {}): FormArray {
@@ -124,13 +99,6 @@ export class RoleTabAssociationEditorComponent implements OnInit {
     }
     return obj;
   }
-
-/**
- *      Role ->
- *  Tab
-*    |
-*    v
- */
 
   ngOnInit(): void {
 
@@ -145,17 +113,30 @@ export class RoleTabAssociationEditorComponent implements OnInit {
     let mat: boolean[][];
     mat = this.form.value?.['association'];
 
-    let res = [];
+    let associations: string = '';
     for(let i = 0; i < mat.length; i+= 1){
       for(let j = 0; j < mat[i].length; j+= 1){
         if(mat[i][j] !== this.originalAssociation[i][j]){
-          res.push({
-            tab: this.allTabs[i],
-            role: this.allRoles[j],
-            associated: mat[i][j]
-          })
+          
+          associations += this.allTabs[i] + '|' + this.allRoles[j] + ':' + (mat[i][j] ? '1' : '0') + ','
         }
       }
     }
+    associations = associations.slice(0, -1);
+    let model: PutAccessModel = <PutAccessModel>{};
+    model.associations = associations;
+    model.username = this.dataService.getCurrentUserName();
+
+    this.subscriptions.push(this.accessService.putAssociations(model).subscribe({
+      next: result => {
+        if(result.isSuccess){
+          this.setWarningMsg("Successfully updated access", "Dismiss", "ark-theme-snackbar-success")
+        }
+      },
+      error: error => {
+        this.setWarningMsg("Failed to update access", "Dismiss", "ark-theme-snackbar-error")
+        console.error("Failed to update associations");
+      }
+    }))
   }
 }

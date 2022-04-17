@@ -9,17 +9,14 @@ export class APIConfig {
 
     public static ARKWEB_ACCESSIBLE_TABS_GET_API: string = APIConfig.BASEURL + "/api/Access/GetTabs";
     public static ARKWEB_TABROLE_ASSOCIATION_GET_API: string = APIConfig.BASEURL + "/api/Access/GetRoleTabAssociation";
-    
+    public static ARKWEB_PUTASSOCIATIONS_API: string = APIConfig.BASEURL + "/api/Access/PutAssociations";
+
     public static GET_DETAILED_VIEW: string = APIConfig.BASEURL + "/api/General/GetDetailedView";
 
     public static PORTFOLIO_HISTORY_GET_API: string = APIConfig.BASEURL + "/api/ParGIRHistory/getdata";
     public static PORTFOLIO_HISTORY_PUT_API: string = APIConfig.BASEURL + "/api/AssetGIR/put";
     public static PORTFOLIO_HISTORY_BULK_PUT_API: string = APIConfig.BASEURL + "/api/AssetGIR/putbulk";
     public static PORTFOLIO_HISTORY_DELETE_API: string = APIConfig.BASEURL + "/api/AssetGIR/delete";
-
-    public static SAVE_LAYOUT_API: string = APIConfig.BASEURL + "/api/Layout/save";
-    public static GET_LAYOUT_API: string = APIConfig.BASEURL + "/api/layout/get";
-    public static DELETE_LAYOUT_API: string = APIConfig.BASEURL + "/api/layout/delete";
 
     public static CASH_BALANCE_GET_API: string = APIConfig.BASEURL + "/api/CashBalance/GetData";
 

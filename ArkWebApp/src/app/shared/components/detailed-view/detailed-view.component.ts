@@ -5,7 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { amountFormatter, dateFormatter, dateTimeFormatter } from '../../functions/formatter';
-import { DetailedView } from '../../models/DetailedViewModel';
+import { DetailedView } from '../../models/GeneralModel';
 
 @Component({
   selector: 'app-detailed-view',

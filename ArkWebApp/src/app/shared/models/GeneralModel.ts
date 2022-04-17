@@ -6,3 +6,8 @@ export interface DetailedView{
     param4: string,
     param5: string,
 }
+
+export interface PutAccessModel{
+    associations: string,   /* (Tab|Role:Association,)+ */
+    username: string
+}

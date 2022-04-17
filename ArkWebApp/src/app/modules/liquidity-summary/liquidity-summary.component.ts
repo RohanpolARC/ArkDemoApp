@@ -26,7 +26,7 @@ import { AddModalComponent } from './add-modal/add-modal.component';
 import { AddCellRendererComponent } from './add-cell-renderer/add-cell-renderer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
-import { DetailedView } from 'src/app/shared/models/DetailedViewModel';
+import { DetailedView } from 'src/app/shared/models/GeneralModel';
 import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
 import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
 
