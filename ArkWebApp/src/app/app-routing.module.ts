@@ -10,6 +10,7 @@ import { UnauthorizedComponent } from './shared/components/unauthorized/unauthor
 import { HomeComponent } from './home-component/home.component';
 import { FacilityDetailComponent } from './modules/facility-detail/facility-detail.component';
 import { LiquiditySummaryComponent } from './modules/liquidity-summary/liquidity-summary.component';
+import { AccessControlComponent } from './shared/components/access-control/access-control.component';
   
   
 const routes: Routes = [
@@ -70,6 +71,17 @@ const routes: Routes = [
     ],
     data: {
       tab: 'Liquidity Summary'
+    }
+  },
+  {
+    path: 'access-control',
+    component: AccessControlComponent,
+    canActivate: [
+      MsalGuard,
+      RoleGuard
+    ],
+    data: {
+      tab: 'Access Control'
     }
   },
   { path: 'accessibility', 

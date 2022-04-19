@@ -38,6 +38,9 @@ import { FacilityDetailModule } from './modules/facility-detail/facility-detail.
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { LiquiditySummaryModule } from './modules/liquidity-summary/liquidity-summary.module';
 import { DetailedViewComponent } from './shared/components/detailed-view/detailed-view.component';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import { AccessControlComponent } from './shared/components/access-control/access-control.component';
+import { MatSelectModule } from '@angular/material/select';
 
 export const protectedResourceMap: any =  
   [  
@@ -47,7 +50,7 @@ export const protectedResourceMap: any =
   
 @NgModule({  
   declarations: [  
-    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent
+    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent
   ],  
   imports: [  
     MsalModule.forRoot({  
@@ -86,7 +89,9 @@ export const protectedResourceMap: any =
   MatTooltipModule,
   FacilityDetailModule,
   NgMultiSelectDropDownModule.forRoot(),
-  LiquiditySummaryModule
+  LiquiditySummaryModule,
+  MatCheckboxModule,
+  MatSelectModule
   ],  
   providers: [  
     HttpClient,  

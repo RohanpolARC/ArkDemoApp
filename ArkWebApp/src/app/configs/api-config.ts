@@ -8,6 +8,9 @@ export class APIConfig {
     public static BASEURL: string = (/^.*localhost.*/.test(window.location.host) && window.location.port == "4200") ? "https://localhost:44366" : environment.baseUrl;
 
     public static ARKWEB_ACCESSIBLE_TABS_GET_API: string = APIConfig.BASEURL + "/api/Access/GetTabs";
+    public static ARKWEB_TABROLE_ASSOCIATION_GET_API: string = APIConfig.BASEURL + "/api/Access/GetRoleTabAssociation";
+    public static ARKWEB_PUTASSOCIATIONS_API: string = APIConfig.BASEURL + "/api/Access/PutAssociations";
+
     public static GET_DETAILED_VIEW: string = APIConfig.BASEURL + "/api/General/GetDetailedView";
 
     public static PORTFOLIO_HISTORY_GET_API: string = APIConfig.BASEURL + "/api/ParGIRHistory/getdata";

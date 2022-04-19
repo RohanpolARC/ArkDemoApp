@@ -7,7 +7,7 @@ import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { APIConfig } from 'src/app/configs/api-config';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { DetailedView } from 'src/app/shared/models/DetailedViewModel';
+import { DetailedView } from 'src/app/shared/models/GeneralModel';
 
 
 @Injectable({  

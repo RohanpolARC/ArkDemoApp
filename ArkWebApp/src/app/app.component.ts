@@ -74,6 +74,7 @@ export class AppComponent {
   CapitalActivityStyle: any = {};
   FacilityDetailStyle: any = {};
   LiquiditySummaryStyle: any = {};
+  AccessControlStyle: any = {};
 
   constructor(private http: HttpClient,
     private dataService: DataService,
@@ -201,9 +202,11 @@ export class AppComponent {
     else if(this.location.path() === '/liquidity-summary'){
       this.updateSelection('Liquidity Summary')
     }
+    else if(this.location.path() === '/access-control'){
+      this.updateSelection('Access Control')
+    }
     else this.updateSelection('')
-
-  }  
+  }
 
   logout(){  
     this.dataService.logout();  
@@ -243,7 +246,8 @@ export class AppComponent {
     this.dataService.changeSearchTextValues(null);
     this.dataService.changeNumberField(null);
     
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.notSelectedElement;
+
     this.lastClickedTabRoute = this.location.path();
 
     if(screen === 'Portfolio'){
@@ -319,6 +323,10 @@ export class AppComponent {
         
       };
       this.router.navigate(['/liquidity-summary'])
+    }
+    else if(screen === 'Access Control'){
+      this.AccessControlStyle = this.selectedElement;
+      this.router.navigate(['/access-control'])
     }
   }
 
