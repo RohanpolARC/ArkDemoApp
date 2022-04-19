@@ -4,7 +4,7 @@ import { ICellRendererParams } from '@ag-grid-community/all-modules';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { LiquiditySummaryComponent } from '../liquidity-summary.component';
-import { AddModalComponent } from '../add-modal/add-modal.component';
+import { AttributeEditorComponent } from '../attribute-editor/attribute-editor.component';
 import { LiquiditySummaryAttributeModel } from 'src/app/shared/models/LiquiditySummaryModel';
 import { formatDate } from 'src/app/shared/functions/formatter';
 
@@ -62,7 +62,7 @@ export class AttributeGroupRendererComponent implements ICellRendererAngularComp
 
       if(this.componentParent.isWriteAccess){
 
-        const dialogRef = this.dialog.open(AddModalComponent,{
+        const dialogRef = this.dialog.open(AttributeEditorComponent,{
           data: {
             action: actionType,
             fundHedgings: this.componentParent.fundHedgings,

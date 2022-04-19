@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from './core/services/FacilityDetails/facility-detail.service';
+import { MsalUserService } from './core/services/Auth/msaluser.service';
 
 @Component({  
   selector: 'app-root',  
@@ -83,7 +84,8 @@ export class AppComponent {
     public location:Location,
     public accessService: AccessService,
     private router:Router,
-    private facilityDetailSvc: FacilityDetailService
+    private facilityDetailSvc: FacilityDetailService,
+    private msalSvc: MsalUserService
   ) {}   
 
   get getAccessibleTabs(){
@@ -174,6 +176,10 @@ export class AppComponent {
     }
 
     this.rightSidebarOpened = false
+  }
+
+  showUserRoles(){
+    alert(`Your role(s) : ${this.msalSvc.getCurrentUserInfo().idToken['roles']}`)
   }
 
   ngOnInit(): void { 

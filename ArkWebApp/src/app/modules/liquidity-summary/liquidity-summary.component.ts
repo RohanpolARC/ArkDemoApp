@@ -22,8 +22,8 @@ import { Subscription } from 'rxjs';
 import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/liquidity-summary.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { MatDialog }  from '@angular/material/dialog';
-import { AddModalComponent } from './add-modal/add-modal.component';
-import { AddCellRendererComponent } from './add-cell-renderer/add-cell-renderer.component';
+import { AttributeEditorComponent } from './attribute-editor/attribute-editor.component';
+import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-renderer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DetailedView } from 'src/app/shared/models/GeneralModel';
@@ -359,25 +359,31 @@ export class LiquiditySummaryComponent implements OnInit {
   }
 
   openDialog(actionType: string = 'ADD'): void {
-    const dialogRef = this.dialog.open(AddModalComponent,{
-      data: {
-        action: actionType,
-        fundHedgings: this.fundHedgings,
-        asOfDate: this.asOfDate,
-        refData: this.refData
-      }
-    })
 
-    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
-      if(result.event === 'Close with success'){
-
-        // Re-fetch attributes & IDs for newly added attributes
-        this.fetchLiquiditySummaryRef();
-
-          // Refresh the grid
-        this.fetchLiquiditySummary();
-      }
-    }))
+    if(this.isWriteAccess){
+      const dialogRef = this.dialog.open(AttributeEditorComponent,{
+        data: {
+          action: actionType,
+          fundHedgings: this.fundHedgings,
+          asOfDate: this.asOfDate,
+          refData: this.refData
+        }
+      })
+  
+      this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
+        if(result.event === 'Close with success'){
+  
+          // Re-fetch attributes & IDs for newly added attributes
+          this.fetchLiquiditySummaryRef();
+  
+            // Refresh the grid
+          this.fetchLiquiditySummary();
+        }
+      }))  
+    }
+    else {
+      this.setWarningMsg('Unauthorized', 'Dismiss', 'ark-theme-snackbar-error')
+    }
   }
 
   onLiquidityCellClicked(event: CellClickedEvent){
@@ -450,7 +456,7 @@ export class LiquiditySummaryComponent implements OnInit {
         }
       },
       frameworkComponents:{
-        addCellRenderer: AddCellRendererComponent,
+        addCellRenderer: UpdateCellRendererComponent,
         attributeGroupRenderer: AttributeGroupRendererComponent
       },
       groupMultiAutoColumn: true

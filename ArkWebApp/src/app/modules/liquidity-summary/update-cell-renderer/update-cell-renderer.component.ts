@@ -9,11 +9,11 @@ import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/liquidity-summary.service';
 
 @Component({
-  selector: 'app-add-cell-renderer',
-  templateUrl: './add-cell-renderer.component.html',
-  styleUrls: ['./add-cell-renderer.component.scss']
+  selector: 'app-update-cell-renderer',
+  templateUrl: './update-cell-renderer.component.html',
+  styleUrls: ['./update-cell-renderer.component.scss']
 })
-export class AddCellRendererComponent implements OnInit, ICellRendererAngularComp {
+export class UpdateCellRendererComponent implements OnInit, ICellRendererAngularComp {
 
   subscriptions: Subscription[] = []
   params: ICellRendererParams

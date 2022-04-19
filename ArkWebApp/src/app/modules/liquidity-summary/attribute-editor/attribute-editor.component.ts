@@ -9,11 +9,11 @@ import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 
 @Component({
-  selector: 'app-add-modal',
-  templateUrl: './add-modal.component.html',
-  styleUrls: ['./add-modal.component.scss']
+  selector: 'app-attribute-editor',
+  templateUrl: './attribute-editor.component.html',
+  styleUrls: ['./attribute-editor.component.scss']
 })
-export class AddModalComponent implements OnInit {
+export class AttributeEditorComponent implements OnInit {
 
   subscriptions: Subscription[] = [];
   disableSubmit: boolean = true;
@@ -31,7 +31,7 @@ export class AddModalComponent implements OnInit {
   asOfDate: Date;
 
   constructor(
-    public dialogRef: MatDialogRef<AddModalComponent>,
+    public dialogRef: MatDialogRef<AttributeEditorComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
     private liquiditySummarySvc: LiquiditySummaryService,
     private msalUserSvc: MsalUserService
