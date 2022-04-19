@@ -8,11 +8,11 @@ import { DataService } from 'src/app/core/services/data.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'app-role-tab-association-editor',
-  templateUrl: './role-tab-association-editor.component.html',
-  styleUrls: ['./role-tab-association-editor.component.scss']
+  selector: 'app-access-control',
+  templateUrl: './access-control.component.html',
+  styleUrls: ['./access-control.component.scss']
 })
-export class RoleTabAssociationEditorComponent implements OnInit {
+export class AccessControlComponent implements OnInit {
 
   allTabs
   allRoles
@@ -127,16 +127,22 @@ export class RoleTabAssociationEditorComponent implements OnInit {
     model.associations = associations;
     model.username = this.dataService.getCurrentUserName();
 
-    this.subscriptions.push(this.accessService.putAssociations(model).subscribe({
-      next: result => {
-        if(result.isSuccess){
-          this.setWarningMsg("Successfully updated access", "Dismiss", "ark-theme-snackbar-success")
+    if(!!associations){
+      this.subscriptions.push(this.accessService.putAssociations(model).subscribe({
+        next: result => {
+          if(result.isSuccess){
+            this.originalAssociation = this.form.value?.['association'];
+            this.setWarningMsg("Successfully updated access", "Dismiss", "ark-theme-snackbar-success")
+          }
+        },
+        error: error => {
+          this.setWarningMsg("Failed to update access", "Dismiss", "ark-theme-snackbar-error")
+          console.error("Failed to update associations");
         }
-      },
-      error: error => {
-        this.setWarningMsg("Failed to update access", "Dismiss", "ark-theme-snackbar-error")
-        console.error("Failed to update associations");
-      }
-    }))
+      }))  
+    }
+    else{
+      this.setWarningMsg("No change in association", "Dismiss", "ark-theme-snackbar-warning")
+    }
   }
 }

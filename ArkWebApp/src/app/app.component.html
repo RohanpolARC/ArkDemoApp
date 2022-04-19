@@ -18,7 +18,7 @@
     </a>
   
     <div [matMenuTriggerFor]="menu" class="user-details">
-      <mat-icon class="user-icon" (click)="openDialog()" >account_circle</mat-icon>
+      <mat-icon class="user-icon" >account_circle</mat-icon>
       <span class="user-name"> {{userName}} </span>
   </div>
   <mat-menu #menu="matMenu">
@@ -89,8 +89,8 @@
         </mat-expansion-panel-header>
   
         <mat-list>
-          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Access Editor')" [ngStyle]="AccessEditorStyle">
-            <div class="list-item-text">Access Editor</div>
+          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Access Control')" [ngStyle]="AccessControlStyle">
+            <div class="list-item-text">Access Control</div>
           </mat-list-item>
         </mat-list>
   
