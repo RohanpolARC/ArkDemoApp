@@ -1,0 +1,65 @@
+<h3>
+    Portfolio Rules Editor
+</h3>
+
+<div *ngIf="isSuccess || isFailure"
+[class.success-msg]="isSuccess"
+[class.failure-msg]="isFailure"
+>
+    {{ updateMsg }}
+</div>
+
+<mat-dialog-content>
+        <!-- How to add labels on both sides of mat-slide-toggle 
+            https://stackoverflow.com/a/58204995/17121446
+        -->
+
+    <form [formGroup]="modelForm" autocomplete="off">
+        <div class="form-container">
+            <div>
+                <div class="mat-slide-toggle-content">
+                    Create &nbsp;
+                </div>
+                <mat-slide-toggle [disabled]="disableUpdate || isSuccess"
+                [color]="'primary'" formControlName="isUpdate">
+                    Update
+                </mat-slide-toggle>
+            </div>
+            <mat-form-field class="form-field" appearance="outline">
+                <mat-label>Model Name</mat-label>
+                <input matInput type="text" name="model-name" autocomplete="off" [disabled]="isSuccess" formControlName="modelName">
+                <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="modelForm.get('modelName').reset()">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </mat-form-field>
+            <mat-form-field class="form-field" appearance="outline">
+                <mat-label>Model Description</mat-label>
+                <input matInput type="text" name="model-desc" autocomplete="off" [disabled]="isSuccess" formControlName="modelDesc">
+                <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="modelForm.get('modelDesc').reset()">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </mat-form-field>
+        </div>
+    </form>
+
+    <ng-container *ngIf="isAutomatic">
+        Rules: <br>
+        <div *ngFor="let rule of rules">
+            Column: {{ rule.ColumnId }}, Values: {{ rule.Predicate.Inputs }}
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="!isAutomatic">
+        Position IDs: <br>
+        <ng-container *ngFor="let ID of positionIDs">
+            {{ ID }}, 
+        </ng-container>
+    </ng-container>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-raised-button [disabled]="disableSubmit" type="button"
+    color="primary" (click)="onProceed()">Proceed</button>
+    <button mat-raised-button (click)="onClose()" type="button">Cancel</button>            
+<mat-dialog-actions>

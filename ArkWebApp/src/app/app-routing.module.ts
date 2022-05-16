@@ -11,6 +11,8 @@ import { HomeComponent } from './home-component/home.component';
 import { FacilityDetailComponent } from './modules/facility-detail/facility-detail.component';
 import { LiquiditySummaryComponent } from './modules/liquidity-summary/liquidity-summary.component';
 import { AccessControlComponent } from './shared/components/access-control/access-control.component';
+import { IrrCalculationComponent } from './modules/irr-calculation/irr-calculation.component';
+import { IrrResultComponent } from './modules/irr-calculation/irr-result/irr-result.component';
   
   
 const routes: Routes = [
@@ -90,7 +92,17 @@ const routes: Routes = [
       MsalGuard
     ]
   },
- 
+  {
+    path: 'irr',
+    children: [
+      { path: 'portfoliomodeller', component: IrrCalculationComponent},
+      { path: 'runcalcs', component: IrrResultComponent}
+    ],
+    canActivate: [
+      MsalGuard,
+      // RoleGuard
+    ]
+  }
 ];  
   
 @NgModule({  

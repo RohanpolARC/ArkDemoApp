@@ -76,6 +76,7 @@ export class AppComponent {
   FacilityDetailStyle: any = {};
   LiquiditySummaryStyle: any = {};
   AccessControlStyle: any = {};
+  IRRStyle: any = {};
 
   constructor(private http: HttpClient,
     private dataService: DataService,
@@ -175,6 +176,13 @@ export class AppComponent {
       this.dataService.changeFilterApplyBtnState(true);
     }
 
+    if(['/irr/portfoliomodeller', '/irr/runcalcs'].includes(this.location.path())){
+      this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
+      this.dataService.changeSearchDate(this.asOfDate);
+      this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['rule']));
+      this.dataService.changeFilterApplyBtnState(true);
+    }
+
     this.rightSidebarOpened = false
   }
 
@@ -183,6 +191,7 @@ export class AppComponent {
   }
 
   ngOnInit(): void { 
+
     this.lastClickedTabRoute = this.location.path();
     this.fetchTabs();
     this.userName=this.dataService.getCurrentUserName();
@@ -210,6 +219,10 @@ export class AppComponent {
     }
     else if(this.location.path() === '/access-control'){
       this.updateSelection('Access Control')
+    }
+    /** If IRR is direclty loaded */
+    else if(['/irr/portfoliomodeller', '/irr/runcalcs'].includes(this.location.path())){
+      this.updateSelection('IRR')
     }
     else this.updateSelection('')
   }
@@ -247,12 +260,17 @@ export class AppComponent {
     this.filterPane.TextValueSelect = false;
     this.filterPane.NumberField = false;
 
+    this.multiSelectPlaceHolder = null;
+    this.dropdownSettings = null;
+    this.dropdownData = [];
+    this.selectedDropdownData = [];
+
     this.dataService.changeSearchDate(null);
     this.dataService.changeSearchDateRange(null);
     this.dataService.changeSearchTextValues(null);
     this.dataService.changeNumberField(null);
     
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.IRRStyle = this.notSelectedElement;
 
     this.lastClickedTabRoute = this.location.path();
 
@@ -301,7 +319,7 @@ export class AppComponent {
         allowSearchFilter: true,
         
       };
-      this.router.navigate(['/facility-detail']);
+        this.router.navigate(['/facility-detail']);
 
     }
     else if(screen === 'Liquidity Summary'){
@@ -329,6 +347,15 @@ export class AppComponent {
         
       };
       this.router.navigate(['/liquidity-summary'])
+    }
+    else if(screen === 'IRR'){
+      this.IRRStyle = this.selectedElement;
+      this.filterPane.AsOfDate = true;
+      this.filterPane.TextValueSelect = false;
+
+      this.asOfDate = moment(this.getLastBusinessDay()).format('YYYY-MM-DD')
+      this.filterApply();
+      this.router.navigate(['/irr/portfoliomodeller'])
     }
     else if(screen === 'Access Control'){
       this.AccessControlStyle = this.selectedElement;

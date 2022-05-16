@@ -41,6 +41,7 @@ import { DetailedViewComponent } from './shared/components/detailed-view/detaile
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { AccessControlComponent } from './shared/components/access-control/access-control.component';
 import { MatSelectModule } from '@angular/material/select';
+import { IrrCalculationModule } from './modules/irr-calculation/irr-calculation.module';
 
 export const protectedResourceMap: any =  
   [  
@@ -91,7 +92,8 @@ export const protectedResourceMap: any =
   NgMultiSelectDropDownModule.forRoot(),
   LiquiditySummaryModule,
   MatCheckboxModule,
-  MatSelectModule
+  MatSelectModule,
+  IrrCalculationModule
   ],  
   providers: [  
     HttpClient,  

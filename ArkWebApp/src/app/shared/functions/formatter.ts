@@ -51,6 +51,13 @@ export function noDecimalAmountFormatter(params){
     }
 }
 
+export function nonAmountNumberFormatter(params){
+    // Non amount number requires no locale.
+    if(params.value == null || Number(params.value) == 0)
+        return " ";
+    else return String(params.value);
+}
+
 export function nullOrZeroFormatter(params){
     if(params.value == null || Number(params.value) == 0)
         return "";
@@ -68,6 +75,17 @@ export function removeDecimalFormatter(params){
         return ""
 }
 
+export function nonAmountNumberFormatter2Dec(params){
+    if(params.value!=undefined && Number(Number(params.value).toFixed(2))!=0    ){
+        if(Number.isInteger(Number(Number(params.value).toFixed(2)))){         // Don't show trailing 0's if number rounded off to 2 decimals is an integer
+            return Number(params.value).toFixed(0)
+        }
+        else{
+            return Number(params.value).toFixed(2)
+        }
+    }
+    else return "-"
+}
 export function formatDate(inputFormat, forCompare: boolean = false) {
     function pad(s) { return (s < 10) ? '0' + s : s; }
     var d = new Date(inputFormat)

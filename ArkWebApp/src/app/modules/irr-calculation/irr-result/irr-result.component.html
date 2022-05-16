@@ -1,0 +1,37 @@
+<div class="parent">
+    <div class="header">
+        <div class="title">
+            IRR
+            
+        </div>
+        <div class="action">
+            <div>
+                AsOfDate : {{ asOfDate | date:"dd MMM yyyy" }}
+            </div>
+            <div>
+                Model : {{ modelName }}
+            </div>
+            <div>
+                <button mat-icon-button (click)="goBack()"
+                    matTooltip="Portfolio Modeller"
+                    matTooltipClass="tooltip-style">
+                    <mat-icon class="material-icons-outlined">arrow_back</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <mat-card class="mat-content">
+            <ag-grid-angular
+            [gridOptions]="gridOptions"
+            [defaultColDef]="defaultColDef"
+            [modules]="agGridModules"
+            [rowData]="calcs"
+            class="ag-theme-alpine ag-grid"
+            >
+            </ag-grid-angular>
+        </mat-card>
+    </div>
+
+</div>

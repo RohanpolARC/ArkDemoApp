@@ -1,0 +1,66 @@
+<div class="parent">
+    <div class="header">
+        <div class="title">
+            Portfolio Modeller            
+        </div>
+        <div class="action">
+            <div>
+                <mat-slide-toggle
+                [color]="'primary'" [formControl]="isLocal">
+                    Local Override
+                </mat-slide-toggle>
+            </div>
+            
+            <div style="color: #0590ca;">|</div>
+            <div>
+                <div class="mat-slide-toggle-content">
+                    Manual &nbsp;
+                </div>
+                <mat-slide-toggle
+                [color]="'primary'" [formControl]="isAutomatic">
+                    Automatic
+                </mat-slide-toggle>
+            </div>
+
+            <div class="dropdown">
+                <ng-multiselect-dropdown
+                [placeholder]="'Model name'"
+                [settings]="dropdownSettings"
+                [data]="modelData"
+                [(ngModel)]="selectedDropdownData"
+                (onSelect)="onPortfolioModelSelect($event)"
+                >
+                </ng-multiselect-dropdown>
+        
+            </div>
+            <button *ngIf="isAutomatic"
+            mat-raised-button (click)="onSavePortfolio()">
+                Save
+            </button>
+            <button mat-raised-button (click)="runIRRCalc()">
+                Run
+            </button>
+            <button *ngIf="isAutomatic"
+            mat-raised-button (click)="onReset()">
+                Clear
+            </button>
+        </div>
+    </div>
+
+    <div class="content">
+        <mat-card class="mat-content">
+            <ag-grid-angular
+            [adaptableOptions]="adaptableOptions"
+            [gridOptions]="gridOptions"
+            [defaultColDef]="defaultColDef"
+            [modules]="agGridModules"
+            [rowData]="rowData"
+            class="ag-theme-alpine ag-grid"
+            (adaptableReady)="onAdaptableReady($event)"
+            (cellValueChanged)="onCellValueChanged($event)"
+            (rowSelected)="onRowSelected($event)"
+            >
+            </ag-grid-angular>
+        </mat-card>
+    </div>
+</div>
