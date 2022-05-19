@@ -76,7 +76,7 @@ export class AppComponent {
   FacilityDetailStyle: any = {};
   LiquiditySummaryStyle: any = {};
   AccessControlStyle: any = {};
-  IRRStyle: any = {};
+  PortfolioModellerStyle: any = {};
 
   constructor(private http: HttpClient,
     private dataService: DataService,
@@ -176,7 +176,7 @@ export class AppComponent {
       this.dataService.changeFilterApplyBtnState(true);
     }
 
-    if(['/irr/portfoliomodeller', '/irr/runcalcs'].includes(this.location.path())){
+    if(['/irr/portfoliomodeller'].includes(this.location.path())){
       this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
       this.dataService.changeSearchDate(this.asOfDate);
       this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['rule']));
@@ -221,8 +221,8 @@ export class AppComponent {
       this.updateSelection('Access Control')
     }
     /** If IRR is direclty loaded */
-    else if(['/irr/portfoliomodeller', '/irr/runcalcs'].includes(this.location.path())){
-      this.updateSelection('IRR')
+    else if(this.location.path() === '/irr/portfoliomodeller'){
+      this.updateSelection('Portfolio Modeller')
     }
     else this.updateSelection('')
   }
@@ -270,7 +270,7 @@ export class AppComponent {
     this.dataService.changeSearchTextValues(null);
     this.dataService.changeNumberField(null);
     
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.IRRStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.notSelectedElement;
 
     this.lastClickedTabRoute = this.location.path();
 
@@ -348,8 +348,8 @@ export class AppComponent {
       };
       this.router.navigate(['/liquidity-summary'])
     }
-    else if(screen === 'IRR'){
-      this.IRRStyle = this.selectedElement;
+    else if(screen === 'Portfolio Modeller'){
+      this.PortfolioModellerStyle = this.selectedElement;
       this.filterPane.AsOfDate = true;
       this.filterPane.TextValueSelect = false;
 

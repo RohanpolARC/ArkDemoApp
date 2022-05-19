@@ -1,66 +1,21 @@
 <div class="parent">
-    <div class="header">
-        <div class="title">
-            Portfolio Modeller            
-        </div>
-        <div class="action">
-            <div>
-                <mat-slide-toggle
-                [color]="'primary'" [formControl]="isLocal">
-                    Local Override
-                </mat-slide-toggle>
-            </div>
-            
-            <div style="color: #0590ca;">|</div>
-            <div>
-                <div class="mat-slide-toggle-content">
-                    Manual &nbsp;
-                </div>
-                <mat-slide-toggle
-                [color]="'primary'" [formControl]="isAutomatic">
-                    Automatic
-                </mat-slide-toggle>
-            </div>
 
-            <div class="dropdown">
-                <ng-multiselect-dropdown
-                [placeholder]="'Model name'"
-                [settings]="dropdownSettings"
-                [data]="modelData"
-                [(ngModel)]="selectedDropdownData"
-                (onSelect)="onPortfolioModelSelect($event)"
-                >
-                </ng-multiselect-dropdown>
-        
-            </div>
-            <button *ngIf="isAutomatic"
-            mat-raised-button (click)="onSavePortfolio()">
-                Save
-            </button>
-            <button mat-raised-button (click)="runIRRCalc()">
-                Run
-            </button>
-            <button *ngIf="isAutomatic"
-            mat-raised-button (click)="onReset()">
-                Clear
-            </button>
-        </div>
-    </div>
+            <mat-tab-group [selectedIndex]="selected.value" 
+               (selectedIndexChange)="selected.setValue($event)" style="margin-right: 32px;">
+                <mat-tab *ngFor="let tab of tabs; let index = index" [label]="tab">
+                    <ng-template mat-tab-label>
+                        {{ tab }}
 
-    <div class="content">
-        <mat-card class="mat-content">
-            <ag-grid-angular
-            [adaptableOptions]="adaptableOptions"
-            [gridOptions]="gridOptions"
-            [defaultColDef]="defaultColDef"
-            [modules]="agGridModules"
-            [rowData]="rowData"
-            class="ag-theme-alpine ag-grid"
-            (adaptableReady)="onAdaptableReady($event)"
-            (cellValueChanged)="onCellValueChanged($event)"
-            (rowSelected)="onRowSelected($event)"
-            >
-            </ag-grid-angular>
-        </mat-card>
-    </div>
+                        <mat-icon (click)="removeTab(index)" *ngIf="index !== 0">close</mat-icon>
+
+                    </ng-template>
+                    <app-portfolio-modeller  *ngIf="index === 0" style="display: block; height: calc(100vh - 64px - 50px); width: 100%;"
+                    (calcParamsEmitter)="irrCalcParamsReceived($event)"></app-portfolio-modeller>
+                    <app-irr-result *ngIf="index !== 0" style="display: block; height: calc(100vh - 64px - 50px);"
+                        [calcParams] = "calcParamsMap[tab]"
+                    ></app-irr-result>
+               </mat-tab>
+            </mat-tab-group>
+
 </div>
+ 

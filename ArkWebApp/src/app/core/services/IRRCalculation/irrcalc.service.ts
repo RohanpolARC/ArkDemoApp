@@ -21,8 +21,8 @@ export class IRRCalcService {
   constructor(private http: HttpClient,
     private msalService: MsalUserService) { }
 
-  public getIRRPositions(requestedDate: string){
-    return this.http.get<any[]>(`${APIConfig.IRR_POSITIONS_GET_API}/?searchDate=${requestedDate}`, this.httpOptions).pipe(
+  public getIRRPositions(requestedDate: string, modelID?: number){
+    return this.http.get<any[]>(`${APIConfig.IRR_POSITIONS_GET_API}/?searchDate=${requestedDate}&modelId=${modelID}`, this.httpOptions).pipe(
       catchError((ex) => throwError(ex)));
   }
 
@@ -32,8 +32,8 @@ export class IRRCalcService {
     );
   }
 
-  public getPortfolioModels(){
-    return this.http.get<any>(`${APIConfig.IRR_PORTFOLIO_MODEL_GET_API}`, this.httpOptions).pipe(
+  public getPortfolioModels(userName: string){
+    return this.http.get<any>(`${APIConfig.IRR_PORTFOLIO_MODEL_GET_API}/?userName=${userName}`, this.httpOptions).pipe(
       catchError((ex) => throwError(ex))
     )
   }

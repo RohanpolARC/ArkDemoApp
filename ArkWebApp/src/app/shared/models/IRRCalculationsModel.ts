@@ -7,6 +7,7 @@ export interface VPortfolioModel{
     modelID: number,  // If modalID = null, then create, else update 
     isLocal: boolean,
     isManual: boolean,
+    isShared: boolean,
     localOverrides: VPortfolioLocalOverrideModel[]
 }
 
@@ -20,5 +21,6 @@ export interface VPortfolioLocalOverrideModel{
 export interface IRRCalcParams{
     asOfDate: string,
     positionIDs: number[],
-    modelID: number
+    modelID: number,
+    modelName: string
 }

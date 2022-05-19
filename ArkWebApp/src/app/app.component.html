@@ -59,6 +59,30 @@
   
       </mat-expansion-panel>
   </mat-accordion>
+
+  <mat-accordion>
+    <mat-expansion-panel [expanded]="false" >
+      <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
+        <mat-panel-title>
+         Returns
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+  
+      <mat-list>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Facility Detail')" [ngStyle]="FacilityDetailStyle">
+          <div class="list-item-text">Asset Browser</div>
+        </mat-list-item>
+      </mat-list>
+
+      <mat-list>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Portfolio Modeller')" [ngStyle]="PortfolioModellerStyle">
+          <div class="list-item-text">Portfolio Modeller</div>
+        </mat-list-item>
+      </mat-list>
+
+    </mat-expansion-panel>
+  </mat-accordion>
+
   <mat-accordion>
       <mat-expansion-panel [expanded]="false" >
         <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
@@ -73,20 +97,9 @@
           </mat-list-item>
         </mat-list>
   
-        <mat-list>
-          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Facility Detail')" [ngStyle]="FacilityDetailStyle">
-            <div class="list-item-text">Asset Browser</div>
-          </mat-list-item>
-        </mat-list>
-
-        <mat-list>
-          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('IRR')" [ngStyle]="IRRStyle">
-            <div class="list-item-text">IRR</div>
-          </mat-list-item>
-        </mat-list>
-
       </mat-expansion-panel>
     </mat-accordion>
+
     <mat-accordion>
       <mat-expansion-panel [expanded]="false" >
         <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">

@@ -17,18 +17,20 @@ import { MatIconModule } from '@angular/material/icon';
 import { IrrResultComponent } from './irr-result/irr-result.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import {MatTabsModule} from '@angular/material/tabs';
+import { PortfolioModellerComponent } from './portfolio-modeller/portfolio-modeller.component';
 
 @NgModule({
   declarations: [
     IrrCalculationComponent,
     PortfolioSaveRulesComponent,
-    IrrResultComponent
+    IrrResultComponent,
+    PortfolioModellerComponent
   ],
   imports: [
     CommonModule,
     BrowserAnimationsModule,
     AdaptableAngularAgGridModule,
-    AgGridModule,
+    AgGridModule.withComponents([]),
     MatCardModule,
     MatButtonModule,
     MatSlideToggleModule,

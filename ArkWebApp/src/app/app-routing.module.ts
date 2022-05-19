@@ -95,8 +95,7 @@ const routes: Routes = [
   {
     path: 'irr',
     children: [
-      { path: 'portfoliomodeller', component: IrrCalculationComponent},
-      { path: 'runcalcs', component: IrrResultComponent}
+      { path: 'portfoliomodeller', component: IrrCalculationComponent}
     ],
     canActivate: [
       MsalGuard,

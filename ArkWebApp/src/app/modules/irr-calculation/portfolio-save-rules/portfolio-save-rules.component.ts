@@ -22,6 +22,8 @@ export class PortfolioSaveRulesComponent implements OnInit {
   selectedModelName: string
   disableUpdate: boolean
   disableSubmit: boolean
+  disableSave: boolean
+  disableSaveRun: boolean
   asOfDate: string
   positionIDs: number[] 
   positionIDsSTR: string
@@ -34,7 +36,8 @@ export class PortfolioSaveRulesComponent implements OnInit {
   isSuccess: boolean
   isFailure: boolean
   modelForm: FormGroup
-  
+  context: "Save" | "SaveRun"  
+
   constructor(
     public dialogRef: MatDialogRef<PortfolioSaveRulesComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
@@ -45,7 +48,7 @@ export class PortfolioSaveRulesComponent implements OnInit {
   modelValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     let RN: boolean = !!control.get('modelName').value
     let RD: boolean = !!control.get('modelDesc').value
-    return (RN && RD) ? { validated: true } : { validated: false }
+    return (RN) ? { validated: true } : { validated: false }
   }
   
   ngOnInit(): void {
@@ -61,6 +64,7 @@ export class PortfolioSaveRulesComponent implements OnInit {
     this.isAutomatic = this.data.isAutomatic
     this.isLocal = this.data.isLocal
     this.disableSubmit = false;
+    this.disableSave = this.disableSaveRun = false;
     this.isSuccess = this.isFailure = false;
     this.adaptableApi = this.data.adaptableApi;
     this.selectedModelName = this.data.model?.modelName;
@@ -89,8 +93,9 @@ export class PortfolioSaveRulesComponent implements OnInit {
 
     this.modelForm = new FormGroup({
       modelName: new FormControl(this.data.model?.modelName, Validators.required),
-      modelDesc: new FormControl(this.data.model?.modelDesc, Validators.required),
-      isUpdate: new FormControl(!!this.modelID, Validators.required)
+      modelDesc: new FormControl(this.data.model?.modelDesc),
+      isUpdate: new FormControl(!!this.modelID, Validators.required),
+      isShared: new FormControl(this.data.isShared)
     },{
       validators: this.modelValidator
     })
@@ -100,9 +105,11 @@ export class PortfolioSaveRulesComponent implements OnInit {
   changeListeners(){
     this.subscriptions.push(this.modelForm.valueChanges.subscribe(_ => {
       if(this.modelForm.errors?.['validated'] && !this.isSuccess && (this.rules?.length > 0 || this.positionIDs?.length > 0)){
+        this.disableSave = this.disableSaveRun = false;
         this.disableSubmit = false;
       }
       else if(!this.modelForm.errors?.['validated']){
+        this.disableSave = this.disableSaveRun = true;
         this.disableSubmit = true;
       }
     }))
@@ -115,13 +122,16 @@ export class PortfolioSaveRulesComponent implements OnInit {
     }))
   }
 
-  onProceed(){
+  onProceed(context: 'Save' | 'SaveRun' = 'Save'){
+    this.context = context
+
     let model: VPortfolioModel = <VPortfolioModel> {};
     model.modelName = this.modelForm.get('modelName').value;
     model.modelDesc = this.modelForm.get('modelDesc').value;
     model.username = this.dataService.getCurrentUserName();
     model.modelID = (this.modelForm.get('isUpdate').value) ? this.modelID : null;
     model.isLocal = this.isLocal;
+    model.isShared = this.modelForm.get('isShared').value;
     model.isManual = !this.isAutomatic;
 
     if(this.isAutomatic){
@@ -153,6 +163,7 @@ export class PortfolioSaveRulesComponent implements OnInit {
       model.localOverrides = null;
     }
     this.disableSubmit = true
+    this.disableSave = this.disableSaveRun = true
     this.subscriptions.push(this.irrCalcService.putPortfolioModels(model).subscribe({
       next: result => {
         if(result.isSuccess){
@@ -160,15 +171,18 @@ export class PortfolioSaveRulesComponent implements OnInit {
           this.isFailure = false
           this.updateMsg = 'Successfully updated model';
           this.disableSubmit = true
-
-          /*Updating ruleID for inserted rule*/
+          this.disableSave = this.disableSaveRun = true
+          /*Updating modelID for inserted rule*/
           if(!this.modelForm.get('isUpdate').value){
             // 0th result has inserted key, 1st result has updated key, if any, else they are 0
             this.modelID = result.data[0].value;
           }
 
-          if(this.data.context === 'Save&Run'){
-            this.dialogRef.close();
+          if(context === 'SaveRun'){
+            this.dialogRef.close({ 
+              context: 'SaveRun',
+              isSuccess: true
+             });
           }
         }
         else{
@@ -197,6 +211,8 @@ export class PortfolioSaveRulesComponent implements OnInit {
   }
 
   onClose(){
-    this.dialogRef.close({ isSuccess: this.isSuccess})
+    this.dialogRef.close({
+      context: this.context,
+      isSuccess: this.isSuccess})
   }
 }

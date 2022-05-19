@@ -25,6 +25,14 @@
                     Update
                 </mat-slide-toggle>
             </div>
+
+            <div>
+                <mat-slide-toggle
+                [color]="'primary'" formControlName="isShared">
+                    Shared
+                </mat-slide-toggle>
+            </div>
+            
             <mat-form-field class="form-field" appearance="outline">
                 <mat-label>Model Name</mat-label>
                 <input matInput type="text" name="model-name" autocomplete="off" [disabled]="isSuccess" formControlName="modelName">
@@ -39,6 +47,8 @@
                     <mat-icon>close</mat-icon>
                 </button>
             </mat-form-field>
+            
+
         </div>
     </form>
 
@@ -59,7 +69,10 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-    <button mat-raised-button [disabled]="disableSubmit" type="button"
-    color="primary" (click)="onProceed()">Proceed</button>
+    <button mat-raised-button [disabled]="disableSave" type="button"
+    color="primary" (click)="onProceed('Save')">Save</button>
+
+    <button mat-raised-button [disabled]="disableSaveRun" type="button"
+    color="primary" (click)="onProceed('SaveRun')">Save & Run</button>
     <button mat-raised-button (click)="onClose()" type="button">Cancel</button>            
 <mat-dialog-actions>

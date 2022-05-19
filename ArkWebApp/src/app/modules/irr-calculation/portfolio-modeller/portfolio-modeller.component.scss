@@ -8,6 +8,8 @@
     display: flex;
     flex-flow: column;
     height: 100%;
+
+    font-size: 0.5rem;
 }
 
 .parent .content{
@@ -40,7 +42,6 @@
 
 .ag-grid{
     height: calc(100% - 40px);   // If using adaptable
-    // height: 100%;
     font-size: 0.8rem;
 }
 
@@ -55,7 +56,15 @@
   align-items: center;
 
   gap: 1em;
-  font-size: 0.9rem;
+  font-size: 1.6em;
+}
+
+.dropdown{
+    min-width: 200px;
+}
+
+.dropdown > ng-multiselect-dropdown{
+    width: 100%;
 }
 
 .material-icons-outlined {
@@ -63,6 +72,8 @@
   font-size:1.6rem;
 }
 
-.tooltip-style{
-    font-size: 1rem;
+.mat-slide-toggle-content{
+    vertical-align: top;
+    display: inline-block;
+    line-height: 24px; // this is defined in .mat-slide-toggle
 }
