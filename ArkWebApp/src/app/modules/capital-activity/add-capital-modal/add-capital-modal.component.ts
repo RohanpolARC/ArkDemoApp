@@ -111,6 +111,10 @@ export class AddCapitalModalComponent implements OnInit{
     let CCY: boolean = (currency !== null && currency !== '')
     let TA: boolean = (totalAmount !== null) 
 
+    let ISN_AS_NR = !control.get('issuerShortName')?.errors?.['invalid']
+                  && !control.get('asset')?.errors?.['invalid']
+                  && !control.get('narrative')?.errors?.['invalid']
+
     let ISN: boolean = (issuerShortName !== null && issuerShortName !== '');
     let AS: boolean = (asset !== null && asset !== '');
     let NR: boolean = (narrative !== null && narrative !== '');
@@ -120,13 +124,13 @@ export class AddCapitalModalComponent implements OnInit{
     let LA: boolean = (localAmount !== null)
 
     if(this.data.actionType === 'LINK-ADD')
-      return ((CD && VD && FH && CT && CST && CCY && TA && ((ISN && AS)|| NR || ISN) && FX && LA)) ? { 
+      return ((CD && VD && FH && CT && CST && CCY && TA && (((ISN && AS)|| NR || ISN) && ISN_AS_NR) && FX && LA)) ? { 
         validated : true 
       }: { 
         validated : false
       };
     else if(this.data.actionType === 'ADD' || this.data.actionType === 'EDIT')
-      return (CD && VD && FH && CT && CST && CCY && TA && POSCcy && ((ISN && AS)|| NR || ISN)) ? { 
+      return (CD && VD && FH && CT && CST && CCY && TA && POSCcy && (((ISN && AS)|| NR || ISN) && ISN_AS_NR)) ? { 
         validated : true 
       }: { 
         validated : false
@@ -168,9 +172,11 @@ export class AddCapitalModalComponent implements OnInit{
     this.netISS = [];
     let seen = new Map();
     for(let i = 0; i < issuers.length; i+= 1){
-      if(seen.has(issuers[i]) === null || seen.has(issuers[i]) === false){
-        seen.set(issuers[i],true)
-        this.netISS.push([issuers[i], issuerSN[i], issuerIDs[i]])
+      if(!!issuers[i] && !!issuerSN[i] && !!issuerIDs[i]){
+        if(seen.has(issuers[i]) === null || seen.has(issuers[i]) === false){
+          seen.set(issuers[i],true)
+          this.netISS.push([issuers[i], issuerSN[i], issuerIDs[i]])
+        }  
       }
     }
   }
@@ -179,15 +185,13 @@ export class AddCapitalModalComponent implements OnInit{
     this.netAssets = [];
     let seen = new Map();
     for(let i: number = 0; i<assets.length; i+=1){
-      if(!seen.has(assets[i])){
-        seen.set(assets[i], true);
-        this.netAssets.push([assets[i], assetIDs[i]])
+      if(!!assets[i] && !!assetIDs[i]){
+        if(!seen.has(assets[i])){
+          seen.set(assets[i], true);
+          this.netAssets.push([assets[i], assetIDs[i]])
+        }  
       }
     }    
-  }
-
-  setDynamicOptions_(FH?: string, IssuerSN?: string, Asset?: string): void{
-    // if(FH)
   }
 
   setDynamicOptions(FH?: string, IssuerSN?: string, Asset?: string): void {
@@ -251,11 +255,15 @@ export class AddCapitalModalComponent implements OnInit{
          */
   
       for(let i = 0; i < this.data.refData.length; i+= 1){
-        this.issuerOptions.push(this.data.refData[i].issuer);
-        this.issuerSNOptions.push(this.data.refData[i].issuerShortName)
-        this.wsoIssuerIDOptions.push(this.data.refData[i].wsoIssuerID)
-        this.assetOptions.push(this.data.refData[i].asset);
-        this.assetIDOptions.push(<number>this.data.refData[i].wsoAssetID);
+        if(!!this.data.refData[i].issuer){
+          this.issuerOptions.push(this.data.refData[i].issuer);
+          this.issuerSNOptions.push(this.data.refData[i].issuerShortName)
+          this.wsoIssuerIDOptions.push(this.data.refData[i].wsoIssuerID)
+        }
+        if(!!this.data.refData[i].asset){
+          this.assetOptions.push(this.data.refData[i].asset);
+          this.assetIDOptions.push(<number>this.data.refData[i].wsoAssetID);  
+        }
       }
 
       // this.assetOptions = [...new Set(this.assetOptions)] 
@@ -466,8 +474,12 @@ export class AddCapitalModalComponent implements OnInit{
     this.capitalSubTypeOptions = this.data.capitalSubTypes;
 
     for(let i = 0; i < this.data.refData.length; i+= 1){
-      this.fundHedgingOptions.push(this.data.refData[i].fundHedging);
-      this.fundCcyOptions.push(this.data.refData[i].fundCcy);
+      if(!!this.data.refData[i].fundHedging){
+        this.fundHedgingOptions.push(this.data.refData[i].fundHedging);
+      }
+      if(!!this.data.refData[i].fundCcy){
+        this.fundCcyOptions.push(this.data.refData[i].fundCcy);
+      }
     }
     this.fundHedgingOptions = [...new Set(this.fundHedgingOptions)]
     this.fundCcyOptions = [...new Set(this.fundCcyOptions)]
@@ -676,7 +688,8 @@ export class AddCapitalModalComponent implements OnInit{
   }
 
   onBlurForLink(){
-    this.childLinkComponent.searchCapitalActivities();
+    if(this.data.actionType === 'LINK-ADD')
+      this.childLinkComponent.searchCapitalActivities();
   }
 
   closeFromLink(outcome){
