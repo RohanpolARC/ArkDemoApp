@@ -1,4 +1,5 @@
 import { ColumnFilter, AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent, CheckboxColumnClickedInfo } from '@adaptabletools/adaptable-angular-aggrid';
+import { FiltersToolPanelModule } from '@ag-grid-enterprise/filter-tool-panel';
 import { ClientSideRowModelModule, ColDef, EditableCallbackParams, GridOptions, RowSelectedEvent, RowNode, CellValueChangedEvent } from '@ag-grid-community/all-modules';
 import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, Module,ExcelExportModule } from '@ag-grid-enterprise/all-modules';
 import { ChangeDetectionStrategy, Component, OnInit, Output } from '@angular/core';
@@ -18,8 +19,7 @@ import { PortfolioSaveRulesComponent } from '../portfolio-save-rules/portfolio-s
 @Component({
   selector: 'app-portfolio-modeller',
   templateUrl: './portfolio-modeller.component.html',
-  styleUrls: ['./portfolio-modeller.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./portfolio-modeller.component.scss']
 })
 export class PortfolioModellerComponent implements OnInit {
 
@@ -58,7 +58,8 @@ export class PortfolioModellerComponent implements OnInit {
     SetFilterModule,
     ColumnsToolPanelModule,
     MenuModule,
-    ExcelExportModule
+    ExcelExportModule,
+    FiltersToolPanelModule
   ];
   columnDefs: ColDef[] = [    
   {field: 'positionID', width:100, tooltipField: 'positionID', type:'abColDefNumber'},
@@ -227,19 +228,25 @@ export class PortfolioModellerComponent implements OnInit {
             // data[i].old_expectedDate = data[i].expectedDate
             // data[i].old_expectedPrice = data[i].expectedPrice
           }  
-          this.rowData = data;
+
+          // if(!this.selectedModelID){
+          //   this.rowData = data;
+          // }
           
-          for(let i = 0; i < this.rowData?.length; i+= 1){
-            this.rowData[i]['IsChecked'] = false;
-            if(this.selectedModelID){
-              if(this.modelMap[this.selectedModelID].positionIDs.includes(this.rowData[i].positionID))
-              this.rowData[i]['IsChecked'] = true
-            }
-          }
+          // for(let i = 0; i < this.rowData?.length; i+= 1){
+          //   this.rowData[i]['IsChecked'] = false;
+          //   if(this.selectedModelID){
+          //     if(this.modelMap[this.selectedModelID].positionIDs?.includes(this.rowData[i].positionID))
+          //     this.rowData[i]['IsChecked'] = true
+          //   }
+          // }
 
-          this.adapTableApi.gridApi.loadGridData(this.rowData)
-          this.selectedPositionIDs = this.modelMap[this.selectedModelID].positionIDs
-
+          // if(!this.selectedModelID){
+          //   this.rowData = data
+          // }
+          // this.adapTableApi.gridApi.loadGridData(data)
+          // this.rowData = data
+          this.gridOptions.api.setRowData(data)
           if(this.selectedModelID){
             if(this.modelMap[this.selectedModelID].positionIDs){
 
@@ -248,9 +255,11 @@ export class PortfolioModellerComponent implements OnInit {
                 let node: RowNode = this.adapTableApi.gridApi.getRowNodeForPrimaryKey(posID)
                 node.setSelected(true);
                 // this.selectedPositionIDs = []
+                this.selectedPositionIDs = this.modelMap[this.selectedModelID].positionIDs
               })
-              this.selectedPositionIDs = this.modelMap[this.selectedModelID].positionIDs
             }
+          
+            this.selectManualPositions(this.selectedModelID);
           }
 
         },
@@ -264,13 +273,16 @@ export class PortfolioModellerComponent implements OnInit {
     }
   }
 
-  fetchPortfolioModels(modelID?: number){
+  fetchPortfolioModels(modelID?: number, context: string = 'SaveRun'){
     console.log(this.dataService.getCurrentUserName())
     this.subscriptions.push(this.irrCalcService.getPortfolioModels(this.dataService.getCurrentUserName()).subscribe({
       next: data => {
         this.parseFetchedModels(data);
         this.InitModelMap()
         this.setSelectedModel(modelID)
+        if(!!modelID && context === 'SaveRun'){
+            this.calcIRR();
+        }
       },
       error: error => {
         console.error(`Failed to fetch Portfolio Rules: ${error}`)
@@ -293,9 +305,12 @@ export class PortfolioModellerComponent implements OnInit {
   ngOnInit(): void {
     console.log(this.dataService.getCurrentUserName())
 
-    this.isAutomatic = new FormControl(false)
-    this.isLocal = new FormControl(false)
-
+    this.isAutomatic = new FormControl()
+    this.isLocal = new FormControl()
+      // Toggle layout programmatically
+    this.isAutomatic.setValue(false)
+      // Don't toggle programmatically
+    this.isLocal.setValue(false, {emitEvent: false})
     this.context = {
       componentParent: this
     }
@@ -487,22 +502,31 @@ export class PortfolioModellerComponent implements OnInit {
     /** Updating all the filtered children nodes as Ag/Adaptable isn't doing itself */
     let node: RowNode = params.node, colID: string, colVal;
     if(node.group){
-
+      console.log(node)
       colID = params.column.getColId();
       colVal = params.data[colID]
   
-      for(let i: number = 0; i < node.childrenAfterFilter.length; i++){
-        node.childrenAfterFilter[i].setDataValue(colID, colVal);
-      }  
+      let updates = [];
+      for(let i: number = 0; i < node.allLeafChildren.length; i++){
+      //  node.childrenAfterFilter[i].setDataValue(colID, colVal);
+       let nodeData = node.allLeafChildren[i].data;
+       nodeData[colID] = colVal
+       updates.push(nodeData)
+      }
+      this.gridOptions.api.applyTransaction({ update: updates})
+
     }
   }
 
   getUpdatedValues(): VPortfolioLocalOverrideModel[]{
     let temp: VPortfolioLocalOverrideModel[] = [];
-    let gridData = this.adapTableApi.gridApi.getVendorGrid().rowData;
+
+    let gridData = []
+    this.gridOptions.api.forEachLeafNode((node) => gridData.push(node.data))
+    // this.gridOptions.api.getRow .gridApi.getVendorGrid().rowData;
 
     for(let i: number = 0; i< gridData?.length; i+= 1){
-      if(gridData[i].expectedDate !== gridData[i].localExpectedDate){
+      if(gridData[i].expectedDate !== gridData[i].globalExpectedDate){
         temp.push({
           positionID: gridData[i].positionID,
           assetID: gridData[i].assetID,
@@ -510,7 +534,7 @@ export class PortfolioModellerComponent implements OnInit {
           value: gridData[i].expectedDate
         })
       }
-      if(gridData[i].expectedPrice !== gridData[i].localExpectedPrice){
+      if(gridData[i].expectedPrice !== gridData[i].globalExpectedPrice){
         temp.push({
           positionID: gridData[i].positionID,
           assetID: gridData[i].assetID,
@@ -520,6 +544,23 @@ export class PortfolioModellerComponent implements OnInit {
       }
     }
     return temp;
+  }
+
+  selectManualPositions(modelID: number){
+    this.selectedPositionIDs = []
+    if(modelID != null)
+      return;
+
+    let positionIDs = this.modelMap[modelID]?.positionIDs
+    this.adapTableApi?.gridApi?.deselectAll();
+    if(positionIDs != null || positionIDs != []){
+      positionIDs.forEachLeafNode(posID => {
+        let node: RowNode = this.adapTableApi?.gridApi?.getRowNodeForPrimaryKey(posID);
+        node.setSelected(posID)
+      })
+      this.selectedPositionIDs = positionIDs;
+    }
+    else this.selectedPositionIDs = [];
   }
   
   setSelectedModel(modelID?: number){
@@ -531,6 +572,22 @@ export class PortfolioModellerComponent implements OnInit {
         }]    
     }
     else this.selectedDropdownData = [];
+  }
+
+  updateLocalFields(){
+    let gridData: any[] = []
+    this.gridOptions.api.forEachLeafNode(node => gridData.push(node.data))
+
+    for(let i: number = 0; i < gridData.length; i++){
+      gridData[i].localExpectedDate = gridData[i].expectedDate
+      gridData[i].localExepectedPrice = gridData[i].expectedPrice
+    }
+
+    this.gridOptions.api.applyTransaction({update: gridData})
+    this.gridOptions.api.refreshCells({
+      force: true,
+      suppressFlash: true
+    })
   }
 
   onSavePortfolio(context = 'Save'){
@@ -572,33 +629,39 @@ export class PortfolioModellerComponent implements OnInit {
                 this.selectedPositionIDs.push(node.data?.positionID)
             })  
         }
-        if(res.context === 'Save' && res.isSuccess){
-          /** If rules were successfully updated/inserted, then refresh the rules */
-          this.fetchPortfolioModels(dialogRef.componentInstance.modelID);
-          // this.selectedDropdownData = [
-          //   {
-          //     modelID: dialogRef.componentInstance.modelID,
-          //     displayName: this.modelMap[dialogRef.componentInstance.modelID].displayName
-          //   }
-          // ]
-          // this.selectedDropdownData = [{modelName: dialogRef.componentInstance.modelForm.get('modelName').value, modelID: dialogRef.componentInstance.modelID}]
+        if(res.isSuccess){
           this.selectedModelID = dialogRef.componentInstance.modelID
+          this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context);
+          this.updateLocalFields()
+          // this.fetchIRRPostions()
         }
-        else if(res.context === 'SaveRun' && res.isSuccess){
-          console.log('Calling calcIRR')
-          this.fetchPortfolioModels(dialogRef.componentInstance.modelID);
-          // this.selectedDropdownData = [{modelName: dialogRef.componentInstance.modelForm.get('modelName').value, modelID: dialogRef.componentInstance.modelID}]
+        // if(res.context === 'Save' && res.isSuccess){
+        //   /** If rules were successfully updated/inserted, then refresh the rules */
+        //   this.fetchPortfolioModels(dialogRef.componentInstance.modelID);
+        //   // this.selectedDropdownData = [
+        //   //   {
+        //   //     modelID: dialogRef.componentInstance.modelID,
+        //   //     displayName: this.modelMap[dialogRef.componentInstance.modelID].displayName
+        //   //   }
+        //   // ]
+        //   // this.selectedDropdownData = [{modelName: dialogRef.componentInstance.modelForm.get('modelName').value, modelID: dialogRef.componentInstance.modelID}]
+        //   this.selectedModelID = dialogRef.componentInstance.modelID
+        // }
+        // else if(res.context === 'SaveRun' && res.isSuccess){
+        //   console.log('Calling calcIRR')
+        //   this.fetchPortfolioModels(dialogRef.componentInstance.modelID);
+        //   // this.selectedDropdownData = [{modelName: dialogRef.componentInstance.modelForm.get('modelName').value, modelID: dialogRef.componentInstance.modelID}]
 
-          // this.selectedDropdownData = [
-          //   {
-          //     modelID: dialogRef.componentInstance.modelID,
-          //     displayName: this.modelMap[dialogRef.componentInstance.modelID].displayName
-          //   }
-          // ]
+        //   // this.selectedDropdownData = [
+        //   //   {
+        //   //     modelID: dialogRef.componentInstance.modelID,
+        //   //     displayName: this.modelMap[dialogRef.componentInstance.modelID].displayName
+        //   //   }
+        //   // ]
 
-          this.selectedModelID = dialogRef.componentInstance.modelID
-          this.calcIRR();
-        }
+        //   this.selectedModelID = dialogRef.componentInstance.modelID
+        //   this.calcIRR();
+        // }
       }
     }))
   }
@@ -614,7 +677,7 @@ export class PortfolioModellerComponent implements OnInit {
     calcParams.asOfDate = this.asOfDate;
     calcParams.positionIDs = this.selectedPositionIDs;
     calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
-    calcParams.modelName = this.modelMap[this.selectedModelID].modelName;
+    calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
 
     this.calcParamsEmitter.emit(calcParams);
   }
@@ -624,18 +687,24 @@ export class PortfolioModellerComponent implements OnInit {
 
   }
 
-  onReset(){
-    /** Here, we clear all filters applied on the grid & change selectedRule to 'Default' in filterpane dropdown */
+  onReset(userAction: boolean = false){
+    /** Here, we clear all filters applied on the grid, overrides, toggles etc.*/
 
     if(this.adapTableApi){
       this.adapTableApi.filterApi.clearAllColumnFilter();
       this.gridOptions.api.deselectAll();
-      this.clearGridOverrides();
+      if(userAction)
+        this.updateGridOverrides('Clear');
     }
     this.selectedDropdownData = [];
-    this.selectedPositionIDs = [];  
-    this.isAutomatic.setValue(false, {emitEvent: false})
-    this.isLocal.setValue(false, {emitEvent: false})
+    this.selectedPositionIDs = [];
+
+    if(userAction)
+      this.isLocal.setValue(false) 
+    else
+      this.isLocal.setValue(false, {emitEvent: false})
+
+    this.isAutomatic.setValue(false)
     this.localOverrides = null
     this.selectedModelID = null
   }
@@ -660,24 +729,38 @@ export class PortfolioModellerComponent implements OnInit {
   }
 
   overridenPositionIDs = {}
-  clearGridOverrides(){
+
     /** 
-     * 
-     * TODO: Maintain a set of overriden positionIDs to only keep track of the nodes that were overriden instead of going through the entire grid. 
-     * */
+   * We have a set of 3 columns for each override column:
+   *  Eg: expectedPrice
+   *    We receive, <expectedPrice,localExpectedPrice,globalExpectedPrice>. expectedPrice is the column that is visible and editable on grid.
+   *  To get overrides, we compare `expectedPrice` with `localExpectedPrice`.
+   * 
+   * To clear overrides, we simply set expectedPrice = globalExpectedPrice on the UI. 
+   * 
+   * */
 
-    this.adapTableApi.gridApi.loadGridData(this.rowData);
+  updateGridOverrides(context: 'Clear' | 'Set' = 'Clear'){
 
-    // for(let i: number = 0; i < this.rowData?.length; i++){
-    //   let posID: number = this.rowData[i].positionID;
-    //   let node: RowNode = this.adapTableApi.gridApi.getRowNodeForPrimaryKey(posID);
-    //   if(node.data.expectedDate !== this.rowData[i].old_expectedDate){
-    //     node.setDataValue('expectedDate', this.rowData[i].old_expectedDate);        
-    //   }
-    //   if(node.data.expectedPrice !== this.rowData[i].old_expectedPrice){
-    //     node.setDataValue('expectedPrice', this.rowData[i].old_expectedPrice);
-    //   }
-    // }
+    // let gridData: any[] = this.adapTableApi.gridApi.getVendorGrid().rowData;
+    let gridData: any[]  = [];
+    let updates = []
+    this.gridOptions.api.forEachLeafNode((node) => gridData.push(node.data))
+    console.log(gridData)
+    for(let i: number = 0; i < gridData?.length; i++){
+      gridData[i].expectedPrice = (context === 'Clear') ? gridData[i].globalExpectedPrice : gridData[i].localExpectedPrice 
+      gridData[i].expectedDate = (context === 'Clear') ? gridData[i].globalExpectedDate : gridData[i].localExpectedDate
+      updates.push(gridData[i])
+    }
+    
+    this.gridOptions.api.applyTransaction({ update: updates})
+    // this.rowData = gridData
+    // this.gridOptions.api.setRowData(gridData)
+    this.gridOptions.api.refreshCells({
+      force: true,
+      suppressFlash: true
+    })
+    // this.adapTableApi.gridApi.loadGridData(gridData);  
   }
 
   fetchOverridesForModel(modelID: number){
@@ -711,47 +794,33 @@ export class PortfolioModellerComponent implements OnInit {
       this.adapTableApi.filterApi.setColumnFilter(this.modelMap[this.selectedModelID].rules)
     }
 
+    /** On model selection, data will be refetched with overrides, hence we do not want to programmatically set it again, hence emitEvent: false */
     this.isLocal.setValue(this.modelMap[this.selectedModelID].isLocal, {emitEvent: false})
-    this.isAutomatic.setValue(!this.modelMap[this.selectedModelID].isManual, {emitEvent: false})
 
-    // this.gridOptions.api.forEachNodeAfterFilter(node => {
-    //   console.log(node)
-    //   if(!node.group){
-    //     if(this.modelMap[this.selectedModelID].positionIDs.includes(node.data.positionID)){
-    //       node.setSelected(true)
-    //     }
-    //     else node.setSelected(false)
-    //   }
-    // })  
-    
-    // this.fetchOverridesForModel(this.selectedModelID);
+    //emitEvent: true (Default) since we want to switch layouts programmatically. 
+    this.isAutomatic.setValue(!this.modelMap[this.selectedModelID].isManual)
 
     this.fetchIRRPostions()
  }
 
   changeListeners(){
     this.subscriptions.push(this.isAutomatic.valueChanges.subscribe( isAuto => {
+      console.log("Calling isAuto: " + isAuto)
       if(isAuto){
         this.adapTableApi.layoutApi.setLayout('Automatic')
-        this.gridOptions.api.deselectAll();
       }
       else {
         this.adapTableApi.layoutApi.setLayout('Manual')
-        this.modelMap[this.selectedModelID].positionIDs?.forEach(posID => {
-          let node: RowNode = this.adapTableApi.gridApi.getRowNodeForPrimaryKey(posID)
-          node.setSelected(true);
-          // this.selectedPositionIDs = []
-        })
-
       }
     }))
 
     this.subscriptions.push(this.isLocal.valueChanges.subscribe(isLocal => {
+      console.log("Calling Local: " + isLocal)
       if(!isLocal){
-       this.clearGridOverrides();
+       this.updateGridOverrides('Clear');
       }
       else{
-//        this.updateGridWithOverrides(this.localOverrides)
+        this.updateGridOverrides('Set')
       }
     }))
   }

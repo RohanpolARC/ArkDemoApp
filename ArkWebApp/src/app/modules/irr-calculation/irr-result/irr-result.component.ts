@@ -199,6 +199,12 @@ export class IrrResultComponent implements OnInit {
   
       },
 
+      userInterfaceOptions: {
+        styleClassNames: [
+          'realised-unrealised'
+        ]
+      },
+
       predefinedConfig: {  
         Dashboard: {
           Revision: 2,
@@ -210,6 +216,21 @@ export class IrrResultComponent implements OnInit {
           }],  
           IsHidden: false,
           DashboardTitle: ' '
+        },
+        ConditionalStyle:{
+          Revision: 3,
+          ConditionalStyles: [
+            {
+              Scope: {All: true},
+              Style: {
+                BackColor: '#0590ca',
+                FontWeight: 'Bold'
+              },
+              Rule: {
+                BooleanExpression: '[issuerShortName] =  "Total" OR [issuerShortName] = "Realised" OR [issuerShortName] = "Unrealised"'
+              }
+            }
+          ]
         },
         Layout: {
           Revision: 5,
