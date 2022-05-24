@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
-import { amountFormatter, nonAmountNumberFormatter2Dec } from 'src/app/shared/functions/formatter';
+import { amountFormatter, noDecimalAmountFormatter, nonAmountNumberFormatter2Dec } from 'src/app/shared/functions/formatter';
 import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 
 @Component({
@@ -47,6 +47,14 @@ export class IrrResultComponent implements OnInit {
     private elementRef: ElementRef
   ) { }
 
+  percentFormatter(params : ValueFormatterParams) {
+    if(params.node.group)
+      return " "
+    else{
+      return `${Number(params.value * 100).toFixed(2)}%`
+    }
+  }
+
   fetchIRRCalculations(){
     let model: IRRCalcParams = <IRRCalcParams>{};
     model.asOfDate = this.asOfDate
@@ -67,7 +75,24 @@ export class IrrResultComponent implements OnInit {
             issuerShortName: data[i].mapGroupColValues['Issuer Short Name'],
             fund: data[i].mapGroupColValues['Fund'],
             realisedUnrealised: data[i].mapGroupColValues['RealisedUnrealised'],
-            sortOrder: data[i].mapGroupColValues['Sort Order']
+            sortOrder: data[i].mapGroupColValues['Sort Order'],
+            
+            accruedFees: data[i].paggr['accFees'],
+            accruedInterest: data[i].paggr['accInterest'],
+            allInRate: data[i].paggr['allInRate'],
+            averageCashMargin: data[i].paggr['averageCashMargin'],
+            cashMargin: data[i].paggr['cashMargin'],
+            cashYield: data[i].paggr['cashYield'],
+            cost: data[i].paggr['cost'],
+            costValue: data[i].paggr['costValue'],
+            exitPrice: data[i].paggr['exitPrice'],
+            expectedPrice: data[i].paggr['expectedPrice'],
+            expectedAge: data[i].paggr['expectedAge'],
+            faceValue: data[i].paggr['faceValue'],
+            faceValueExpected: data[i].paggr['faceValueExpected'],
+            mark: data[i].paggr['mark'],
+            pikMargin: data[i].paggr['pikMargin'],
+            unfundedMargin: data[i].paggr['unfundedMargin']
           }
           calcs.push(calc);
           this.cashFlows.push(data[i].cfList);
@@ -98,77 +123,56 @@ export class IrrResultComponent implements OnInit {
       // { field: 'issuerID' },
       { field: 'fund'},
       { field: 'issuerShortName'},
-      { field: 'capitalInvestedEur', valueFormatter: amountFormatter},
-      {field: 'realizedProceedsEur', valueFormatter: amountFormatter},
-      { field: 'cashCarryingValueEur', valueFormatter: amountFormatter},
+      { field: 'capitalInvestedEur', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'realizedProceedsEur', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'cashCarryingValueEur', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
       { field: 'cashIRR', 
-        valueFormatter: (params : ValueFormatterParams) => {
-        if(params.node.group)
-          return " "
-        else{
-          return `${Number(params.value * 100).toFixed(2)}%`
-        }
-      }},
+      valueFormatter: this.percentFormatter},
+      {field: 'cost', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'discountPriceE', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'discountPriceW', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'npve', headerName: 'NPVE', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'npveActual', headerName: 'NPVE Actual',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'npveMinus100', headerName: 'NPVE -100',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'npvePlus100', headerName: 'NPVE +100',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
       { field: 'yte', headerName: 'YTE',
-      valueFormatter: (params : ValueFormatterParams) => {
-        if(params.node.group)
-          return " "
-        else{
-          return `${Number(params.value * 100).toFixed(2)}%`
-        }
-      }},
-      {field: 'currentYTE',
-      valueFormatter: (params : ValueFormatterParams) => {
-        if(params.node.group)
-          return " "
-        else{
-          return `${Number(params.value * 100).toFixed(2)}%`
-        }
-      }},
-      { field: 'yteHedged',
-      valueFormatter: (params : ValueFormatterParams) => {
-        if(params.node.group)
-          return " "
-        else{
-          return `${Number(params.value * 100).toFixed(2)}%`
-        }
-      }},
+      valueFormatter: this.percentFormatter},
+      {field: 'currentYTE', headerName: 'Current YTE',
+      valueFormatter: this.percentFormatter},
+      { field: 'yteHedged', headerName: 'YTE Hedged',
+      valueFormatter: this.percentFormatter},
       { field: 'ytw', headerName: 'YTW',
-      valueFormatter: (params : ValueFormatterParams) => {
-        if(params.node.group)
-          return " "
-        else{
-          return `${Number(params.value * 100).toFixed(2)}%`
-        }
-      }},
+      valueFormatter: this.percentFormatter},
       {field: 'currentYTW',
-      valueFormatter: (params : ValueFormatterParams) => {
-        if(params.node.group)
-          return " "
-        else{
-          return `${Number(params.value * 100).toFixed(2)}%`
-        }
-      }},
-      { field: 'ytwHedged',
-      valueFormatter: (params : ValueFormatterParams) => {
-        if(params.node.group)
-          return " "
-        else{
-          return `${Number(params.value * 100).toFixed(2)}%`
-        }
-      }},
-
+      valueFormatter: this.percentFormatter},
+      { field: 'ytwHedged', headerName: 'YTW Hedged',
+      valueFormatter: this.percentFormatter},
+      { field: 'accruedFees', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'  },
+      { field: 'accruedInterest', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
+      { field: 'allInRate', valueFormatter: amountFormatter },
+      { field:  'averageCashMargin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'cashMargin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'cashYield', valueFormatter: amountFormatter},
+      
+      {field: 'costValue', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'exitPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'expectedPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'expectedAge', valueFormatter: nonAmountNumberFormatter2Dec},
+      {field: 'faceValue', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'faceValueExpected', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
       { field: 'averageLifeE', valueFormatter: nonAmountNumberFormatter2Dec},
       { field: 'averageLifeW', valueFormatter: nonAmountNumberFormatter2Dec},
       { field: 'cashMOM', valueFormatter: nonAmountNumberFormatter2Dec},
       {field: 'mome', headerName: 'MOM E', valueFormatter: nonAmountNumberFormatter2Dec},
       {field: 'momw', headerName: 'MOM W', valueFormatter: nonAmountNumberFormatter2Dec},
-      {field: 'paybackE'},
-      {field: 'paybackW'},
-      {field: 'totalRealizedIncome', valueFormatter: amountFormatter},
+      {field: 'paybackE', headerName: 'Payback E', valueFormatter: nonAmountNumberFormatter2Dec},
+      {field: 'paybackW', valueFormatter: nonAmountNumberFormatter2Dec},
+      {field: 'totalRealizedIncome', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
       {field: 'realisedUnrealised'},
-      {field: 'pikmargin', headerName: 'PIK Margin', valueFormatter: amountFormatter},
-      {field: 'unfundedMargin', headerName: 'Unfunded Margin', valueFormatter: amountFormatter},
+      {field: 'pikMargin', headerName: 'PIK Margin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      // {field: 'pikmargin', headerName: 'PIK Margin', valueFormatter: amountFormatter},
+      {field: 'unfundedMargin', headerName: 'Unfunded Margin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
       {field: 'sortOrder'}
     ]
 
@@ -218,7 +222,7 @@ export class IrrResultComponent implements OnInit {
           DashboardTitle: ' '
         },
         ConditionalStyle:{
-          Revision: 3,
+          Revision: 7,
           ConditionalStyles: [
             {
               Scope: {All: true},
@@ -227,13 +231,36 @@ export class IrrResultComponent implements OnInit {
                 FontWeight: 'Bold'
               },
               Rule: {
-                BooleanExpression: '[issuerShortName] =  "Total" OR [issuerShortName] = "Realised" OR [issuerShortName] = "Unrealised"'
+                BooleanExpression: '[issuerShortName] =  "Total"'
               }
+            },
+            {
+              Scope: {All: true},
+              Style: {
+                BackColor: '#69bcdf',
+                FontWeight: 'Bold'
+              },
+              Rule: {
+                BooleanExpression: '[issuerShortName] =  "Realised"'
+              }
+
+            },
+            {
+              Scope: {All: true},
+              Style: {
+                BackColor: '#69bcdf',
+                FontWeight: 'Bold'
+              },
+              Rule: {
+                BooleanExpression: '[issuerShortName] =  "Unrealised"'
+              }
+
             }
+
           ]
         },
         Layout: {
-          Revision: 5,
+          Revision: 7,
           CurrentLayout: 'Default IRR Result',
           Layouts: [
           {
@@ -251,17 +278,32 @@ export class IrrResultComponent implements OnInit {
               'ytw',
               'currentYTW',
               'ytwHedged',
-              'averageLifeE', 
-              'averageLifeW',
-              'pikmargin',
-              'unfundedMargin', 
-              'cashMOM', 
-              'mome', 
-              'momw', 
-              'paybackE',
-              'paybackW',
-              'totalRealizedIncome',
-              'realisedUnrealised',
+              'discountPriceE',
+              'discountPriceW',
+              'npve',
+              'npveActual',
+              'npveMinus100',
+              'npvePlus100',
+              'cost',
+              'mark',
+              'expectedPrice',
+              'expectedAge',
+              'cashMargin',
+              'cashYield',
+              'pikMargin',
+              'allInRate',
+              'accruedFees',
+              'accruedInterest',
+              'unfundedMargin',
+              // 'averageLifeE', 
+              // 'averageLifeW',
+              // 'cashMOM', 
+              // 'mome', 
+              // 'momw', 
+              // 'paybackE',
+              // 'paybackW',
+              // 'totalRealizedIncome',
+              // 'realisedUnrealised',
               'sortOrder' 
             ],
             ColumnSorts: [

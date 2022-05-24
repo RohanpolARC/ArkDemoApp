@@ -1,6 +1,6 @@
 import { ColumnFilter, AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent, CheckboxColumnClickedInfo } from '@adaptabletools/adaptable-angular-aggrid';
 import { FiltersToolPanelModule } from '@ag-grid-enterprise/filter-tool-panel';
-import { ClientSideRowModelModule, ColDef, EditableCallbackParams, GridOptions, RowSelectedEvent, RowNode, CellValueChangedEvent } from '@ag-grid-community/all-modules';
+import { ClientSideRowModelModule, ColDef, EditableCallbackParams, GridOptions, RowSelectedEvent, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi } from '@ag-grid-community/all-modules';
 import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, Module,ExcelExportModule } from '@ag-grid-enterprise/all-modules';
 import { ChangeDetectionStrategy, Component, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
@@ -141,7 +141,35 @@ export class PortfolioModellerComponent implements OnInit {
     headerName: 'Spread Discount',
     width: 151,
     field: 'spreadDiscount',
-    valueFormatter: removeDecimalFormatter, type:'abColDefNumber'
+    valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
+    editable: (params: EditableCallbackParams) => {
+      return this.isLocal.value
+    },
+    cellStyle: (params) => {
+      return (this.isLocal.value && !params.node.group) ? 
+      {
+        'border-color': '#0590ca',
+      } : {
+        'border-color': '#fff'
+      };
+    }
+  },
+  {
+    field: 'positionPercent',
+    width: 150,
+    headerName: 'Position Percent',
+    valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
+    editable: (params: EditableCallbackParams) => {
+      return this.isLocal.value
+    },
+    cellStyle: (params) => {
+      return (this.isLocal.value && !params.node.group) ? 
+      {
+        'border-color': '#0590ca',
+      } : {
+        'border-color': '#fff'
+      };
+    }
   },
   { field: 'assetClass', width: 145 },
   { field: 'capStructureTranche', width: 145 },
@@ -169,6 +197,7 @@ export class PortfolioModellerComponent implements OnInit {
     }
   }
   gridOptions: GridOptions;
+  gridApi: GridApi;
   adapTableApi: AdaptableApi;
   adaptableOptions: AdaptableOptions;
 
@@ -246,11 +275,11 @@ export class PortfolioModellerComponent implements OnInit {
           // }
           // this.adapTableApi.gridApi.loadGridData(data)
           // this.rowData = data
-          this.gridOptions.api.setRowData(data)
+          this.gridApi.setRowData(data)
           if(this.selectedModelID){
             if(this.modelMap[this.selectedModelID].positionIDs){
 
-              this.gridOptions.api.deselectAll();
+              this.gridApi.deselectAll();
               this.modelMap[this.selectedModelID].positionIDs?.forEach(posID => {
                 let node: RowNode = this.adapTableApi.gridApi.getRowNodeForPrimaryKey(posID)
                 node.setSelected(true);
@@ -333,16 +362,16 @@ export class PortfolioModellerComponent implements OnInit {
 
     }
 
-    this.subscriptions.push(this.dataService.currentSearchDate.subscribe(asOfDate => {
-      this.asOfDate = asOfDate;
-    }));
+    // this.subscriptions.push(this.dataService.currentSearchDate.subscribe(asOfDate => {
+    //   this.asOfDate = asOfDate;
+    // }));
 
-    this.subscriptions.push(this.dataService.filterApplyBtnState.subscribe(isHit => {
-      if(isHit){
-        this.onReset()
-        this.fetchIRRPostions();
-      }
-    }))
+    // this.subscriptions.push(this.dataService.filterApplyBtnState.subscribe(isHit => {
+    //   if(isHit){
+    //     this.onReset()
+    //     this.fetchIRRPostions();
+    //   }
+    // }))
     
     this.gridOptions = {
       context: this.context,
@@ -404,7 +433,7 @@ export class PortfolioModellerComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 4,
+          Revision: 5,
           CurrentLayout: 'Manual',
           Layouts: [
           {
@@ -431,6 +460,7 @@ export class PortfolioModellerComponent implements OnInit {
               'expectedPrice',
               'maturityPrice',
               'spreadDiscount',
+              'positionPercent',
               'assetClass',
               'capStructureTranche',
               'securedUnsecured',
@@ -466,6 +496,7 @@ export class PortfolioModellerComponent implements OnInit {
               'expectedPrice',
               'maturityPrice',
               'spreadDiscount',
+              'positionPercent',
               'assetClass',
               'capStructureTranche',
               'securedUnsecured',
@@ -513,7 +544,7 @@ export class PortfolioModellerComponent implements OnInit {
        nodeData[colID] = colVal
        updates.push(nodeData)
       }
-      this.gridOptions.api.applyTransaction({ update: updates})
+      this.gridApi.applyTransaction({ update: updates})
 
     }
   }
@@ -522,27 +553,60 @@ export class PortfolioModellerComponent implements OnInit {
     let temp: VPortfolioLocalOverrideModel[] = [];
 
     let gridData = []
-    this.gridOptions.api.forEachLeafNode((node) => gridData.push(node.data))
-    // this.gridOptions.api.getRow .gridApi.getVendorGrid().rowData;
+    this.gridApi.forEachLeafNode((node) => gridData.push(node.data))
+    // this.gridApi.getRow .gridApi.getVendorGrid().rowData;
 
-    for(let i: number = 0; i< gridData?.length; i+= 1){
-      if(gridData[i].expectedDate !== gridData[i].globalExpectedDate){
-        temp.push({
-          positionID: gridData[i].positionID,
-          assetID: gridData[i].assetID,
-          key: 'expectedDate',
-          value: gridData[i].expectedDate
-        })
-      }
+    for(let i = 0 ; i < gridData.length; i++){
+
       if(gridData[i].expectedPrice !== gridData[i].globalExpectedPrice){
-        temp.push({
-          positionID: gridData[i].positionID,
-          assetID: gridData[i].assetID,
-          key: 'expectedPrice',
-          value: gridData[i].expectedPrice
-        })
+          console.log(gridData[i].expectedPrice, gridData[i].globalExpectedPrice)
+          temp.push({
+            positionID: gridData[i].positionID,
+            assetID: gridData[i].assetID,
+            key: 'expectedPrice',
+            value: gridData[i].expectedPrice
+          })
+  
+      }
+      if(gridData[i].expectedDate !== gridData[i].globalExpectedDate){
+          console.log(gridData[i].expectedDate, gridData[i].globalExpectedDate)
+          temp.push({
+            positionID: gridData[i].positionID,
+            assetID: gridData[i].assetID,
+            key: 'expectedDate',
+            value: gridData[i].expectedDate
+          })  
+      }
+      if(gridData[i].spreadDiscount !== gridData[i].globalSpreadDiscount){
+          console.log(gridData[i].spreadDiscount, gridData[i].globalSpreadDiscount)
+          temp.push({
+            positionID: gridData[i].positionID,
+            assetID: gridData[i].assetID,
+            key: 'SpreadDiscount',
+            value: gridData[i].spreadDiscount,
+          })  
+      }
+      if(gridData[i].positionPercent !== gridData[i].globalPositionPercent){
+          console.log(gridData[i].positionPercent, gridData[i].globalPositionPercent)
+          temp.push({
+            positionID: gridData[i].positionID,
+            assetID: gridData[i].assetID,
+            key: 'PositionPercent',
+            value: gridData[i].positionPercent
+          })  
       }
     }
+    // for(let i: number = 0; i< gridData?.length; i+= 1){
+    //   if(gridData[i].expectedDate !== gridData[i].globalExpectedDate){
+    //   }
+    //   if(gridData[i].expectedPrice !== gridData[i].globalExpectedPrice){
+    //     console.log(gridData[i])
+    //   }
+    //   if(gridData[i].spreadDiscount !== gridData[i].globalSpreadDiscount){
+    //   }
+    //   if(gridData[i].positionPercent !== gridData[i].gloalPositionPercent){
+    //   }
+    // }
     return temp;
   }
 
@@ -576,15 +640,17 @@ export class PortfolioModellerComponent implements OnInit {
 
   updateLocalFields(){
     let gridData: any[] = []
-    this.gridOptions.api.forEachLeafNode(node => gridData.push(node.data))
+    this.gridApi.forEachLeafNode(node => gridData.push(node.data))
 
     for(let i: number = 0; i < gridData.length; i++){
       gridData[i].localExpectedDate = gridData[i].expectedDate
-      gridData[i].localExepectedPrice = gridData[i].expectedPrice
+      gridData[i].localExpectedPrice = gridData[i].expectedPrice
+      gridData[i].localSpreadDiscount = gridData[i].spreadDiscount
+      gridData[i].localPositionPercent = gridData[i].positionPercent
     }
 
-    this.gridOptions.api.applyTransaction({update: gridData})
-    this.gridOptions.api.refreshCells({
+    this.gridApi.applyTransaction({update: gridData})
+    this.gridApi.refreshCells({
       force: true,
       suppressFlash: true
     })
@@ -600,7 +666,7 @@ export class PortfolioModellerComponent implements OnInit {
     }
 
     if(!this.isAutomatic.value){
-      this.selectedPositionIDs = this.gridOptions.api.getSelectedNodes()?.map(node => node.data.positionID)
+      this.selectedPositionIDs = this.gridApi.getSelectedNodes()?.map(node => node.data.positionID)
     }
     const dialogRef = this.dialog.open(PortfolioSaveRulesComponent, {
       data: {
@@ -623,7 +689,7 @@ export class PortfolioModellerComponent implements OnInit {
       if(dialogRef.componentInstance.isSuccess){
         if(this.isAutomatic.value){
           this.selectedPositionIDs = [];
-          this.gridOptions.api.forEachNodeAfterFilter(node => 
+          this.gridApi.forEachNodeAfterFilter(node => 
             {
               if(!!node.data?.positionID)
                 this.selectedPositionIDs.push(node.data?.positionID)
@@ -692,7 +758,7 @@ export class PortfolioModellerComponent implements OnInit {
 
     if(this.adapTableApi){
       this.adapTableApi.filterApi.clearAllColumnFilter();
-      this.gridOptions.api.deselectAll();
+      this.gridApi.deselectAll();
       if(userAction)
         this.updateGridOverrides('Clear');
     }
@@ -743,20 +809,25 @@ export class PortfolioModellerComponent implements OnInit {
   updateGridOverrides(context: 'Clear' | 'Set' = 'Clear'){
 
     // let gridData: any[] = this.adapTableApi.gridApi.getVendorGrid().rowData;
+    if(this.selectedModelID == null)
+      return
+
     let gridData: any[]  = [];
     let updates = []
-    this.gridOptions.api.forEachLeafNode((node) => gridData.push(node.data))
-    console.log(gridData)
+    this.gridApi.forEachLeafNode((node) => gridData.push(node.data))
+
     for(let i: number = 0; i < gridData?.length; i++){
       gridData[i].expectedPrice = (context === 'Clear') ? gridData[i].globalExpectedPrice : gridData[i].localExpectedPrice 
       gridData[i].expectedDate = (context === 'Clear') ? gridData[i].globalExpectedDate : gridData[i].localExpectedDate
+      gridData[i].spreadDiscount = (context === 'Clear') ? gridData[i].globalSpreadDiscount : gridData[i].localSpreadDiscount
+      gridData[i].positionPercent = (context === 'Clear') ? gridData[i].globalPositionPercent : gridData[i].localPositionPercent
       updates.push(gridData[i])
     }
     
-    this.gridOptions.api.applyTransaction({ update: updates})
+    this.gridApi.applyTransaction({ update: updates})
     // this.rowData = gridData
-    // this.gridOptions.api.setRowData(gridData)
-    this.gridOptions.api.refreshCells({
+    // this.gridApi.setRowData(gridData)
+    this.gridApi.refreshCells({
       force: true,
       suppressFlash: true
     })
@@ -816,6 +887,12 @@ export class PortfolioModellerComponent implements OnInit {
 
     this.subscriptions.push(this.isLocal.valueChanges.subscribe(isLocal => {
       console.log("Calling Local: " + isLocal)
+
+      this.gridApi.refreshCells({
+        force: true,
+        suppressFlash: true
+      })
+  
       if(!isLocal){
        this.updateGridOverrides('Clear');
       }
@@ -840,15 +917,24 @@ export class PortfolioModellerComponent implements OnInit {
       // do stuff
     });
 
-
-    this.adapTableApi.eventApi.on(
-      'CheckboxColumnClicked',
-      (info: CheckboxColumnClickedInfo) => {
-    })
-
     this.adapTableApi.filterApi.clearAllColumnFilter();
   }
 
+  onGridReady(params: GridReadyEvent){
+    this.gridApi = params.api;
+
+    this.subscriptions.push(this.dataService.currentSearchDate.subscribe(asOfDate => {
+      this.asOfDate = asOfDate;
+    }));
+
+    this.subscriptions.push(this.dataService.filterApplyBtnState.subscribe(isHit => {
+      if(isHit){
+        this.onReset()
+        this.fetchIRRPostions();
+      }
+    }))  
+  }
+  
   parseFetchedModels(data){
     /* Converts delimeted portfolio rules filter for the grid into Filter object*/
     this.modelData = data

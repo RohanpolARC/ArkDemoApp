@@ -2,17 +2,18 @@
 
             <mat-tab-group [selectedIndex]="selected.value" 
                (selectedIndexChange)="selected.setValue($event)" style="margin-right: 32px;">
-                <mat-tab *ngFor="let tab of tabs; let index = index" [label]="tab">
+                <mat-tab *ngFor="let tab of tabs; let index = index" [label]="tab.displayName">
                     <ng-template mat-tab-label>
-                        {{ tab }}
-
+                        {{ tab.displayName }}
+                        <br>
+                        ({{ asOfDate | date:"dd/MM/yyyy" }}) &nbsp;<mat-spinner *ngIf="index !== 0" [diameter] = "15"></mat-spinner>
                         <mat-icon (click)="removeTab(index)" *ngIf="index !== 0">close</mat-icon>
 
                     </ng-template>
                     <app-portfolio-modeller  *ngIf="index === 0" style="display: block; height: calc(100vh - 64px - 50px); width: 100%;"
                     (calcParamsEmitter)="irrCalcParamsReceived($event)"></app-portfolio-modeller>
                     <app-irr-result *ngIf="index !== 0" style="display: block; height: calc(100vh - 64px - 50px);"
-                        [calcParams] = "calcParamsMap[tab]"
+                        [calcParams] = "calcParamsMap[tab.displayName]"
                     ></app-irr-result>
                </mat-tab>
             </mat-tab-group>
