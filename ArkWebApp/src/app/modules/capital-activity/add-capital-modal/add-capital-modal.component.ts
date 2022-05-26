@@ -451,7 +451,8 @@ export class AddCapitalModalComponent implements OnInit{
   gridOptions: GridOptions = {
     tooltipShowDelay: 0,
     columnDefs: this.columnDefs,
-    defaultColDef: this.defaultColDef
+    defaultColDef: this.defaultColDef,
+    rowGroupPanelShow: 'always'
   }
 
   onGridReady(params: GridReadyEvent){

@@ -4,9 +4,10 @@ import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/ca
 import {
   GridOptions,
   Module,
-  ColDef
+  ColDef,
+  ClientSideRowModelModule
 } from '@ag-grid-community/all-modules';
-import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, dateTimeFormatter, amountFormatter, nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
 
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 
@@ -20,6 +21,8 @@ import {
 import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/CapitalActivityModel';
 import { Subscription } from 'rxjs';
+import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
+import { ExcelExportModule, MenuModule, RowGroupingModule, SetFilterModule } from '@ag-grid-enterprise/all-modules';
 
 
 
@@ -47,6 +50,8 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   isCreateNew: boolean = false;
   newCapitalAct: CapitalActivityModel = null;
 
+  agGridModules: Module[] = [ClientSideRowModelModule, RowGroupingModule,SetFilterModule,ColumnsToolPanelModule,MenuModule, ExcelExportModule];
+
   rowContext: ActionColumnButtonContext = null;
   columnDefs: ColDef[] = [
     {field: 'capitalID', headerName: 'Capital ID', type: 'abColDefNumber'},
@@ -59,10 +64,11 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     { field: 'totalAmount', headerName: 'Total Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     { field: 'issuerShortName', headerName: 'Issuer Short Name', type:'abColDefString'},
     { field: 'asset', headerName: 'Asset', type:'abColDefString'},
+    { field: 'wsoAssetID', headerName: 'Asset ID', type:'abColDefNumber',valueFormatter: nonAmountNumberFormatter},
     { field: 'narrative', headerName: 'Narrative', type:'abColDefString'},
     { field: 'source', headerName: 'Source', type:'abColDefString'},
-    {field: 'Link', headerName: 'Link', type:'abColDefBoolean', editable: true},
-    {field: 'resultCategory', headerName: 'Result Category', type:'abColDefString'},
+    { field: 'Link', headerName: 'Link', type:'abColDefBoolean', editable: true},
+    { field: 'resultCategory', headerName: 'Result Category', type:'abColDefString'},
   ]
 
   buttonText: string = 'Create New';
@@ -70,7 +76,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   defaultColDef = {
     resizable: true,
     enableValue: true,
-    enableRowGroup: false,
+    enableRowGroup: true,
     enablePivot: false,
     sortable: true,
     filter: true,
@@ -83,6 +89,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     suppressMenuHide: true,
     suppressClickEdit: true,
     singleClickEdit: false,
+    rowGroupPanelShow: 'always',
     groupSelectsFiltered: true,
     enableGroupEdit: false,
     components: {
@@ -99,6 +106,10 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     userName: 'TestUser',
     adaptableId: '',
     adaptableStateKey: 'Linking Key',
+
+    toolPanelOptions: {
+      toolPanelOrder: ['columns', 'AdaptableToolPanel']
+    },
     predefinedConfig: {
       Dashboard: {
         ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
@@ -120,6 +131,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
         ]
       },
       Layout:{
+        Revision: 2,
         Layouts:[{
           Name: 'Associate Grid layout',
           Columns:[
@@ -132,6 +144,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
             'fundHedging',
             'issuerShortName',
             'asset',
+            'wsoAssetID',
             'narrative',
             'source',
             'capitalID',
