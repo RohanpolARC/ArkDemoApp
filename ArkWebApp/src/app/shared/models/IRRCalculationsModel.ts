@@ -8,7 +8,8 @@ export interface VPortfolioModel{
     isLocal: boolean,
     isManual: boolean,
     isShared: boolean,
-    localOverrides: VPortfolioLocalOverrideModel[]
+    localOverrides: VPortfolioLocalOverrideModel[],
+    irrAggrType: string // `type1 > type2 > type3`
 }
 
 export interface VPortfolioLocalOverrideModel{
@@ -22,5 +23,6 @@ export interface IRRCalcParams{
     asOfDate: string,
     positionIDs: number[],
     modelID: number,
-    modelName: string
+    modelName: string,
+    irrAggrType: string // single type
 }

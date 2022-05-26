@@ -1,9 +1,9 @@
 import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
 import { ClientSideRowModelModule, ColDef, ColGroupDef, GridOptions, Module, ValueFormatterParams } from '@ag-grid-community/all-modules';
 import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule } from '@ag-grid-enterprise/all-modules';
-import { Component, ElementRef, Input, OnInit, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
@@ -16,9 +16,12 @@ import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
   styleUrls: ['./irr-result.component.scss']
 })
 export class IrrResultComponent implements OnInit {
-
+  str :string = ''
   @Input() calcParams: IRRCalcParams;
+  @Output() status = new EventEmitter<string>();
 
+  fetchData = {}
+  aggregationType: string
   subscriptions: Subscription[] = []
   columnDefs: (ColDef | ColGroupDef)[];
   positionIDs: number[]
@@ -39,7 +42,13 @@ export class IrrResultComponent implements OnInit {
   cashFlows // cfList
   modelName: string;
   adapTableApi: AdaptableApi;
-  
+
+  aggregationTypes = 
+    {
+      'Fund > Realised/Unrealised > Issuer Short Name' : ['IssuerFundMerged', 'FundRealisedUnrealised', 'Fund'],
+      'Firmwide > Realised/Unrealised > Issuer Short Name' : ['IssuerFirmwide', 'FirmwideRealisedUnrealised', 'Firmwide']
+    }
+
   constructor(
     private irrCalcSvc: IRRCalcService,
     private dataSvc: DataService,
@@ -55,58 +64,68 @@ export class IrrResultComponent implements OnInit {
     }
   }
 
-  fetchIRRCalculations(){
-    let model: IRRCalcParams = <IRRCalcParams>{};
-    model.asOfDate = this.asOfDate
-    model.positionIDs = this.positionIDs
-    model.modelID = this.modelID
-    this.gridOptions?.api.showLoadingOverlay();
-    this.subscriptions.push(this.irrCalcSvc.getIRRCalculation(model).subscribe({
-      next: data => {
-        this.gridOptions?.api.hideOverlay();
-        this.calcs = this.cashFlows = []
+  // fetchIRRCalculations(aggregationType: string){
+  //   let model: IRRCalcParams = <IRRCalcParams>{};
+  //   model.asOfDate = this.asOfDate
+  //   model.positionIDs = this.positionIDs
+  //   model.modelID = this.modelID
+  //   model.irrAggrType = aggregationType
 
-        let calcs = []
-        for(let i: number = 0; i < data.length; i++){
-          let calc = data[i].calcHelper;
-          calc = {
-            ...calc, 
-            issuerID: data[i].mapGroupColValues['IssuerId'],
-            issuerShortName: data[i].mapGroupColValues['Issuer Short Name'],
-            fund: data[i].mapGroupColValues['Fund'],
-            realisedUnrealised: data[i].mapGroupColValues['RealisedUnrealised'],
-            sortOrder: data[i].mapGroupColValues['Sort Order'],
+  //   this.gridOptions?.api.showLoadingOverlay();
+  //   this.subscriptions.push(this.irrCalcSvc.getIRRCalculation(model).subscribe({
+  //     next: data => {this.str = data[0].debugStr
+  //       this.gridOptions?.api.hideOverlay();
+  //       // this.calcs = this.cashFlows = []
+
+  //       let calcs = []
+  //       for(let i: number = 0; i < data.length; i++){
+  //         let calc = data[i].calcHelper;
+  //         calc = {
+  //           ...calc, 
+  //           issuerID: data[i].mapGroupColValues['IssuerId'],
+  //           issuerShortName: data[i].mapGroupColValues['Issuer Short Name'],
+  //           fund: data[i].mapGroupColValues['Fund'],
+  //           realisedUnrealised: data[i].mapGroupColValues['RealisedUnrealised'],
+  //           sortOrder: data[i].mapGroupColValues['Sort Order'],
             
-            accruedFees: data[i].paggr['accFees'],
-            accruedInterest: data[i].paggr['accInterest'],
-            allInRate: data[i].paggr['allInRate'],
-            averageCashMargin: data[i].paggr['averageCashMargin'],
-            cashMargin: data[i].paggr['cashMargin'],
-            cashYield: data[i].paggr['cashYield'],
-            cost: data[i].paggr['cost'],
-            costValue: data[i].paggr['costValue'],
-            exitPrice: data[i].paggr['exitPrice'],
-            expectedPrice: data[i].paggr['expectedPrice'],
-            expectedAge: data[i].paggr['expectedAge'],
-            faceValue: data[i].paggr['faceValue'],
-            faceValueExpected: data[i].paggr['faceValueExpected'],
-            mark: data[i].paggr['mark'],
-            pikMargin: data[i].paggr['pikMargin'],
-            unfundedMargin: data[i].paggr['unfundedMargin']
-          }
-          calcs.push(calc);
-          this.cashFlows.push(data[i].cfList);
-        }
+  //           accruedFees: data[i].paggr['accFees'],
+  //           accruedInterest: data[i].paggr['accInterest'],
+  //           allInRate: data[i].paggr['allInRate'],
+  //           averageCashMargin: data[i].paggr['averageCashMargin'],
+  //           cashMargin: data[i].paggr['cashMargin'],
+  //           cashYield: data[i].paggr['cashYield'],
+  //           cost: data[i].paggr['cost'],
+  //           costValue: data[i].paggr['costValue'],
+  //           exitPrice: data[i].paggr['exitPrice'],
+  //           expectedPrice: data[i].paggr['expectedPrice'],
+  //           expectedAge: data[i].paggr['expectedAge'],
+  //           faceValue: data[i].paggr['faceValue'],
+  //           faceValueExpected: data[i].paggr['faceValueExpected'],
+  //           mark: data[i].paggr['mark'],
+  //           pikMargin: data[i].paggr['pikMargin'],
+  //           unfundedMargin: data[i].paggr['unfundedMargin']
+  //         }
+  //         calcs.push(calc);
+  //         this.cashFlows.push(data[i].cfList);
+  //       }
 
-        this.calcs = calcs;
-      },
-      error: error => {
-        this.calcs = []
-        console.error(`Failed to fetch IRR Calculations` )
-        console.error(error)
-      }
-    }))
-  }
+  //       // this.calcs = calcs;
+
+  //       this.status.emit('Loaded')
+
+  //       //
+
+  //       this.fetchData[aggregationType] = calcs;
+  //       console.log(this.fetchData);
+  //     },
+  //     error: error => {
+  //       this.calcs = []
+  //       this.status.emit('Failed')
+  //       console.error(`Failed to fetch IRR Calculations` )
+  //       console.error(error)
+  //     }
+  //   }))
+  // }
 
   Init(){
     this.defaultColDef = {
@@ -120,9 +139,9 @@ export class IrrResultComponent implements OnInit {
     };
 
     this.columnDefs = [
-      // { field: 'issuerID' },
-      { field: 'fund'},
-      { field: 'issuerShortName'},
+      { field: 'IssuerID' },
+      { field: 'Fund'},
+      { field: 'Issuer Short Name'},
       { field: 'capitalInvestedEur', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
       {field: 'realizedProceedsEur', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
       { field: 'cashCarryingValueEur', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
@@ -148,8 +167,8 @@ export class IrrResultComponent implements OnInit {
       valueFormatter: this.percentFormatter},
       { field: 'ytwHedged', headerName: 'YTW Hedged',
       valueFormatter: this.percentFormatter},
-      { field: 'accruedFees', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'  },
-      { field: 'accruedInterest', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
+      { field: 'accFees', headerName: 'Accrued Fees', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'  },
+      { field: 'accInterest', headerName: 'Accrued Interest', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
       { field: 'allInRate', valueFormatter: amountFormatter },
       { field:  'averageCashMargin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
       { field: 'cashMargin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
@@ -169,11 +188,11 @@ export class IrrResultComponent implements OnInit {
       {field: 'paybackE', headerName: 'Payback E', valueFormatter: nonAmountNumberFormatter2Dec},
       {field: 'paybackW', valueFormatter: nonAmountNumberFormatter2Dec},
       {field: 'totalRealizedIncome', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      {field: 'realisedUnrealised'},
+      {field: 'RealisedUnrealised'},
       {field: 'pikMargin', headerName: 'PIK Margin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
       // {field: 'pikmargin', headerName: 'PIK Margin', valueFormatter: amountFormatter},
       {field: 'unfundedMargin', headerName: 'Unfunded Margin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      {field: 'sortOrder'}
+      {field: 'Sort Order'}
     ]
 
     this.gridOptions = {
@@ -222,7 +241,7 @@ export class IrrResultComponent implements OnInit {
           DashboardTitle: ' '
         },
         ConditionalStyle:{
-          Revision: 7,
+          Revision: 9,
           ConditionalStyles: [
             {
               Scope: {All: true},
@@ -231,7 +250,7 @@ export class IrrResultComponent implements OnInit {
                 FontWeight: 'Bold'
               },
               Rule: {
-                BooleanExpression: '[issuerShortName] =  "Total"'
+                BooleanExpression: '[Issuer Short Name] =  "Total"'
               }
             },
             {
@@ -241,33 +260,21 @@ export class IrrResultComponent implements OnInit {
                 FontWeight: 'Bold'
               },
               Rule: {
-                BooleanExpression: '[issuerShortName] =  "Realised"'
+                BooleanExpression: '[Issuer Short Name] =  "Realised" OR [Issuer Short Name] = "Unrealised"'
               }
 
             },
-            {
-              Scope: {All: true},
-              Style: {
-                BackColor: '#69bcdf',
-                FontWeight: 'Bold'
-              },
-              Rule: {
-                BooleanExpression: '[issuerShortName] =  "Unrealised"'
-              }
-
-            }
-
           ]
         },
         Layout: {
-          Revision: 7,
+          Revision: 9,
           CurrentLayout: 'Default IRR Result',
           Layouts: [
           {
             Name: 'Default IRR Result',
             Columns: [
-              'fund',
-              'issuerShortName',
+              'Fund',
+              'Issuer Short Name',
               'capitalInvestedEur',
               'realizedProceedsEur',
               'cashCarryingValueEur',
@@ -292,8 +299,8 @@ export class IrrResultComponent implements OnInit {
               'cashYield',
               'pikMargin',
               'allInRate',
-              'accruedFees',
-              'accruedInterest',
+              'accFees',
+              'accInterest',
               'unfundedMargin',
               // 'averageLifeE', 
               // 'averageLifeW',
@@ -304,19 +311,19 @@ export class IrrResultComponent implements OnInit {
               // 'paybackW',
               // 'totalRealizedIncome',
               // 'realisedUnrealised',
-              'sortOrder' 
+              'Sort Order' 
             ],
             ColumnSorts: [
               {
-                ColumnId: 'fund',
+                ColumnId: 'Fund',
                 SortOrder: 'Asc'
               },
               {
-                ColumnId: 'sortOrder',
+                ColumnId: 'Sort Order',
                 SortOrder: 'Asc'
               },
               {
-                ColumnId: 'issuerShortName',
+                ColumnId: 'Issuer Short Name',
                 SortOrder: 'Asc'
               }
             ]
@@ -359,24 +366,57 @@ export class IrrResultComponent implements OnInit {
 
   ngOnInit(): void {
     this.Init();
-    this.irrCalcSvc.currentCalcs.pipe(first()).subscribe(params => {
-      if(params !== null){
-        this.asOfDate = params.asOfDate;
-        this.positionIDs = params.positionIDs;
-        this.modelID = params.modelID;
-        this.modelName = params.modelName;
-        this.fetchIRRCalculations()
-      }
-    })
+    // this.irrCalcSvc.currentCalcs.pipe(first()).subscribe(params => {
+    //   if(params !== null){
+    //     this.asOfDate = params.asOfDate;
+    //     this.positionIDs = params.positionIDs;
+    //     this.modelID = params.modelID;
+    //     this.modelName = params.modelName;
+    //     this.fetchIRRCalculations()
+    //   }
+    // })
   }
 
   ngOnChanges(changes: SimpleChanges){
-    this.asOfDate = this.calcParams.asOfDate;
-    this.positionIDs = this.calcParams.positionIDs;
-    this.modelID = this.calcParams.modelID;
-    this.modelName = this.calcParams.modelName;
-    this.fetchIRRCalculations()
+    if(this.calcParams !== null){
+      this.asOfDate = this.calcParams.asOfDate;
+      this.positionIDs = this.calcParams.positionIDs;
+      this.modelID = this.calcParams.modelID;
+      this.modelName = this.calcParams.modelName;
+      this.aggregationType = this.calcParams.irrAggrType
+      
+      let paramModels :IRRCalcParams[] = []; 
+      for(let i: number = 0; i < this.aggregationTypes[this.aggregationType].length; i+= 1){
+        let model: IRRCalcParams = <IRRCalcParams>{};
+        model.asOfDate = this.asOfDate
+        model.positionIDs = this.positionIDs
+        model.modelID = this.modelID
+        model.irrAggrType = this.aggregationTypes[this.aggregationType][i]
 
+        paramModels.push(model)
+      }
+
+
+      console.log("Calling forkJoin")
+      this.subscriptions.push(forkJoin(paramModels.map((model: IRRCalcParams) => this.irrCalcSvc.getIRRCalculation(model)))
+      .subscribe(
+        (data) => {
+          let calcs = [];
+      
+          calcs = []
+          for(let i = 0 ; i < data.length; i++){
+              for(let j = 0; j < data[i].length; j++){
+                  calcs.push({... data[i][j].calcHelper, ... data[i][j].mapGroupColValues, ... data[i][j].paggr})
+              }
+          }
+          console.log(data)
+          console.log(calcs)
+
+          this.calcs = calcs
+          this.status.emit('Loaded')
+        }
+      ))
+    }
   }
 
   ngOnDestroy(){

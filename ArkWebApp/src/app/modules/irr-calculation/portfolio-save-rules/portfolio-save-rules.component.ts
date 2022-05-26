@@ -37,6 +37,10 @@ export class PortfolioSaveRulesComponent implements OnInit {
   isFailure: boolean
   modelForm: FormGroup
   context: "Save" | "SaveRun"  
+  aggregationTypes: {
+    type: string,
+    levels: string[]
+  }[] = []
 
   constructor(
     public dialogRef: MatDialogRef<PortfolioSaveRulesComponent>,
@@ -46,9 +50,9 @@ export class PortfolioSaveRulesComponent implements OnInit {
   ) { }
 
   modelValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
-    let RN: boolean = !!control.get('modelName').value
-    let RD: boolean = !!control.get('modelDesc').value
-    return (RN) ? { validated: true } : { validated: false }
+    let MN: boolean = !!control.get('modelName').value
+    let AT: boolean = !!control.get('aggregationType').value
+    return (MN && AT) ? { validated: true } : { validated: false }
   }
   
   ngOnInit(): void {
@@ -95,11 +99,22 @@ export class PortfolioSaveRulesComponent implements OnInit {
       modelName: new FormControl(this.data.model?.modelName, Validators.required),
       modelDesc: new FormControl(this.data.model?.modelDesc),
       isUpdate: new FormControl(!!this.modelID, Validators.required),
-      isShared: new FormControl(this.data.isShared)
+      isShared: new FormControl(this.data.isShared),
+      aggregationType: new FormControl(this.data.aggregationType, Validators.required)
     },{
       validators: this.modelValidator
     })
 
+    this.aggregationTypes = [
+      {
+        type: 'Fund > Realised/Unrealised > Issuer Short Name',
+        levels: ['IssuerFundMerged', 'FundRealisedUnrealised', 'Fund']
+      },
+      {
+        type: 'Firmwide > Realised/Unrealised > Issuer Short Name',
+        levels: ['IssuerFirmwide', 'FirmwideRealisedUnrealised', 'Firmwide']
+      }
+    ]
   }
 
   changeListeners(){
@@ -118,6 +133,7 @@ export class PortfolioSaveRulesComponent implements OnInit {
       if(isUpdate === false){
         this.modelForm.get('modelName').reset()
         this.modelForm.get('modelDesc').reset()
+        this.modelForm.get('aggregationType').reset()
       }
     }))
   }
@@ -133,6 +149,7 @@ export class PortfolioSaveRulesComponent implements OnInit {
     model.isLocal = this.isLocal;
     model.isShared = this.modelForm.get('isShared').value;
     model.isManual = !this.isAutomatic;
+    model.irrAggrType = this.modelForm.get('aggregationType').value;
 
     if(this.isAutomatic){
       /** Convert rules object into rules string separated by delimeter that is to be sent to ArkWebApi */

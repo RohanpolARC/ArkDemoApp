@@ -48,7 +48,14 @@
                 </button>
             </mat-form-field>
             
-
+            <mat-form-field class="form-field" appearance="outline">
+                <mat-label>Aggregation Type</mat-label>
+                <mat-select formControlName="aggregationType" required disableOptionCentering>
+                  <mat-option *ngFor="let aggr of aggregationTypes" [value]="aggr.type">
+                    {{aggr.type}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
         </div>
     </form>
 

@@ -46,7 +46,7 @@ export class PortfolioModellerComponent implements OnInit {
   modelData: {
     modelID: number, modelName: string, displayName: string, modelDesc: string, 
     rules: ColumnFilter[], positionIDs: number[], 
-    isLocal: boolean, isManual: boolean, username: string, isShared: boolean
+    isLocal: boolean, isManual: boolean, username: string, isShared: boolean, aggregationType: string
   }[]
   modelMap = {} //<id, model Object>
   selectedPositionIDs: number[] = []
@@ -677,11 +677,12 @@ export class PortfolioModellerComponent implements OnInit {
         isLocal: this.isLocal.value,
         isShared: this.modelMap[this.selectedModelID]?.isShared,
         positionIDs: this.selectedPositionIDs,
+        aggregationType: this.modelMap[this.selectedModelID]?.aggregationType,
         updatedValues: this.getUpdatedValues(),
         context: context
       },
       maxHeight: '100vh',
-      width: '60vw',
+      width: '80vw',
       maxWidth: '2000px'
     })
 
@@ -744,12 +745,13 @@ export class PortfolioModellerComponent implements OnInit {
     calcParams.positionIDs = this.selectedPositionIDs;
     calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
     calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
+    calcParams.irrAggrType = this.modelMap[this.selectedModelID]?.irrAggrType;
 
     this.calcParamsEmitter.emit(calcParams);
   }
 
   runIRRCalc(){
-    this.onSavePortfolio('Save&Run');
+    this.onSavePortfolio('SaveRun');
 
   }
 
@@ -950,6 +952,7 @@ export class PortfolioModellerComponent implements OnInit {
       this.modelData[i].username = null;
       this.modelData[i].positionIDs = data[i].positionIDs?.split(',').map(x => parseInt(x))
       this.modelData[i].rules = [];
+      this.modelData[i].aggregationType = data[i].irrAggrType;
       
       let ruleArr: string[] = tempRules.split('|').join('"').split('~');
       ruleArr.forEach(x => data[i].rules.push(JSON.parse(x)))

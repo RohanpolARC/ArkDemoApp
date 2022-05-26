@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
@@ -10,17 +10,9 @@ import { IrrResultComponent } from './irr-result/irr-result.component';
   templateUrl: './irr-calculation.component.html',
   styleUrls: ['./irr-calculation.component.scss']
 })
-export class IrrCalculationComponent implements OnInit, AfterViewInit {
+export class IrrCalculationComponent implements OnInit {
 
   asOfDate: string
-
-  @ViewChildren(IrrResultComponent) resultChildren!: QueryList<IrrResultComponent>;
-  ngAfterViewInit(){
-    console.log(this.resultChildren);
-
-    // this.resultChildren.notifyOnChanges
-  }
-  
   constructor(
     private dataService: DataService
   ) { }
@@ -28,10 +20,12 @@ export class IrrCalculationComponent implements OnInit, AfterViewInit {
   subscriptions: Subscription[] = []
   tabs : {
     actualName: string, 
-    displayName: string
+    displayName: string,
+    status: string    // Loaded, Loading, Failed
   }[] = [{
     actualName: 'Portfolio Modeller',
-    displayName: 'Portfolio Modeller'
+    displayName: 'Portfolio Modeller',
+    status: 'Loaded'
   }];
 
   selected = new FormControl(0);
@@ -51,11 +45,17 @@ export class IrrCalculationComponent implements OnInit, AfterViewInit {
       if(isHit){
         this.tabs = [{
           actualName: 'Portfolio Modeller',
-          displayName: 'Portfolio Modeller'
+          displayName: 'Portfolio Modeller',
+          status: 'Loaded'
         }]
       }
     }))
 
+  }
+  statusReceived(status: string, index: number){
+    if(index >= 1){
+      this.tabs[index].status = status
+    }
   }
 
   irrCalcParamsReceived(params: IRRCalcParams){
@@ -67,11 +67,21 @@ export class IrrCalculationComponent implements OnInit, AfterViewInit {
     let cnt: number = this.tabs.filter(tab => tab.actualName === params.modelName).length;
     let newTab = {
       displayName: (cnt !== 0) ? `${params.modelName} ${cnt + 1}`: `${params.modelName}`,
-      actualName: `${params.modelName}`
+      actualName: `${params.modelName}`,
+      status: 'Loading'
     }
     this.tabs.push(newTab);    
     this.selected.setValue(this.tabs.indexOf(newTab))
     this.calcParamsMap[newTab.displayName] = params;
+  }
+
+  reRun(index: number){
+    if(index >= 1){
+      let displayName: string = this.tabs[index].displayName
+      let params = this.calcParamsMap[displayName]
+      this.calcParamsMap[displayName] = null;
+      this.calcParamsMap[displayName] = params
+    }
   }
 
   ngOnDestroy(){
