@@ -36,6 +36,13 @@ export function amountFormatter(params){
     }
 }
 
+export function nonAmountNumberFormatter(params){
+    // Non amount number requires no locale.
+    if(params.value == null || Number(params.value) == 0)
+        return " ";
+    else return String(params.value);
+}
+
 export function noDecimalAmountFormatter(params){
     
     if(params.value!=undefined && Number(Number(params.value).toFixed(0))!=0){
