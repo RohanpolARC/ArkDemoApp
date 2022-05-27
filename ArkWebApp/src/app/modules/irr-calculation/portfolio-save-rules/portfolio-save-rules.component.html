@@ -35,15 +35,15 @@
             
             <mat-form-field class="form-field" appearance="outline">
                 <mat-label>Model Name</mat-label>
-                <input matInput type="text" name="model-name" autocomplete="off" [disabled]="isSuccess" formControlName="modelName">
-                <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="modelForm.get('modelName').reset()">
+                <input matInput type="text" name="model-name" autocomplete="off" formControlName="modelName" required>
+                <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="modelForm.get('modelName').reset()" [disabled]="isSuccess">
                     <mat-icon>close</mat-icon>
                 </button>
             </mat-form-field>
             <mat-form-field class="form-field" appearance="outline">
                 <mat-label>Model Description</mat-label>
-                <input matInput type="text" name="model-desc" autocomplete="off" [disabled]="isSuccess" formControlName="modelDesc">
-                <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="modelForm.get('modelDesc').reset()">
+                <input matInput type="text" name="model-desc" autocomplete="off" formControlName="modelDesc">
+                <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="modelForm.get('modelDesc').reset()" [disabled]="isSuccess">
                     <mat-icon>close</mat-icon>
                 </button>
             </mat-form-field>
@@ -76,10 +76,10 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-    <button mat-raised-button [disabled]="disableSave" type="button"
+    <button mat-raised-button [disabled]="modelForm.invalid ? true : isSuccess" type="button"
     color="primary" (click)="onProceed('Save')">Save</button>
 
-    <button mat-raised-button [disabled]="disableSaveRun" type="button"
+    <button mat-raised-button [disabled]="modelForm.invalid ? true : isSuccess" type="button"
     color="primary" (click)="onProceed('SaveRun')">Save & Run</button>
     <button mat-raised-button (click)="onClose()" type="button">Cancel</button>            
 <mat-dialog-actions>

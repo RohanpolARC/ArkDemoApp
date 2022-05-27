@@ -172,7 +172,7 @@ export class IrrResultComponent implements OnInit {
       { field: 'allInRate', valueFormatter: amountFormatter },
       { field:  'averageCashMargin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
       { field: 'cashMargin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      {field: 'cashYield', valueFormatter: amountFormatter},
+      {field: 'cashYield', valueFormatter: this.percentFormatter},
       
       {field: 'costValue', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
       {field: 'exitPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
@@ -399,11 +399,10 @@ export class IrrResultComponent implements OnInit {
 
       console.log("Calling forkJoin")
       this.subscriptions.push(forkJoin(paramModels.map((model: IRRCalcParams) => this.irrCalcSvc.getIRRCalculation(model)))
-      .subscribe(
-        (data) => {
-          let calcs = [];
-      
-          calcs = []
+      .subscribe({
+        next: data => {
+
+          let calcs = []
           for(let i = 0 ; i < data.length; i++){
               for(let j = 0; j < data[i].length; j++){
                   calcs.push({... data[i][j].calcHelper, ... data[i][j].mapGroupColValues, ... data[i][j].paggr})
@@ -414,7 +413,14 @@ export class IrrResultComponent implements OnInit {
 
           this.calcs = calcs
           this.status.emit('Loaded')
+
+        },
+        error: error => {
+          this.calcs = []
+          this.status.emit('Failed');
+          console.error(`Failed to load IRR Calcs:  ${error}`)
         }
+      }
       ))
     }
   }

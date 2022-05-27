@@ -58,6 +58,7 @@ export class PortfolioSaveRulesComponent implements OnInit {
   ngOnInit(): void {
     this.Init();
     this.changeListeners();
+    this.modelForm.updateValueAndValidity()
   }
 
   ngOnDestroy(){
@@ -68,7 +69,7 @@ export class PortfolioSaveRulesComponent implements OnInit {
     this.isAutomatic = this.data.isAutomatic
     this.isLocal = this.data.isLocal
     this.disableSubmit = false;
-    this.disableSave = this.disableSaveRun = false;
+    this.disableSave = this.disableSaveRun = true;
     this.isSuccess = this.isFailure = false;
     this.adaptableApi = this.data.adaptableApi;
     this.selectedModelName = this.data.model?.modelName;
@@ -99,11 +100,13 @@ export class PortfolioSaveRulesComponent implements OnInit {
       modelName: new FormControl(this.data.model?.modelName, Validators.required),
       modelDesc: new FormControl(this.data.model?.modelDesc),
       isUpdate: new FormControl(!!this.modelID, Validators.required),
-      isShared: new FormControl(this.data.isShared),
+      isShared: new FormControl(this.data.isShared, Validators.required),
       aggregationType: new FormControl(this.data.aggregationType, Validators.required)
-    },{
-      validators: this.modelValidator
-    })
+    }
+    // ,{
+    //   validators: this.modelValidator
+    // }
+    )
 
     this.aggregationTypes = [
       {
@@ -118,16 +121,16 @@ export class PortfolioSaveRulesComponent implements OnInit {
   }
 
   changeListeners(){
-    this.subscriptions.push(this.modelForm.valueChanges.subscribe(_ => {
-      if(this.modelForm.errors?.['validated'] && !this.isSuccess && (this.rules?.length > 0 || this.positionIDs?.length > 0)){
-        this.disableSave = this.disableSaveRun = false;
-        this.disableSubmit = false;
-      }
-      else if(!this.modelForm.errors?.['validated']){
-        this.disableSave = this.disableSaveRun = true;
-        this.disableSubmit = true;
-      }
-    }))
+    // this.subscriptions.push(this.modelForm.statusChanges.subscribe(_ => {
+    
+    //   if(this.modelForm.errors?.['validated'] && !this.isSuccess && (this.rules?.length > 0 || this.positionIDs?.length > 0)){
+    //     this.disableSave = this.disableSaveRun = false;
+
+    //   }
+    //   else {
+    //     this.disableSave = this.disableSaveRun = true
+    //   }
+    // }))
 
     this.subscriptions.push(this.modelForm.get('isUpdate').valueChanges.subscribe(isUpdate => {
       if(isUpdate === false){
@@ -184,6 +187,7 @@ export class PortfolioSaveRulesComponent implements OnInit {
     this.subscriptions.push(this.irrCalcService.putPortfolioModels(model).subscribe({
       next: result => {
         if(result.isSuccess){
+          this.modelForm.disable()
           this.isSuccess = true
           this.isFailure = false
           this.updateMsg = 'Successfully updated model';
