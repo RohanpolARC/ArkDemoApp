@@ -91,6 +91,7 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'narrative', headerName: 'Narrative', type:'abColDefString'},
     { field: 'source', headerName: 'Source', type:'abColDefString'},
     { field: 'sourceID', headerName: 'Source ID', type:'abColDefNumber', valueFormatter: nullOrZeroFormatter},
+    { field: 'isLinked', headerName: 'Is Linked', type:'abColDefBoolean'},
     { field: 'createdOn', headerName: 'Created On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
     { field: 'createdBy', headerName: 'Created By', type:'abColDefString'},
     { field: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
@@ -275,6 +276,7 @@ export class CapitalActivityComponent implements OnInit {
   
       predefinedConfig: {
         Dashboard: {
+          Revision: 1,
           ModuleButtons: ['TeamSharing','Export', 'Layout','ConditionalStyle'],
           IsCollapsed: true,
           Tabs: [{
@@ -285,6 +287,7 @@ export class CapitalActivityComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
+          Revision: 2,
           CurrentLayout: 'Basic Capital Activity',
           Layouts: [{
             Name: 'Basic Capital Activity',
@@ -294,17 +297,18 @@ export class CapitalActivityComponent implements OnInit {
               'capitalType',
               'capitalSubType',
               'fundHedging',
+              'issuerShortName',
+              'asset',
               'fundCcy',
               'posCcy',
               'totalAmount',
               'localAmount',
               'fxRate',
               // 'wsoIssuerID',
-              // 'issuerShortName',
               'wsoAssetID',
-              'asset',
               'narrative',
               'source',
+              'isLinked',
               'createdBy',
               'createdOn',
               'modifiedBy',
@@ -385,6 +389,7 @@ export class CapitalActivityComponent implements OnInit {
   
       predefinedConfig: {
         Dashboard: {
+          Revision: 1,
           ModuleButtons: ['TeamSharing', 'Export', 'Layout','ConditionalStyle'],
           IsCollapsed: true,
           Tabs: [{
@@ -395,6 +400,7 @@ export class CapitalActivityComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
+          Revision: 1,
           Layouts:[{
             Name: 'Basic Investment Cashflow',
             Columns: [
