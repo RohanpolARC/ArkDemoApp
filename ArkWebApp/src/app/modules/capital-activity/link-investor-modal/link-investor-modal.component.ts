@@ -67,6 +67,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     { field: 'wsoAssetID', headerName: 'Asset ID', type:'abColDefNumber',valueFormatter: nonAmountNumberFormatter},
     { field: 'narrative', headerName: 'Narrative', type:'abColDefString'},
     { field: 'source', headerName: 'Source', type:'abColDefString'},
+    { field: 'isLinked', headerName: 'Is Linked', type: 'abColDefBoolean'},
     { field: 'Link', headerName: 'Link', type:'abColDefBoolean', editable: true},
     { field: 'resultCategory', headerName: 'Result Category', type:'abColDefString'},
   ]
@@ -131,7 +132,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
         ]
       },
       Layout:{
-        Revision: 2,
+        Revision: 3,
         Layouts:[{
           Name: 'Associate Grid layout',
           Columns:[
@@ -147,6 +148,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
             'wsoAssetID',
             'narrative',
             'source',
+            'isLinked',
             'capitalID',
             'Link'
 
