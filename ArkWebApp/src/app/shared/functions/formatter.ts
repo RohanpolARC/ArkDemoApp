@@ -58,13 +58,6 @@ export function noDecimalAmountFormatter(params){
     }
 }
 
-export function nonAmountNumberFormatter(params){
-    // Non amount number requires no locale.
-    if(params.value == null || Number(params.value) == 0)
-        return " ";
-    else return String(params.value);
-}
-
 export function nullOrZeroFormatter(params){
     if(params.value == null || Number(params.value) == 0)
         return "";
