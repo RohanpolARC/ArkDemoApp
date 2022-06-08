@@ -2,10 +2,9 @@ import { ColumnFilter, AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridC
 import { FiltersToolPanelModule } from '@ag-grid-enterprise/filter-tool-panel';
 import { ClientSideRowModelModule, ColDef, EditableCallbackParams, GridOptions, RowSelectedEvent, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi } from '@ag-grid-community/all-modules';
 import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, Module,ExcelExportModule } from '@ag-grid-enterprise/all-modules';
-import { ChangeDetectionStrategy, Component, OnInit, Output } from '@angular/core';
+import { Component, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
@@ -14,7 +13,7 @@ import { amountFormatter, removeDecimalFormatter, formatDate } from 'src/app/sha
 import { IRRCalcParams, VPortfolioLocalOverrideModel } from 'src/app/shared/models/IRRCalculationsModel';
 import { EventEmitter } from '@angular/core';
 import { AggridMaterialDatepickerComponent } from '../../facility-detail/aggrid-material-datepicker/aggrid-material-datepicker.component';
-import { PortfolioSaveRulesComponent } from '../portfolio-save-rules/portfolio-save-rules.component';
+import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/portfolio-save-run-model.component';
 
 @Component({
   selector: 'app-portfolio-modeller',
@@ -26,8 +25,7 @@ export class PortfolioModellerComponent implements OnInit {
   constructor(
     private dataService: DataService,
     private irrCalcService: IRRCalcService,
-    public dialog: MatDialog,
-    private router: Router
+    public dialog: MatDialog
   ) { }
 
   @Output() calcParamsEmitter = new EventEmitter<IRRCalcParams>();
@@ -361,17 +359,6 @@ export class PortfolioModellerComponent implements OnInit {
       closeDropDownOnSelection: true,
 
     }
-
-    // this.subscriptions.push(this.dataService.currentSearchDate.subscribe(asOfDate => {
-    //   this.asOfDate = asOfDate;
-    // }));
-
-    // this.subscriptions.push(this.dataService.filterApplyBtnState.subscribe(isHit => {
-    //   if(isHit){
-    //     this.onReset()
-    //     this.fetchIRRPostions();
-    //   }
-    // }))
     
     this.gridOptions = {
       context: this.context,
@@ -596,17 +583,6 @@ export class PortfolioModellerComponent implements OnInit {
           })  
       }
     }
-    // for(let i: number = 0; i< gridData?.length; i+= 1){
-    //   if(gridData[i].expectedDate !== gridData[i].globalExpectedDate){
-    //   }
-    //   if(gridData[i].expectedPrice !== gridData[i].globalExpectedPrice){
-    //     console.log(gridData[i])
-    //   }
-    //   if(gridData[i].spreadDiscount !== gridData[i].globalSpreadDiscount){
-    //   }
-    //   if(gridData[i].positionPercent !== gridData[i].gloalPositionPercent){
-    //   }
-    // }
     return temp;
   }
 
@@ -668,7 +644,7 @@ export class PortfolioModellerComponent implements OnInit {
     if(!this.isAutomatic.value){
       this.selectedPositionIDs = this.gridApi.getSelectedNodes()?.map(node => node.data.positionID)
     }
-    const dialogRef = this.dialog.open(PortfolioSaveRulesComponent, {
+    const dialogRef = this.dialog.open(PortfolioSaveRunModelComponent, {
       data: {
         adaptableApi: this.adapTableApi, 
         model: this.modelMap[this.selectedModelID], 
@@ -700,35 +676,8 @@ export class PortfolioModellerComponent implements OnInit {
           this.selectedModelID = dialogRef.componentInstance.modelID
           this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context);
           this.updateLocalFields()
-          // this.fetchIRRPostions()
         }
-        // if(res.context === 'Save' && res.isSuccess){
-        //   /** If rules were successfully updated/inserted, then refresh the rules */
-        //   this.fetchPortfolioModels(dialogRef.componentInstance.modelID);
-        //   // this.selectedDropdownData = [
-        //   //   {
-        //   //     modelID: dialogRef.componentInstance.modelID,
-        //   //     displayName: this.modelMap[dialogRef.componentInstance.modelID].displayName
-        //   //   }
-        //   // ]
-        //   // this.selectedDropdownData = [{modelName: dialogRef.componentInstance.modelForm.get('modelName').value, modelID: dialogRef.componentInstance.modelID}]
-        //   this.selectedModelID = dialogRef.componentInstance.modelID
-        // }
-        // else if(res.context === 'SaveRun' && res.isSuccess){
-        //   console.log('Calling calcIRR')
-        //   this.fetchPortfolioModels(dialogRef.componentInstance.modelID);
-        //   // this.selectedDropdownData = [{modelName: dialogRef.componentInstance.modelForm.get('modelName').value, modelID: dialogRef.componentInstance.modelID}]
-
-        //   // this.selectedDropdownData = [
-        //   //   {
-        //   //     modelID: dialogRef.componentInstance.modelID,
-        //   //     displayName: this.modelMap[dialogRef.componentInstance.modelID].displayName
-        //   //   }
-        //   // ]
-
-        //   this.selectedModelID = dialogRef.componentInstance.modelID
-        //   this.calcIRR();
-        // }
+        
       }
     }))
   }
@@ -801,22 +750,36 @@ export class PortfolioModellerComponent implements OnInit {
     /** 
    * We have a set of 3 columns for each override column:
    *  Eg: expectedPrice
-   *    We receive, <expectedPrice,localExpectedPrice,globalExpectedPrice>. expectedPrice is the column that is visible and editable on grid.
+   *    We receive, `<expectedPrice,localExpectedPrice,globalExpectedPrice>`. expectedPrice is the column that is visible and editable on grid.
    *  To get overrides, we compare `expectedPrice` with `localExpectedPrice`.
    * 
-   * To clear overrides, we simply set expectedPrice = globalExpectedPrice on the UI. 
+   * To clear overrides, we simply set `expectedPrice = globalExpectedPrice` on the UI. 
    * 
    * */
 
   updateGridOverrides(context: 'Clear' | 'Set' = 'Clear'){
 
     // let gridData: any[] = this.adapTableApi.gridApi.getVendorGrid().rowData;
-    if(this.selectedModelID == null)
+    if(this.selectedModelID == null && context === 'Set')
       return
 
     let gridData: any[]  = [];
     let updates = []
-    this.gridApi.forEachLeafNode((node) => gridData.push(node.data))
+    this.gridApi.forEachNodeAfterFilterAndSort((node) => {
+      if(node.group){
+        if(!!node.data?.expectedDate)
+          node.setDataValue('expectedDate', node.data.localExpectedDate);
+        if(!!node.data?.expectedPrice){
+          console.log(node.data.expectedPrice)
+          node.setDataValue('expectedPrice', node.data.localExpectedPrice);
+        }
+        if(!!node.data?.spreadDiscount)
+          node.setDataValue('spreadDiscount', node.data.localSpreadDiscount);
+        if(!!node.data?.positionPercent)
+          node.setDataValue('positionPercent', node.data.localPositionPercent);
+      }
+      else gridData.push(node.data)
+    })
 
     for(let i: number = 0; i < gridData?.length; i++){
       gridData[i].expectedPrice = (context === 'Clear') ? gridData[i].globalExpectedPrice : gridData[i].localExpectedPrice 
@@ -897,6 +860,7 @@ export class PortfolioModellerComponent implements OnInit {
   
       if(!isLocal){
        this.updateGridOverrides('Clear');
+       this.gridApi.stopEditing();
       }
       else{
         this.updateGridOverrides('Set')

@@ -45,12 +45,13 @@ export class IRRCalcService {
   }
 
   public getIRRCalculation(model: IRRCalcParams){
-    return this.http.post<any>(`${APIConfig.IRR_CALCS_GET_API}`, model, this.httpOptions).pipe(catchError((ex) => throwError(ex)))
+//    return this.http.post<any>(`${APIConfig.IRR_CALCS_GET_API}`, model, this.httpOptions).pipe(catchError((ex) => throwError(ex)))
+
+return this.http.post<any>(`${APIConfig.IRR_RUN_CALCS_API}`, model, this.httpOptions)
+.pipe(catchError((ex) => throwError(ex)))
   }
 
-  private calcSource = new BehaviorSubject(null);
-  currentCalcs = this.calcSource.asObservable();
-  updateCalcParams(calcs){
-    this.calcSource.next(calcs);
-  }  
+  public getIRRStatus(uri: string){
+    return this.http.get<any>(`${uri}`, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
+  }
 }

@@ -4,10 +4,12 @@ import { environment } from "src/environments/environment";
 export class APIConfig {
 
 
-    // public static BASEURL: string = window.location.origin;
     // public static BASEURL: string = (/^.*localhost.*/.test(window.location.host) && window.location.port == "4200") ? "https://localhost:44366" : environment.baseUrl;
 
     public static BASEURL: string = environment.baseUrl
+    // public static IRRCALC_BASEURL: string = (/^.*localhost.*/.test(window.location.host) && window.location.port == "4200") ? "http://localhost:7071" : environment.irrCalcFunUrl;
+
+    public static IRRCALC_BASEURL: string = environment.irrCalcFunUrl;
 
     public static ARKWEB_ACCESSIBLE_TABS_GET_API: string = APIConfig.BASEURL + "/api/Access/GetTabs";
     public static ARKWEB_TABROLE_ASSOCIATION_GET_API: string = APIConfig.BASEURL + "/api/Access/GetRoleTabAssociation";
@@ -48,5 +50,5 @@ export class APIConfig {
     public static IRR_PORTFOLIO_MODEL_PUT_API: string = APIConfig.BASEURL + "/api/IRRCalculation/PutModel";
     public static IRR_PORTFOLIO_MODEL_GET_API: string = APIConfig.BASEURL + "/api/IRRCalculation/GetModel";
     public static IRR_LOCAL_OVERRIDES_GET_API: string = APIConfig.BASEURL + "/api/IRRCalculation/GetLocalOverrides";
-    public static IRR_CALCS_GET_API: string = APIConfig.BASEURL + "/api/IRRCalculation/RunCalcs";
+    public static IRR_RUN_CALCS_API: string = APIConfig.IRRCALC_BASEURL + "/api/IRRCalculatorFunction_HttpTrigger";
 }

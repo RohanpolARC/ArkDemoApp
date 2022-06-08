@@ -3,8 +3,8 @@ import { ClientSideRowModelModule, ColDef, ColGroupDef, GridOptions, Module, Val
 import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule } from '@ag-grid-enterprise/all-modules';
 import { Component, ElementRef, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
-import { forkJoin, Subscription } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { Subject, Subscription, timer } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { amountFormatter, noDecimalAmountFormatter, nonAmountNumberFormatter2Dec } from 'src/app/shared/functions/formatter';
@@ -16,11 +16,10 @@ import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
   styleUrls: ['./irr-result.component.scss']
 })
 export class IrrResultComponent implements OnInit {
-  str :string = ''
+
   @Input() calcParams: IRRCalcParams;
   @Output() status = new EventEmitter<string>();
 
-  fetchData = {}
   aggregationType: string
   subscriptions: Subscription[] = []
   columnDefs: (ColDef | ColGroupDef)[];
@@ -49,11 +48,11 @@ export class IrrResultComponent implements OnInit {
       'Firmwide > Realised/Unrealised > Issuer Short Name' : ['IssuerFirmwide', 'FirmwideRealisedUnrealised', 'Firmwide']
     }
 
+  closeTimer = new Subject<any>();
+
   constructor(
     private irrCalcSvc: IRRCalcService,
-    private dataSvc: DataService,
-    private router: Router,
-    private elementRef: ElementRef
+    private dataSvc: DataService
   ) { }
 
   percentFormatter(params : ValueFormatterParams) {
@@ -63,69 +62,6 @@ export class IrrResultComponent implements OnInit {
       return `${Number(params.value * 100).toFixed(2)}%`
     }
   }
-
-  // fetchIRRCalculations(aggregationType: string){
-  //   let model: IRRCalcParams = <IRRCalcParams>{};
-  //   model.asOfDate = this.asOfDate
-  //   model.positionIDs = this.positionIDs
-  //   model.modelID = this.modelID
-  //   model.irrAggrType = aggregationType
-
-  //   this.gridOptions?.api.showLoadingOverlay();
-  //   this.subscriptions.push(this.irrCalcSvc.getIRRCalculation(model).subscribe({
-  //     next: data => {this.str = data[0].debugStr
-  //       this.gridOptions?.api.hideOverlay();
-  //       // this.calcs = this.cashFlows = []
-
-  //       let calcs = []
-  //       for(let i: number = 0; i < data.length; i++){
-  //         let calc = data[i].calcHelper;
-  //         calc = {
-  //           ...calc, 
-  //           issuerID: data[i].mapGroupColValues['IssuerId'],
-  //           issuerShortName: data[i].mapGroupColValues['Issuer Short Name'],
-  //           fund: data[i].mapGroupColValues['Fund'],
-  //           realisedUnrealised: data[i].mapGroupColValues['RealisedUnrealised'],
-  //           sortOrder: data[i].mapGroupColValues['Sort Order'],
-            
-  //           accruedFees: data[i].paggr['accFees'],
-  //           accruedInterest: data[i].paggr['accInterest'],
-  //           allInRate: data[i].paggr['allInRate'],
-  //           averageCashMargin: data[i].paggr['averageCashMargin'],
-  //           cashMargin: data[i].paggr['cashMargin'],
-  //           cashYield: data[i].paggr['cashYield'],
-  //           cost: data[i].paggr['cost'],
-  //           costValue: data[i].paggr['costValue'],
-  //           exitPrice: data[i].paggr['exitPrice'],
-  //           expectedPrice: data[i].paggr['expectedPrice'],
-  //           expectedAge: data[i].paggr['expectedAge'],
-  //           faceValue: data[i].paggr['faceValue'],
-  //           faceValueExpected: data[i].paggr['faceValueExpected'],
-  //           mark: data[i].paggr['mark'],
-  //           pikMargin: data[i].paggr['pikMargin'],
-  //           unfundedMargin: data[i].paggr['unfundedMargin']
-  //         }
-  //         calcs.push(calc);
-  //         this.cashFlows.push(data[i].cfList);
-  //       }
-
-  //       // this.calcs = calcs;
-
-  //       this.status.emit('Loaded')
-
-  //       //
-
-  //       this.fetchData[aggregationType] = calcs;
-  //       console.log(this.fetchData);
-  //     },
-  //     error: error => {
-  //       this.calcs = []
-  //       this.status.emit('Failed')
-  //       console.error(`Failed to fetch IRR Calculations` )
-  //       console.error(error)
-  //     }
-  //   }))
-  // }
 
   Init(){
     this.defaultColDef = {
@@ -142,56 +78,56 @@ export class IrrResultComponent implements OnInit {
       { field: 'IssuerID' },
       { field: 'Fund'},
       { field: 'Issuer Short Name'},
-      { field: 'capitalInvestedEur', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
-      {field: 'realizedProceedsEur', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
-      { field: 'cashCarryingValueEur', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
-      { field: 'cashIRR', 
+      { field: 'CapitalInvestedEur', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'RealizedProceedsEur', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'CashCarryingValueEur', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'CashIRR', 
       valueFormatter: this.percentFormatter},
-      {field: 'cost', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      {field: 'mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      { field: 'discountPriceE', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      { field: 'discountPriceW', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      { field: 'npve', headerName: 'NPVE', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      { field: 'npveActual', headerName: 'NPVE Actual',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      { field: 'npveMinus100', headerName: 'NPVE -100',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      { field: 'npvePlus100', headerName: 'NPVE +100',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      { field: 'yte', headerName: 'YTE',
+      {field: 'Cost', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'Mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'DiscountPriceE', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'DiscountPriceW', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'NPVE', headerName: 'NPVE', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'NPVEActual', headerName: 'NPVE Actual',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'NPVEMinus100', headerName: 'NPVE -100',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'NPVEPlus100', headerName: 'NPVE +100',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'YTE', headerName: 'YTE',
       valueFormatter: this.percentFormatter},
-      {field: 'currentYTE', headerName: 'Current YTE',
+      {field: 'CurrentYTE', headerName: 'Current YTE',
       valueFormatter: this.percentFormatter},
-      { field: 'yteHedged', headerName: 'YTE Hedged',
+      { field: 'YTEHedged', headerName: 'YTE Hedged',
       valueFormatter: this.percentFormatter},
-      { field: 'ytw', headerName: 'YTW',
+      { field: 'YTW', headerName: 'YTW',
       valueFormatter: this.percentFormatter},
-      {field: 'currentYTW',
+      {field: 'CurrentYTW',
       valueFormatter: this.percentFormatter},
-      { field: 'ytwHedged', headerName: 'YTW Hedged',
+      { field: 'YTWHedged', headerName: 'YTW Hedged',
       valueFormatter: this.percentFormatter},
-      { field: 'accFees', headerName: 'Accrued Fees', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'  },
-      { field: 'accInterest', headerName: 'Accrued Interest', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
-      { field: 'allInRate', valueFormatter: amountFormatter },
-      { field:  'averageCashMargin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      { field: 'cashMargin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      {field: 'cashYield', valueFormatter: this.percentFormatter},
+      { field: 'AccFees', headerName: 'Accrued Fees', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'  },
+      { field: 'AccInterest', headerName: 'Accrued Interest', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
+      { field: 'AllInRate', valueFormatter: amountFormatter },
+      { field:  'AverageCashMargin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'CashMargin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'CashYield', valueFormatter: this.percentFormatter},
       
-      {field: 'costValue', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      {field: 'exitPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      {field: 'expectedPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-      {field: 'expectedAge', valueFormatter: nonAmountNumberFormatter2Dec},
-      {field: 'faceValue', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
-      {field: 'faceValueExpected', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
-      { field: 'averageLifeE', valueFormatter: nonAmountNumberFormatter2Dec},
-      { field: 'averageLifeW', valueFormatter: nonAmountNumberFormatter2Dec},
-      { field: 'cashMOM', valueFormatter: nonAmountNumberFormatter2Dec},
-      {field: 'mome', headerName: 'MOM E', valueFormatter: nonAmountNumberFormatter2Dec},
-      {field: 'momw', headerName: 'MOM W', valueFormatter: nonAmountNumberFormatter2Dec},
-      {field: 'paybackE', headerName: 'Payback E', valueFormatter: nonAmountNumberFormatter2Dec},
-      {field: 'paybackW', valueFormatter: nonAmountNumberFormatter2Dec},
-      {field: 'totalRealizedIncome', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'CostValue', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'ExitPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'ExpectedPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'ExpectedAge', valueFormatter: nonAmountNumberFormatter2Dec},
+      {field: 'FaceValue', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'FaceValueExpected', valueFormatter: noDecimalAmountFormatter, cellClass: 'ag-right-aligned-cell'},
+      { field: 'AverageLifeE', valueFormatter: nonAmountNumberFormatter2Dec},
+      { field: 'AverageLifeW', valueFormatter: nonAmountNumberFormatter2Dec},
+      { field: 'CashMOM', valueFormatter: nonAmountNumberFormatter2Dec},
+      {field: 'MOME', headerName: 'MOM E', valueFormatter: nonAmountNumberFormatter2Dec},
+      {field: 'MOMW', headerName: 'MOM W', valueFormatter: nonAmountNumberFormatter2Dec},
+      {field: 'PaybackE', headerName: 'Payback E', valueFormatter: nonAmountNumberFormatter2Dec},
+      {field: 'PaybackW', valueFormatter: nonAmountNumberFormatter2Dec},
+      {field: 'TotalRealizedIncome', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
       {field: 'RealisedUnrealised'},
-      {field: 'pikMargin', headerName: 'PIK Margin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'PikMargin', headerName: 'PIK Margin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
       // {field: 'pikmargin', headerName: 'PIK Margin', valueFormatter: amountFormatter},
-      {field: 'unfundedMargin', headerName: 'Unfunded Margin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+      {field: 'UnfundedMargin', headerName: 'Unfunded Margin', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
       {field: 'Sort Order'}
     ]
 
@@ -206,7 +142,6 @@ export class IrrResultComponent implements OnInit {
       suppressAggFuncInHeader: true,
       rowGroupPanelShow: 'always'
     }
-
     
     this.adaptableOptions = {
       primaryKey: '',
@@ -267,7 +202,7 @@ export class IrrResultComponent implements OnInit {
           ]
         },
         Layout: {
-          Revision: 9,
+          Revision: 10,
           CurrentLayout: 'Default IRR Result',
           Layouts: [
           {
@@ -275,33 +210,33 @@ export class IrrResultComponent implements OnInit {
             Columns: [
               'Fund',
               'Issuer Short Name',
-              'capitalInvestedEur',
-              'realizedProceedsEur',
-              'cashCarryingValueEur',
-              'cashIRR',
-              'yte',
-              'currentYTE',
-              'yteHedged',
-              'ytw',
-              'currentYTW',
-              'ytwHedged',
-              'discountPriceE',
-              'discountPriceW',
-              'npve',
-              'npveActual',
-              'npveMinus100',
-              'npvePlus100',
-              'cost',
-              'mark',
-              'expectedPrice',
-              'expectedAge',
-              'cashMargin',
-              'cashYield',
-              'pikMargin',
-              'allInRate',
-              'accFees',
-              'accInterest',
-              'unfundedMargin',
+              'CapitalInvestedEur',
+              'RealizedProceedsEur',
+              'CashCarryingValueEur',
+              'CashIRR',
+              'YTE',
+              'CurrentYTE',
+              'YTEHedged',
+              'YTW',
+              'CurrentYTW',
+              'YTWHedged',
+              'DiscountPriceE',
+              'DiscountPriceW',
+              'NPVE',
+              'NPVEActual',
+              'NPVEMinus100',
+              'NPVEPlus100',
+              'Cost',
+              'Mark',
+              'ExpectedPrice',
+              'ExpectedAge',
+              'CashMargin',
+              'CashYield',
+              'PikMargin',
+              'AllInRate',
+              'AccFees',
+              'AccInterest',
+              'UnfundedMargin',
               // 'averageLifeE', 
               // 'averageLifeW',
               // 'cashMOM', 
@@ -366,15 +301,6 @@ export class IrrResultComponent implements OnInit {
 
   ngOnInit(): void {
     this.Init();
-    // this.irrCalcSvc.currentCalcs.pipe(first()).subscribe(params => {
-    //   if(params !== null){
-    //     this.asOfDate = params.asOfDate;
-    //     this.positionIDs = params.positionIDs;
-    //     this.modelID = params.modelID;
-    //     this.modelName = params.modelName;
-    //     this.fetchIRRCalculations()
-    //   }
-    // })
   }
 
   ngOnChanges(changes: SimpleChanges){
@@ -385,43 +311,41 @@ export class IrrResultComponent implements OnInit {
       this.modelName = this.calcParams.modelName;
       this.aggregationType = this.calcParams.irrAggrType
       
-      let paramModels :IRRCalcParams[] = []; 
-      for(let i: number = 0; i < this.aggregationTypes[this.aggregationType].length; i+= 1){
-        let model: IRRCalcParams = <IRRCalcParams>{};
-        model.asOfDate = this.asOfDate
-        model.positionIDs = this.positionIDs
-        model.modelID = this.modelID
-        model.irrAggrType = this.aggregationTypes[this.aggregationType][i]
+      console.log("Calling Durable function")
+      this.subscriptions.push(this.irrCalcSvc.getIRRCalculation(this.calcParams).subscribe({
+        next: response => {
 
-        paramModels.push(model)
-      }
+          timer(0, 5000).pipe(
+            switchMap(() => this.irrCalcSvc.getIRRStatus(response?.['statusQueryGetUri'])),
+            takeUntil(this.closeTimer)
+          ).subscribe({
+            next: (res: any) => {
 
+              if(res?.['runtimeStatus'] === 'Completed'){
+                let calcs = []
+                for(let i = 0 ; i < res?.['output'].length; i++){
+                  calcs.push({... res?.['output'][i].calcHelper, ... res?.['output'][i].MapGroupColValues, ... res?.['output'][i].paggr})
+                }
+                this.calcs = calcs
+                this.status.emit('Loaded')
 
-      console.log("Calling forkJoin")
-      this.subscriptions.push(forkJoin(paramModels.map((model: IRRCalcParams) => this.irrCalcSvc.getIRRCalculation(model)))
-      .subscribe({
-        next: data => {
-
-          let calcs = []
-          for(let i = 0 ; i < data.length; i++){
-              for(let j = 0; j < data[i].length; j++){
-                  calcs.push({... data[i][j].calcHelper, ... data[i][j].mapGroupColValues, ... data[i][j].paggr})
+                this.closeTimer.next();
               }
-          }
-          console.log(data)
-          console.log(calcs)
-
-          this.calcs = calcs
-          this.status.emit('Loaded')
-
+              else if(res?.['runtimeStatus'] === 'Failed'){
+                this.closeTimer.next();
+                this.status.emit('Failed')
+                this.calcs = [];
+              }
+            }
+          })
         },
         error: error => {
+          this.closeTimer.next();
+          this.status.emit('Failed')
           this.calcs = []
-          this.status.emit('Failed');
-          console.error(`Failed to load IRR Calcs:  ${error}`)
+          console.error(`Failed to fetch response: ${error}`);
         }
-      }
-      ))
+      }))
     }
   }
 
@@ -429,7 +353,6 @@ export class IrrResultComponent implements OnInit {
     this.subscriptions.forEach(sub => {
       sub.unsubscribe()
     })
-    this.elementRef.nativeElement.remove();
   }
 
   onAdaptableReady(

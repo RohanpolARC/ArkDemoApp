@@ -8,12 +8,12 @@ import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.ser
 import { VPortfolioModel } from 'src/app/shared/models/IRRCalculationsModel';
 
 @Component({
-  selector: 'app-portfolio-save-rules',
-  templateUrl: './portfolio-save-rules.component.html',
-  styleUrls: ['./portfolio-save-rules.component.scss']
+  selector: 'app-portfolio-save-run-model',
+  templateUrl: './portfolio-save-run-model.component.html',
+  styleUrls: ['./portfolio-save-run-model.component.scss']
 })
 
-export class PortfolioSaveRulesComponent implements OnInit {
+export class PortfolioSaveRunModelComponent implements OnInit {
 
   isLocal: boolean
   isAutomatic: boolean
@@ -43,7 +43,7 @@ export class PortfolioSaveRulesComponent implements OnInit {
   }[] = []
 
   constructor(
-    public dialogRef: MatDialogRef<PortfolioSaveRulesComponent>,
+    public dialogRef: MatDialogRef<PortfolioSaveRunModelComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
     private dataService: DataService,
     private irrCalcService: IRRCalcService
@@ -100,7 +100,7 @@ export class PortfolioSaveRulesComponent implements OnInit {
       modelName: new FormControl(this.data.model?.modelName, Validators.required),
       modelDesc: new FormControl(this.data.model?.modelDesc),
       isUpdate: new FormControl(!!this.modelID, Validators.required),
-      isShared: new FormControl(this.data.isShared, Validators.required),
+      isShared: new FormControl(!!this.data.isShared, Validators.required),
       aggregationType: new FormControl(this.data.aggregationType, Validators.required)
     }
     // ,{

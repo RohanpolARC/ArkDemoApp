@@ -6,7 +6,7 @@ import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-import { PortfolioSaveRulesComponent } from './portfolio-save-rules/portfolio-save-rules.component';
+import { PortfolioSaveRunModelComponent } from './portfolio-save-run-model/portfolio-save-run-model.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -23,7 +23,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 @NgModule({
   declarations: [
     IrrCalculationComponent,
-    PortfolioSaveRulesComponent,
+    PortfolioSaveRunModelComponent,
     IrrResultComponent,
     PortfolioModellerComponent
   ],
