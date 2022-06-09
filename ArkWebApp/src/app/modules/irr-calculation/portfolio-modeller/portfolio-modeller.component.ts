@@ -139,6 +139,7 @@ export class PortfolioModellerComponent implements OnInit {
     headerName: 'Spread Discount',
     width: 151,
     field: 'spreadDiscount',
+    enableCellChangeFlash: true,
     valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
     editable: (params: EditableCallbackParams) => {
       return this.isLocal.value
@@ -156,6 +157,7 @@ export class PortfolioModellerComponent implements OnInit {
     field: 'positionPercent',
     width: 150,
     headerName: 'Position Percent',
+    enableCellChangeFlash: true,
     valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
     editable: (params: EditableCallbackParams) => {
       return this.isLocal.value
@@ -685,7 +687,7 @@ export class PortfolioModellerComponent implements OnInit {
   calcIRR(){
     /** 
      * 
-     * Opening new tab for IRR Result in IRR Calculation and sending IRRCalcParams as @Input to <app-irr-result> component.
+     * Opening new tab for IRR Result in IRR Calculation and sending IRRCalcParams as `@Input` to `<app-irr-result>` component.
      *  Portfolio Modeller -> IRR Calculation -> IRR Result 
     */
 
@@ -766,29 +768,18 @@ export class PortfolioModellerComponent implements OnInit {
     let gridData: any[]  = [];
     let updates = []
     this.gridApi.forEachNodeAfterFilterAndSort((node) => {
-      if(node.group){
-        if(!!node.data?.expectedDate)
-          node.setDataValue('expectedDate', node.data.localExpectedDate);
-        if(!!node.data?.expectedPrice){
-          console.log(node.data.expectedPrice)
-          node.setDataValue('expectedPrice', node.data.localExpectedPrice);
-        }
-        if(!!node.data?.spreadDiscount)
-          node.setDataValue('spreadDiscount', node.data.localSpreadDiscount);
-        if(!!node.data?.positionPercent)
-          node.setDataValue('positionPercent', node.data.localPositionPercent);
-      }
-      else gridData.push(node.data)
+      if(node.data)
+      gridData.push(node.data)
     })
 
     for(let i: number = 0; i < gridData?.length; i++){
-      gridData[i].expectedPrice = (context === 'Clear') ? gridData[i].globalExpectedPrice : gridData[i].localExpectedPrice 
-      gridData[i].expectedDate = (context === 'Clear') ? gridData[i].globalExpectedDate : gridData[i].localExpectedDate
-      gridData[i].spreadDiscount = (context === 'Clear') ? gridData[i].globalSpreadDiscount : gridData[i].localSpreadDiscount
-      gridData[i].positionPercent = (context === 'Clear') ? gridData[i].globalPositionPercent : gridData[i].localPositionPercent
+      gridData[i].expectedPrice = (context === 'Clear') ? gridData[i]?.globalExpectedPrice : gridData[i]?.localExpectedPrice 
+      gridData[i].expectedDate = (context === 'Clear') ? gridData[i]?.globalExpectedDate : gridData[i]?.localExpectedDate
+      gridData[i].spreadDiscount = (context === 'Clear') ? gridData[i]?.globalSpreadDiscount : gridData[i]?.localSpreadDiscount
+      gridData[i].positionPercent = (context === 'Clear') ? gridData[i]?.globalPositionPercent : gridData[i]?.localPositionPercent
       updates.push(gridData[i])
     }
-    
+    console.log(updates)
     this.gridApi.applyTransaction({ update: updates})
     // this.rowData = gridData
     // this.gridApi.setRowData(gridData)
