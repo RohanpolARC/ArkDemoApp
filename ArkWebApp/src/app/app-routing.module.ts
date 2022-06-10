@@ -99,8 +99,11 @@ const routes: Routes = [
     ],
     canActivate: [
       MsalGuard,
-      // RoleGuard
-    ]
+      RoleGuard
+    ],
+    data: {
+      tab: 'Portfolio Modeller'
+    }
   }
 ];  
   

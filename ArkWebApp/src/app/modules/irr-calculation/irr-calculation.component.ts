@@ -59,7 +59,6 @@ export class IrrCalculationComponent implements OnInit {
   }
 
   irrCalcParamsReceived(params: IRRCalcParams){
-    console.log(params)
     /** 
      * Calc params received from Portfolio Modeller. Now, creating a new tab for these params with IRR-result inside it.
     */

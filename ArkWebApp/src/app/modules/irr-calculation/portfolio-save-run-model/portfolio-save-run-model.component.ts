@@ -103,9 +103,6 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       isShared: new FormControl(!!this.data.isShared, Validators.required),
       aggregationType: new FormControl(this.data.aggregationType, Validators.required)
     }
-    // ,{
-    //   validators: this.modelValidator
-    // }
     )
 
     this.aggregationTypes = [
@@ -114,23 +111,13 @@ export class PortfolioSaveRunModelComponent implements OnInit {
         levels: ['IssuerFundMerged', 'FundRealisedUnrealised', 'Fund']
       },
       {
-        type: 'Firmwide > Realised/Unrealised > Issuer Short Name',
+        type: 'Realised/Unrealised > Issuer Short Name',
         levels: ['IssuerFirmwide', 'FirmwideRealisedUnrealised', 'Firmwide']
       }
     ]
   }
 
   changeListeners(){
-    // this.subscriptions.push(this.modelForm.statusChanges.subscribe(_ => {
-    
-    //   if(this.modelForm.errors?.['validated'] && !this.isSuccess && (this.rules?.length > 0 || this.positionIDs?.length > 0)){
-    //     this.disableSave = this.disableSaveRun = false;
-
-    //   }
-    //   else {
-    //     this.disableSave = this.disableSaveRun = true
-    //   }
-    // }))
 
     this.subscriptions.push(this.modelForm.get('isUpdate').valueChanges.subscribe(isUpdate => {
       if(isUpdate === false){

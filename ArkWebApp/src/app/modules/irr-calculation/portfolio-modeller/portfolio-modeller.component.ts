@@ -303,7 +303,6 @@ export class PortfolioModellerComponent implements OnInit {
   }
 
   fetchPortfolioModels(modelID?: number, context: string = 'SaveRun'){
-    console.log(this.dataService.getCurrentUserName())
     this.subscriptions.push(this.irrCalcService.getPortfolioModels(this.dataService.getCurrentUserName()).subscribe({
       next: data => {
         this.parseFetchedModels(data);
@@ -332,7 +331,6 @@ export class PortfolioModellerComponent implements OnInit {
   context
 
   ngOnInit(): void {
-    console.log(this.dataService.getCurrentUserName())
 
     this.isAutomatic = new FormControl()
     this.isLocal = new FormControl()
@@ -522,7 +520,6 @@ export class PortfolioModellerComponent implements OnInit {
     /** Updating all the filtered children nodes as Ag/Adaptable isn't doing itself */
     let node: RowNode = params.node, colID: string, colVal;
     if(node.group){
-      console.log(node)
       colID = params.column.getColId();
       colVal = params.data[colID]
   
@@ -548,7 +545,6 @@ export class PortfolioModellerComponent implements OnInit {
     for(let i = 0 ; i < gridData.length; i++){
 
       if(gridData[i].expectedPrice !== gridData[i].globalExpectedPrice){
-          console.log(gridData[i].expectedPrice, gridData[i].globalExpectedPrice)
           temp.push({
             positionID: gridData[i].positionID,
             assetID: gridData[i].assetID,
@@ -558,7 +554,6 @@ export class PortfolioModellerComponent implements OnInit {
   
       }
       if(gridData[i].expectedDate !== gridData[i].globalExpectedDate){
-          console.log(gridData[i].expectedDate, gridData[i].globalExpectedDate)
           temp.push({
             positionID: gridData[i].positionID,
             assetID: gridData[i].assetID,
@@ -567,7 +562,6 @@ export class PortfolioModellerComponent implements OnInit {
           })  
       }
       if(gridData[i].spreadDiscount !== gridData[i].globalSpreadDiscount){
-          console.log(gridData[i].spreadDiscount, gridData[i].globalSpreadDiscount)
           temp.push({
             positionID: gridData[i].positionID,
             assetID: gridData[i].assetID,
@@ -576,7 +570,6 @@ export class PortfolioModellerComponent implements OnInit {
           })  
       }
       if(gridData[i].positionPercent !== gridData[i].globalPositionPercent){
-          console.log(gridData[i].positionPercent, gridData[i].globalPositionPercent)
           temp.push({
             positionID: gridData[i].positionID,
             assetID: gridData[i].assetID,
@@ -779,7 +772,6 @@ export class PortfolioModellerComponent implements OnInit {
       gridData[i].positionPercent = (context === 'Clear') ? gridData[i]?.globalPositionPercent : gridData[i]?.localPositionPercent
       updates.push(gridData[i])
     }
-    console.log(updates)
     this.gridApi.applyTransaction({ update: updates})
     // this.rowData = gridData
     // this.gridApi.setRowData(gridData)
@@ -802,7 +794,6 @@ export class PortfolioModellerComponent implements OnInit {
     }))
   }
   onPortfolioModelSelect(event){
-    console.log(event)
     this.selectedModelID = event.modelID
 
     /** On portfolio model select, clearing out all exisiting selected positions & applied filters 
@@ -832,7 +823,6 @@ export class PortfolioModellerComponent implements OnInit {
 
   changeListeners(){
     this.subscriptions.push(this.isAutomatic.valueChanges.subscribe( isAuto => {
-      console.log("Calling isAuto: " + isAuto)
       if(isAuto){
         this.adapTableApi.layoutApi.setLayout('Automatic')
       }
@@ -842,8 +832,6 @@ export class PortfolioModellerComponent implements OnInit {
     }))
 
     this.subscriptions.push(this.isLocal.valueChanges.subscribe(isLocal => {
-      console.log("Calling Local: " + isLocal)
-
       this.gridApi.refreshCells({
         force: true,
         suppressFlash: true

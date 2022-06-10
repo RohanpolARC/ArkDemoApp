@@ -311,7 +311,6 @@ export class IrrResultComponent implements OnInit {
       this.modelName = this.calcParams.modelName;
       this.aggregationType = this.calcParams.irrAggrType
       
-      console.log("Calling Durable function")
       this.subscriptions.push(this.irrCalcSvc.getIRRCalculation(this.calcParams).subscribe({
         next: response => {
 
