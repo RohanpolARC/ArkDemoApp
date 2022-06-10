@@ -59,6 +59,30 @@
   
       </mat-expansion-panel>
   </mat-accordion>
+
+  <mat-accordion>
+    <mat-expansion-panel [expanded]="false" >
+      <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
+        <mat-panel-title>
+         Returns
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+  
+      <mat-list>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Facility Detail')" [ngStyle]="FacilityDetailStyle">
+          <div class="list-item-text">Asset Browser</div>
+        </mat-list-item>
+      </mat-list>
+
+      <mat-list>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Portfolio Modeller')" [ngStyle]="PortfolioModellerStyle">
+          <div class="list-item-text">Portfolio Modeller</div>
+        </mat-list-item>
+      </mat-list>
+
+    </mat-expansion-panel>
+  </mat-accordion>
+
   <mat-accordion>
       <mat-expansion-panel [expanded]="false" >
         <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
@@ -73,14 +97,9 @@
           </mat-list-item>
         </mat-list>
   
-        <mat-list>
-          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Facility Detail')" [ngStyle]="FacilityDetailStyle">
-            <div class="list-item-text">Asset Browser</div>
-          </mat-list-item>
-        </mat-list>
-  
       </mat-expansion-panel>
     </mat-accordion>
+
     <mat-accordion>
       <mat-expansion-panel [expanded]="false" >
         <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
@@ -104,7 +123,11 @@
   
     <div class="sidenav-right-heading right-cont">
       <span>Filter Pane</span>
-      <button mat-raised-button id="apply-button"  *ngIf="['/facility-detail', '/liquidity-summary'].includes(location.path())" (click)="filterApply()">Apply</button>
+      <button mat-raised-button id="apply-button"  
+        *ngIf="[
+        '/facility-detail', '/liquidity-summary', 
+        '/irr/portfoliomodeller', '/irr/runcalcs'].includes(location.path())" 
+        (click)="filterApply()">Apply</button>
     </div>
 
     <ng-container *ngIf="filterPane.TextValueSelect">

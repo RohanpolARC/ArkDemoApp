@@ -61,7 +61,6 @@ export class AggridMaterialDatepickerComponent implements OnInit, ICellEditorAng
     if(this.val == null || ['01/01/1970', '01/01/2001', '01/01/1', '01/01/01', 'NaN/NaN/NaN'].includes(formatDate(this.val))){
       return null;
     }
-
     return formatDate(this.val)
   }
 }
