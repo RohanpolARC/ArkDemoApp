@@ -314,7 +314,7 @@ export class IrrResultComponent implements OnInit {
       this.subscriptions.push(this.irrCalcSvc.getIRRCalculation(this.calcParams).subscribe({
         next: response => {
 
-          timer(0, 5000).pipe(
+          timer(0, 10000).pipe(
             switchMap(() => this.irrCalcSvc.getIRRStatus(response?.['statusQueryGetUri'])),
             takeUntil(this.closeTimer)
           ).subscribe({
