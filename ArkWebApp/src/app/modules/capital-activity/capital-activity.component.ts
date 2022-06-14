@@ -92,6 +92,7 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'source', headerName: 'Source', type:'abColDefString'},
     { field: 'sourceID', headerName: 'Source ID', type:'abColDefNumber', valueFormatter: nullOrZeroFormatter},
     { field: 'isLinked', headerName: 'Is Linked', type:'abColDefBoolean'},
+    { field: 'linkedAmount', headerName: 'Linked Amount', type:'abColDefNumber', valueFormatter: amountFormatter},
     { field: 'createdOn', headerName: 'Created On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
     { field: 'createdBy', headerName: 'Created By', type:'abColDefString'},
     { field: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
@@ -287,7 +288,7 @@ export class CapitalActivityComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 2,
+          Revision: 3,
           CurrentLayout: 'Basic Capital Activity',
           Layouts: [{
             Name: 'Basic Capital Activity',
@@ -309,6 +310,7 @@ export class CapitalActivityComponent implements OnInit {
               'narrative',
               'source',
               'isLinked',
+              'linkedAmount',
               'createdBy',
               'createdOn',
               'modifiedBy',

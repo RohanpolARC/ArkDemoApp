@@ -4,7 +4,7 @@ import { HttpClient, HttpParams,HttpHeaders } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { MsalUserService } from '../Auth/msaluser.service';  
-import { CapitalActivityModel, CapitalInvestment } from '../../../shared/models/CapitalActivityModel'
+import { AssociateInvestment, CapitalActivityModel, CapitalInvestment } from '../../../shared/models/CapitalActivityModel'
 
 @Injectable({
   providedIn: 'root'
@@ -45,8 +45,12 @@ export class CapitalActivityService {
       catchError((ex) => throwError(ex)));
   }
 
-  public associateCapitalInvestments(investments: CapitalInvestment[]){
-    return this.http.post<any>(this.CAPITAL_INVESTMENT_ASSOCIATE_API, investments, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
+  // public associateCapitalInvestments(investments: CapitalInvestment[]){
+  //   return this.http.post<any>(this.CAPITAL_INVESTMENT_ASSOCIATE_API, investments, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
+  // }
+
+  public associateCapitalInvestments(model: AssociateInvestment){
+    return this.http.post<any>(this.CAPITAL_INVESTMENT_ASSOCIATE_API, model, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
   }
 
   public getCapitalActivity(){
