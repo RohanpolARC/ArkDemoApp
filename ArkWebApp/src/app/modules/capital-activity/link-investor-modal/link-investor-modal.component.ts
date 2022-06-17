@@ -40,9 +40,14 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     investmentData: any[]
   };
   
-  @Input() disableCreateNew: boolean = false;
+  @Input() disableCreateNew: {
+    disable: boolean
+  };
 
   @Output() closePopUpEvent = new EventEmitter<any>();
+  @Output() isAlreadyLinkedEmit = new EventEmitter<boolean>();
+  isAlreadyLinkedEmmited: boolean = false;
+  isAlreadyLinked: boolean = null
 
   subscriptions: Subscription[] = []
   receivedCapitalAct: any[] = null;
@@ -138,12 +143,13 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
         ]
       },
       Layout:{
-        Revision: 4,
+        Revision: 6,
         Layouts:[{
           Name: 'Associate Grid layout',
           Columns:[
             'fundCcy',
             'totalAmount',
+            'linkedAmount',
             'callDate',
             'valueDate',
             'capitalType',
@@ -154,7 +160,6 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
             'wsoAssetID',
             'narrative',
             'source',
-            'linkedAmount',
             'capitalID',
             'Link'
 
@@ -165,7 +170,11 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
           ColumnWidthMap:{
             Link: 20
           },
-          RowGroupedColumns: ['resultCategory']
+          RowGroupedColumns: ['resultCategory'],
+          AggregationColumns: {
+            totalAmount: 'sum',
+            linkedAmount: 'sum'
+          }
         }]
       }
     }
@@ -188,31 +197,17 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
 
   associate(capitalIDs?: number[], action?: string){
 
-    let models: CapitalInvestment[] = [];
-
     let pIDcashDtStr: string = '';
     let cIDActionStr: string = '';
 
     this.message.investmentData.forEach(investment => {
       pIDcashDtStr += `${investment.positionID}|${formatDate(investment.cashDate, true)},`
     })
-
-    this.newChecked.forEach(cid => {
-      cIDActionStr += `${cid}|Link,`
-    })
-
-    this.newUnchecked.forEach(cid => {
-      cIDActionStr += `${cid}|Unlink,`
-    })  
     
     if(pIDcashDtStr.length)
       pIDcashDtStr = pIDcashDtStr.slice(0, -1);
     
-    if(cIDActionStr.length)
-      cIDActionStr = cIDActionStr.slice(0, -1);
-    
     console.log(`PositionIDs|CashDate : ${pIDcashDtStr}`)
-    console.log(`CapitalIDs|Action : ${cIDActionStr}`)
 
     let model: AssociateInvestment = <AssociateInvestment> {};
     model.positionIDCashdateStr = pIDcashDtStr;
@@ -224,7 +219,9 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
       this.subscriptions.push(this.capitalActivityService.associateCapitalInvestments(model).subscribe({
         next: result => {
           if(result.isSuccess){
-            this.disableCreateNew = true;
+            this.disableCreateNew = {
+              disable: true
+            };
             this.updateMsg = 'Successfully updated investment associations';
             this.isSuccess = true;
             this.isFailure = false;
@@ -232,7 +229,9 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
         },
         error: error => {
           console.error(`Failed to update associations: ${error}`)
-          this.disableCreateNew = false;
+          this.disableCreateNew = {
+            disable: false
+          };
           this.updateMsg = 'Failed to update investment associations';
           this.isSuccess = false;
           this.isFailure = true;
@@ -241,38 +240,6 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
       }))
     }
     
-    // for(let i = 0; i < this.message.investmentData.length; i+= 1){
-    //   let investment = <CapitalInvestment> this.message.investmentData[i];
-
-    //   if(action === 'ASSOCIATE'){
-    //     let capitalID = capitalIDs;
-    //     investment.capitalIDs = capitalIDs;
-    //   }
-    //   else investment.capitalIDs = null;
-
-    //   investment.createdBy = investment.modifiedBy = this.msalService.getUserName()
-    //   investment.createdOn = investment.modifiedOn = new Date();
-    //   investment.valueDate = investment.fxRate = null;
-
-    //   models.push(investment);
-    // }
-
-    // if(action === 'ASSOCIATE'){
-    //   this.subscriptions.push(this.capitalActivityService.associateCapitalInvestments(models).subscribe({
-    //     next: received => {
-    //       this.receivedCapitalID = received.data; //GroupID is received
-
-    //       this.isSuccess = true;
-    //       this.isFailure = false;
-    //       this.updateMsg = `Successfully associated investments to capital activities`;
-    //     },
-    //     error: error => {
-    //       this.isFailure = true;
-    //       this.isSuccess = false;
-    //       this.updateMsg = 'Association failed';
-    //     }
-    //   }))
-    // }
     else if(action === 'ADD'){
       /**
        *  Step 1 - Add new Capital Activity to INVESTOR table and get CapitalID.
@@ -287,48 +254,45 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
       this.message.capitalAct.source = 'ArkUI - link';
       this.message.capitalAct.sourceID = 4;
 
-      
       this.subscriptions.push(this.capitalActivityService.putCapitalActivity(this.message.capitalAct).subscribe({
         next: received => {
 
-          // Step 2
           let newCapitalID: number = received.data;
-
-          for(let i =0; i < models.length; i+= 1)
-            models[i].capitalIDs = [newCapitalID];
-            
+          model.capitalIDs = [newCapitalID]
           this.subscriptions.push(this.capitalActivityService.associateCapitalInvestments(model).subscribe({
-            next: received => {
-              console.log(`Successfully associated investments to group ID [${received.data}]`);
-              this.receivedCapitalID = newCapitalID;
-              this.isCreateNew = true;
+            next: result => {
+              if(result.isSuccess){
+                this.disableCreateNew = {
+                  disable: true
+                };
+                this.updateMsg = 'Successfully updated investment associations';
+                this.isSuccess = true;
+                this.isFailure = false;
 
-              this.isSuccess = true;
-              this.isFailure = false;
-              this.updateMsg = `Successfully associated investments to capital activities`;
-
-              this.newCapitalAct = JSON.parse(JSON.stringify(this.message.capitalAct));
-              this.newCapitalAct.capitalID = newCapitalID;
+                this.newCapitalAct = JSON.parse(JSON.stringify(this.message.capitalAct));
+                this.newCapitalAct.capitalID = newCapitalID;
+              }
             },
             error: error => {
-              console.error("Association failed");
-
-              this.isFailure = true;
+              console.error(`Failed to update associations: ${error}`)
+              this.disableCreateNew = {
+                disable: false
+              };
+              this.updateMsg = 'Failed to update investment associations';
               this.isSuccess = false;
-              this.updateMsg = 'Association failed';
-            }
-          }))
+              this.isFailure = true;
     
+            }    
+          }))
         },
         error: error => {
-          console.error("Add capital activity failed");
-
+          console.error(`Failed to add capital activity before linking`)
           this.isFailure = true;
           this.isSuccess = false;
-          this.updateMsg = 'Add capital activity failed';
+          this.updateMsg = 'Create new and link failed';
         }
       }))
-
+      
     }
   }
 
@@ -352,7 +316,6 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     this.adapTableApi.eventApi.on(
       'CheckboxColumnClicked',
       (info: CheckboxColumnClickedInfo) => {
-        console.log("CallBack called")
         this.checkedCapitalIDs = [];
         let gridData = this.adapTableApi.gridApi.getVendorGrid().rowData;
 
@@ -370,12 +333,14 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
         }
 
         this.checkedCapitalIDs = this.checkedCapitalIDs.filter(cID => cID !== null && cID !== undefined)
-
-        this.newChecked = this.checkedCapitalIDs;
-        this.newUnchecked = allCids.filter(cID => cID != null && this.originalChecked.includes(cID) && !this.checkedCapitalIDs.includes(cID));
-
         this.buttonText = (this.checkedCapitalIDs.length === 0) ? 'Create New' : 'Update Link';
-        console.log(this.newChecked, this.newUnchecked)
+
+        if(this.isAlreadyLinked){
+          this.buttonText = 'Update Link'
+        }
+        else if(!this.isAlreadyLinked && this.checkedCapitalIDs.length === 0){
+          this.buttonText = 'Create New'
+        }
       }
     )
 
@@ -391,6 +356,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   }
 
   searchCapitalActivities(){
+    
     this.checkedCapitalIDs = [];
     this.buttonText = 'Create New';
 
@@ -409,21 +375,36 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     this.subscriptions.push(this.capitalActivityService.lookUpCapitalActivity(this.message.capitalAct).subscribe({
       next: data => {
 
-        // ADD
-
-        this.disableCreateNew = true
-        this.originalChecked = []
+        this.isAlreadyLinkedEmmited = false;
+        this.disableCreateNew = {
+          disable: true
+        }
 
         for(let i = 0; i < data.length; i+= 1){
           if((data[i].resultCategory.trim().toLowerCase() === 'linked')){
             data[i]['Link'] = true
-            this.disableCreateNew = false
+            this.disableCreateNew = {
+              disable: false
+            }
             this.buttonText = 'Update Link'
-            this.originalChecked.push(Number(data[i].capitalID));
+
+            if(!this.isAlreadyLinkedEmmited){
+              this.isAlreadyLinkedEmit.emit(true)
+              this.isAlreadyLinked = true
+              this.isAlreadyLinkedEmmited = true
+            }
+
           }
           else data[i]['Link'] = false;
         }
+
         this.receivedCapitalAct = data;
+        
+        if(!this.isAlreadyLinkedEmmited){
+          this.isAlreadyLinkedEmit.emit(false)
+          this.isAlreadyLinked = false
+          this.isAlreadyLinkedEmmited = true
+        }
 //        this.disableCreateNew = true;
       },
       error: error => {
@@ -433,13 +414,10 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges){
+    console.log(changes)
   }
 
   checkedCapitalIDs: number[] = [];
-
-  originalChecked: number[] = [];
-  newChecked: number[] = [];
-  newUnchecked: number[] = [];
 
   ngOnInit(): void {
 

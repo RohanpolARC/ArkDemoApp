@@ -45,10 +45,6 @@ export class CapitalActivityService {
       catchError((ex) => throwError(ex)));
   }
 
-  // public associateCapitalInvestments(investments: CapitalInvestment[]){
-  //   return this.http.post<any>(this.CAPITAL_INVESTMENT_ASSOCIATE_API, investments, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
-  // }
-
   public associateCapitalInvestments(model: AssociateInvestment){
     return this.http.post<any>(this.CAPITAL_INVESTMENT_ASSOCIATE_API, model, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
   }

@@ -289,7 +289,7 @@ export class CapitalActivityComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 3,
+          Revision: 4,
           CurrentLayout: 'Basic Capital Activity',
           Layouts: [{
             Name: 'Basic Capital Activity',
@@ -312,10 +312,6 @@ export class CapitalActivityComponent implements OnInit {
               'source',
               'isLinked',
               'linkedAmount',
-              'createdBy',
-              'createdOn',
-              'modifiedBy',
-              'modifiedOn',
               'ActionEdit',
             ],
             RowGroupedColumns: [],
@@ -403,7 +399,7 @@ export class CapitalActivityComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 2,
+          Revision: 3,
           Layouts:[{
             Name: 'Basic Investment Cashflow',
             Columns: [
@@ -431,7 +427,9 @@ export class CapitalActivityComponent implements OnInit {
             },
             AggregationColumns: {
               totalBase: 'sum',
-              totalEur: 'sum'
+              totalEur: 'sum',
+              linkedAmount: 'sum',
+              amount: 'sum'
             }
           }]
         }  

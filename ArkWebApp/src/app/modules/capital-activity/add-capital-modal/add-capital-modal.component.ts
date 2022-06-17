@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewChild } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, Output } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CapitalActivityModel } from 'src/app/shared/models/CapitalActivityModel';
@@ -65,7 +65,12 @@ export class AddCapitalModalComponent implements OnInit{
   
   placeHolderGIR: string = null;
 
-  isFormPurelyNotValid: boolean = true; // To be sent to link investor component.
+  isFormPurelyNotValid: {
+    disable: boolean
+  } = {
+    disable: true
+  }; // To be sent to link investor component.
+  isAlreadyLinked: boolean = null;
 
   validateField(options: string[], control: AbstractControl, field: string): string | null{
       //  Validates individual fields and returns fetched value if it's an allowed value.
@@ -379,12 +384,17 @@ export class AddCapitalModalComponent implements OnInit{
           this.placeHolderGIR = 'Pos ccy -> Fund ccy'
       }
 
-      this.isFormPurelyNotValid = !this.capitalActivityForm.errors?.['validated']
 
       if(this.capitalActivityForm.errors?.['validated'] && this.capitalActivityForm.touched)
         this.disableSubmit = false;
       else if(!this.capitalActivityForm.errors?.['validated'])
         this.disableSubmit = true;
+
+      this.isFormPurelyNotValid = {
+        disable: !this.capitalActivityForm.errors?.['validated']
+      }
+      console.log(this.isFormPurelyNotValid.disable)
+
     })
 
 
@@ -704,6 +714,10 @@ export class AddCapitalModalComponent implements OnInit{
       }
     }
     this.dialogRef.close({event: outcome.isNewCapital ? 'Close with Success' : 'Close'});
+  }
+
+  onIsAlreadyLinked(isAlreadyLinked: boolean){
+    this.isAlreadyLinked = isAlreadyLinked
   }
 
   onSubmit(): void {
