@@ -69,6 +69,7 @@ export class CapitalActivityComponent implements OnInit {
     {field: 'fundCcy', headerName: 'Fund Ccy'},
     {field: 'positionCcy', headerName: 'Position Ccy'},
     {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    {field: 'linkedAmount', headerName: 'Linked Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'totalEur', headerName: 'Total Eur', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
   ]
@@ -402,7 +403,7 @@ export class CapitalActivityComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 1,
+          Revision: 2,
           Layouts:[{
             Name: 'Basic Investment Cashflow',
             Columns: [
@@ -416,6 +417,7 @@ export class CapitalActivityComponent implements OnInit {
               'fundCcy',
               'positionCcy',
               'amount',
+              'linkedAmount',
               'totalBase',
               'totalEur',
               'ActionLink'

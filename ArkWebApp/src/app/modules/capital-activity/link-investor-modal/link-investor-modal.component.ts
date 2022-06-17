@@ -214,11 +214,12 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     console.log(`PositionIDs|CashDate : ${pIDcashDtStr}`)
     console.log(`CapitalIDs|Action : ${cIDActionStr}`)
 
+    let model: AssociateInvestment = <AssociateInvestment> {};
+    model.positionIDCashdateStr = pIDcashDtStr;
+    model.capitalIDs = this.checkedCapitalIDs;
+    model.username = this.msalService.getUserName();
+
     if(action === 'ASSOCIATE'){
-      let model: AssociateInvestment = <AssociateInvestment> {};
-      model.positionIDCashdateStr = pIDcashDtStr;
-      model.capitalIDActionStr = cIDActionStr;
-      model.username = this.msalService.getUserName();
 
       this.subscriptions.push(this.capitalActivityService.associateCapitalInvestments(model).subscribe({
         next: result => {
@@ -238,18 +239,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
 
         }
       }))
-    }    
-    
-
-
-
-
-
-
-
-
-
-
+    }
     
     // for(let i = 0; i < this.message.investmentData.length; i+= 1){
     //   let investment = <CapitalInvestment> this.message.investmentData[i];
@@ -283,63 +273,63 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     //     }
     //   }))
     // }
-    // else if(action === 'ADD'){
-    //   /**
-    //    *  Step 1 - Add new Capital Activity to INVESTOR table and get CapitalID.
-    //    *  Step 2- Use this new CapitalID to add the positions to the Association table.
-    //    */
+    else if(action === 'ADD'){
+      /**
+       *  Step 1 - Add new Capital Activity to INVESTOR table and get CapitalID.
+       *  Step 2- Use this new CapitalID to add the positions to the Association table.
+       */
 
-    //   // Step 1
-    //   this.message.capitalAct.capitalID = null;
-    //   this.message.capitalAct.createdOn = this.message.capitalAct.modifiedOn = new Date();
-    //   this.message.capitalAct.createdBy = this.message.capitalAct.modifiedBy =this.msalService.getUserName();  
+      // Step 1
+      this.message.capitalAct.capitalID = null;
+      this.message.capitalAct.createdOn = this.message.capitalAct.modifiedOn = new Date();
+      this.message.capitalAct.createdBy = this.message.capitalAct.modifiedBy =this.msalService.getUserName();  
 
-    //   this.message.capitalAct.source = 'ArkUI - link';
-    //   this.message.capitalAct.sourceID = 4;
+      this.message.capitalAct.source = 'ArkUI - link';
+      this.message.capitalAct.sourceID = 4;
 
       
-    //   this.subscriptions.push(this.capitalActivityService.putCapitalActivity(this.message.capitalAct).subscribe({
-    //     next: received => {
+      this.subscriptions.push(this.capitalActivityService.putCapitalActivity(this.message.capitalAct).subscribe({
+        next: received => {
 
-    //       // Step 2
-    //       let newCapitalID: number = received.data;
+          // Step 2
+          let newCapitalID: number = received.data;
 
-    //       for(let i =0; i < models.length; i+= 1)
-    //         models[i].capitalIDs = [received.data];
+          for(let i =0; i < models.length; i+= 1)
+            models[i].capitalIDs = [newCapitalID];
             
-    //       this.subscriptions.push(this.capitalActivityService.associateCapitalInvestments(models).subscribe({
-    //         next: received => {
-    //           console.log(`Successfully associated investments to group ID [${received.data}]`);
-    //           this.receivedCapitalID = newCapitalID;
-    //           this.isCreateNew = true;
+          this.subscriptions.push(this.capitalActivityService.associateCapitalInvestments(model).subscribe({
+            next: received => {
+              console.log(`Successfully associated investments to group ID [${received.data}]`);
+              this.receivedCapitalID = newCapitalID;
+              this.isCreateNew = true;
 
-    //           this.isSuccess = true;
-    //           this.isFailure = false;
-    //           this.updateMsg = `Successfully associated investments to capital activities`;
+              this.isSuccess = true;
+              this.isFailure = false;
+              this.updateMsg = `Successfully associated investments to capital activities`;
 
-    //           this.newCapitalAct = JSON.parse(JSON.stringify(this.message.capitalAct));
-    //           this.newCapitalAct.capitalID = newCapitalID;
-    //         },
-    //         error: error => {
-    //           console.error("Association failed");
+              this.newCapitalAct = JSON.parse(JSON.stringify(this.message.capitalAct));
+              this.newCapitalAct.capitalID = newCapitalID;
+            },
+            error: error => {
+              console.error("Association failed");
 
-    //           this.isFailure = true;
-    //           this.isSuccess = false;
-    //           this.updateMsg = 'Association failed';
-    //         }
-    //       }))
+              this.isFailure = true;
+              this.isSuccess = false;
+              this.updateMsg = 'Association failed';
+            }
+          }))
     
-    //     },
-    //     error: error => {
-    //       console.error("Add capital activity failed");
+        },
+        error: error => {
+          console.error("Add capital activity failed");
 
-    //       this.isFailure = true;
-    //       this.isSuccess = false;
-    //       this.updateMsg = 'Add capital activity failed';
-    //     }
-    //   }))
+          this.isFailure = true;
+          this.isSuccess = false;
+          this.updateMsg = 'Add capital activity failed';
+        }
+      }))
 
-    // }
+    }
   }
 
   onAdaptableReady(

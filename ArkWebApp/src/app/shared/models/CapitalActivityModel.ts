@@ -57,6 +57,6 @@ export interface CapitalInvestment{
 
 export interface AssociateInvestment{
     positionIDCashdateStr: string,
-    capitalIDActionStr: string,
+    capitalIDs: number[],
     username: string
 }

@@ -16,11 +16,10 @@
         </div>
     </div>
 
-    <div *ngIf="isSuccess" class="success-msg">
-        {{ updateMsg }}
-    </div>
-
-    <div *ngIf="isFailure" class="failure-msg">
+    <div *ngIf="isSuccess || isFailure"
+    [class.success-msg]="isSuccess"
+    [class.failure-msg]="isFailure"
+    >
         {{ updateMsg }}
     </div>
 
@@ -38,7 +37,7 @@
 </ng-container>
     <mat-dialog-actions align="end">
         <button mat-raised-button color="primary" 
-        [disabled]="(receivedCapitalID !== null) ? true : (buttonText === 'Create New' ? disableCreateNew : false)"
+        [disabled]="isSuccess"
         (click)="action(buttonText)"> {{buttonText}} </button>
         <button mat-raised-button (click)="closePopUp()">Close</button>
     </mat-dialog-actions>

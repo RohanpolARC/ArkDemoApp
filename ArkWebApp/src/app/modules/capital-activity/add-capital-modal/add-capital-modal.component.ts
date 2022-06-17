@@ -431,6 +431,7 @@ export class AddCapitalModalComponent implements OnInit{
     {field: 'positionID', headerName: 'Position ID', tooltipField: 'positionID'},
     {field: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter, tooltipField: 'cashDate'},
     {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'amount'},
+    {field: 'linkedAmount', headerName: 'Linked Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'linkedAmount'},
     {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'totalBase'},
     {field: 'positionCcy', headerName: 'Position Ccy', tooltipField: 'positionCcy'},
     {field: 'portfolio', headerName: 'Portfolio', tooltipField: 'portfolio'},
@@ -696,7 +697,7 @@ export class AddCapitalModalComponent implements OnInit{
   closeFromLink(outcome){
 
     if(outcome.event === 'Linked Close'){      
-      this.data.adapTableApiInvstmnt.gridApi.deleteGridData(this.data.rowData);
+      // this.data.adapTableApiInvstmnt.gridApi.deleteGridData(this.data.rowData);
       
       if(outcome.isNewCapital){
         this.data.adapTableApi.gridApi.addGridData([outcome.capitalAct]);
