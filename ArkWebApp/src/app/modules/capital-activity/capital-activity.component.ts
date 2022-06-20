@@ -69,7 +69,7 @@ export class CapitalActivityComponent implements OnInit {
     {field: 'fundCcy', headerName: 'Fund Ccy'},
     {field: 'positionCcy', headerName: 'Position Ccy'},
     {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    // {field: 'linkedAmount', headerName: 'Linked Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    {field: 'linkedAmount', headerName: 'Linked Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'totalEur', headerName: 'Total Eur', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
   ]
@@ -133,27 +133,32 @@ export class CapitalActivityComponent implements OnInit {
   investorPanelOpenState = false;
 
   fetchInvestmentData(): void{
-
+    this.gridOptionsInvstmnt?.api?.showLoadingOverlay();
     this.subscriptions.push(this.capitalActivityService.getCapitalInvestment().subscribe({
       next: data => {
+        this.gridOptionsInvstmnt?.api?.hideOverlay();
         this.rowDataInvstmnt = data;
         this.adapTableApiInvstmnt.gridApi.loadGridData(this.rowDataInvstmnt);
       },
       error: error => {
         this.rowDataInvstmnt = [];
+        this.gridOptionsInvstmnt?.api?.hideOverlay();
         console.error("Capital Investment Data fetch failed");
       }
     }))
   }
 
   fetchCapitalActivityData(): void{
+    this.gridOptions?.api?.showLoadingOverlay();
     this.subscriptions.push(this.capitalActivityService.getCapitalActivity().subscribe({
       next: data => {
+        this.gridOptions?.api?.hideOverlay();
         this.rowData = data;
         this.adapTableApi.gridApi.loadGridData(this.rowData);
       },
       error: error => {
         this.rowData = [];
+        this.gridOptions?.api?.hideOverlay();
         console.error("Capital Activity Data fetch failed");
       }
     }));
@@ -399,7 +404,7 @@ export class CapitalActivityComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 4,
+          Revision: 7,
           Layouts:[{
             Name: 'Basic Investment Cashflow',
             Columns: [
@@ -413,7 +418,7 @@ export class CapitalActivityComponent implements OnInit {
               'fundCcy',
               'positionCcy',
               'amount',
-              // 'linkedAmount',
+              'linkedAmount',
               'totalBase',
               'totalEur',
               'ActionLink'
@@ -428,7 +433,7 @@ export class CapitalActivityComponent implements OnInit {
             AggregationColumns: {
               totalBase: 'sum',
               totalEur: 'sum',
-              // linkedAmount: 'sum',
+              linkedAmount: 'sum',
               amount: 'sum'
             }
           }]
@@ -484,6 +489,16 @@ export class CapitalActivityComponent implements OnInit {
       maxWidth: '2000px',
       maxHeight: '99vh'
     });
+
+    this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
+      if(result.event === 'Close with Success' && result.refresh && actionType === 'LINK-ADD'){
+        this.fetchCapitalActivityData();
+        this.fetchInvestmentData();
+      }
+      else if(result.event === 'Close with Success' && !result.refresh && actionType === 'LINK-ADD'){
+        this.fetchInvestmentData();
+      }
+    }))
   }
 
   onAdaptableReady(

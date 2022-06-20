@@ -82,10 +82,13 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     { field: 'linkedAmount', headerName: 'Linked Amount', type: 'abColDefNumber', valueFormatter: amountFormatter},
     { field: 'Link', headerName: 'Link', type:'abColDefBoolean', editable: true},
     { field: 'resultCategory', headerName: 'Result Category', type:'abColDefString'},
-    { field: 'isChecked', headerName: 'Link', type: 'abColDefBoolean', checkboxSelection: true}
+    // { field: 'isChecked', headerName: 'Link', type: 'abColDefBoolean', checkboxSelection: true}
   ]
 
   buttonText: string = 'Create New';
+
+  investmentAmt: number = 0
+  investorAmt: number = 0
 
   defaultColDef = {
     resizable: true,
@@ -117,7 +120,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   adaptableOptions: AdaptableOptions = {
     primaryKey: 'capitalID',
     userName: this.msalService.getUserName(),
-    adaptableId: '',
+    adaptableId: 'Linking',
     adaptableStateKey: 'Linking Key',
 
     toolPanelOptions: {
@@ -125,10 +128,12 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     },
     predefinedConfig: {
       Dashboard: {
+        Revision: 1,
         ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
         IsCollapsed: true,
         Tabs: [],
-        IsHidden: true
+        IsHidden: true,
+        DashboardTitle: ' '
       },
       FormatColumn: {
         FormatColumns: [
@@ -183,8 +188,64 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
 
 
   closePopUp(){
+    let updateInvestors: {
+      capitalID: number,
+      isLinked: boolean,
+      linkingAmt: number,
+      newLink: boolean
+    }[] = []
+    let updateInvestments: {
+      positionID: number,
+      cashDate: Date,
+      linkingAmt: number
+    }[] = []
+
+    this.investmentAmt = 0
+    this.message.investmentData.forEach(investment  => {
+      this.investmentAmt += Number(investment.amount)
+    })
+
+    this.investorAmt = 0
+    this.receivedCapitalAct.forEach(row => {
+      if(this.checkedCapitalIDs.includes(Number(row.capitalID))){
+        this.investorAmt += Number(row.totalAmount);
+      }
+    })
+
+    this.message.investmentData.forEach(investment => {
+      updateInvestments.push({
+        positionID: Number(investment.positionID),
+        cashDate: investment.cashDate,
+        linkingAmt: this.investorAmt
+      })
+    })
+
+    this.checkedCapitalIDs.forEach(capitalID => {
+      updateInvestors.push({
+        capitalID: capitalID,
+        isLinked: true,
+        linkingAmt: this.investmentAmt,
+        newLink: !this.prevCheckedCapitalIDs.includes(capitalID)
+      })
+    })
+
+    this.prevCheckedCapitalIDs.forEach(capitalID => {
+      if(!this.checkedCapitalIDs.includes(capitalID)){
+        updateInvestors.push({
+          capitalID: capitalID,
+          isLinked: false,
+          linkingAmt: this.investmentAmt,
+          newLink: false
+        })
+      }
+    })
+
+    console.log(updateInvestments, updateInvestors)
     if(this.isSuccess)
-      this.closePopUpEvent.emit({event: 'Linked Close', capitalAct: this.newCapitalAct, isNewCapital: this.isCreateNew});
+      this.closePopUpEvent.emit({event: 'Linked Close', capitalAct: this.newCapitalAct, isNewCapital: this.isCreateNew, gridUpdates: {
+        updateInvestments: updateInvestments,
+        updateInvestors: updateInvestors
+      }});
     else
       this.closePopUpEvent.emit({event: 'Empty Close', capitalAct: null});
   }
@@ -199,9 +260,11 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   associate(capitalIDs?: number[], action?: string){
 
     let pIDcashDtStr: string = '';
+    let amt: number = 0;
 
     this.message.investmentData.forEach(investment => {
       pIDcashDtStr += `${investment.positionID}|${formatDate(investment.cashDate, true)},`
+      amt += Number(investment.amount)
     })
     
     if(pIDcashDtStr.length)
@@ -245,6 +308,9 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
        */
 
       // Step 1
+
+      this.message.capitalAct.linkedAmount = amt
+      this.message.capitalAct.isLinked = true
       this.message.capitalAct.capitalID = null;
       this.message.capitalAct.createdOn = this.message.capitalAct.modifiedOn = new Date();
       this.message.capitalAct.createdBy = this.message.capitalAct.modifiedBy =this.msalService.getUserName();  
@@ -381,6 +447,8 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
           disable: true
         }
 
+        this.prevCheckedCapitalIDs = [];
+
         for(let i = 0; i < data.length; i+= 1){
           if((data[i].resultCategory.trim().toLowerCase() === 'linked')){
             data[i]['Link'] = true
@@ -389,6 +457,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
             }
             this.buttonText = 'Update Link'
 
+            this.prevCheckedCapitalIDs.push(Number(data[i].capitalID))
             // let node: RowNode = this.adapTableApi.gridApi.getRowNodeForPrimaryKey(data[i]?.['capitalID']);
             // node.setSelected(true)
 
@@ -422,8 +491,9 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     }
   }
 
+  prevCheckedCapitalIDs: number[] = [];
   checkedCapitalIDs: number[] = [];
-
+  
   ngOnInit(): void {
 
     this.isSuccess = this.isFailure = false;

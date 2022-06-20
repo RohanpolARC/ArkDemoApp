@@ -24,7 +24,9 @@ export interface CapitalActivityModel{
     fxRate: number;
     
     posCcy: string;
-
+    linkedAmount: number;
+    isLinked: boolean;
+    
     positionIDs: string;
     cashDate: Date;
 }

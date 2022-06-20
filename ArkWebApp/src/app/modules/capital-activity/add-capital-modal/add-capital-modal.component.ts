@@ -14,6 +14,8 @@ import { ColDef, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 
 import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
 import { LinkInvestorModalComponent } from '../link-investor-modal/link-investor-modal.component';
+import { RowNode } from '@ag-grid-enterprise/all-modules';
+import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 
 @Component({
   selector: 'app-add-capital-modal',
@@ -168,7 +170,16 @@ export class AddCapitalModalComponent implements OnInit{
   );
 
   constructor(public dialogRef: MatDialogRef<AddCapitalModalComponent>, 
-    @Inject(MAT_DIALOG_DATA) public data: any,
+    @Inject(MAT_DIALOG_DATA) public data: {
+      rowData : any,
+      adapTableApi: AdaptableApi,
+      adapTableApiInvstmnt: AdaptableApi,
+      actionType: string,
+      capitalTypes: string[],
+      capitalSubTypes: string[],
+      refData: any,
+      gridData: any
+    },
     public dialog: MatDialog,
     private capitalActivityService: CapitalActivityService, 
     private msalService: MsalUserService) { }
@@ -440,7 +451,7 @@ export class AddCapitalModalComponent implements OnInit{
     {field: 'positionID', headerName: 'Position ID', tooltipField: 'positionID'},
     {field: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter, tooltipField: 'cashDate'},
     {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'amount'},
-    // {field: 'linkedAmount', headerName: 'Linked Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'linkedAmount'},
+    {field: 'linkedAmount', headerName: 'Linked Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'linkedAmount'},
     {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'totalBase'},
     {field: 'positionCcy', headerName: 'Position Ccy', tooltipField: 'positionCcy'},
     {field: 'portfolio', headerName: 'Portfolio', tooltipField: 'portfolio'},
@@ -704,13 +715,53 @@ export class AddCapitalModalComponent implements OnInit{
 
   closeFromLink(outcome){
 
+    let refresh: boolean = false;
     if(outcome.event === 'Linked Close'){      
       
       if(outcome.isNewCapital){
         this.data.adapTableApi.gridApi.addGridData([outcome.capitalAct]);
+        refresh = false;
       }
+      else{
+        refresh = true;
+      }
+
+      // if(outcome.gridUpdates.updateInvestments){
+
+      //   this.data.adapTableApiInvstmnt.gridApi.getVendorGrid().api.forEachNodeAfterFilter(node => {
+      //     outcome.gridUpdates.updateInvestments.forEach(investment => {
+      //         if(investment.positionID === node.data?.positionID && node.data?.cashDate === investment.cashDate){
+      //             console.log(investment)
+      //             node.setDataValue('linkedAmount', investment.linkingAmt)
+      //         }
+      //     })
+      // })
+      // }
+      // if(outcome.gridUpdates.updateInvestors){
+
+      //   outcome.gridUpdates.updateInvestors.forEach(act => {
+      //     let node: RowNode = this.data.adapTableApi.gridApi.getRowNodeForPrimaryKey(act.capitalID);
+      //     if(act.isLinked && act.newLink){
+
+      //       node.setDataValue('linkedAmount', node.data.linkedAmount + act.linkingAmt)
+      //       node.setDataValue('isLinked', true)  
+      //     }
+      //     if(!act.isLinked){
+
+      //       node.setDataValue('linkedAmount', node.data.linkedAmount - act.linkingAmt)
+      //       if(Number((node.data.linkedAmount - act.linkingAmt).toFixed(2)) == 0){
+      //         node.setDataValue('isLinked', false)
+      //       }
+      //       else node.setDataValue('isLinked', true)
+      //     }
+      //   })
+      // }
+
+      this.dialogRef.close({event: 'Close with Success', refresh: refresh});
     }
-    this.dialogRef.close({event: outcome.isNewCapital ? 'Close with Success' : 'Close'});
+    else{
+      this.dialogRef.close({event: 'Close', refresh: false})
+    }
   }
 
   onIsAlreadyLinked(isAlreadyLinked: boolean){
