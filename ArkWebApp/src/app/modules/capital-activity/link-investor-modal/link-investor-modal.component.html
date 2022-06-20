@@ -25,12 +25,13 @@
 
     <ag-grid-angular
      *ngIf="receivedCapitalAct.length !== 0"
-        style="height: 350px;"
+        style="height: 300px;"
         [adaptableOptions]="adaptableOptions"
         [gridOptions]="gridOptions"
         [defaultColDef]="defaultColDef"
         [modules]="agGridModules"
         [rowData]="receivedCapitalAct"
+        (gridReady)="onGridReady($event)"
         (adaptableReady)="onAdaptableReady($event)"
         class="ag-theme-alpine"
     ></ag-grid-angular>

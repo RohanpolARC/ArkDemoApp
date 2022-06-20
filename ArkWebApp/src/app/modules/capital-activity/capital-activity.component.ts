@@ -294,7 +294,7 @@ export class CapitalActivityComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 4,
+          Revision: 5,
           CurrentLayout: 'Basic Capital Activity',
           Layouts: [{
             Name: 'Basic Capital Activity',
@@ -317,6 +317,7 @@ export class CapitalActivityComponent implements OnInit {
               'source',
               'isLinked',
               'linkedAmount',
+              'capitalID',
               'ActionEdit',
             ],
             RowGroupedColumns: [],
@@ -491,11 +492,8 @@ export class CapitalActivityComponent implements OnInit {
     });
 
     this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
-      if(result.event === 'Close with Success' && result.refresh && actionType === 'LINK-ADD'){
+      if(actionType === 'LINK-ADD' && result.event === 'Close with Success'){
         this.fetchCapitalActivityData();
-        this.fetchInvestmentData();
-      }
-      else if(result.event === 'Close with Success' && !result.refresh && actionType === 'LINK-ADD'){
         this.fetchInvestmentData();
       }
     }))

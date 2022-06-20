@@ -7,14 +7,13 @@ import { Subscription } from 'rxjs';
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import * as moment from 'moment';
 import { UpdateConfirmComponent } from '../update-confirm/update-confirm.component';
-import {Observable} from 'rxjs';
-import {startWith, map} from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { startWith, map } from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { ColDef, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 
-import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
 import { LinkInvestorModalComponent } from '../link-investor-modal/link-investor-modal.component';
-import { RowNode } from '@ag-grid-enterprise/all-modules';
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 
 @Component({
@@ -73,6 +72,7 @@ export class AddCapitalModalComponent implements OnInit{
     disable: true
   }; // To be sent to link investor component.
   isAlreadyLinked: boolean = null;
+  linkStatus
 
   validateField(options: string[], control: AbstractControl, field: string): string | null{
       //  Validates individual fields and returns fetched value if it's an allowed value.
@@ -368,6 +368,11 @@ export class AddCapitalModalComponent implements OnInit{
 
     /** For LINK-ADD, update Total Amount, based on changes in FX RATE, LOCAL AMOUNT */
     if(this.data.actionType === 'LINK-ADD'){
+
+      this.dialogRef.beforeClosed().subscribe(() => {
+        this.closePopUp();
+      })
+      
       this.capitalActivityForm.get('localAmount').valueChanges.subscribe(LA => {
         this.capitalActivityForm.patchValue({
           totalAmount: LA * this.capitalActivityForm.get('fxRate').value
@@ -713,57 +718,28 @@ export class AddCapitalModalComponent implements OnInit{
       this.childLinkComponent.searchCapitalActivities();
   }
 
-  closeFromLink(outcome){
+  /**
+   *  Updating `status` from `link investor` component 
+   */
+  onLinkStatus(outcome){
+    this.linkStatus = outcome
+  }
 
+  /** Closing pop up during `LINK-ADD` */
+  closePopUp(source?: string){
     let refresh: boolean = false;
-    if(outcome.event === 'Linked Close'){      
-      
-      if(outcome.isNewCapital){
-        this.data.adapTableApi.gridApi.addGridData([outcome.capitalAct]);
-        refresh = false;
-      }
-      else{
-        refresh = true;
-      }
-
-      // if(outcome.gridUpdates.updateInvestments){
-
-      //   this.data.adapTableApiInvstmnt.gridApi.getVendorGrid().api.forEachNodeAfterFilter(node => {
-      //     outcome.gridUpdates.updateInvestments.forEach(investment => {
-      //         if(investment.positionID === node.data?.positionID && node.data?.cashDate === investment.cashDate){
-      //             console.log(investment)
-      //             node.setDataValue('linkedAmount', investment.linkingAmt)
-      //         }
-      //     })
-      // })
-      // }
-      // if(outcome.gridUpdates.updateInvestors){
-
-      //   outcome.gridUpdates.updateInvestors.forEach(act => {
-      //     let node: RowNode = this.data.adapTableApi.gridApi.getRowNodeForPrimaryKey(act.capitalID);
-      //     if(act.isLinked && act.newLink){
-
-      //       node.setDataValue('linkedAmount', node.data.linkedAmount + act.linkingAmt)
-      //       node.setDataValue('isLinked', true)  
-      //     }
-      //     if(!act.isLinked){
-
-      //       node.setDataValue('linkedAmount', node.data.linkedAmount - act.linkingAmt)
-      //       if(Number((node.data.linkedAmount - act.linkingAmt).toFixed(2)) == 0){
-      //         node.setDataValue('isLinked', false)
-      //       }
-      //       else node.setDataValue('isLinked', true)
-      //     }
-      //   })
-      // }
-
-      this.dialogRef.close({event: 'Close with Success', refresh: refresh});
+    if(this.linkStatus?.event === 'Linked Close'){      
+      this.dialogRef.close({event: 'Close with Success'});
     }
     else{
-      this.dialogRef.close({event: 'Close', refresh: false})
+      this.dialogRef.close({event: 'Close'})
     }
   }
 
+  /**
+   * 
+   * @param isAlreadyLinked To hide form if the investment in `link investor` components is already linked to some investor activities.
+   */
   onIsAlreadyLinked(isAlreadyLinked: boolean){
     this.isAlreadyLinked = isAlreadyLinked
   }

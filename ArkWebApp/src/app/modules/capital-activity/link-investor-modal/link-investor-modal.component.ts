@@ -1,39 +1,34 @@
-import { Component, OnInit, Inject, Input, OnChanges, SimpleChanges, SimpleChange, Output, EventEmitter } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
 import {
   GridOptions,
   Module,
   ColDef,
   ClientSideRowModelModule,
-  RowNode
+  SelectionChangedEvent
 } from '@ag-grid-community/all-modules';
-import { dateFormatter, dateTimeFormatter, amountFormatter, nonAmountNumberFormatter, formatDate } from 'src/app/shared/functions/formatter';
+import { dateFormatter, amountFormatter, nonAmountNumberFormatter, formatDate } from 'src/app/shared/functions/formatter';
 
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 
 import {
   AdaptableOptions,
   AdaptableApi,
-  AdaptableButton,
-  ActionColumnButtonContext,
-  CheckboxColumnClickedInfo,
+  ActionColumnButtonContext
 } from '@adaptabletools/adaptable/types';
 import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
-import { AssociateInvestment, CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/CapitalActivityModel';
+import { AssociateInvestment, CapitalActivityModel } from 'src/app/shared/models/CapitalActivityModel';
 import { Subscription } from 'rxjs';
 import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
 import { ExcelExportModule, MenuModule, RowGroupingModule, SetFilterModule } from '@ag-grid-enterprise/all-modules';
 import * as moment from 'moment';
-
-
 
 @Component({
   selector: 'app-link-investor-modal',
   templateUrl: './link-investor-modal.component.html',
   styleUrls: ['./link-investor-modal.component.scss']
 })
-export class LinkInvestorModalComponent implements OnInit, OnChanges {
+export class LinkInvestorModalComponent implements OnInit {
 
   @Input() message: {
     actionType: string,
@@ -43,10 +38,12 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   
   @Input() disableCreateNew: {
     disable: boolean
-  };
+  }
 
-  @Output() closePopUpEvent = new EventEmitter<any>();
+  @Output() linkStatus = new EventEmitter<any>();
   @Output() isAlreadyLinkedEmit = new EventEmitter<boolean>();
+  @Output() closePopUpEvent = new EventEmitter<string>();
+
   isAlreadyLinkedEmmited: boolean = false;
   isAlreadyLinked: boolean = null
 
@@ -82,13 +79,10 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     { field: 'linkedAmount', headerName: 'Linked Amount', type: 'abColDefNumber', valueFormatter: amountFormatter},
     { field: 'Link', headerName: 'Link', type:'abColDefBoolean', editable: true},
     { field: 'resultCategory', headerName: 'Result Category', type:'abColDefString'},
-    // { field: 'isChecked', headerName: 'Link', type: 'abColDefBoolean', checkboxSelection: true}
+    { field: 'isChecked', headerName: 'Link', type: 'abColDefBoolean', checkboxSelection: true}
   ]
 
   buttonText: string = 'Create New';
-
-  investmentAmt: number = 0
-  investorAmt: number = 0
 
   defaultColDef = {
     resizable: true,
@@ -103,17 +97,20 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   gridOptions: GridOptions = {
     enableRangeSelection: true,
     sideBar: false,
+    rowSelection: 'multiple',
+    groupSelectsFiltered: true,
+    groupSelectsChildren: true,
     suppressMenuHide: true,
     suppressClickEdit: true,
     singleClickEdit: false,
     rowGroupPanelShow: 'always',
-    groupSelectsFiltered: true,
     enableGroupEdit: false,
     components: {
       AdaptableToolPanel: AdaptableToolPanelAgGridComponent
     },
     columnDefs: this.columnDefs,
-    allowContextMenuWithControlKey:true
+    allowContextMenuWithControlKey:true,
+    onSelectionChanged: this.onSelectionChanged.bind(this)
 
   };
   adapTableApi: AdaptableApi;
@@ -149,7 +146,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
         ]
       },
       Layout:{
-        Revision: 6,
+        Revision: 7,
         Layouts:[{
           Name: 'Associate Grid layout',
           Columns:[
@@ -167,14 +164,15 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
             'narrative',
             'source',
             'capitalID',
-            'Link'
+            // 'Link',
+            'isChecked'
 
           ],
           PinnedColumnsMap: {
-            Link: 'right'
+            isChecked: 'right'
           },
           ColumnWidthMap:{
-            Link: 20
+            isChecked: 15
           },
           RowGroupedColumns: ['resultCategory'],
           AggregationColumns: {
@@ -188,66 +186,11 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
 
 
   closePopUp(){
-    let updateInvestors: {
-      capitalID: number,
-      isLinked: boolean,
-      linkingAmt: number,
-      newLink: boolean
-    }[] = []
-    let updateInvestments: {
-      positionID: number,
-      cashDate: Date,
-      linkingAmt: number
-    }[] = []
 
-    this.investmentAmt = 0
-    this.message.investmentData.forEach(investment  => {
-      this.investmentAmt += Number(investment.amount)
-    })
-
-    this.investorAmt = 0
-    this.receivedCapitalAct.forEach(row => {
-      if(this.checkedCapitalIDs.includes(Number(row.capitalID))){
-        this.investorAmt += Number(row.totalAmount);
-      }
-    })
-
-    this.message.investmentData.forEach(investment => {
-      updateInvestments.push({
-        positionID: Number(investment.positionID),
-        cashDate: investment.cashDate,
-        linkingAmt: this.investorAmt
-      })
-    })
-
-    this.checkedCapitalIDs.forEach(capitalID => {
-      updateInvestors.push({
-        capitalID: capitalID,
-        isLinked: true,
-        linkingAmt: this.investmentAmt,
-        newLink: !this.prevCheckedCapitalIDs.includes(capitalID)
-      })
-    })
-
-    this.prevCheckedCapitalIDs.forEach(capitalID => {
-      if(!this.checkedCapitalIDs.includes(capitalID)){
-        updateInvestors.push({
-          capitalID: capitalID,
-          isLinked: false,
-          linkingAmt: this.investmentAmt,
-          newLink: false
-        })
-      }
-    })
-
-    console.log(updateInvestments, updateInvestors)
-    if(this.isSuccess)
-      this.closePopUpEvent.emit({event: 'Linked Close', capitalAct: this.newCapitalAct, isNewCapital: this.isCreateNew, gridUpdates: {
-        updateInvestments: updateInvestments,
-        updateInvestors: updateInvestors
-      }});
-    else
-      this.closePopUpEvent.emit({event: 'Empty Close', capitalAct: null});
+    if(!this.isSuccess)
+      this.linkStatus.emit({event: 'Empty Close', capitalAct: null});
+    
+    this.closePopUpEvent.emit('Link')
   }
 
   action(type: string){
@@ -286,6 +229,8 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
             this.updateMsg = 'Successfully updated investment associations';
             this.isSuccess = true;
             this.isFailure = false;
+
+            this.linkStatus.emit({event: 'Linked Close', capitalAct: this.newCapitalAct, isNewCapital: this.isCreateNew});      
           }
         },
         error: error => {
@@ -336,6 +281,9 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
 
                 this.newCapitalAct = JSON.parse(JSON.stringify(this.message.capitalAct));
                 this.newCapitalAct.capitalID = newCapitalID;
+
+                this.linkStatus.emit({event: 'Linked Close', capitalAct: this.newCapitalAct, isNewCapital: this.isCreateNew});      
+
               }
             },
             error: error => {
@@ -361,6 +309,19 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     }
   }
 
+  selectCapitalIDs(){
+    this.gridOptions?.api?.forEachLeafNode(node => {
+      if(this.prevCheckedCapitalIDs.includes(node.data.capitalID)){
+        node.setSelected(true)
+      }
+    })
+  }
+
+  onGridReady(params: any){
+    this.selectCapitalIDs();
+  }
+
+
   onAdaptableReady(
     {
       adaptableApi,
@@ -372,48 +333,23 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   ) {
     this.adapTableApi = adaptableApi;
     adaptableApi.columnApi.autosizeAllColumns()
-    adaptableApi.eventApi.on('SelectionChanged', selection => {
-      // do stuff
-    });
+  }
 
-    this.clearFilter();
+  onSelectionChanged(params: SelectionChangedEvent){
+    this.checkedCapitalIDs =  params.api.getSelectedNodes()?.map(node => node.data.capitalID)
+    this.buttonText = (this.checkedCapitalIDs.length === 0) ? 'Create New' : 'Update Link';
 
-    this.adapTableApi.eventApi.on(
-      'CheckboxColumnClicked',
-      (info: CheckboxColumnClickedInfo) => {
-        this.checkedCapitalIDs = [];
-        let gridData = this.adapTableApi.gridApi.getVendorGrid().rowData;
-
-        let allCids: number[] = []
-
-        for(let i:number = 0; i < gridData.length; i+=1){
-          if(!!gridData[i].capitalID)
-            allCids.push(Number(gridData[i].capitalID));
-
-          if(gridData[i].Link === true){
-            if(this.checkedCapitalIDs.includes(gridData[i].capitalID))
-              continue;
-            else this.checkedCapitalIDs.push(gridData[i].capitalID);
-          }
-        }
-
-        this.checkedCapitalIDs = this.checkedCapitalIDs.filter(cID => cID !== null && cID !== undefined)
-        this.buttonText = (this.checkedCapitalIDs.length === 0) ? 'Create New' : 'Update Link';
-
-        if(this.isAlreadyLinked){
-          this.buttonText = 'Update Link'
-        }
-        else if(!this.isAlreadyLinked && this.checkedCapitalIDs.length === 0){
-          this.buttonText = 'Create New'
-        }
-      }
-    )
-
+    if(this.isAlreadyLinked){
+      this.buttonText = 'Update Link'
+    }
+    else if(!this.isAlreadyLinked && this.checkedCapitalIDs.length === 0){
+      this.buttonText = 'Create New'
+    }
   }
 
   constructor(
     private capitalActivityService: CapitalActivityService, 
-    private msalService: MsalUserService,
+    private msalService: MsalUserService
 ) { }
 
   clearFilter(): void{
@@ -423,10 +359,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   searchCapitalActivities(){
     
     this.checkedCapitalIDs = [];
-    this.buttonText = 'Create New';
-
     this.message.capitalAct.posCcy = this.message.investmentData[0].positionCcy;
-
     this.message.capitalAct.positionIDs = '';
     let ids: string = '';
     for(let i: number = 0; i < this.message.investmentData.length; i+= 1){
@@ -437,47 +370,38 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
 
     /** Assuming that investmentData has a valid cashDate on 1st row */
     this.message.capitalAct.cashDate = new Date(moment(this.message.investmentData[0].cashDate).format('YYYY-MM-DD'));
+
+    this.gridOptions?.api?.showLoadingOverlay();
     this.subscriptions.push(this.capitalActivityService.lookUpCapitalActivity(this.message.capitalAct).subscribe({
       next: data => {
 
+        this.gridOptions?.api?.hideOverlay()
         this.receivedCapitalAct = data;
-
         this.isAlreadyLinkedEmmited = false;
-        this.disableCreateNew = {
-          disable: true
-        }
-
         this.prevCheckedCapitalIDs = [];
 
         for(let i = 0; i < data.length; i+= 1){
           if((data[i].resultCategory.trim().toLowerCase() === 'linked')){
-            data[i]['Link'] = true
             this.disableCreateNew = {
               disable: false
             }
             this.buttonText = 'Update Link'
-
             this.prevCheckedCapitalIDs.push(Number(data[i].capitalID))
-            // let node: RowNode = this.adapTableApi.gridApi.getRowNodeForPrimaryKey(data[i]?.['capitalID']);
-            // node.setSelected(true)
 
             if(!this.isAlreadyLinkedEmmited){
               this.isAlreadyLinkedEmit.emit(true)
               this.isAlreadyLinked = true
               this.isAlreadyLinkedEmmited = true
             }
-
           }
-          else data[i]['Link'] = false;
         }
 
-        
         if(!this.isAlreadyLinkedEmmited){
           this.isAlreadyLinkedEmit.emit(false)
           this.isAlreadyLinked = false
           this.isAlreadyLinkedEmmited = true
         }
-//        this.disableCreateNew = true;
+        this.selectCapitalIDs()
       },
       error: error => {
         console.error('Failed to fetched looked up capital activities')
@@ -485,20 +409,12 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     }))
   }
 
-  ngOnChanges(changes: SimpleChanges){
-    if(changes?.disableCreateNew){
-      this.disableCreateNew.disable = changes.disableCreateNew.currentValue.disable
-    }
-  }
-
   prevCheckedCapitalIDs: number[] = [];
   checkedCapitalIDs: number[] = [];
   
   ngOnInit(): void {
-
     this.isSuccess = this.isFailure = false;
     this.searchCapitalActivities();
-
   }
 
   ngOnDestroy(): void{

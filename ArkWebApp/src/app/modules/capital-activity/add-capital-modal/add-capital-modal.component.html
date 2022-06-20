@@ -243,9 +243,9 @@
   }"
   [disableCreateNew]="isFormPurelyNotValid"
   (isAlreadyLinkedEmit)="onIsAlreadyLinked($event)"
-  (closePopUpEvent)=closeFromLink($event)></app-link-investor-modal>
+  (linkStatus)=onLinkStatus($event)
+  (closePopUpEvent)="closePopUp($event)"></app-link-investor-modal>
 </ng-container>
-
 
 <ng-container *ngIf="data.actionType !== 'LINK-ADD'">
   <mat-dialog-actions align="end"> 
