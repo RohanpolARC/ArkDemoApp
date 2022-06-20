@@ -2,10 +2,10 @@
     
     <!-- Add dynamic load content here -->
 <div>
-    <div class="success-msg" *ngIf="isSuccessMsgAvailable">
-        {{ updateMsg }}
-    </div>
-    <div class="failure-msg" *ngIf="isFailureMsgAvailable">
+    <div *ngIf="isSuccess || isFailure"
+    [class.success-msg]="isSuccess"
+    [class.failure-msg]="isFailure"
+    >
         {{ updateMsg }}
     </div>
 </div>

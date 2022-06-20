@@ -5,7 +5,8 @@ import {
   GridOptions,
   Module,
   ColDef,
-  ClientSideRowModelModule
+  ClientSideRowModelModule,
+  RowNode
 } from '@ag-grid-community/all-modules';
 import { dateFormatter, dateTimeFormatter, amountFormatter, nonAmountNumberFormatter, formatDate } from 'src/app/shared/functions/formatter';
 
@@ -81,6 +82,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     { field: 'linkedAmount', headerName: 'Linked Amount', type: 'abColDefNumber', valueFormatter: amountFormatter},
     { field: 'Link', headerName: 'Link', type:'abColDefBoolean', editable: true},
     { field: 'resultCategory', headerName: 'Result Category', type:'abColDefString'},
+    { field: 'isChecked', headerName: 'Link', type: 'abColDefBoolean', checkboxSelection: true}
   ]
 
   buttonText: string = 'Create New';
@@ -113,8 +115,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   };
   adapTableApi: AdaptableApi;
   adaptableOptions: AdaptableOptions = {
-    primaryKey: '',
-    autogeneratePrimaryKey: true,
+    primaryKey: 'capitalID',
     userName: this.msalService.getUserName(),
     adaptableId: '',
     adaptableStateKey: 'Linking Key',
@@ -198,7 +199,6 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   associate(capitalIDs?: number[], action?: string){
 
     let pIDcashDtStr: string = '';
-    let cIDActionStr: string = '';
 
     this.message.investmentData.forEach(investment => {
       pIDcashDtStr += `${investment.positionID}|${formatDate(investment.cashDate, true)},`
@@ -207,8 +207,6 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     if(pIDcashDtStr.length)
       pIDcashDtStr = pIDcashDtStr.slice(0, -1);
     
-    console.log(`PositionIDs|CashDate : ${pIDcashDtStr}`)
-
     let model: AssociateInvestment = <AssociateInvestment> {};
     model.positionIDCashdateStr = pIDcashDtStr;
     model.capitalIDs = this.checkedCapitalIDs;
@@ -254,6 +252,7 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
       this.message.capitalAct.source = 'ArkUI - link';
       this.message.capitalAct.sourceID = 4;
 
+      this.isCreateNew = true
       this.subscriptions.push(this.capitalActivityService.putCapitalActivity(this.message.capitalAct).subscribe({
         next: received => {
 
@@ -375,6 +374,8 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
     this.subscriptions.push(this.capitalActivityService.lookUpCapitalActivity(this.message.capitalAct).subscribe({
       next: data => {
 
+        this.receivedCapitalAct = data;
+
         this.isAlreadyLinkedEmmited = false;
         this.disableCreateNew = {
           disable: true
@@ -388,6 +389,9 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
             }
             this.buttonText = 'Update Link'
 
+            // let node: RowNode = this.adapTableApi.gridApi.getRowNodeForPrimaryKey(data[i]?.['capitalID']);
+            // node.setSelected(true)
+
             if(!this.isAlreadyLinkedEmmited){
               this.isAlreadyLinkedEmit.emit(true)
               this.isAlreadyLinked = true
@@ -398,7 +402,6 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
           else data[i]['Link'] = false;
         }
 
-        this.receivedCapitalAct = data;
         
         if(!this.isAlreadyLinkedEmmited){
           this.isAlreadyLinkedEmit.emit(false)
@@ -414,7 +417,9 @@ export class LinkInvestorModalComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges){
-    console.log(changes)
+    if(changes?.disableCreateNew){
+      this.disableCreateNew.disable = changes.disableCreateNew.currentValue.disable
+    }
   }
 
   checkedCapitalIDs: number[] = [];

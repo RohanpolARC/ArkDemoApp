@@ -41,8 +41,8 @@ export class AddCapitalModalComponent implements OnInit{
   header: string;
   buttontext: string;
 
-  isSuccessMsgAvailable: boolean;
-  isFailureMsgAvailable: boolean;
+  isSuccess: boolean;
+  isFailure: boolean;
   updateMsg:string;
   disableSubmit: boolean = true;
   valueErrorMessage: string = null;
@@ -393,7 +393,6 @@ export class AddCapitalModalComponent implements OnInit{
       this.isFormPurelyNotValid = {
         disable: !this.capitalActivityForm.errors?.['validated']
       }
-      console.log(this.isFormPurelyNotValid.disable)
 
     })
 
@@ -441,7 +440,7 @@ export class AddCapitalModalComponent implements OnInit{
     {field: 'positionID', headerName: 'Position ID', tooltipField: 'positionID'},
     {field: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter, tooltipField: 'cashDate'},
     {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'amount'},
-    {field: 'linkedAmount', headerName: 'Linked Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'linkedAmount'},
+    // {field: 'linkedAmount', headerName: 'Linked Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'linkedAmount'},
     {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'totalBase'},
     {field: 'positionCcy', headerName: 'Position Ccy', tooltipField: 'positionCcy'},
     {field: 'portfolio', headerName: 'Portfolio', tooltipField: 'portfolio'},
@@ -473,9 +472,8 @@ export class AddCapitalModalComponent implements OnInit{
   ngOnInit(): void {
     this.setDynamicOptions();
 
-    this.isSuccessMsgAvailable = this.isFailureMsgAvailable = false;
+    this.isSuccess = this.isFailure = false;
   
-
     this.changeListeners();
 
     this.disableSubmit = true;
@@ -625,7 +623,7 @@ export class AddCapitalModalComponent implements OnInit{
   }
 
   performSubmit() {
-    this.isSuccessMsgAvailable = this.isFailureMsgAvailable = false;
+    this.isSuccess = this.isFailure = false;
     this.disableSubmit = true;
 
     this.getFormCapitalAct();
@@ -650,8 +648,8 @@ export class AddCapitalModalComponent implements OnInit{
     this.capitalActivityForm.disable();
     this.subscriptions.push(this.capitalActivityService.putCapitalActivity(this.capitalAct).subscribe({
       next: data => {
-        this.isSuccessMsgAvailable = true;
-        this.isFailureMsgAvailable = false;
+        this.isSuccess = true;
+        this.isFailure = false;
 
         if(this.data.actionType === 'ADD'){
           if(data.data != -1)   // .data is the returned data(here, capitalID) of the newly inserted/updated row.
@@ -684,8 +682,8 @@ export class AddCapitalModalComponent implements OnInit{
         }
       },
       error: error => {
-        this.isFailureMsgAvailable = true;
-        this.isSuccessMsgAvailable = false;
+        this.isFailure = true;
+        this.isSuccess = false;
 
         if(this.data.actionType === 'ADD')
           this.updateMsg = 'Insert failed';
@@ -707,7 +705,6 @@ export class AddCapitalModalComponent implements OnInit{
   closeFromLink(outcome){
 
     if(outcome.event === 'Linked Close'){      
-      // this.data.adapTableApiInvstmnt.gridApi.deleteGridData(this.data.rowData);
       
       if(outcome.isNewCapital){
         this.data.adapTableApi.gridApi.addGridData([outcome.capitalAct]);
@@ -740,7 +737,7 @@ export class AddCapitalModalComponent implements OnInit{
   }
 
   closeDialog(data?: CapitalActivityModel): void {
-    if(this.isSuccessMsgAvailable)
+    if(this.isSuccess)
       this.dialogRef.close({event:'Close with Success', data:data});
     else
       this.dialogRef.close({event:'Close', data:null});

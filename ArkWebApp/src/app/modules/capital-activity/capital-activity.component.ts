@@ -69,7 +69,7 @@ export class CapitalActivityComponent implements OnInit {
     {field: 'fundCcy', headerName: 'Fund Ccy'},
     {field: 'positionCcy', headerName: 'Position Ccy'},
     {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'linkedAmount', headerName: 'Linked Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    // {field: 'linkedAmount', headerName: 'Linked Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'totalEur', headerName: 'Total Eur', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
   ]
@@ -399,7 +399,7 @@ export class CapitalActivityComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 3,
+          Revision: 4,
           Layouts:[{
             Name: 'Basic Investment Cashflow',
             Columns: [
@@ -413,7 +413,7 @@ export class CapitalActivityComponent implements OnInit {
               'fundCcy',
               'positionCcy',
               'amount',
-              'linkedAmount',
+              // 'linkedAmount',
               'totalBase',
               'totalEur',
               'ActionLink'
@@ -428,7 +428,7 @@ export class CapitalActivityComponent implements OnInit {
             AggregationColumns: {
               totalBase: 'sum',
               totalEur: 'sum',
-              linkedAmount: 'sum',
+              // linkedAmount: 'sum',
               amount: 'sum'
             }
           }]
@@ -480,19 +480,10 @@ export class CapitalActivityComponent implements OnInit {
         refData: this.refData,
         gridData: gridData
       },
-      // minWidth: (actionType === 'LINK-ADD') ? '1500px' : '830px',
       width: '90vw',
       maxWidth: '2000px',
-      // width: '95vw',
       maxHeight: '99vh'
     });
-    this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
-      /** ADD Rows to Investor Grid */
-      if(result.event === 'Close with Success' && actionType !== 'EDIT'){
-        this.fetchCapitalActivityData();
-      }
-
-    }));
   }
 
   onAdaptableReady(
