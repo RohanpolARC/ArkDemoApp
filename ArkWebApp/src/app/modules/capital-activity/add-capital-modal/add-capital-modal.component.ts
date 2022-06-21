@@ -653,6 +653,8 @@ export class AddCapitalModalComponent implements OnInit{
       this.capitalAct.createdBy = this.data.rowData.createdBy;
       this.capitalAct.createdOn = this.data.rowData.createdOn;
 
+      this.capitalAct.isLinked = this.data.rowData.isLinked;
+      this.capitalAct.linkedAmount = this.data.rowData.linkedAmount;
     }
     else{
       this.capitalAct.capitalID = null;
