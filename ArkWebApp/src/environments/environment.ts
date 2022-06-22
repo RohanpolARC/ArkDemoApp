@@ -10,8 +10,7 @@ export const environment = {
   tenantId: '1aca2fbe-6078-4dfb-8c1f-9d98d6245214',  
   uiClienId: '9a06035c-d10f-4b52-817d-8cc7583721a1',  
   redirectUrl: 'http://localhost:4200/',
-  // irrCalcFunUrl: 'http://localhost:7071'  
-  irrCalcFunUrl: 'https://irrcalcfunuatnew.azurewebsites.net/'
+  irrCalcFunUrl: 'http://localhost:7071'  
 };
 
 /*
