@@ -16,29 +16,31 @@
         </div>
     </div>
 
-    <div *ngIf="isSuccess" class="success-msg">
-        {{ updateMsg }}
-    </div>
-
-    <div *ngIf="isFailure" class="failure-msg">
+    <div *ngIf="isSuccess || isFailure"
+    [class.success-msg]="isSuccess"
+    [class.failure-msg]="isFailure"
+    >
         {{ updateMsg }}
     </div>
 
     <ag-grid-angular
      *ngIf="receivedCapitalAct.length !== 0"
-        style="height: 250px;"
+        style="height: 300px;"
         [adaptableOptions]="adaptableOptions"
         [gridOptions]="gridOptions"
         [defaultColDef]="defaultColDef"
         [modules]="agGridModules"
         [rowData]="receivedCapitalAct"
+        (gridReady)="onGridReady($event)"
         (adaptableReady)="onAdaptableReady($event)"
         class="ag-theme-alpine"
     ></ag-grid-angular>
 </ng-container>
+
     <mat-dialog-actions align="end">
         <button mat-raised-button color="primary" 
-        [disabled]="(receivedCapitalID !== null) ? true : (buttonText === 'Create New' ? disableCreateNew : false)"
+        [disabled]="isSuccess ? true : (buttonText === 'Create New' ? disableCreateNew.disable : false)"
         (click)="action(buttonText)"> {{buttonText}} </button>
+
         <button mat-raised-button (click)="closePopUp()">Close</button>
     </mat-dialog-actions>

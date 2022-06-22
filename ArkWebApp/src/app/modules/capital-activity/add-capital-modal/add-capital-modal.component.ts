@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewChild } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, Output } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CapitalActivityModel } from 'src/app/shared/models/CapitalActivityModel';
@@ -7,13 +7,14 @@ import { Subscription } from 'rxjs';
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import * as moment from 'moment';
 import { UpdateConfirmComponent } from '../update-confirm/update-confirm.component';
-import {Observable} from 'rxjs';
-import {startWith, map} from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { startWith, map } from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { ColDef, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 
-import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
 import { LinkInvestorModalComponent } from '../link-investor-modal/link-investor-modal.component';
+import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 
 @Component({
   selector: 'app-add-capital-modal',
@@ -41,8 +42,8 @@ export class AddCapitalModalComponent implements OnInit{
   header: string;
   buttontext: string;
 
-  isSuccessMsgAvailable: boolean;
-  isFailureMsgAvailable: boolean;
+  isSuccess: boolean;
+  isFailure: boolean;
   updateMsg:string;
   disableSubmit: boolean = true;
   valueErrorMessage: string = null;
@@ -65,7 +66,13 @@ export class AddCapitalModalComponent implements OnInit{
   
   placeHolderGIR: string = null;
 
-  isFormPurelyNotValid: boolean = true; // To be sent to link investor component.
+  isFormPurelyNotValid: {
+    disable: boolean
+  } = {
+    disable: true
+  }; // To be sent to link investor component.
+  isAlreadyLinked: boolean = null;
+  linkStatus
 
   validateField(options: string[], control: AbstractControl, field: string): string | null{
       //  Validates individual fields and returns fetched value if it's an allowed value.
@@ -163,7 +170,16 @@ export class AddCapitalModalComponent implements OnInit{
   );
 
   constructor(public dialogRef: MatDialogRef<AddCapitalModalComponent>, 
-    @Inject(MAT_DIALOG_DATA) public data: any,
+    @Inject(MAT_DIALOG_DATA) public data: {
+      rowData : any,
+      adapTableApi: AdaptableApi,
+      adapTableApiInvstmnt: AdaptableApi,
+      actionType: string,
+      capitalTypes: string[],
+      capitalSubTypes: string[],
+      refData: any,
+      gridData: any
+    },
     public dialog: MatDialog,
     private capitalActivityService: CapitalActivityService, 
     private msalService: MsalUserService) { }
@@ -352,6 +368,11 @@ export class AddCapitalModalComponent implements OnInit{
 
     /** For LINK-ADD, update Total Amount, based on changes in FX RATE, LOCAL AMOUNT */
     if(this.data.actionType === 'LINK-ADD'){
+
+      this.dialogRef.beforeClosed().subscribe(() => {
+        this.closePopUp();
+      })
+      
       this.capitalActivityForm.get('localAmount').valueChanges.subscribe(LA => {
         this.capitalActivityForm.patchValue({
           totalAmount: LA * this.capitalActivityForm.get('fxRate').value
@@ -379,12 +400,16 @@ export class AddCapitalModalComponent implements OnInit{
           this.placeHolderGIR = 'Pos ccy -> Fund ccy'
       }
 
-      this.isFormPurelyNotValid = !this.capitalActivityForm.errors?.['validated']
 
       if(this.capitalActivityForm.errors?.['validated'] && this.capitalActivityForm.touched)
         this.disableSubmit = false;
       else if(!this.capitalActivityForm.errors?.['validated'])
         this.disableSubmit = true;
+
+      this.isFormPurelyNotValid = {
+        disable: !this.capitalActivityForm.errors?.['validated']
+      }
+
     })
 
 
@@ -431,6 +456,7 @@ export class AddCapitalModalComponent implements OnInit{
     {field: 'positionID', headerName: 'Position ID', tooltipField: 'positionID'},
     {field: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter, tooltipField: 'cashDate'},
     {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'amount'},
+    {field: 'linkedAmount', headerName: 'Linked Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'linkedAmount'},
     {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'totalBase'},
     {field: 'positionCcy', headerName: 'Position Ccy', tooltipField: 'positionCcy'},
     {field: 'portfolio', headerName: 'Portfolio', tooltipField: 'portfolio'},
@@ -462,9 +488,8 @@ export class AddCapitalModalComponent implements OnInit{
   ngOnInit(): void {
     this.setDynamicOptions();
 
-    this.isSuccessMsgAvailable = this.isFailureMsgAvailable = false;
+    this.isSuccess = this.isFailure = false;
   
-
     this.changeListeners();
 
     this.disableSubmit = true;
@@ -614,7 +639,7 @@ export class AddCapitalModalComponent implements OnInit{
   }
 
   performSubmit() {
-    this.isSuccessMsgAvailable = this.isFailureMsgAvailable = false;
+    this.isSuccess = this.isFailure = false;
     this.disableSubmit = true;
 
     this.getFormCapitalAct();
@@ -628,6 +653,8 @@ export class AddCapitalModalComponent implements OnInit{
       this.capitalAct.createdBy = this.data.rowData.createdBy;
       this.capitalAct.createdOn = this.data.rowData.createdOn;
 
+      this.capitalAct.isLinked = this.data.rowData.isLinked;
+      this.capitalAct.linkedAmount = this.data.rowData.linkedAmount;
     }
     else{
       this.capitalAct.capitalID = null;
@@ -639,8 +666,8 @@ export class AddCapitalModalComponent implements OnInit{
     this.capitalActivityForm.disable();
     this.subscriptions.push(this.capitalActivityService.putCapitalActivity(this.capitalAct).subscribe({
       next: data => {
-        this.isSuccessMsgAvailable = true;
-        this.isFailureMsgAvailable = false;
+        this.isSuccess = true;
+        this.isFailure = false;
 
         if(this.data.actionType === 'ADD'){
           if(data.data != -1)   // .data is the returned data(here, capitalID) of the newly inserted/updated row.
@@ -673,8 +700,8 @@ export class AddCapitalModalComponent implements OnInit{
         }
       },
       error: error => {
-        this.isFailureMsgAvailable = true;
-        this.isSuccessMsgAvailable = false;
+        this.isFailure = true;
+        this.isSuccess = false;
 
         if(this.data.actionType === 'ADD')
           this.updateMsg = 'Insert failed';
@@ -693,16 +720,30 @@ export class AddCapitalModalComponent implements OnInit{
       this.childLinkComponent.searchCapitalActivities();
   }
 
-  closeFromLink(outcome){
+  /**
+   *  Updating `status` from `link investor` component 
+   */
+  onLinkStatus(outcome){
+    this.linkStatus = outcome
+  }
 
-    if(outcome.event === 'Linked Close'){      
-      this.data.adapTableApiInvstmnt.gridApi.deleteGridData(this.data.rowData);
-      
-      if(outcome.isNewCapital){
-        this.data.adapTableApi.gridApi.addGridData([outcome.capitalAct]);
-      }
+  /** Closing pop up during `LINK-ADD` */
+  closePopUp(source?: string){
+    let refresh: boolean = false;
+    if(this.linkStatus?.event === 'Linked Close'){      
+      this.dialogRef.close({event: 'Close with Success'});
     }
-    this.dialogRef.close({event: outcome.isNewCapital ? 'Close with Success' : 'Close'});
+    else{
+      this.dialogRef.close({event: 'Close'})
+    }
+  }
+
+  /**
+   * 
+   * @param isAlreadyLinked To hide form if the investment in `link investor` components is already linked to some investor activities.
+   */
+  onIsAlreadyLinked(isAlreadyLinked: boolean){
+    this.isAlreadyLinked = isAlreadyLinked
   }
 
   onSubmit(): void {
@@ -725,7 +766,7 @@ export class AddCapitalModalComponent implements OnInit{
   }
 
   closeDialog(data?: CapitalActivityModel): void {
-    if(this.isSuccessMsgAvailable)
+    if(this.isSuccess)
       this.dialogRef.close({event:'Close with Success', data:data});
     else
       this.dialogRef.close({event:'Close', data:null});
