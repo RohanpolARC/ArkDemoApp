@@ -253,28 +253,8 @@ export class PortfolioModellerComponent implements OnInit {
             if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].maturityDate)){
               data[i].maturityDate = null;
             }
-
-            // data[i].old_expectedDate = data[i].expectedDate
-            // data[i].old_expectedPrice = data[i].expectedPrice
           }  
 
-          // if(!this.selectedModelID){
-          //   this.rowData = data;
-          // }
-          
-          // for(let i = 0; i < this.rowData?.length; i+= 1){
-          //   this.rowData[i]['IsChecked'] = false;
-          //   if(this.selectedModelID){
-          //     if(this.modelMap[this.selectedModelID].positionIDs?.includes(this.rowData[i].positionID))
-          //     this.rowData[i]['IsChecked'] = true
-          //   }
-          // }
-
-          // if(!this.selectedModelID){
-          //   this.rowData = data
-          // }
-          // this.adapTableApi.gridApi.loadGridData(data)
-          // this.rowData = data
           this.gridApi.setRowData(data)
           if(this.selectedModelID){
             if(this.modelMap[this.selectedModelID].positionIDs){
