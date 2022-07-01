@@ -12,9 +12,8 @@ import { FacilityDetailComponent } from './modules/facility-detail/facility-deta
 import { LiquiditySummaryComponent } from './modules/liquidity-summary/liquidity-summary.component';
 import { AccessControlComponent } from './shared/components/access-control/access-control.component';
 import { IrrCalculationComponent } from './modules/irr-calculation/irr-calculation.component';
-import { IrrResultComponent } from './modules/irr-calculation/irr-result/irr-result.component';
-  
-  
+import { PortfolioManagerComponent } from './modules/portfolio-manager/portfolio-manager.component';
+    
 const routes: Routes = [
   {
     path: '',
@@ -104,7 +103,18 @@ const routes: Routes = [
     data: {
       tab: 'Portfolio Modeller'
     }
-  }
+  },
+  {
+    path: 'portfolio-manager',
+    component: PortfolioManagerComponent,
+    canActivate: [
+      MsalGuard,
+      // RoleGuard
+    ],
+    data: {
+      tab: 'Portfolio Manager'
+    }
+  },
 ];  
   
 @NgModule({  

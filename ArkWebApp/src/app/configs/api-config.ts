@@ -45,10 +45,15 @@ export class APIConfig {
     public static LIQUIDITY_SUMMARY_PUT_UPDATE_API: string = APIConfig.BASEURL + "/api/LiquiditySummary/Update";
 
     public static REFDATA_GET_FUNDHEDGINGS_API: string = APIConfig.BASEURL + "/api/GetRef/GetFundHedgings";
+    public static REFDATA_GET_WSOPORTFOLIO_API: string = APIConfig.BASEURL + "/api/GetRef/GetWSOPortfolioRef";
 
     public static IRR_POSITIONS_GET_API: string = APIConfig.BASEURL + "/api/IRRCalculation/GetPositions";
     public static IRR_PORTFOLIO_MODEL_PUT_API: string = APIConfig.BASEURL + "/api/IRRCalculation/PutModel";
     public static IRR_PORTFOLIO_MODEL_GET_API: string = APIConfig.BASEURL + "/api/IRRCalculation/GetModel";
     public static IRR_LOCAL_OVERRIDES_GET_API: string = APIConfig.BASEURL + "/api/IRRCalculation/GetLocalOverrides";
     public static IRR_RUN_CALCS_API: string = APIConfig.IRRCALC_BASEURL + "/api/IRRCalculatorFunction_HttpTrigger";
+
+    public static PORTFOLIO_MAPPING_GET_API: string = APIConfig.BASEURL + "/api/PortfolioManager/GetPortfolioMapping";
+    public static PORTFOLIO_MAPPING_PUT_API: string = APIConfig.BASEURL + "/api/PortfolioManager/PutPortfolioMapping";
+
 }

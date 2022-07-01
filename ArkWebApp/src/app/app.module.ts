@@ -42,6 +42,8 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import { AccessControlComponent } from './shared/components/access-control/access-control.component';
 import { MatSelectModule } from '@angular/material/select';
 import { IrrCalculationModule } from './modules/irr-calculation/irr-calculation.module';
+import { PortfolioManagerModule } from './modules/portfolio-manager/portfolio-manager.module';
+import { MatAutocompleteEditorComponent } from './shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 
 export const protectedResourceMap: any =  
   [  
@@ -51,7 +53,7 @@ export const protectedResourceMap: any =
   
 @NgModule({  
   declarations: [  
-    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent
+    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent, MatAutocompleteEditorComponent
   ],  
   imports: [  
     MsalModule.forRoot({  
@@ -93,7 +95,8 @@ export const protectedResourceMap: any =
   LiquiditySummaryModule,
   MatCheckboxModule,
   MatSelectModule,
-  IrrCalculationModule
+  IrrCalculationModule,
+  PortfolioManagerModule
   ],  
   providers: [  
     HttpClient,  
