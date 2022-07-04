@@ -1,5 +1,5 @@
 import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
-import { CellValueChangedEvent, ClientSideRowModelModule, ColDef, EditableCallbackParams, GridOptions, GridReadyEvent, Module, RowNode } from '@ag-grid-community/all-modules';
+import { CellClickedEvent, CellValueChangedEvent, ClientSideRowModelModule, ColDef, EditableCallbackParams, GridOptions, GridReadyEvent, Module, RowNode } from '@ag-grid-community/all-modules';
 import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule } from '@ag-grid-enterprise/all-modules';
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
@@ -56,51 +56,124 @@ export class PortfolioManagerComponent implements OnInit {
     this.columnDefs = [
       { field: 'mappingID' },
       { field: 'fund',
-        editable: this.isEditable.bind(this)
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fund'),
+        cellStyle: this.getEditableCellStyle.bind(this)
       },
       { field: "fundLegalEntity",
-        editable: this.isEditable.bind(this)
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundLegalEntity'),
+        cellStyle: this.getEditableCellStyle.bind(this)
       },
       { field: "fundHedging",
-        editable: this.isEditable.bind(this)
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundHedging'),
+        cellStyle: this.getEditableCellStyle.bind(this)
       },
       { field: "fundStrategy",
-        editable: this.isEditable.bind(this)
-      }
-      ,{ field: "fundPipeline2",
-         editable: this.isEditable.bind(this)
-       }
-      ,{ field: "fundSMA",
-         editable: this.isEditable.bind(this)
-      }
-      ,{ field: "fundInvestor",
-         editable: this.isEditable.bind(this)
-      }
-      ,{field: "wsoPortfolioID",
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
-        cellEditorParams: this.getPortfolioIDParams.bind(this)
-      }
-      ,{ 
-        field: "portfolioName", 
-        // cellEditor: 'agSelectCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundStrategy'),
+        cellStyle: this.getEditableCellStyle.bind(this),
+      },
+      { field: "fundPipeline2",
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
-        cellEditorParams: this.getPortfolioNameParams.bind(this)
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundPipeline2'),
+        cellStyle: this.getEditableCellStyle.bind(this),
+      },
+      { field: "fundSMA",
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundSMA'),
+        cellStyle: this.getEditableCellStyle.bind(this),
+      },
+      { field: "fundInvestor",
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundInvestor'),
+        cellStyle: this.getEditableCellStyle.bind(this)
+      },
+      { field: "wsoPortfolioID",
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getPortfolioIDParams.bind(this),
+        cellStyle: this.getEditableCellStyle.bind(this)
+      },
+      { 
+        field: "portfolioName",
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getPortfolioNameParams.bind(this),
+        cellStyle: this.getEditableCellStyle.bind(this)
+      },
+      { field: "solvencyPortfolioName", 
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'solvencyPortfolioName'),
+        cellStyle: this.getEditableCellStyle.bind(this)
+      },
+
+      { field: "fundPipeline", 
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundPipeline'),
+        cellStyle: this.getEditableCellStyle.bind(this) 
+      },
+      { field: "fundCcy", 
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundCcy'),
+        cellStyle: this.getEditableCellStyle.bind(this)  
+      },
+      { field: "fundAdmin", 
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundAdmin'),
+        cellStyle: this.getEditableCellStyle.bind(this)  
+      },
+      { field: "portfolioAUMMethod", 
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'portfolioAUMMethod'),
+        cellStyle: this.getEditableCellStyle.bind(this),
+      },
+      { field: "fundRecon", 
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundRecon'),
+        cellStyle: this.getEditableCellStyle.bind(this)  
+      },
+      { field: "legalEntityName", 
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'legalEntityName'),
+        cellStyle: this.getEditableCellStyle.bind(this)  
+      },
+      { field: "lei", headerName: 'LEI', 
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'lei'),
+        cellStyle: this.getEditableCellStyle.bind(this)  
+      },
+      { field: "isCoinvestment", 
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'isCoinvestment'),
+        cellStyle: this.getEditableCellStyle.bind(this)  
+      },
+      { field: "excludeFxExposure", 
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'excludeFxExposure'),
+        cellStyle: this.getEditableCellStyle.bind(this)  
+      },
+      { field: 'action', 
+        cellRenderer: 'updateCellRenderer' 
       }
-      ,{ field: "solvencyPortfolioName" }
-
-      ,{ field: "fundPipeline", editable: this.isEditable.bind(this) }
-      ,{ field: "fundCcy", editable: this.isEditable.bind(this) }
-      ,{ field: "fundAdmin", editable: this.isEditable.bind(this) }
-      ,{ field: "portfolioAUMMethod", editable: this.isEditable.bind(this) }
-      ,{ field: "fundRecon", editable: this.isEditable.bind(this) }
-      ,{ field: "legalEntityName", editable: this.isEditable.bind(this) }
-      ,{ field: "lei", headerName: 'LEI', editable: this.isEditable.bind(this) }
-      ,{ field: "isCoinvestment", editable: this.isEditable.bind(this) }
-      ,{ field: "excludeFxExposure", editable: this.isEditable.bind(this) }
-      ,{ field: 'action', cellRenderer: 'updateCellRenderer' }
-
     ]
 
     this.defaultColDef = {
@@ -108,7 +181,7 @@ export class PortfolioManagerComponent implements OnInit {
       enableValue: true,
       enableRowGroup: true,
       enablePivot: false,
-      sortable: true,
+      // sortable: true,
       filter: true,
       autosize:true,
       floatingFilter: false
@@ -126,6 +199,7 @@ export class PortfolioManagerComponent implements OnInit {
         autocompleteCellEditor: MatAutocompleteEditorComponent
       },
       singleClickEdit: true,
+      rowGroupPanelShow: 'always',
       onCellValueChanged: this.onCellValueChanged.bind(this)
     }
 
@@ -220,6 +294,10 @@ export class PortfolioManagerComponent implements OnInit {
        */
       this.gridOptions.api?.stopEditing(true);
     }
+    this.gridOptions.api?.refreshCells({
+      force: true,
+      suppressFlash: true
+    })
   }
 
   getSelectedRowID(){
@@ -238,19 +316,47 @@ export class PortfolioManagerComponent implements OnInit {
     }
   }
 
+  getUniqueParamsFromGrid(field: string){
+    return {
+      options: [...new Set(this.getGridData().map(e => 
+        {
+          if(typeof e[field] === 'string')
+            return String(e[field]).replace(/\s/g,'')
+          else return e[field]
+        }
+        ))].filter(e => 
+        String(e)?.replace(/\s/g,'').length && (e !== null) && (e !== undefined) && (e !== 0)
+      ).sort()
+    }
+  }
+
   isEditable (params: EditableCallbackParams)  {
     return params.node.rowIndex === this.actionClickedRowID;
   }
 
-  onCellValueChanged(params: CellValueChangedEvent){
-    console.log(params)
+  getEditableCellStyle (params) {
+    return (params.rowIndex === this.actionClickedRowID) ? 
+    {
+      'border-color': '#0590ca',
+    } : null
+  }
+
+  getGridData(){
+    let liveData: any[] = []
+    this.gridOptions?.api.forEachLeafNode(node => {
+      liveData.push(node.data)
+    })
+    return liveData;
+  }
+
+  validateAndUpdate(params: CellValueChangedEvent){
     let nodeData = params.data;
     let val = params.newValue;
     let found: boolean = false
 
     if(params.column.getColId() === 'portfolioName'){
 
-      let liveGrid = this.adapTableApi.gridApi.getVendorGrid().rowData
+      let liveGrid = this.getGridData();
       let isDuplicate: boolean = false;
 
       for(let i: number = 0; i < liveGrid.length; i+= 1){
@@ -284,7 +390,7 @@ export class PortfolioManagerComponent implements OnInit {
     }
     else if(params.column.getColId() === 'wsoPortfolioID'){
 
-      let liveGrid = this.adapTableApi.gridApi.getVendorGrid().rowData
+      let liveGrid = this.getGridData();
       let isDuplicate: boolean = false;
 
       for(let i: number = 0; i < liveGrid.length; i+= 1){
@@ -318,6 +424,10 @@ export class PortfolioManagerComponent implements OnInit {
     }
   }
 
+  onCellValueChanged(params: CellValueChangedEvent){
+    this.validateAndUpdate(params)
+  }
+
   onAdaptableReady(
     {
       adaptableApi,
@@ -329,10 +439,6 @@ export class PortfolioManagerComponent implements OnInit {
   ) {
     this.adapTableApi = adaptableApi;
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel()
-    adaptableApi.eventApi.on('SelectionChanged', selection => {
-      // do stuff
-    });
-
   }
 
   onGridReady(params: GridReadyEvent){
@@ -349,16 +455,6 @@ export class PortfolioManagerComponent implements OnInit {
 
       }
     }))
-
-  }
-
-  editClonedRow(){
-
-    let node: RowNode = this.adapTableApi.gridApi.getRowNodeForPrimaryKey(null)
-    this.setSelectedRowID(node.rowIndex)
-    this.gridOptions.api.startEditingCell({ 
-      rowIndex: node.rowIndex, colKey: this.columnDefs[1].field
-    });      
 
   }
 }

@@ -1,12 +1,12 @@
 <ng-container *ngIf="!params.node.group">
+    
     <span *ngIf="!(componentParent.getSelectedRowID() === params.node.rowIndex)"
         (click)="cloneRow()"
         matTooltip="Clone row">
         <mat-icon [ngStyle]="{'margin-left': '15px', color:'#285170','cursor':'pointer'}" >content_copy</mat-icon>
 
-
     </span>
-    
+
     <span *ngIf="!(componentParent.getSelectedRowID() === params.node.rowIndex)"
         (click)="onEditClick()"
         matTooltip="Edit">

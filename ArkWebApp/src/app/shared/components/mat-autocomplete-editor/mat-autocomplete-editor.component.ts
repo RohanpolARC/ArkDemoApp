@@ -16,7 +16,6 @@ export class MatAutocompleteEditorComponent implements ICellEditorAngularComp, O
   options: string[] 
   filteredOptions: Observable<string[]>
   params: ICellEditorParams;
-  value: any
   subscriptions: Subscription[] = []
 
   constructor() { }
@@ -29,7 +28,7 @@ export class MatAutocompleteEditorComponent implements ICellEditorAngularComp, O
   }
 
   getValue() {
-    return this.value  
+    return this.field.value;  
   }
 
   _filter(value: string): string[] {
@@ -43,15 +42,6 @@ export class MatAutocompleteEditorComponent implements ICellEditorAngularComp, O
       startWith(''),
       map(value => this._filter(value || '')),
     );
-
-    this.subscriptions.push(this.field.valueChanges.subscribe({
-      next: (value) => {
-        this.value = value;
-      },
-      error: (error) => {
-        console.error(error)
-      }
-    }))
   }
 
   ngOnDestroy(): void {

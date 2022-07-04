@@ -1,8 +1,7 @@
-import { ICellRendererParams } from '@ag-grid-community/all-modules';
+import { ICellRendererParams, RowNode } from '@ag-grid-community/all-modules';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { take } from 'rxjs-compat/operator/take';
 import { DataService } from 'src/app/core/services/data.service';
 import { PortfolioManagerService } from 'src/app/core/services/PortfolioManager/portfolio-manager.service';
 import { PortfolioMapping } from 'src/app/shared/models/PortfolioManagerModel';
@@ -61,9 +60,6 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
 
     if(this.componentParent.getSelectedRowID() === null || (this.componentParent.getSelectedRowID() === this.params.node.rowIndex)){
 
-        this.params.api.startEditingCell({ 
-          rowIndex: this.params.node.rowIndex, colKey: this.componentParent.columnDefs[1].field
-        });      
     }
     else{
       this.dataSvc.setWarningMsg('Please save the existing entry', 'Dismiss', 'ark-theme-snackbar-warning')   
@@ -73,7 +69,10 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
   onSave(){
     let data = this.params.node.data
 
-    if(!(data.wsoPortfolioID && data.fund && data.fundLegalEntity && data.fundHedging && data.fundStrategy && data.fundSMA && data.fundInvestor && data.fundCcy && data.fundAdmin && data.portfolioAUMMethod && data.isCoinvestment && data.excludeFxExposure)){
+    if(!(data.wsoPortfolioID && data.fund && data.fundLegalEntity && data.fundHedging && data.fundStrategy && (data.fundSMA === true || data.fundSMA === false) && 
+    data.fundInvestor && data.fundCcy && data.fundAdmin && data.portfolioAUMMethod && 
+    (data.isCoinvestment === true || data.isCoinvestment === false) && 
+    (data.excludeFxExposure === true || data.excludeFxExposure === false))){
       this.dataSvc.setWarningMsg('Please finish editing the mapping first', 'Dismiss', 'ark-theme-snackbar-warning')
       return
     }
@@ -129,33 +128,31 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
       this.params.api?.getRowNode(this.originalRowNodeID)?.setData(this.originalRowNodeData);
       this.originalRowNodeData = this.originalRowNodeID = null;
       this.componentParent.setSelectedRowID(null);
-      this.params.api.refreshCells({
-        force: true,
-        columns: this.componentParent.columnDefs.map(col => col.field),
-        rowNodes: [this.params.api.getRowNode(this.params.node.id)]
-      });
+
       this.params.api.recomputeAggregates();  
     }
     else {
+      /** In case of Cloned row editing */
+
       this.componentParent.setSelectedRowID(null)
       this.componentParent.adapTableApi.gridApi.deleteGridData([this.params.node.data])
     }
   }
 
   cloneRow(){
+
     if(this.componentParent.getSelectedRowID() === null){
+
       let nodeData = JSON.parse(JSON.stringify(this.params.node.data));
       nodeData['mappingID'] = null
       nodeData['wsoPortfolioID'] = null
       nodeData['portfolioName'] = null
   
       this.componentParent.adapTableApi.gridApi.addGridData([nodeData])
-      // this.params.api.applyTransaction({
-      //   add: [nodeData]
-      // })
       this.params.api.ensureNodeVisible(nodeData)
   
-      this.componentParent.editClonedRow();  
+      let node: RowNode = this.componentParent.adapTableApi.gridApi.getRowNodeForPrimaryKey(null)
+      this.componentParent.setSelectedRowID(node.rowIndex)
     }
     else{
       this.dataSvc.setWarningMsg('Please save the existing entry', 'Dismiss', 'ark-theme-snackbar-warning')   

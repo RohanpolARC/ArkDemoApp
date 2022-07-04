@@ -77,7 +77,7 @@ export class AppComponent {
   LiquiditySummaryStyle: any = {};
   AccessControlStyle: any = {};
   PortfolioModellerStyle: any = {};
-  PortfolioManagerStyle: any = {}
+  PortfolioMappingStyle: any = {}
 
   constructor(private http: HttpClient,
     private dataService: DataService,
@@ -225,8 +225,8 @@ export class AppComponent {
     else if(this.location.path() === '/irr/portfoliomodeller'){
       this.updateSelection('Portfolio Modeller')
     }
-    else if(this.location.path() === '/portfolio-manager'){
-      this.updateSelection('Portfolio Manager')
+    else if(this.location.path() === '/portfolio-mapping'){
+      this.updateSelection('Portfolio Mapping')
     }
     else this.updateSelection('')
   }
@@ -274,7 +274,7 @@ export class AppComponent {
     this.dataService.changeSearchTextValues(null);
     this.dataService.changeNumberField(null);
     
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioManagerStyle =  this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle =  this.notSelectedElement;
 
     this.lastClickedTabRoute = this.location.path();
 
@@ -361,9 +361,9 @@ export class AppComponent {
       this.filterApply();
       this.router.navigate(['/irr/portfoliomodeller'])
     }
-    else if(screen === 'Portfolio Manager'){
-      this.PortfolioManagerStyle = this.selectedElement
-      this.router.navigate(['/portfolio-manager'])
+    else if(screen === 'Portfolio Mapping'){
+      this.PortfolioMappingStyle = this.selectedElement
+      this.router.navigate(['/portfolio-mapping'])
     }
     else if(screen === 'Access Control'){
       this.AccessControlStyle = this.selectedElement;

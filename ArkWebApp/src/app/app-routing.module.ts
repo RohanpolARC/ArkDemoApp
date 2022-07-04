@@ -105,14 +105,14 @@ const routes: Routes = [
     }
   },
   {
-    path: 'portfolio-manager',
+    path: 'portfolio-mapping',
     component: PortfolioManagerComponent,
     canActivate: [
       MsalGuard,
       // RoleGuard
     ],
     data: {
-      tab: 'Portfolio Manager'
+      tab: 'Portfolio Mapping'
     }
   },
 ];  
