@@ -42,15 +42,16 @@
 }
 
 .ag-grid{
-    height: calc(100% - 40px);
+
+    height: calc(100vh - 64px - 40px - 64px - 40px - 48px - 10px);
     font-size: 0.8rem;
 }
 
-div.ag-rich-select .ag-rich-select-list {
-    width: 100%;
-    min-width: 200px;
-    background-color: lightgreen;
-    height: 100% !important;    
+.material-icons-outlined {
+    color: #0590ca;
+    font-size:1.6rem;
+  }
+
+.action {
+    margin-right: 3.5em;
 }
-
-

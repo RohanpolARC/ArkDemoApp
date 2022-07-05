@@ -1,6 +1,6 @@
 import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
-import { CellClickedEvent, CellValueChangedEvent, ClientSideRowModelModule, ColDef, EditableCallbackParams, GridOptions, GridReadyEvent, Module, RowNode } from '@ag-grid-community/all-modules';
-import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule } from '@ag-grid-enterprise/all-modules';
+import { CellValueChangedEvent, ClientSideRowModelModule, ColDef, EditableCallbackParams, GridOptions, GridReadyEvent, Module, RowNode } from '@ag-grid-community/all-modules';
+import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
@@ -31,7 +31,9 @@ export class PortfolioManagerComponent implements OnInit {
     MenuModule,
     ExcelExportModule,
     FiltersToolPanelModule,
-    ClipboardModule
+    ClipboardModule,
+    SideBarModule,
+    RangeSelectionModule
   ];
   actionClickedRowID: number = null;
   context: any;
@@ -49,7 +51,8 @@ export class PortfolioManagerComponent implements OnInit {
         this.wsoPortfolioRef = resp
       },
       error: error => {
-
+        this.wsoPortfolioRef = [];
+        console.error(`Failed to load WSO Portfolio Ref Data: ${error}`)
       }
     }))
 
@@ -188,6 +191,7 @@ export class PortfolioManagerComponent implements OnInit {
     }
   
     this.gridOptions = {
+      enableRangeSelection: true,
       columnDefs: this.columnDefs,
       defaultColDef: this.defaultColDef,
       sideBar: true,
@@ -260,20 +264,6 @@ export class PortfolioManagerComponent implements OnInit {
               'action'
       
             ],
-            // ColumnSorts: [
-            //   {
-            //     ColumnId: 'fund',
-            //     SortOrder: 'Asc'
-            //   },
-            //   {
-            //     ColumnId: 'fundHedging',
-            //     SortOrder: 'Asc'
-            //   },
-            //   {
-            //     ColumnId: 'portfolioName',
-            //     SortOrder: 'Asc'
-            //   }
-            // ],
             PinnedColumnsMap: {
               action: 'right'
             }
@@ -447,14 +437,33 @@ export class PortfolioManagerComponent implements OnInit {
       componentParent: this
     }
 
+    this.fetchPortfolioMapping();
+  }
+
+  fetchPortfolioMapping(){
+    this.gridOptions?.api?.showLoadingOverlay();
     this.subscriptions.push(this.portfolioManagerSvc.getPortfolioMapping().subscribe({
       next: resp => {
         this.rowData = resp
+        this.gridOptions.api?.hideOverlay();
       },
       error: error => {
-
+        this.rowData = [];
+        console.error(`Failed to load portfolio mapping data: ${error}`)
       }
     }))
 
   }
+
+  refreshMappings(){
+    this.fetchPortfolioMapping();
+  }
+
+  refreshApproval : { refresh: boolean }
+  refreshApprovalGrid(){
+    this.refreshApproval = { 
+      refresh: true
+    }
+  }
+  
 }

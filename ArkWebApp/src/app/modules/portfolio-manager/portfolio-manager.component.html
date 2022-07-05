@@ -4,22 +4,65 @@
             Portfolio Mapping
         </div>
         <div class="action">
+
+            <button mat-icon-button (click)="refreshApprovalGrid()"
+            matTooltip="Refresh Approvals"
+            >
+                <mat-icon class="material-icons-outlined">refresh</mat-icon>
+            </button>
+
+            <button mat-icon-button (click)="refreshMappings()"
+            matTooltip="Refresh Mappings"
+            >
+                <mat-icon class="material-icons-outlined">refresh</mat-icon>
+            </button>
+
         </div>
     </div>
 
     <div class="content">
         <mat-card class="mat-content">
-            <ag-grid-angular
-            [context]="context"
-            [rowData] = "rowData"
-            [gridOptions] = "gridOptions"
-            [adaptableOptions] = "adaptableOptions"
-            [modules] = "agGridModules"
-            (adaptableReady)="onAdaptableReady($event)"
-            (gridReady)="onGridReady($event)"
-            class="ag-theme-alpine ag-grid"
-            >
-            </ag-grid-angular> 
+
+            <mat-accordion>
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Pending For Approval
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+
+                        <app-approval
+                            [refreshApproval] = "refreshApproval"
+                        ></app-approval>                        
+                    
+    
+                </mat-expansion-panel>
+            </mat-accordion>
+    
+            <mat-accordion>
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Mappings
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <ag-grid-angular
+                        [context]="context"
+                        [rowData] = "rowData"
+                        [gridOptions] = "gridOptions"
+                        [adaptableOptions] = "adaptableOptions"
+                        [modules] = "agGridModules"
+                        (adaptableReady)="onAdaptableReady($event)"
+                        (gridReady)="onGridReady($event)"
+                        class="ag-theme-alpine ag-grid"
+                    >
+                    </ag-grid-angular> 
+    
+                </mat-expansion-panel>
+            </mat-accordion>
+
         </mat-card>
     </div>
 </div>

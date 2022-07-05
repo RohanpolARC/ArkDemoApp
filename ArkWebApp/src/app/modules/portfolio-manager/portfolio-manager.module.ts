@@ -9,20 +9,32 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { ApprovalComponent } from './approval/approval.component';
+import { ApprovalActionCellRendererComponent } from './approval-action-cell-renderer/approval-action-cell-renderer.component';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   declarations: [
     PortfolioManagerComponent,
-    UpdateCellRendererComponent
+    UpdateCellRendererComponent,
+    ApprovalComponent,
+    ApprovalActionCellRendererComponent
   ],
   imports: [
     CommonModule,
     AdaptableAngularAgGridModule,
-    AgGridModule.withComponents([UpdateCellRendererComponent, MatAutocompleteEditorComponent]),
+    AgGridModule.withComponents([
+      UpdateCellRendererComponent, MatAutocompleteEditorComponent, ApprovalActionCellRendererComponent
+    ]),
+
     MatCardModule,
     MatIconModule,
     MatTooltipModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatExpansionModule,
+    MatButtonModule
   ]
 })
-export class PortfolioManagerModule { }
+
+export class PortfolioManagerModule {}

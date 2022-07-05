@@ -55,5 +55,6 @@ export class APIConfig {
 
     public static PORTFOLIO_MAPPING_GET_API: string = APIConfig.BASEURL + "/api/PortfolioManager/GetPortfolioMapping";
     public static PORTFOLIO_MAPPING_PUT_API: string = APIConfig.BASEURL + "/api/PortfolioManager/PutPortfolioMapping";
-
+    public static PORTFOLIO_MAPPING_STAGING_GET_API: string = APIConfig.BASEURL + "/api/PortfolioManager/GetPortfolioMappingStaging";
+    public static PORTFOLIO_MAPPING_APPROVAL_PUT_API: string = APIConfig.BASEURL + "/api/PortfolioManager/PutPortfolioMappingApproval";
 }

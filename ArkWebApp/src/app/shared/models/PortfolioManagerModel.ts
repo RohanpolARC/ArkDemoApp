@@ -21,3 +21,10 @@ export interface PortfolioMapping {
     solvencyPortfolioName: string,
     userName: string
 }
+
+export interface PortfolioMappingApproval{
+    stagingID: number,
+    actionType: string,
+    approval: boolean,
+    approvedBy: string
+}

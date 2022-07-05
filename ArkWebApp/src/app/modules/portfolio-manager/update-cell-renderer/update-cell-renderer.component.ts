@@ -105,19 +105,23 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
     ).subscribe({
       next: resp => {
         if(resp.isSuccess){
-          this.dataSvc.setWarningMsg('Successfully saved portfolio mapping', 'Dismiss', 'ark-theme-snackbar-success')
+          this.dataSvc.setWarningMsg('Sent for approval', 'Dismiss', 'ark-theme-snackbar-success')
           
-          data.mappingID = parseInt(resp.data);
-          this.componentParent.adapTableApi.gridApi.updateGridData([data]);
+          // Remove new temp row if cloning, else undo edited to row to previous state, to only show approved mappings in the below grid.
+          
+          if(!data.mappingID)
+            this.componentParent.adapTableApi.gridApi.deleteGridData([data]);
+          else
+            this.undoEdit();
 
           this.componentParent.setSelectedRowID(null);
         }
       },
       error: error => {
 
-        this.dataSvc.setWarningMsg('Failed to save portfolio mapping', 'Dismiss', 'ark-theme-snackbar-error')   
+        this.dataSvc.setWarningMsg('Sending for approval failed', 'Dismiss', 'ark-theme-snackbar-error')  
 
-        console.error("Failed to save portfolio Mapping")
+        console.error("Sending for approval failed")
         console.error(error)
       }
     }))

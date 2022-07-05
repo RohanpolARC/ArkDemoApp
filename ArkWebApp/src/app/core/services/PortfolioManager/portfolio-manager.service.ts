@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
-import { PortfolioMapping } from 'src/app/shared/models/PortfolioManagerModel';
+import { PortfolioMapping, PortfolioMappingApproval } from 'src/app/shared/models/PortfolioManagerModel';
 import { MsalUserService } from '../Auth/msaluser.service';
 
 @Injectable({
@@ -30,9 +30,23 @@ export class PortfolioManagerService {
     )
   }
 
+  public getPortfolioMappingStaging(){
+
+    return this.http.get<any>(APIConfig.PORTFOLIO_MAPPING_STAGING_GET_API, this.httpOptions).pipe(
+      catchError((ex) => throwError(ex))
+    )
+  }
+
   public putPortfolioMapping(model: PortfolioMapping){
 
     return this.http.post<any>(APIConfig.PORTFOLIO_MAPPING_PUT_API, model, this.httpOptions).pipe(
+      catchError((ex) => throwError(ex))
+    )
+  }
+
+  public putPortfolioMappingApproval(model: PortfolioMappingApproval){
+
+    return this.http.post<any>(APIConfig.PORTFOLIO_MAPPING_APPROVAL_PUT_API, model, this.httpOptions).pipe(
       catchError((ex) => throwError(ex))
     )
   }

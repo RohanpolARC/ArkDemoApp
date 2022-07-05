@@ -100,7 +100,7 @@ export class DataService {
         );
     }
 
-    setWarningMsg(message: string, action: string, type: string = 'ark-theme-snackbar-normal'){
+    setWarningMsg(message: string, action: string, type: 'ark-theme-snackbar-normal' | 'ark-theme-snackbar-warning' | 'ark-theme-snackbar-error' | 'ark-theme-snackbar-success' = 'ark-theme-snackbar-normal'){
         this.snackBar.open(message, action, {
           duration: 5000,
           panelClass: [type]
