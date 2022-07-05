@@ -1,15 +1,17 @@
-<ng-container *ngIf="!params.node.group && params.node.data.state === 'Requested'">
+<ng-container *ngIf="componentParent.access.approvalAccess">
+    <ng-container *ngIf="!params.node.group && params.node.data.state === 'Requested' && params.node.data.status === 'Pending'">
     
-    <span
-        (click)="onAction('approve')"
-        matTooltip="Approve">
-        <mat-icon [ngStyle]="{'margin-left': '15px', color:'green','cursor':'pointer'}" >done</mat-icon>
-    </span>
-
-    <span
-        (click)="onAction('reject')"
-        matTooltip="Reject">
-        <mat-icon [ngStyle]="{'margin-left': '15px', color:'red','cursor':'pointer'}" >close</mat-icon>
-    </span>
-
+        <span
+            (click)="onAction('approve')"
+            matTooltip="Approve">
+            <mat-icon [ngStyle]="{'margin-left': '15px', color:'green','cursor':'pointer'}" >done</mat-icon>
+        </span>
+    
+        <span
+            (click)="onAction('reject')"
+            matTooltip="Reject">
+            <mat-icon [ngStyle]="{'margin-left': '15px', color:'red','cursor':'pointer'}" >close</mat-icon>
+        </span>
+    
+    </ng-container>
 </ng-container>

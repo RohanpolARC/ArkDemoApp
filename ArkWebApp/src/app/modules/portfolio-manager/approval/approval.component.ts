@@ -1,5 +1,5 @@
 import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridOptions, Module, ClientSideRowModelModule, GridReadyEvent } from '@ag-grid-community/all-modules';
+import { ColDef, GridOptions, Module, ClientSideRowModelModule, GridReadyEvent, RowNode } from '@ag-grid-community/all-modules';
 import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { Component, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
 import { Subscription } from 'rxjs';
@@ -15,6 +15,12 @@ import { ApprovalActionCellRendererComponent } from '../approval-action-cell-ren
   styleUrls: ['./approval.component.scss']
 })
 export class ApprovalComponent implements OnInit {
+
+  @Input() access: {
+    editAccess: boolean,
+    cloneAccess: boolean,
+    approvalAccess: boolean
+  }
 
   @Output() refreshMappingsEvent = new EventEmitter<'Refresh'>();
   @Input() refreshApproval: { 
@@ -47,57 +53,133 @@ export class ApprovalComponent implements OnInit {
     private dataSvc: DataService
 ) { }
 
+  getOtherNodeForID(stagingID: number, rowState: 'Current' | 'Requested'): any{
+    let otherNode
+    this.gridOptions?.api?.forEachNodeAfterFilterAndSort((rowNode: RowNode, index: number) => {
+      
+      if(rowNode.data?.['stagingID'] === stagingID && rowNode.data?.['state'] !== rowState && rowNode.data?.['status'] === 'Pending'){
+        otherNode = rowNode.data;
+        return;
+      }
+    })
+
+    return otherNode;
+  }
+
+
+  getPendingCellStyle(col, params) {
+
+    if(!params.node?.group && params.data?.['status'] === 'Pending'){
+
+      let otherNode = this.getOtherNodeForID(params.data?.['stagingID'], params.data?.['state']);
+      if(otherNode?.[col] !== params.data?.[col]){
+
+        if(params.data?.['state'] === 'Current')
+          return {
+            'background-color': 'rgb(253,100,100)',
+          }
+        else if(params.data?.['state'] === 'Requested')
+          return {
+            'background-color': 'rgb(135, 243, 180)'
+          }
+
+      }
+
+    }
+
+    return null;
+  }
+
   ngOnInit(): void {
 
     this.columnDefs = [
       { field: 'unqiueRowID' },
-      { field: 'stagingID' },
+      { field: 'stagingID', type: 'abColDefNumber' },
       { field: 'mappingID' },
       { field: 'state'},
+      { field: 'status'},
       { field: 'actionType'
       },
       { field: 'fund',
+        cellStyle: this.getPendingCellStyle.bind(this, 'fund')
       },
       { field: "fundLegalEntity",
+      cellStyle: this.getPendingCellStyle.bind(this, 'fundLegalEntity')
       },
       { field: "fundHedging",
+      cellStyle: this.getPendingCellStyle.bind(this, 'fundHedging')
+
       },
       { field: "fundStrategy",
+      cellStyle: this.getPendingCellStyle.bind(this, 'fundStrategy')
+
       },
       { field: "fundPipeline2",
+      cellStyle: this.getPendingCellStyle.bind(this, 'fundPipeline2')
+
       },
       { field: "fundSMA",
+      cellStyle: this.getPendingCellStyle.bind(this, 'fundSMA')
+
       },
       { field: "fundInvestor",
+      cellStyle: this.getPendingCellStyle.bind(this, 'fundInvestor')
+
       },
       { field: "wsoPortfolioID",
+      cellStyle: this.getPendingCellStyle.bind(this, 'wsoPortfolioID')
+
       },
       { 
         field: "portfolioName",
+        cellStyle: this.getPendingCellStyle.bind(this, 'portfolioName')
+
       },
       { field: "solvencyPortfolioName", 
+      cellStyle: this.getPendingCellStyle.bind(this, 'solvencyPortfolioName')
+
       },
       { field: "fundPipeline", 
+      cellStyle: this.getPendingCellStyle.bind(this, 'fundPipeline')
+
       },
       { field: "fundCcy", 
+      cellStyle: this.getPendingCellStyle.bind(this, 'fundCcy')
+
       },
       { field: "fundAdmin", 
+      cellStyle: this.getPendingCellStyle.bind(this, 'fundAdmin')
+
       },
       { field: "portfolioAUMMethod", 
+      cellStyle: this.getPendingCellStyle.bind(this, 'portfolioAUMMethod')
+
       },
       { field: "fundRecon", 
+      cellStyle: this.getPendingCellStyle.bind(this, 'fundRecon')
+
       },
       { field: "legalEntityName", 
+      cellStyle: this.getPendingCellStyle.bind(this, 'legalEntityName')
+
       },
       { field: "lei", headerName: 'LEI', 
+      cellStyle: this.getPendingCellStyle.bind(this, 'lei')
+
       },
       { field: "isCoinvestment", 
+      cellStyle: this.getPendingCellStyle.bind(this, 'isCoinvestment')
+
       },
       { field: "excludeFxExposure",
+      cellStyle: this.getPendingCellStyle.bind(this, 'excludeFxExposure')
+
       },
       { field: "action", cellRenderer: 'actionCellRenderer'},
       { field: 'modifiedBy' },
-      { field: 'modifiedOn', valueFormatter: dateTimeFormatter }
+      { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
+      { field: 'reviewedBy'},
+      { field: 'reviewedOn', valueFormatter: dateTimeFormatter }
     ]
 
     this.defaultColDef = {
@@ -156,8 +238,20 @@ export class ApprovalComponent implements OnInit {
           IsHidden: false,
           DashboardTitle: ' '
         },
+
+        Filter:{
+          Revision: 3,
+          ColumnFilters: [{
+            ColumnId: 'status',
+            Predicate: {
+              PredicateId: 'Values',
+              Inputs: ['Pending', 'Rejected']
+            }
+          }]
+        },  
+
         Layout: {
-          Revision: 9,
+          Revision: 13,
           CurrentLayout: 'Default Approval Layout',
           Layouts: [{
             Name: 'Default Approval Layout',
@@ -184,6 +278,8 @@ export class ApprovalComponent implements OnInit {
               "excludeFxExposure",
               'modifiedBy',
               'modifiedOn',
+              'reviewedBy',
+              'reviewedOn',
               'action'
       
             ],
@@ -193,7 +289,7 @@ export class ApprovalComponent implements OnInit {
             ColumnWidthMap:{
               action: 150,
             },
-            RowGroupedColumns: ['actionType', 'portfolioName']            
+            RowGroupedColumns: ['actionType', 'status', 'portfolioName']            
 
           }]
         }
@@ -243,10 +339,9 @@ export class ApprovalComponent implements OnInit {
       next: stagingData => {
 
         for(let i: number = 0; i < stagingData.length; i+=1){
-          stagingData[i]['uniqueRowID'] = i+1;
+          stagingData[i].uniqueRowID = i+1;
         }
 
-        console.log(stagingData)
         this.rowData = stagingData;
         this.adaptableApi.gridApi.loadGridData(stagingData)
         this.gridOptions?.api.hideOverlay();

@@ -3,6 +3,7 @@ import { CellValueChangedEvent, ClientSideRowModelModule, ColDef, EditableCallba
 import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { PortfolioManagerService } from 'src/app/core/services/PortfolioManager/portfolio-manager.service';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
@@ -15,6 +16,12 @@ import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-
   styleUrls: ['./portfolio-manager.component.scss']
 })
 export class PortfolioManagerComponent implements OnInit {
+
+  accessObj: {
+    editAccess: boolean,
+    cloneAccess: boolean,
+    approvalAccess: boolean
+  }
 
   wsoPortfolioRef: any[]
   rowData
@@ -41,10 +48,30 @@ export class PortfolioManagerComponent implements OnInit {
 
   constructor(
     private portfolioManagerSvc: PortfolioManagerService,
-    private dataSvc: DataService
+    private dataSvc: DataService,
+    private accessSvc: AccessService
   ) { }
 
   ngOnInit(): void {
+
+    this.accessObj = {
+      editAccess: false,
+      cloneAccess: false,
+      approvalAccess: false
+    }
+
+    let userRoles: string[] = this.dataSvc.getCurrentUserInfo().idToken['roles'];
+
+    if(userRoles.map(role => role.toLowerCase()).includes('admin.write')){
+      this.accessObj.approvalAccess = true
+    }
+
+    for(let i: number = 0; i < this.accessSvc.accessibleTabs.length; i+= 1){
+      if(this.accessSvc.accessibleTabs[i].tab === 'Portfolio Mapping' && this.accessSvc.accessibleTabs[i].isWrite){
+        this.accessObj.editAccess = this.accessObj.cloneAccess = true;
+        break;
+      }        
+    }
 
     this.subscriptions.push(this.dataSvc.getWSOPortfolioRef().subscribe({
       next: resp => {

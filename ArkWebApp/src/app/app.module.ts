@@ -43,7 +43,6 @@ import { AccessControlComponent } from './shared/components/access-control/acces
 import { MatSelectModule } from '@angular/material/select';
 import { IrrCalculationModule } from './modules/irr-calculation/irr-calculation.module';
 import { PortfolioManagerModule } from './modules/portfolio-manager/portfolio-manager.module';
-import { MatAutocompleteEditorComponent } from './shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 
 export const protectedResourceMap: any =  
   [  
@@ -53,7 +52,7 @@ export const protectedResourceMap: any =
   
 @NgModule({  
   declarations: [  
-    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent, MatAutocompleteEditorComponent
+    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent
   ],  
   imports: [  
     MsalModule.forRoot({  

@@ -109,14 +109,14 @@ const routes: Routes = [
     component: PortfolioManagerComponent,
     canActivate: [
       MsalGuard,
-      // RoleGuard
+      RoleGuard
     ],
     data: {
       tab: 'Portfolio Mapping'
     }
   },
-];  
-  
+];
+
 @NgModule({  
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],

@@ -1,9 +1,11 @@
 import { ICellRendererParams } from '@ag-grid-community/all-modules';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { PortfolioManagerService } from 'src/app/core/services/PortfolioManager/portfolio-manager.service';
+import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 import { PortfolioMappingApproval } from 'src/app/shared/models/PortfolioManagerModel';
 import { ApprovalComponent } from '../approval/approval.component';
 
@@ -29,16 +31,17 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
 
   constructor(
     private dataSvc: DataService,
-    private portfolioManagerSvc: PortfolioManagerService
+    private portfolioManagerSvc: PortfolioManagerService,
+    private dialog:MatDialog
   ) { }
 
-  onAction(action: 'approve' | 'reject'): void {
+  onConfirm(action: 'approve' | 'reject'){
 
     let model: PortfolioMappingApproval = <PortfolioMappingApproval>{};
     model.actionType = this.params.data['actionType'];
     model.approval = (action === 'approve');
     model.stagingID = Number(this.params.data['stagingID'])
-    model.approvedBy = this.dataSvc.getCurrentUserName();
+    model.reviewer = this.dataSvc.getCurrentUserName();
 
     this.subscriptions.push(this.portfolioManagerSvc.putPortfolioMappingApproval(model).subscribe({
       next: resp => {
@@ -50,8 +53,9 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
             remove: [this.params.data] 
           })
           
-          // Refreshing mappings grid
+          // Refreshing mappings grid & approval grid
           this.componentParent.refreshMappingsEvent.emit('Refresh');
+          this.componentParent.fetchPortfolioMappingStaging();
         }
       },
       error: error => {
@@ -63,6 +67,24 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
 
       }
     }))
+
+  }
+
+  onAction(action: 'approve' | 'reject'): void {
+
+    const dialogRef = this.dialog.open(ConfirmationPopupComponent, {
+      data: {
+        confirmText: `Are you sure you want to ${action} the request?`
+      }
+    })
+
+    this.subscriptions.push(dialogRef.afterClosed().subscribe((result?: { action: string }) => {
+      if(result?.action === 'Confirm'){
+
+        this.onConfirm(action);
+      }
+    }))
+
   }
 
   ngOnDestroy(){
