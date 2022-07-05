@@ -455,8 +455,11 @@ export class PortfolioManagerComponent implements OnInit {
 
   }
 
-  refreshMappings(){
-    this.fetchPortfolioMapping();
+  refreshMappings(action: 'Refresh'){
+    
+    if(action === 'Refresh'){
+      this.fetchPortfolioMapping();
+    }
   }
 
   refreshApproval : { refresh: boolean }

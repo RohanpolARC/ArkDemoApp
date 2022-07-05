@@ -108,12 +108,15 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
           this.dataSvc.setWarningMsg('Sent for approval', 'Dismiss', 'ark-theme-snackbar-success')
           
           // Remove new temp row if cloning, else undo edited to row to previous state, to only show approved mappings in the below grid.
-          
+
           if(!data.mappingID)
             this.componentParent.adapTableApi.gridApi.deleteGridData([data]);
           else
             this.undoEdit();
 
+          //Refresh Approval grid on staging table update
+          this.componentParent.refreshApprovalGrid()
+            
           this.componentParent.setSelectedRowID(null);
         }
       },

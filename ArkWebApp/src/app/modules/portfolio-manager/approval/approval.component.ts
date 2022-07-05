@@ -1,7 +1,7 @@
 import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
 import { ColDef, GridOptions, Module, ClientSideRowModelModule, GridReadyEvent } from '@ag-grid-community/all-modules';
 import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { PortfolioManagerService } from 'src/app/core/services/PortfolioManager/portfolio-manager.service';
@@ -16,6 +16,7 @@ import { ApprovalActionCellRendererComponent } from '../approval-action-cell-ren
 })
 export class ApprovalComponent implements OnInit {
 
+  @Output() refreshMappingsEvent = new EventEmitter<'Refresh'>();
   @Input() refreshApproval: { 
     refresh: boolean
   }
@@ -156,7 +157,7 @@ export class ApprovalComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 8,
+          Revision: 9,
           CurrentLayout: 'Default Approval Layout',
           Layouts: [{
             Name: 'Default Approval Layout',
@@ -192,7 +193,7 @@ export class ApprovalComponent implements OnInit {
             ColumnWidthMap:{
               action: 150,
             },
-            RowGroupedColumns: ['actionType', 'mappingID']            
+            RowGroupedColumns: ['actionType', 'portfolioName']            
 
           }]
         }

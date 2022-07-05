@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { PortfolioManagerService } from 'src/app/core/services/PortfolioManager/portfolio-manager.service';
 import { PortfolioMappingApproval } from 'src/app/shared/models/PortfolioManagerModel';
+import { ApprovalComponent } from '../approval/approval.component';
 
 @Component({
   selector: 'app-approval-action-cell-renderer',
@@ -15,9 +16,11 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
 
   subscriptions: Subscription[] = []
   params: ICellRendererParams
+  componentParent: ApprovalComponent
   agInit(params: ICellRendererParams): void {
     
     this.params = params;
+    this.componentParent = params.context.componentParent;
   }
 
   refresh(params: ICellRendererParams): boolean {
@@ -46,7 +49,9 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
           this.params.api.applyTransaction({
             remove: [this.params.data] 
           })
-        
+          
+          // Refreshing mappings grid
+          this.componentParent.refreshMappingsEvent.emit('Refresh');
         }
       },
       error: error => {

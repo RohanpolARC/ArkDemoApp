@@ -5,18 +5,6 @@
         </div>
         <div class="action">
 
-            <button mat-icon-button (click)="refreshApprovalGrid()"
-            matTooltip="Refresh Approvals"
-            >
-                <mat-icon class="material-icons-outlined">refresh</mat-icon>
-            </button>
-
-            <button mat-icon-button (click)="refreshMappings()"
-            matTooltip="Refresh Mappings"
-            >
-                <mat-icon class="material-icons-outlined">refresh</mat-icon>
-            </button>
-
         </div>
     </div>
 
@@ -34,6 +22,7 @@
 
                         <app-approval
                             [refreshApproval] = "refreshApproval"
+                            (refreshMappingsEvent) = "refreshMappings($event)"
                         ></app-approval>                        
                     
     
