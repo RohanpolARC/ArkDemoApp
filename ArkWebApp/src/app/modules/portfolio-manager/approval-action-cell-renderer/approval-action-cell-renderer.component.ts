@@ -5,9 +5,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { PortfolioManagerService } from 'src/app/core/services/PortfolioManager/portfolio-manager.service';
-import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 import { PortfolioMappingApproval } from 'src/app/shared/models/PortfolioManagerModel';
 import { ApprovalComponent } from '../approval/approval.component';
+import { ReviewerConfirmComponent } from '../reviewer-confirm/reviewer-confirm.component';
 
 @Component({
   selector: 'app-approval-action-cell-renderer',
@@ -35,13 +35,14 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
     private dialog:MatDialog
   ) { }
 
-  onConfirm(action: 'approve' | 'reject'){
+  onConfirm(action: 'approve' | 'reject', remark: string){
 
     let model: PortfolioMappingApproval = <PortfolioMappingApproval>{};
     model.actionType = this.params.data['actionType'];
     model.approval = (action === 'approve');
     model.stagingID = Number(this.params.data['stagingID'])
     model.reviewer = this.dataSvc.getCurrentUserName();
+    model.remark = remark;
 
     this.subscriptions.push(this.portfolioManagerSvc.putPortfolioMappingApproval(model).subscribe({
       next: resp => {
@@ -72,16 +73,16 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
 
   onAction(action: 'approve' | 'reject'): void {
 
-    const dialogRef = this.dialog.open(ConfirmationPopupComponent, {
+    const dialogRef = this.dialog.open(ReviewerConfirmComponent, {
       data: {
         confirmText: `Are you sure you want to ${action} the request?`
       }
     })
 
-    this.subscriptions.push(dialogRef.afterClosed().subscribe((result?: { action: string }) => {
+    this.subscriptions.push(dialogRef.afterClosed().subscribe((result?: { action: string, remark: string }) => {
       if(result?.action === 'Confirm'){
 
-        this.onConfirm(action);
+        this.onConfirm(action, result.remark);
       }
     }))
 

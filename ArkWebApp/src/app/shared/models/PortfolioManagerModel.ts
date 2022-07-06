@@ -26,5 +26,6 @@ export interface PortfolioMappingApproval{
     stagingID: number,
     actionType: string,
     approval: boolean,
-    reviewer: string
+    reviewer: string,
+    remark: string
 }

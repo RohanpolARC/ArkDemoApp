@@ -95,91 +95,91 @@ export class ApprovalComponent implements OnInit {
     this.columnDefs = [
       { field: 'unqiueRowID' },
       { field: 'stagingID', type: 'abColDefNumber' },
-      { field: 'mappingID' },
-      { field: 'state'},
-      { field: 'status'},
-      { field: 'actionType'
-      },
-      { field: 'fund',
+      { field: 'mappingID', type: 'abColDefNumber' },
+      { field: 'state', type: 'abColDefString'},
+      { field: 'status', type: 'abColDefString'},
+      { field: 'actionType', type: 'abColDefString'},
+      { field: 'fund', type: 'abColDefString',
         cellStyle: this.getPendingCellStyle.bind(this, 'fund')
       },
-      { field: "fundLegalEntity",
+      { field: "fundLegalEntity", type: 'abColDefString',
       cellStyle: this.getPendingCellStyle.bind(this, 'fundLegalEntity')
       },
-      { field: "fundHedging",
+      { field: "fundHedging", type: 'abColDefString',
       cellStyle: this.getPendingCellStyle.bind(this, 'fundHedging')
 
       },
-      { field: "fundStrategy",
+      { field: "fundStrategy", type: 'abColDefString',
       cellStyle: this.getPendingCellStyle.bind(this, 'fundStrategy')
 
       },
-      { field: "fundPipeline2",
+      { field: "fundPipeline2", type: 'abColDefString',
       cellStyle: this.getPendingCellStyle.bind(this, 'fundPipeline2')
 
       },
-      { field: "fundSMA",
+      { field: "fundSMA", type: 'abColDefBoolean',
       cellStyle: this.getPendingCellStyle.bind(this, 'fundSMA')
 
       },
-      { field: "fundInvestor",
+      { field: "fundInvestor", type: 'abColDefString',
       cellStyle: this.getPendingCellStyle.bind(this, 'fundInvestor')
 
       },
-      { field: "wsoPortfolioID",
+      { field: "wsoPortfolioID", type: 'abColDefNumber',
       cellStyle: this.getPendingCellStyle.bind(this, 'wsoPortfolioID')
 
       },
       { 
-        field: "portfolioName",
+        field: "portfolioName", type: 'abColDefString',
         cellStyle: this.getPendingCellStyle.bind(this, 'portfolioName')
 
       },
-      { field: "solvencyPortfolioName", 
+      { field: "solvencyPortfolioName",  type: 'abColDefString',
       cellStyle: this.getPendingCellStyle.bind(this, 'solvencyPortfolioName')
 
       },
-      { field: "fundPipeline", 
+      { field: "fundPipeline",  type: 'abColDefString',
       cellStyle: this.getPendingCellStyle.bind(this, 'fundPipeline')
 
       },
-      { field: "fundCcy", 
+      { field: "fundCcy",  type: 'abColDefString',
       cellStyle: this.getPendingCellStyle.bind(this, 'fundCcy')
 
       },
-      { field: "fundAdmin", 
+      { field: "fundAdmin",  type: 'abColDefString',
       cellStyle: this.getPendingCellStyle.bind(this, 'fundAdmin')
 
       },
-      { field: "portfolioAUMMethod", 
+      { field: "portfolioAUMMethod",  type: 'abColDefString',
       cellStyle: this.getPendingCellStyle.bind(this, 'portfolioAUMMethod')
 
       },
-      { field: "fundRecon", 
+      { field: "fundRecon",  type: 'abColDefString',
       cellStyle: this.getPendingCellStyle.bind(this, 'fundRecon')
 
       },
-      { field: "legalEntityName", 
+      { field: "legalEntityName",  type: 'abColDefString',
       cellStyle: this.getPendingCellStyle.bind(this, 'legalEntityName')
 
       },
-      { field: "lei", headerName: 'LEI', 
+      { field: "lei", headerName: 'LEI',  type: 'abColDefString',
       cellStyle: this.getPendingCellStyle.bind(this, 'lei')
 
       },
-      { field: "isCoinvestment", 
+      { field: "isCoinvestment",  type: 'abColDefBoolean',
       cellStyle: this.getPendingCellStyle.bind(this, 'isCoinvestment')
 
       },
-      { field: "excludeFxExposure",
+      { field: "excludeFxExposure", type: 'abColDefBoolean',
       cellStyle: this.getPendingCellStyle.bind(this, 'excludeFxExposure')
 
       },
       { field: "action", cellRenderer: 'actionCellRenderer'},
-      { field: 'modifiedBy' },
-      { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
-      { field: 'reviewedBy'},
-      { field: 'reviewedOn', valueFormatter: dateTimeFormatter }
+      { field: 'modifiedBy', headerName: 'Requested By',  type: 'abColDefString' },
+      { field: 'modifiedOn', headerName: 'Requested On', valueFormatter: dateTimeFormatter, type: 'abColDefDate', },
+      { field: 'reviewedBy', type: 'abColDefString'},
+      { field: 'reviewedOn', valueFormatter: dateTimeFormatter, type: 'abColDefDate' },
+      { field: 'remark', type: 'abColDefString' }
     ]
 
     this.defaultColDef = {
@@ -251,7 +251,7 @@ export class ApprovalComponent implements OnInit {
         },  
 
         Layout: {
-          Revision: 13,
+          Revision: 15,
           CurrentLayout: 'Default Approval Layout',
           Layouts: [{
             Name: 'Default Approval Layout',
@@ -278,6 +278,7 @@ export class ApprovalComponent implements OnInit {
               "excludeFxExposure",
               'modifiedBy',
               'modifiedOn',
+              'remark',
               'reviewedBy',
               'reviewedOn',
               'action'
@@ -287,7 +288,7 @@ export class ApprovalComponent implements OnInit {
               action: 'right'
             },
             ColumnWidthMap:{
-              action: 150,
+              action: 130,
             },
             RowGroupedColumns: ['actionType', 'status', 'portfolioName']            
 

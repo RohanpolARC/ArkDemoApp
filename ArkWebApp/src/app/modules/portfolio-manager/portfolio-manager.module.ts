@@ -13,11 +13,11 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { ApprovalComponent } from './approval/approval.component';
 import { ApprovalActionCellRendererComponent } from './approval-action-cell-renderer/approval-action-cell-renderer.component';
 import { MatButtonModule } from '@angular/material/button';
-import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
+import { ReviewerConfirmComponent } from './reviewer-confirm/reviewer-confirm.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +26,7 @@ import { MatInputModule } from '@angular/material/input';
     ApprovalComponent,
     ApprovalActionCellRendererComponent,
     MatAutocompleteEditorComponent,
-    ConfirmationPopupComponent
+    ReviewerConfirmComponent
   ],
   imports: [
     CommonModule,
