@@ -6,9 +6,11 @@ import { Subscription } from 'rxjs';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { PortfolioManagerService } from 'src/app/core/services/PortfolioManager/portfolio-manager.service';
+import { PortfolioMappingDataService } from 'src/app/core/services/PortfolioManager/portfolio-mapping-data.service';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-renderer.component';
+import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, validateAndUpdate } from './utilities/functions';
 
 @Component({
   selector: 'app-portfolio-manager',
@@ -20,10 +22,10 @@ export class PortfolioManagerComponent implements OnInit {
   accessObj: {
     editAccess: boolean,
     cloneAccess: boolean,
-    approvalAccess: boolean
+    approvalAccess: boolean,
+    editOnApproval: boolean // Editing on approval grid
   }
 
-  wsoPortfolioRef: any[]
   rowData
   columnDefs: ColDef[]
   defaultColDef
@@ -49,22 +51,29 @@ export class PortfolioManagerComponent implements OnInit {
   constructor(
     private portfolioManagerSvc: PortfolioManagerService,
     private dataSvc: DataService,
-    private accessSvc: AccessService
+    private accessSvc: AccessService,
+    private portfolioMapDataSvc: PortfolioMappingDataService
   ) { }
 
-  ngOnInit(): void {
+  setAccess(){
 
     this.accessObj = {
       editAccess: false,
       cloneAccess: false,
-      approvalAccess: false
+      approvalAccess: false,
+      editOnApproval: false,
     }
 
     let userRoles: string[] = this.dataSvc.getCurrentUserInfo().idToken['roles'];
 
+
+      // Only Admin.Write has approv/reject access on approval grid
     if(userRoles.map(role => role.toLowerCase()).includes('admin.write')){
       this.accessObj.approvalAccess = true
     }
+
+      // Only Operation.Write(UAT), Ops.Write(Prod), Admin.Write has access to editing on Approval grid
+    this.accessObj.editOnApproval = userRoles.map(role => role.toLowerCase()).some((role) => ['operation.write', 'ops.write', 'admin.write'].includes(role))
 
     for(let i: number = 0; i < this.accessSvc.accessibleTabs.length; i+= 1){
       if(this.accessSvc.accessibleTabs[i].tab === 'Portfolio Mapping' && this.accessSvc.accessibleTabs[i].isWrite){
@@ -72,13 +81,19 @@ export class PortfolioManagerComponent implements OnInit {
         break;
       }        
     }
+  
+  }
+
+  ngOnInit(): void {
+
+    this.setAccess();
 
     this.subscriptions.push(this.dataSvc.getWSOPortfolioRef().subscribe({
       next: resp => {
-        this.wsoPortfolioRef = resp
+        this.portfolioMapDataSvc.setWSOPortfolioRef(resp);
       },
       error: error => {
-        this.wsoPortfolioRef = [];
+        this.portfolioMapDataSvc.setWSOPortfolioRef([]);
         console.error(`Failed to load WSO Portfolio Ref Data: ${error}`)
       }
     }))
@@ -264,7 +279,7 @@ export class PortfolioManagerComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 11,
+          Revision: 13,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -293,6 +308,9 @@ export class PortfolioManagerComponent implements OnInit {
             ],
             PinnedColumnsMap: {
               action: 'right'
+            },
+            ColumnWidthMap:{
+              action: 150
             }
 
           }]
@@ -304,11 +322,6 @@ export class PortfolioManagerComponent implements OnInit {
   setSelectedRowID(rowID: number){
     this.actionClickedRowID = rowID;
     if(this.actionClickedRowID === null){
-      /** 
-       *    gridOptions.api (gridApi can be null on initial load, hence adding ? to not call    stopEditing())
-       * 
-       *  If not adding ?, can give error and wouldn't call getLiquiditySummaryPivoted() in filterBtnApplyState listener
-       */
       this.gridOptions.api?.stopEditing(true);
     }
     this.gridOptions.api?.refreshCells({
@@ -321,32 +334,10 @@ export class PortfolioManagerComponent implements OnInit {
     return this.actionClickedRowID;
   }
 
-  getPortfolioIDParams(){
-    return {
-      options: this.wsoPortfolioRef.map(e => e['wsoPortfolioID'])
-    }
-  }
-
-  getPortfolioNameParams(){
-    return {
-      options: this.wsoPortfolioRef.map(e => e['portfolioName'])
-    }
-  }
-
-  getUniqueParamsFromGrid(field: string){
-    return {
-      options: [...new Set(this.getGridData().map(e => 
-        {
-          if(typeof e[field] === 'string')
-            return String(e[field]).replace(/\s/g,'')
-          else return e[field]
-        }
-        ))].filter(e => 
-        String(e)?.replace(/\s/g,'').length && (e !== null) && (e !== undefined) && (e !== 0)
-      ).sort()
-    }
-  }
-
+  getPortfolioIDParams = getPortfolioIDParams.bind(this)
+  getPortfolioNameParams = getPortfolioNameParams.bind(this)
+  getUniqueParamsFromGrid = getUniqueParamsFromGrid.bind(this)
+  
   isEditable (params: EditableCallbackParams)  {
     return params.node.rowIndex === this.actionClickedRowID;
   }
@@ -366,80 +357,7 @@ export class PortfolioManagerComponent implements OnInit {
     return liveData;
   }
 
-  validateAndUpdate(params: CellValueChangedEvent){
-    let nodeData = params.data;
-    let val = params.newValue;
-    let found: boolean = false
-
-    if(params.column.getColId() === 'portfolioName'){
-
-      let liveGrid = this.getGridData();
-      let isDuplicate: boolean = false;
-
-      for(let i: number = 0; i < liveGrid.length; i+= 1){
-        if((liveGrid[i].mappingID !== params.data.mappingID) && (liveGrid[i]['portfolioName']?.toLowerCase() === params.newValue?.toLowerCase())){
-          
-          this.dataSvc.setWarningMsg('Duplicate Portfolios not allowed', 'Dismiss', 'ark-theme-snackbar-warning')
-          isDuplicate = true
-          nodeData['portfolioName'] = params.oldValue
-          this.adapTableApi.gridApi.updateGridData([nodeData])
-          break;
-        }
-      }
-
-      if(!isDuplicate){
-        for(let i: number = 0; i < this.wsoPortfolioRef.length; i+= 1){
-          if(this.wsoPortfolioRef[i].portfolioName.toLowerCase() === val.toLowerCase()){
-            nodeData['wsoPortfolioID'] = this.wsoPortfolioRef[i].wsoPortfolioID
-            nodeData['portfolioName'] = this.wsoPortfolioRef[i].portfolioName
-            
-            found = true
-            break;
-          }
-        }
-
-        if(!found){
-          nodeData['portfolioName'] = params.oldValue
-          this.dataSvc.setWarningMsg('Please select Portfolio Name from the list', 'Dismiss', 'ark-theme-snackbar-warning')
-        }
-        this.adapTableApi.gridApi.updateGridData([nodeData]);
-      }
-    }
-    else if(params.column.getColId() === 'wsoPortfolioID'){
-
-      let liveGrid = this.getGridData();
-      let isDuplicate: boolean = false;
-
-      for(let i: number = 0; i < liveGrid.length; i+= 1){
-        if((liveGrid[i].mappingID !== params.data.mappingID) && (Number(liveGrid[i]['wsoPortfolioID']) === Number(params.newValue))){
-          
-          this.dataSvc.setWarningMsg('Duplicate Portfolios not allowed', 'Dismiss', 'ark-theme-snackbar-warning')
-          isDuplicate = true
-          nodeData['wsoPortfolioID'] = Number(params.oldValue)
-          this.adapTableApi.gridApi.updateGridData([nodeData])
-          break;
-        }
-      }
-
-      if(!isDuplicate){
-        for(let i: number = 0; i < this.wsoPortfolioRef.length; i+= 1){
-          if(Number(this.wsoPortfolioRef[i].wsoPortfolioID) === Number(val)){
-            nodeData['wsoPortfolioID'] = Number(this.wsoPortfolioRef[i].wsoPortfolioID)
-            nodeData['portfolioName'] = this.wsoPortfolioRef[i].portfolioName
-            
-            found = true
-            break;
-          }
-        }
-
-        if(!found){
-          nodeData['wsoPortfolioID'] = Number(params.oldValue)
-          this.dataSvc.setWarningMsg('Please select Portfolio ID from the list', 'Dismiss', 'ark-theme-snackbar-warning')
-        }
-        this.adapTableApi.gridApi.updateGridData([nodeData]);
-      }
-    }
-  }
+  validateAndUpdate = validateAndUpdate.bind(this, this.portfolioMapDataSvc, 'Mappings')
 
   onCellValueChanged(params: CellValueChangedEvent){
     this.validateAndUpdate(params)
@@ -472,10 +390,12 @@ export class PortfolioManagerComponent implements OnInit {
     this.subscriptions.push(this.portfolioManagerSvc.getPortfolioMapping().subscribe({
       next: resp => {
         this.rowData = resp
+        this.portfolioMapDataSvc.setMappings(resp);
         this.gridOptions.api?.hideOverlay();
       },
       error: error => {
         this.rowData = [];
+        this.portfolioMapDataSvc.setMappings([]);
         console.error(`Failed to load portfolio mapping data: ${error}`)
       }
     }))

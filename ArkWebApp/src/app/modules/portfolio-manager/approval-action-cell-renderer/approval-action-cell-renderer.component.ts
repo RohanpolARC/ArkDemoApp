@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { PortfolioManagerService } from 'src/app/core/services/PortfolioManager/portfolio-manager.service';
-import { PortfolioMappingApproval } from 'src/app/shared/models/PortfolioManagerModel';
+import { PortfolioMapping, PortfolioMappingApproval } from 'src/app/shared/models/PortfolioManagerModel';
 import { ApprovalComponent } from '../approval/approval.component';
 import { ReviewerConfirmComponent } from '../reviewer-confirm/reviewer-confirm.component';
 
@@ -19,6 +19,9 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
   subscriptions: Subscription[] = []
   params: ICellRendererParams
   componentParent: ApprovalComponent
+  originalRowNodeData: any;
+  originalRowNodeID: string;
+  
   agInit(params: ICellRendererParams): void {
     
     this.params = params;
@@ -34,6 +37,7 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
     private portfolioManagerSvc: PortfolioManagerService,
     private dialog:MatDialog
   ) { }
+
 
   onConfirm(action: 'approve' | 'reject', remark: string){
 
@@ -62,10 +66,6 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
       error: error => {
 
         this.dataSvc.setWarningMsg(`Failed to ${action}`, `Dismiss`, `ark-theme-snackbar-error`)
-        this.params.api.applyTransaction({
-          remove: this.params.data 
-        })
-
       }
     }))
 
@@ -90,6 +90,111 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
 
   ngOnDestroy(){
     this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  onEditClick() {
+    if(this.componentParent.access.editOnApproval){
+      this.startEditing();
+    }
+    else{
+      this.dataSvc.setWarningMsg('No edit access', 'Dismiss', 'ark-theme-snackbar-warning');
+    }
+  }
+
+  startEditing(){
+    if(this.componentParent.getSelectedRowID() === null){
+      this.componentParent.setSelectedRowID(this.params.node.rowIndex);
+
+            // getRowNode().data returns references to the cell, so update in grid gets reflected here, JSON.parse(JSON.stringify()) just creates the copy of the object data, instead of reference.
+      this.originalRowNodeData = JSON.parse(JSON.stringify(this.params.api.getRowNode(this.params.node.id).data));
+      this.originalRowNodeID = this.params.node.id;
+    }
+
+    if(this.componentParent.getSelectedRowID() !== null && (this.componentParent.getSelectedRowID() !== this.params.node.rowIndex)){
+
+      this.dataSvc.setWarningMsg('Please save the existing entry', 'Dismiss', 'ark-theme-snackbar-warning')   
+    }
+  }
+
+  onSave(){
+    let data = this.params.node.data
+
+    if(!(data.wsoPortfolioID && data.fund && data.fundLegalEntity && data.fundHedging && data.fundStrategy && (data.fundSMA === true || data.fundSMA === false) && 
+    data.fundInvestor && data.fundCcy && data.fundAdmin && data.portfolioAUMMethod && 
+    (data.isCoinvestment === true || data.isCoinvestment === false) && 
+    (data.excludeFxExposure === true || data.excludeFxExposure === false))){
+      this.dataSvc.setWarningMsg('Please finish editing the mapping first', 'Dismiss', 'ark-theme-snackbar-warning')
+      return
+    }
+
+    if(JSON.stringify(data) === JSON.stringify(this.originalRowNodeData)){
+      this.dataSvc.setWarningMsg('No change in mapping', 'Dismiss', 'ark-theme-snackbar-warning')
+      return
+    }
+
+    let model: PortfolioMapping = <PortfolioMapping>{};
+
+    // Since we are editing an exisiting entry in the staging table.
+    model.stagingID = data.stagingID;
+
+    model.mappingID = data.mappingID
+    model.fund = data.fund
+    model.fundLegalEntity = data.fundLegalEntity
+    model.fundHedging = data.fundHedging
+    model.fundStrategy = data.fundStrategy
+    model.fundPipeline2 = data.fundPipeline2
+    model.fundSMA = data.fundSMA
+    model.fundInvestor = data.fundInvestor
+    model.wsoPortfolioID = data.wsoPortfolioID
+    model.fundPipeline = data.fundPipeline
+    model.fundCcy = data.fundCcy
+    model.fundAdmin = data.fundAdmin
+    model.portfolioAUMMethod = data.portfolioAUMMethod
+    model.fundRecon = data.fundRecon
+    model.legalEntityName = data.legalEntityName
+    model.lei = data.lei
+    model.isCoinvestment = data.isCoinvestment
+    model.excludeFxExposure = data.excludeFxExposure
+    model.portfolioName = data.portfolioName
+    model.solvencyPortfolioName = data.solvencyPortfolioName
+    model.userName = this.dataSvc.getCurrentUserName()
+
+    this.subscriptions.push(this.portfolioManagerSvc.putPortfolioMapping(model).pipe(
+    ).subscribe({
+      next: resp => {
+        if(resp.isSuccess){
+          this.dataSvc.setWarningMsg('Sent for approval', 'Dismiss', 'ark-theme-snackbar-success')
+          
+          //Refresh Approval grid on staging table update
+          this.componentParent.fetchPortfolioMappingStaging();
+            
+          this.componentParent.setSelectedRowID(null);
+        }
+      },
+      error: error => {
+
+        this.dataSvc.setWarningMsg('Sending for approval failed', 'Dismiss', 'ark-theme-snackbar-error')  
+
+        console.error("Sending for approval failed")
+        console.error(error)
+      }
+    }))
+  }
+
+  undoEdit(){
+    if(this.originalRowNodeID){
+      this.params.api?.getRowNode(this.originalRowNodeID)?.setData(this.originalRowNodeData);
+      this.originalRowNodeData = this.originalRowNodeID = null;
+      this.componentParent.setSelectedRowID(null);
+
+      this.params.api.recomputeAggregates();  
+    }
+    else {
+      /** In case of Cloned row editing */
+
+      this.componentParent.setSelectedRowID(null)
+      this.componentParent.adaptableApi.gridApi.deleteGridData([this.params.node.data])
+    }
   }
 
 }

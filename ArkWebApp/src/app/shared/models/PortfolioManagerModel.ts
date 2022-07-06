@@ -1,4 +1,7 @@
 export interface PortfolioMapping {
+        
+    stagingID?: number ,        // Used when updating in staging table (eg: Editing in approval grid);
+
     mappingID: number,
     fund: string,
     fundLegalEntity: string,

@@ -1,17 +1,40 @@
+
+<ng-container *ngIf="params.node.data?.state === 'Requested' && ['Pending', 'Rejected'].includes(params.node.data?.status)">
+
+    <span *ngIf="!(componentParent.getSelectedRowID() === params.node.rowIndex)"
+        (click)="onEditClick()"
+        matTooltip="Edit">
+        <mat-icon [ngStyle]="{'margin-left': '10px', color:'#285170','cursor':'pointer'}" >edit</mat-icon>
+    </span>
+
+    <span *ngIf="(componentParent.getSelectedRowID() === params.node.rowIndex)"
+        (click)="onSave()">
+        <mat-icon [ngStyle]="{'margin-left': '10px', color:'#0590ca','cursor':'pointer'}">save</mat-icon>
+    </span>
+
+    <span *ngIf="(componentParent.getSelectedRowID() === params.node.rowIndex)"
+        (click)="undoEdit()">
+        <mat-icon [ngStyle]="{'margin-left':'10px',color:'#102439','cursor':'pointer'}">cancel</mat-icon>
+    </span>
+
+</ng-container>
+
 <ng-container *ngIf="componentParent.access.approvalAccess">
-    <ng-container *ngIf="!params.node.group && params.node.data.state === 'Requested' && params.node.data.status === 'Pending'">
+    <ng-container *ngIf="!(componentParent.getSelectedRowID() === params.node.rowIndex)">
+        <ng-container *ngIf="!params.node.group && params.node.data?.state === 'Requested' && params.node.data?.status === 'Pending'">
     
-        <span
-            (click)="onAction('approve')"
-            matTooltip="Approve">
-            <mat-icon [ngStyle]="{'margin-left': '15px', color:'green','cursor':'pointer'}" >done</mat-icon>
-        </span>
+            <span
+                (click)="onAction('approve')"
+                matTooltip="Approve">
+                <mat-icon [ngStyle]="{'margin-left': '10px', color:'green','cursor':'pointer'}" >done</mat-icon>
+            </span>
     
-        <span
-            (click)="onAction('reject')"
-            matTooltip="Reject">
-            <mat-icon [ngStyle]="{'margin-left': '15px', color:'red','cursor':'pointer'}" >close</mat-icon>
-        </span>
+            <span
+                (click)="onAction('reject')"
+                matTooltip="Reject">
+                <mat-icon [ngStyle]="{'margin-left': '10px', color:'red','cursor':'pointer'}" >close</mat-icon>
+            </span>
     
+        </ng-container>
     </ng-container>
 </ng-container>

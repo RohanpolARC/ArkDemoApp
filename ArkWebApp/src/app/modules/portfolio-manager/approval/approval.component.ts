@@ -1,13 +1,16 @@
 import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridOptions, Module, ClientSideRowModelModule, GridReadyEvent, RowNode } from '@ag-grid-community/all-modules';
+import { ColDef, GridOptions, Module, ClientSideRowModelModule, GridReadyEvent, RowNode, EditableCallbackParams, ICellRendererParams, CellValueChangedEvent } from '@ag-grid-community/all-modules';
 import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { Component, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { PortfolioManagerService } from 'src/app/core/services/PortfolioManager/portfolio-manager.service';
+import { PortfolioMappingDataService } from 'src/app/core/services/PortfolioManager/portfolio-mapping-data.service';
+import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { dateTimeFormatter } from 'src/app/shared/functions/formatter';
 import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/utilities';
 import { ApprovalActionCellRendererComponent } from '../approval-action-cell-renderer/approval-action-cell-renderer.component';
+import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, validateAndUpdate } from '../utilities/functions';
 
 @Component({
   selector: 'app-approval',
@@ -16,13 +19,15 @@ import { ApprovalActionCellRendererComponent } from '../approval-action-cell-ren
 })
 export class ApprovalComponent implements OnInit {
 
+  @Output() refreshMappingsEvent = new EventEmitter<'Refresh'>();
+
   @Input() access: {
     editAccess: boolean,
     cloneAccess: boolean,
-    approvalAccess: boolean
+    approvalAccess: boolean,
+    editOnApproval: boolean
   }
-
-  @Output() refreshMappingsEvent = new EventEmitter<'Refresh'>();
+  @Input() wsoPortfolioRef: any[]
   @Input() refreshApproval: { 
     refresh: boolean
   }
@@ -44,14 +49,45 @@ export class ApprovalComponent implements OnInit {
     SideBarModule,
     RangeSelectionModule
   ];
+
+  actionClickedRowID: number = null;
   adaptableApi: AdaptableApi;
   context: any;
   rowData: any;
 
   constructor(    
     private portfolioManagerSvc: PortfolioManagerService,
-    private dataSvc: DataService
+    private dataSvc: DataService,
+    private portfolioMapDataSvc: PortfolioMappingDataService
 ) { }
+
+  isEditable (params: EditableCallbackParams | ICellRendererParams)  {
+
+    return (params.node.data?.['state'] === 'Requested') 
+    && (['Pending', 'Rejected'].includes(params.node.data?.['status'])) 
+    && ((this.access.approvalAccess) || this.access.editOnApproval)
+    && (this.getSelectedRowID() === params.node.rowIndex)
+  }
+
+  getSelectedRowID(){
+    return this.actionClickedRowID;
+  }
+
+  setSelectedRowID(rowID: number){
+    this.actionClickedRowID = rowID;
+    if(this.actionClickedRowID === null){
+      this.gridOptions.api?.stopEditing(true);
+    }
+    this.gridOptions.api?.refreshCells({
+      force: true,
+      suppressFlash: true
+    })
+  }
+
+  getPortfolioIDParams = getPortfolioIDParams.bind(this)
+  getPortfolioNameParams = getPortfolioNameParams.bind(this)
+  getUniqueParamsFromGrid = getUniqueParamsFromGrid.bind(this)
+
 
   getOtherNodeForID(stagingID: number, rowState: 'Current' | 'Requested'): any{
     let otherNode
@@ -69,27 +105,91 @@ export class ApprovalComponent implements OnInit {
 
   getPendingCellStyle(col, params) {
 
-    if(!params.node?.group && params.data?.['status'] === 'Pending'){
+    let onlyEdit = { 'border-color': '#0590ca' }
+    let current = { 'background-color': 'rgb(253,100,100)' }
+    let onlyRequested = { 'background-color': 'rgb(135, 243, 180)'}
+    let requestedAndEdit = { 'background-color': 'rgb(135, 243, 180)','border-color': '#0590ca'}
 
-      let otherNode = this.getOtherNodeForID(params.data?.['stagingID'], params.data?.['state']);
-      if(otherNode?.[col] !== params.data?.[col]){
+    if(!params.node?.group){
 
-        if(params.data?.['state'] === 'Current')
-          return {
-            'background-color': 'rgb(253,100,100)',
+      if(params.data?.['actionType'] === 'ADD' && (params.node.rowIndex === this.getSelectedRowID())){
+        return (!['wsoPortfolioID', 'portfolioName'].includes(col)) ? onlyEdit : null;
+      }
+
+      if(params.data?.['actionType'] === 'UPDATE'){
+
+        if(params.data?.['status'] === 'Pending'){
+          let otherNode = this.getOtherNodeForID(params.data?.['stagingID'], params.data?.['state']);
+          if(otherNode?.[col] !== params.data?.[col]){
+            if(params.data?.['state'] === 'Current'){
+              return current;
+            }
+  
+            if(params.data?.['state'] === 'Requested'){
+              if(params.node.rowIndex === this.getSelectedRowID() && !['wsoPortfolioID', 'portfolioName'].includes(col)){
+                return requestedAndEdit;
+              }
+              else return onlyRequested;
+            }
           }
-        else if(params.data?.['state'] === 'Requested')
-          return {
-            'background-color': 'rgb(135, 243, 180)'
+          else{
+            if(params.node.rowIndex === this.getSelectedRowID()){
+              return ['wsoPortfolioID', 'portfolioName'].includes(col) ? null : onlyEdit;
+            }
+          }  
+        }
+        else if(params.data?.['status'] === 'Rejected'){
+          if(params.node.rowIndex === this.getSelectedRowID()){
+            return ['wsoPortfolioID', 'portfolioName'].includes(col) ? null : onlyEdit;
           }
-
+        }
       }
 
     }
 
-    return null;
+    return null
   }
 
+  validateAndUpdate(params: CellValueChangedEvent){
+
+    let wsoRef = this.portfolioMapDataSvc.getWSOPortfolioRef()
+
+    if(params.column.getColId() === 'wsoPortfolioID' || params.column.getColId() === 'portfolioName'){
+      
+      for(let i: number = 0; i < wsoRef.length; i+= 1){
+
+        let data = params.node.data
+        if(params.column.getColId() === 'wsoPortfolioID' && Number(params.newValue) === Number(wsoRef[i]['wsoPortfolioID'])){
+
+          data['wsoPortfolioID'] = Number(params.newValue)
+          data['portfolioName'] = wsoRef[i]['portfolioName']
+          this.adaptableApi.gridApi.updateGridData([data])
+          break;
+        }
+        else if(params.column.getColId() === 'portfolioName' && params.newValue?.toLowerCase() === wsoRef[i]['portfolioName']?.toLowerCase()){
+
+          data['wsoPortfolioID'] = Number(wsoRef[i]['wsoPortfolioID'])
+          data['portfolioName'] = wsoRef[i]['portfolioName']
+          this.adaptableApi.gridApi.updateGridData([data])
+          break;
+
+        }
+      }
+    }    
+  }
+
+  onCellValueChanged(params: CellValueChangedEvent){
+
+    if(params.column.getColId() === 'wsoPortfolioID' || params.column.getColId() === 'portfolioName'){
+      this.validateAndUpdate(params)    
+    }
+
+    this.gridOptions?.api?.refreshCells({
+      force: true,
+      suppressFlash: true
+    })
+  }
+  
   ngOnInit(): void {
 
     this.columnDefs = [
@@ -97,82 +197,132 @@ export class ApprovalComponent implements OnInit {
       { field: 'stagingID', type: 'abColDefNumber' },
       { field: 'mappingID', type: 'abColDefNumber' },
       { field: 'state', type: 'abColDefString'},
-      { field: 'status', type: 'abColDefString'},
+      { field: 'status', type: 'abColDefString', filter: true},
       { field: 'actionType', type: 'abColDefString'},
       { field: 'fund', type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'fund')
+        cellStyle: this.getPendingCellStyle.bind(this, 'fund'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fund'),
       },
       { field: "fundLegalEntity", type: 'abColDefString',
-      cellStyle: this.getPendingCellStyle.bind(this, 'fundLegalEntity')
+        cellStyle: this.getPendingCellStyle.bind(this, 'fundLegalEntity'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundLegalEntity'),
       },
       { field: "fundHedging", type: 'abColDefString',
-      cellStyle: this.getPendingCellStyle.bind(this, 'fundHedging')
-
+        cellStyle: this.getPendingCellStyle.bind(this, 'fundHedging'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundHedging'),
       },
       { field: "fundStrategy", type: 'abColDefString',
-      cellStyle: this.getPendingCellStyle.bind(this, 'fundStrategy')
-
+        cellStyle: this.getPendingCellStyle.bind(this, 'fundStrategy'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundStrategy'),
       },
       { field: "fundPipeline2", type: 'abColDefString',
-      cellStyle: this.getPendingCellStyle.bind(this, 'fundPipeline2')
+        cellStyle: this.getPendingCellStyle.bind(this, 'fundPipeline2'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundPipeline2'),
 
       },
       { field: "fundSMA", type: 'abColDefBoolean',
-      cellStyle: this.getPendingCellStyle.bind(this, 'fundSMA')
+        cellStyle: this.getPendingCellStyle.bind(this, 'fundSMA'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundSMA'),
 
       },
       { field: "fundInvestor", type: 'abColDefString',
-      cellStyle: this.getPendingCellStyle.bind(this, 'fundInvestor')
+        cellStyle: this.getPendingCellStyle.bind(this, 'fundInvestor'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundInvestor'),
 
       },
       { field: "wsoPortfolioID", type: 'abColDefNumber',
-      cellStyle: this.getPendingCellStyle.bind(this, 'wsoPortfolioID')
+        cellStyle: this.getPendingCellStyle.bind(this, 'wsoPortfolioID'),
+        // editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'wsoPortfolioID'),
 
       },
-      { 
-        field: "portfolioName", type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'portfolioName')
+      { field: "portfolioName", type: 'abColDefString',
+        cellStyle: this.getPendingCellStyle.bind(this, 'portfolioName'),
+        // editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'portfolioName'),
 
       },
       { field: "solvencyPortfolioName",  type: 'abColDefString',
-      cellStyle: this.getPendingCellStyle.bind(this, 'solvencyPortfolioName')
+        cellStyle: this.getPendingCellStyle.bind(this, 'solvencyPortfolioName'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'solvencyPortfolioName'),
 
       },
       { field: "fundPipeline",  type: 'abColDefString',
-      cellStyle: this.getPendingCellStyle.bind(this, 'fundPipeline')
+        cellStyle: this.getPendingCellStyle.bind(this, 'fundPipeline'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundPipeline'),
 
       },
       { field: "fundCcy",  type: 'abColDefString',
-      cellStyle: this.getPendingCellStyle.bind(this, 'fundCcy')
+        cellStyle: this.getPendingCellStyle.bind(this, 'fundCcy'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundCcy'),
 
       },
       { field: "fundAdmin",  type: 'abColDefString',
-      cellStyle: this.getPendingCellStyle.bind(this, 'fundAdmin')
+        cellStyle: this.getPendingCellStyle.bind(this, 'fundAdmin'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundAdmin'),
 
       },
       { field: "portfolioAUMMethod",  type: 'abColDefString',
-      cellStyle: this.getPendingCellStyle.bind(this, 'portfolioAUMMethod')
+        cellStyle: this.getPendingCellStyle.bind(this, 'portfolioAUMMethod'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'portfolioAUMMethod'),
 
       },
       { field: "fundRecon",  type: 'abColDefString',
-      cellStyle: this.getPendingCellStyle.bind(this, 'fundRecon')
+        cellStyle: this.getPendingCellStyle.bind(this, 'fundRecon'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundRecon'),
 
       },
       { field: "legalEntityName",  type: 'abColDefString',
-      cellStyle: this.getPendingCellStyle.bind(this, 'legalEntityName')
-
+        cellStyle: this.getPendingCellStyle.bind(this, 'legalEntityName'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'legalEntityName'),
       },
       { field: "lei", headerName: 'LEI',  type: 'abColDefString',
-      cellStyle: this.getPendingCellStyle.bind(this, 'lei')
-
+        cellStyle: this.getPendingCellStyle.bind(this, 'lei'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'lei'),
       },
       { field: "isCoinvestment",  type: 'abColDefBoolean',
-      cellStyle: this.getPendingCellStyle.bind(this, 'isCoinvestment')
-
+        cellStyle: this.getPendingCellStyle.bind(this, 'isCoinvestment'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'isCoinvestment'),
       },
       { field: "excludeFxExposure", type: 'abColDefBoolean',
-      cellStyle: this.getPendingCellStyle.bind(this, 'excludeFxExposure')
-
+        cellStyle: this.getPendingCellStyle.bind(this, 'excludeFxExposure'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'excludeFxExposure'),
       },
       { field: "action", cellRenderer: 'actionCellRenderer'},
       { field: 'modifiedBy', headerName: 'Requested By',  type: 'abColDefString' },
@@ -188,7 +338,7 @@ export class ApprovalComponent implements OnInit {
       enableRowGroup: true,
       enablePivot: false,
       // sortable: true,
-      filter: true,
+      // filter: true,
       autosize:true,
       floatingFilter: false
     }
@@ -202,10 +352,12 @@ export class ApprovalComponent implements OnInit {
         AdaptableToolPanel: AdaptableToolPanelAgGridComponent
       },
       frameworkComponents: {
-        actionCellRenderer: ApprovalActionCellRendererComponent
+        actionCellRenderer: ApprovalActionCellRendererComponent,
+        autocompleteCellEditor: MatAutocompleteEditorComponent
       },
       singleClickEdit: true,
       rowGroupPanelShow: 'always',
+      onCellValueChanged: this.onCellValueChanged.bind(this)
     }
 
     this.adaptableOptions = {
@@ -214,6 +366,10 @@ export class ApprovalComponent implements OnInit {
       userName: this.dataSvc.getCurrentUserName(),
       adaptableId: 'Portfolio Mapping Approval ID',
       adaptableStateKey: 'Portfolio Mapping Approval Key',
+
+      layoutOptions: {
+        includeExpandedRowGroups: true
+      },
 
       toolPanelOptions: {
         toolPanelOrder: ['columns', 'AdaptableToolPanel']
@@ -238,7 +394,7 @@ export class ApprovalComponent implements OnInit {
           IsHidden: false,
           DashboardTitle: ' '
         },
-
+        
         Filter:{
           Revision: 3,
           ColumnFilters: [{
@@ -251,7 +407,7 @@ export class ApprovalComponent implements OnInit {
         },  
 
         Layout: {
-          Revision: 15,
+          Revision: 17,
           CurrentLayout: 'Default Approval Layout',
           Layouts: [{
             Name: 'Default Approval Layout',
@@ -284,11 +440,12 @@ export class ApprovalComponent implements OnInit {
               'action'
       
             ],
+            ExpandedRowGroupValues: ['actionType', 'status'],
             PinnedColumnsMap: {
               action: 'right'
             },
             ColumnWidthMap:{
-              action: 130,
+              action: 150,
             },
             RowGroupedColumns: ['actionType', 'status', 'portfolioName']            
 
@@ -315,6 +472,8 @@ export class ApprovalComponent implements OnInit {
   ) {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel()
+
+    this.portfolioMapDataSvc.mappingsAdaptableApi = adaptableApi
   }
 
   onGridReady(params: GridReadyEvent){
@@ -323,7 +482,8 @@ export class ApprovalComponent implements OnInit {
       componentParent: this
     }
 
-    // this.fetchPortfolioMappingStaging();
+    this.portfolioMapDataSvc.mappingsGridApi = params.api;
+
   }
 
   ngOnChanges(changes: SimpleChanges){

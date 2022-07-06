@@ -5,7 +5,7 @@
         <span *ngIf="!(componentParent.getSelectedRowID() === params.node.rowIndex)"
             (click)="cloneRow()"
             matTooltip="Clone row">
-            <mat-icon [ngStyle]="{'margin-left': '15px', color:'#285170','cursor':'pointer'}" >content_copy</mat-icon>
+            <mat-icon class="clone">content_copy</mat-icon>
         </span>
     </ng-container>
 
@@ -13,18 +13,18 @@
         <span *ngIf="!(componentParent.getSelectedRowID() === params.node.rowIndex)"
             (click)="onEditClick()"
             matTooltip="Edit">
-            <mat-icon [ngStyle]="{'margin-left': '15px', color:'#285170','cursor':'pointer'}" >edit</mat-icon>
+            <mat-icon class="edit">edit</mat-icon>
         </span>
     </ng-container>
 
     <ng-container *ngIf="componentParent.accessObj.editAccess || componentParent.accessObj.cloneAccess">
         <span *ngIf="(componentParent.getSelectedRowID() === params.node.rowIndex)"
             (click)="onSave()">
-            <mat-icon [ngStyle]="{'margin-left': '15px', color:'#0590ca','cursor':'pointer'}">save</mat-icon>
+            <mat-icon class="save">save</mat-icon>
         </span>
         <span *ngIf="(componentParent.getSelectedRowID() === params.node.rowIndex)"
             (click)="undoEdit()">
-            <mat-icon [ngStyle]="{'margin-left':'15px',color:'#102439','cursor':'pointer'}">cancel</mat-icon>
+            <mat-icon class="undo">cancel</mat-icon>
         </span>
     </ng-container>
 </ng-container>

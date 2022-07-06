@@ -36,17 +36,7 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
   }
 
   onEditClick() {
-    this.startEditing();           // No R/W access check
-
-      // R/W access check
-
-      // if(this.componentParent.isWriteAccess){
-      //   this.startEditing();
-      // }
-      // else{
-      //   this.componentParent.setWarningMsg('Unauthorized', 'Dismiss', 'ark-theme-snackbar-error')   
-      // }
-  
+    this.startEditing();
   }
 
   startEditing(){
@@ -58,10 +48,8 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
       this.originalRowNodeID = this.params.node.id;
     }
 
-    if(this.componentParent.getSelectedRowID() === null || (this.componentParent.getSelectedRowID() === this.params.node.rowIndex)){
+    if(this.componentParent.getSelectedRowID() !== null && (this.componentParent.getSelectedRowID() !== this.params.node.rowIndex)){
 
-    }
-    else{
       this.dataSvc.setWarningMsg('Please save the existing entry', 'Dismiss', 'ark-theme-snackbar-warning')   
     }
   }
@@ -77,6 +65,10 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
       return
     }
 
+    if(JSON.stringify(data) === JSON.stringify(this.originalRowNodeData)){
+      this.dataSvc.setWarningMsg('No change in mapping', 'Dismiss', 'ark-theme-snackbar-warning')
+      return
+    }
     let model: PortfolioMapping = <PortfolioMapping>{};
 
     model.mappingID = data.mappingID
