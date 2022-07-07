@@ -31,6 +31,18 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { CapitalActivityModule } from './modules/capital-activity/capital-activity.module';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized.component';
+import {HomeComponent} from '../app/home-component/home.component'
+import { FacilityDetailModule } from './modules/facility-detail/facility-detail.module';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { LiquiditySummaryModule } from './modules/liquidity-summary/liquidity-summary.module';
+import { DetailedViewComponent } from './shared/components/detailed-view/detailed-view.component';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import { AccessControlComponent } from './shared/components/access-control/access-control.component';
+import { MatSelectModule } from '@angular/material/select';
+import { IrrCalculationModule } from './modules/irr-calculation/irr-calculation.module';
+import { PortfolioManagerModule } from './modules/portfolio-manager/portfolio-manager.module';
 
 export const protectedResourceMap: any =  
   [  
@@ -40,7 +52,7 @@ export const protectedResourceMap: any =
   
 @NgModule({  
   declarations: [  
-    AppComponent
+    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent
   ],  
   imports: [  
     MsalModule.forRoot({  
@@ -75,7 +87,15 @@ export const protectedResourceMap: any =
   MatDatepickerModule,
   MatNativeDateModule,
   MatInputModule,
-  CapitalActivityModule
+  CapitalActivityModule,
+  MatTooltipModule,
+  FacilityDetailModule,
+  NgMultiSelectDropDownModule.forRoot(),
+  LiquiditySummaryModule,
+  MatCheckboxModule,
+  MatSelectModule,
+  IrrCalculationModule,
+  PortfolioManagerModule
   ],  
   providers: [  
     HttpClient,  
@@ -84,12 +104,13 @@ export const protectedResourceMap: any =
       provide: HTTP_INTERCEPTORS, useClass: MsalInterceptor, multi: true  
     },
     /* 
+    Switched to: DD-MM-YYYY.
       Default locale is 'en-US' : MM-DD-YYYY
-      Switched to: DD-MM-YYYY.
       
       Applicable to all Ng Material fields for this module.
     */
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  
+    
   ],  
   bootstrap: [AppComponent]  
 })  

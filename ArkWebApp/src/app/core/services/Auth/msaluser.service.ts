@@ -40,7 +40,6 @@ export class MsalUserService {
     
     public  getUserName():string {  
         const user = this.clientApplication.getUser();  
-         
         return user.name;
     }
 

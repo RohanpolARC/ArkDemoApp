@@ -25,12 +25,13 @@ import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/C
 
 import { Subscription } from 'rxjs';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
-import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, dateTimeFormatter, amountFormatter, nullOrZeroFormatter } from 'src/app/shared/functions/formatter';
 
 import { getNodes, validateLinkSelect }from './utilities/functions';
 import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
 
 import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
+import { DataService } from 'src/app/core/services/data.service';
 
 @Component({
   selector: 'app-capital-activity',
@@ -62,13 +63,15 @@ export class CapitalActivityComponent implements OnInit {
     {field: 'fundHedging', headerName: 'Fund Hedging'},
     {field: 'portfolio', headerName: 'Portfolio'},
     {field: 'issuerShortName', headerName: 'Issuer'},
+    {field: 'issuerID', headerName: 'Issuer ID'},
     {field: 'asset', headerName: 'Asset'},
     {field: 'assetID', headerName: 'AssetID'},
     {field: 'fundCcy', headerName: 'Fund Ccy'},
     {field: 'positionCcy', headerName: 'Position Ccy'},
     {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    {field: 'linkedAmount', headerName: 'Linked Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'totalEur', headerName: 'Total Eur', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'}
+    {field: 'totalEur', headerName: 'Total Eur', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
   ]
 
   columnDefs: ColDef[] = [
@@ -78,14 +81,19 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'capitalType', headerName: 'Capital Type', type:'abColDefString'},
     { field: 'capitalSubType', headerName: 'Capital Subtype', type:'abColDefString'},
     { field: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
-    { field: 'fundCcy', headerName: 'Currency', type:'abColDefString'},
+    { field: 'fundCcy', headerName: 'Fund Ccy', type:'abColDefString'},
+    { field: 'posCcy', headerName: 'Position Ccy', type: 'abColDefString'},
+    { field: 'fxRate', headerName: 'FXRate', valueFormatter: nullOrZeroFormatter},
     { field: 'totalAmount', headerName: 'Total Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'wsoIssuerID', headerName: 'WSO Issuer ID'},
+    {field: 'wsoIssuerID', headerName: 'WSO Issuer ID', valueFormatter: nullOrZeroFormatter},
     { field: 'issuerShortName', headerName: 'Issuer Short Name', type:'abColDefString'},
+    {field: 'wsoAssetID', headerName: 'WSO Asset ID', valueFormatter: nullOrZeroFormatter},
     { field: 'asset', headerName: 'Asset', type:'abColDefString'},
     { field: 'narrative', headerName: 'Narrative', type:'abColDefString'},
     { field: 'source', headerName: 'Source', type:'abColDefString'},
-    { field: 'sourceID', headerName: 'Source ID', type:'abColDefNumber'},
+    { field: 'sourceID', headerName: 'Source ID', type:'abColDefNumber', valueFormatter: nullOrZeroFormatter},
+    { field: 'isLinked', headerName: 'Is Linked', type:'abColDefBoolean'},
+    { field: 'linkedAmount', headerName: 'Linked Amount', type:'abColDefNumber', valueFormatter: amountFormatter},
     { field: 'createdOn', headerName: 'Created On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
     { field: 'createdBy', headerName: 'Created By', type:'abColDefString'},
     { field: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
@@ -110,7 +118,9 @@ export class CapitalActivityComponent implements OnInit {
   adapTableApiInvstmnt: AdaptableApi;
   adaptableOptionsInvstmnt: AdaptableOptions;
 
-  constructor(public dialog:MatDialog, private capitalActivityService: CapitalActivityService) { 
+  constructor(public dialog:MatDialog, 
+    private capitalActivityService: CapitalActivityService,
+    private dataService: DataService) { 
   }
 
 
@@ -122,29 +132,79 @@ export class CapitalActivityComponent implements OnInit {
   invstmntPanelOpenState = false;
   investorPanelOpenState = false;
 
-  fetchData(): void{
-
+  fetchInvestmentData(): void{
+    this.gridOptionsInvstmnt?.api?.showLoadingOverlay();
     this.subscriptions.push(this.capitalActivityService.getCapitalInvestment().subscribe({
       next: data => {
+        this.gridOptionsInvstmnt?.api?.hideOverlay();
         this.rowDataInvstmnt = data;
         this.adapTableApiInvstmnt.gridApi.loadGridData(this.rowDataInvstmnt);
       },
       error: error => {
         this.rowDataInvstmnt = [];
+        this.gridOptionsInvstmnt?.api?.hideOverlay();
         console.error("Capital Investment Data fetch failed");
       }
     }))
+  }
 
+  fetchCapitalActivityData(): void{
+    this.gridOptions?.api?.showLoadingOverlay();
     this.subscriptions.push(this.capitalActivityService.getCapitalActivity().subscribe({
       next: data => {
+        this.gridOptions?.api?.hideOverlay();
         this.rowData = data;
         this.adapTableApi.gridApi.loadGridData(this.rowData);
       },
       error: error => {
         this.rowData = [];
+        this.gridOptions?.api?.hideOverlay();
         console.error("Capital Activity Data fetch failed");
       }
     }));
+  }
+
+  fetchCapitalRefData(): void{
+    this.subscriptions.push(this.capitalActivityService.getCapitalRefData().subscribe({
+      next: data => {
+        data.capitalType.forEach(x => { this.capitalTypeOptions.push(x) });
+        data.capitalSubType.forEach(x => { this.capitalSubTypeOptions.push(x) });
+
+        this.refData = data.portfolio_Info;
+      },
+      error: error => {
+        console.error("Couldn't fetch refData. Form dropdown fields not available");
+      }
+    }));
+  }
+
+  async getSharedEntities(adaptableId){
+    return new Promise(resolve => {
+      this.subscriptions.push(this.dataService.getAdaptableState(adaptableId).subscribe({
+        next: state => {
+          try {
+
+            state = state.split('|').join('"')
+            resolve(JSON.parse(state) ||'[]')
+          } catch (e) {
+            console.log("Failed to parse")
+            resolve([])
+          }
+        }
+      }));
+    })
+  }
+
+  async setSharedEntities(adaptableId, sharedEntities): Promise<void>{
+
+    return new Promise(resolve => {
+      this.subscriptions.push(
+        this.dataService.saveAdaptableState(adaptableId, JSON.stringify(sharedEntities).replace(/"/g,'|')).subscribe({
+        next: data => {
+          resolve();
+        }
+      }));
+    })
   }
 
   ngOnInit(): void {
@@ -169,12 +229,19 @@ export class CapitalActivityComponent implements OnInit {
 
     this.adaptableOptions = {
       primaryKey: 'capitalID',
-      userName: 'TestUser',
-      adaptableId: '',
+      userName: this.dataService.getCurrentUserName(),
+      adaptableId: 'Capital Activity - Investor Cashflows',
       adaptableStateKey: `Capital Activity Key`,
       
       layoutOptions: {
         autoSaveLayouts: false
+      },
+  
+      teamSharingOptions: {
+        enableTeamSharing: true,
+        setSharedEntities: this.setSharedEntities.bind(this),
+        getSharedEntities: this.getSharedEntities.bind(this)
+  
       },
   
       toolPanelOptions: {
@@ -216,12 +283,18 @@ export class CapitalActivityComponent implements OnInit {
   
       predefinedConfig: {
         Dashboard: {
-          ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
+          Revision: 1,
+          ModuleButtons: ['TeamSharing','Export', 'Layout','ConditionalStyle'],
           IsCollapsed: true,
-          Tabs: [],
-          IsHidden: false
+          Tabs: [{
+            Name:'Layout',
+            Toolbars: ['Layout']
+          }],  
+          IsHidden: false,
+          DashboardTitle: ' '
         },
         Layout: {
+          Revision: 5,
           CurrentLayout: 'Basic Capital Activity',
           Layouts: [{
             Name: 'Basic Capital Activity',
@@ -231,19 +304,20 @@ export class CapitalActivityComponent implements OnInit {
               'capitalType',
               'capitalSubType',
               'fundHedging',
+              'issuerShortName',
+              'asset',
               'fundCcy',
+              'posCcy',
               'totalAmount',
               'localAmount',
               'fxRate',
-              'wsoIssuerID',
-              'issuerShortName',
-              'asset',
+              // 'wsoIssuerID',
+              'wsoAssetID',
               'narrative',
               'source',
-              'createdBy',
-              'createdOn',
-              'modifiedBy',
-              'modifiedOn',
+              'isLinked',
+              'linkedAmount',
+              'capitalID',
               'ActionEdit',
             ],
             RowGroupedColumns: [],
@@ -262,8 +336,8 @@ export class CapitalActivityComponent implements OnInit {
     this.adaptableOptionsInvstmnt = {
       primaryKey: '',
       autogeneratePrimaryKey: true,
-      userName: 'TestUser',
-      adaptableId: '',
+      userName: this.dataService.getCurrentUserName(),
+      adaptableId: 'Capital Activity - Investment Cashflows',
       adaptableStateKey: `Investment CashFlow Key`,
       
       layoutOptions: {
@@ -274,6 +348,13 @@ export class CapitalActivityComponent implements OnInit {
         toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
       },
 
+      teamSharingOptions: {
+        enableTeamSharing: true,
+        setSharedEntities: this.setSharedEntities.bind(this),
+        getSharedEntities: this.getSharedEntities.bind(this)
+  
+      },
+  
       userInterfaceOptions: {
         actionColumns: [
           {
@@ -313,12 +394,18 @@ export class CapitalActivityComponent implements OnInit {
   
       predefinedConfig: {
         Dashboard: {
-          ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
+          Revision: 1,
+          ModuleButtons: ['TeamSharing', 'Export', 'Layout','ConditionalStyle'],
           IsCollapsed: true,
-          Tabs: [],
-          IsHidden: false
+          Tabs: [{
+            Name:'Layout',
+            Toolbars: ['Layout']
+          }],
+          IsHidden: false,
+          DashboardTitle: ' '
         },
         Layout: {
+          Revision: 7,
           Layouts:[{
             Name: 'Basic Investment Cashflow',
             Columns: [
@@ -332,6 +419,7 @@ export class CapitalActivityComponent implements OnInit {
               'fundCcy',
               'positionCcy',
               'amount',
+              'linkedAmount',
               'totalBase',
               'totalEur',
               'ActionLink'
@@ -345,27 +433,18 @@ export class CapitalActivityComponent implements OnInit {
             },
             AggregationColumns: {
               totalBase: 'sum',
-              totalEur: 'sum'
+              totalEur: 'sum',
+              linkedAmount: 'sum',
+              amount: 'sum'
             }
           }]
         }  
       }
     }
 
-    this.fetchData();
-
-    
-    this.subscriptions.push(this.capitalActivityService.getCapitalRefData().subscribe({
-      next: data => {
-        data.capitalType.forEach(x => { this.capitalTypeOptions.push(x) });
-        data.capitalSubType.forEach(x => { this.capitalSubTypeOptions.push(x) });
-
-        this.refData = data.portfolio_Info;
-      },
-      error: error => {
-        console.error("Couldn't fetch refData. Form dropdown fields not available");
-      }
-    }));
+    this.fetchCapitalActivityData();
+    this.fetchInvestmentData();
+    this.fetchCapitalRefData();
 
   }
 
@@ -385,10 +464,12 @@ export class CapitalActivityComponent implements OnInit {
       width: '90vw',
       maxWidth: '90vw',
       height: '80vh',
-      hasBackdrop: false,
     })
     this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
       // Bulk Upload Dialog Closed.
+      if(result.isSuccess){
+        this.fetchCapitalActivityData();
+      }
     }))
   }
 
@@ -405,11 +486,17 @@ export class CapitalActivityComponent implements OnInit {
         refData: this.refData,
         gridData: gridData
       },
-      minWidth: (actionType === 'LINK-ADD') ? '1500px' : '830px',
+      width: '90vw',
+      maxWidth: '2000px',
+      maxHeight: '99vh'
     });
+
     this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
-      /** ADD Rows to Investor Grid */
-    }));
+      if(actionType === 'LINK-ADD' && result.event === 'Close with Success'){
+        this.fetchCapitalActivityData();
+        this.fetchInvestmentData();
+      }
+    }))
   }
 
   onAdaptableReady(

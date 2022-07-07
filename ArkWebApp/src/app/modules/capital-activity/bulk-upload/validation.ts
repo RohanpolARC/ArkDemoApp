@@ -2,20 +2,25 @@ import * as moment from 'moment';
 import { getUniqueOptions } from '../utilities/utility';
 
 let actualCols: string[] = [         
+    'Cash Flow Date',
+    'Call Date',
     'Fund Hedging',
     'Fund Currency',
-    'Cash Flow Date',
+    'Position Currency',
+    'GIR (Pos - Fund ccy)',
+    'Amount',
     'Capital Type',
     'Capital Subtype',
-    'Amount (fund ccy)',
-    'Wso Issuer ID',
-    'Issuer Short Name(optional)',
+    // 'Wso Issuer ID',
+    // 'Issuer Short Name(optional)',
+    'Wso Asset ID',
     'Asset (optional)',
     'Narative (optional)',
     // 'Action'
 ]
 
 let refOptions;
+let invalidMsg: string = '';
 
 export function validateColumns(fileColumns: string[]): {isValid: boolean, col?: string} {
 
@@ -23,108 +28,101 @@ export function validateColumns(fileColumns: string[]): {isValid: boolean, col?:
         if(actualCols.indexOf(fileColumns[i]) !== -1 || fileColumns[i] === '_COLUMN_TITLE')
             continue;
         else 
-            return {isValid: false, col: fileColumns[i]};   // Mismatch col found
+            return {isValid: false, col: fileColumns[i]};   // Invalid col found
     }
 
     return {isValid: true} // No mismatch col found 
 }
 
-export function validateRowForEmptiness(row: any): {isValid: boolean, remark?: string}{
+export function validateRowForEmptiness(row: any): void{
     
     for(let i:number = 0; i < actualCols.length; i+=1){
-        if((row[actualCols[i]] === null || row[actualCols[i]] === undefined) && 
+        if(!row[actualCols[i]] && 
         [
-            'Issuer Short Name(optional)', 'Asset (optional)','Narative (optional)', 
-            'Wso Issuer ID'
-        ].indexOf(actualCols[i]) === -1)
-            return {
-                isValid: false,
-                remark: `${actualCols[i]} cannot be empty`
-            }
-    }
-    return {
-        isValid: true
-    }
-}
-
-export function validateRowValueRange(row: any): {isValid: boolean, remark?: string}{
-    if(Number(new Date(moment(row['Cash Flow Date']).format('YYYY-MM-DD')).getFullYear) < 2012)
-        return {
-            isValid: false,
-            remark: 'Cash Flow Date cannot be < 2012'
-        };
-
-    if(Number(row['Amount (fund ccy)']) === 0)
-        return {
-            isValid: false,
-            remark: 'Amount cannot be 0'
-        };
-
-    if((['', 'null', 'undefined'].indexOf(String(row['Fund Hedging']).trim()) === -1) && (refOptions.fundHedgings.indexOf(String(row['Fund Hedging']).trim()) === -1)){
-        return {
-            isValid: false,
-            remark: `Fund Hedging '${String(row['Fund Hedging'])}' not in range`
-        };
-    }
-
-    if((['', 'null', 'undefined'].indexOf(String(row['Fund Currency']).trim()) === -1) && (refOptions.fundCcys.indexOf(String(row['Fund Currency']).trim()) === -1)){
-        return {
-            isValid: false,
-            remark: `Fund Currency '${String(row['Fund Currency'])}' not in range`
-        };
-    }
-
-    if((['', 'null', 'undefined'].indexOf(String(row['Capital Type']).trim()) === -1) && (refOptions.capitalTypes.indexOf(String(row['Capital Type']).trim()) === -1)){
-        return {
-            isValid: false,
-            remark: `Capital Type '${String(row['Capital Type'])}' not in range`
-        };
-    }
-
-    if((['', 'null', 'undefined'].indexOf(String(row['Capital Subtype']).trim()) === -1) && (refOptions.capitalSubTypes.indexOf(String(row['Capital Subtype']).trim()) === -1)){
-        return {
-            isValid: false,
-            remark: `Capital Subtype '${String(row['Capital Subtype'])}' not in range`
-        };
-    }
-
-
-    if((['', 'null', 'undefined'].indexOf(String(row['Wso Issuer ID']).trim()) !== -1)){
-        if(['Investment', 'Income'].indexOf(String(row['Capital Subtype']).trim()) !== -1){
-            // Subtype is 'Investment', 'Income' && WSOIssuerID is null
-            return {
-                isValid: false,
-                remark: `WSOIssuerID cannot be empty for subtype '${String(row['Capital Subtype'])}'`
-            };  
+            // 'Issuer Short Name(optional)', 
+            'Asset (optional)',
+            'Narative (optional)', 
+            // 'Wso Issuer ID', 
+            'Wso Asset ID',
+            'Fund Currency'
+        ].indexOf(actualCols[i]) === -1){
+            invalidMsg += (invalidMsg === '') ? `${actualCols[i]} cannot be empty` :  `, ${actualCols[i]} cannot be empty`;
         }
     }
-    
-    if((['', 'null', 'undefined'].indexOf(String(row['Action']).trim()) === -1) && (['ADD', 'UPDATE'].indexOf(String(row['Action']).trim()) === -1)){
-        return {
-            isValid: false,
-            remark: `Action '${String(row['Action'])}' not in range`
-        };
+}
+
+export function validateRowValueRange(row: any): void{
+    if(Number(new Date(moment(row['Cash Flow Date']).format('YYYY-MM-DD')).getFullYear) < 2012){
+        invalidMsg += (invalidMsg === '') ? '' : ','
+        invalidMsg += ` Cashflow date cannot be < 2012`
+    }
+
+    if(Number(new Date(moment(row['Call Date']).format('YYYY-MM-DD')).getFullYear) < 2012){
+        invalidMsg += (invalidMsg === '') ? '' : ','
+        invalidMsg += ` Calldate cannot be < 2021`
+    }
+
+    if(Number(row['Amount']) === 0){
+        invalidMsg += (invalidMsg === '') ? '' : ','
+        invalidMsg += ` Amount cannot be 0`
+    }
+
+    if(Number(row['GIR (Pos - Fund ccy)']) <= 0){
+        invalidMsg += (invalidMsg === '') ? '' : ','
+        invalidMsg += ` GIR should be > 0`
+    }
+        
+    if(!!row['Fund Hedging'] && (refOptions.fundHedgings.indexOf(String(row['Fund Hedging']).trim()) === -1)){
+        invalidMsg += (invalidMsg === '') ? '' : ','
+        invalidMsg += ` Fund Hedging ${String(row['Fund Hedging'])} not in range`
     }
 
 
+    if(!!row['Fund Currency'] && (refOptions.fundCcys.indexOf(String(row['Fund Currency']).trim()) === -1)){
+        invalidMsg += (invalidMsg === '') ? '' : ','
+        invalidMsg += ` Fund Currnecy ${String(row['Fund Currency'])} not in range`
+    }
 
-    return {
-        isValid: true
-    };
+    // Set(posCcy) = Set(fundCcy)
+
+    if(!!row['Position Currency'] && (refOptions.fundCcys.indexOf(String(row['Position Currency']).trim()) === -1)){
+        invalidMsg += (invalidMsg === '') ? '' : ','
+        invalidMsg += ` Position Currency ${String(row['Position Currency'])} not in range`
+    }
+
+    if(!!row['Capital Type'] && (refOptions.capitalTypes.indexOf(String(row['Capital Type']).trim()) === -1)){     
+        invalidMsg += (invalidMsg === '') ? '' : ','
+        invalidMsg += ` Capital type ${String(row['Capital Type'])} not in range`
+    }
+
+    if(!!row['Capital Subtype'] && (refOptions.capitalSubTypes.indexOf(String(row['Capital Subtype']).trim()) === -1)){
+        invalidMsg += (invalidMsg === '') ? '' : ','
+        invalidMsg += ` Capital Subtype ${String(row['Capital Subtype'])} not in range`
+    }
+
+    if(!!row['Wso Asset ID'] && (refOptions.wsoAssetIDs.indexOf(parseInt(row['Wso Asset ID'])) === -1)){
+        invalidMsg += (invalidMsg === '') ? '' : ','
+        invalidMsg += ` Wso Asset ID '${String(row['Wso Asset ID'])}' doesn't exist.`
+    }
+
+    // Subtype is 'Investment', 'Income' && WsoIssuerID is null
+    
+    // if(!row['Wso Issuer ID']){
+    //     if(['Investment', 'Income'].indexOf(String(row['Capital Subtype']).trim()) !== -1){
+    //         return {
+    //             isValid: false,
+    //             remark: `Wso Issuer ID cannot be empty for subtype '${String(row['Capital Subtype'])}'`
+    //         };  
+    //     }
+    // }
     
 }
 
 
 
-export function validateRow(row: any): {isValid: boolean, remark?: string} {
-    //Check if year(date) >= 2012
-    let emptinessVal = validateRowForEmptiness(row);
-    if(!emptinessVal.isValid){
-        return emptinessVal;
-    }
-
-    let rangeVal = validateRowValueRange(row);
-    return rangeVal;
+export function validateRow(row: any):void {
+    validateRowForEmptiness(row);
+    validateRowValueRange(row);
 }
 
 export function validateExcelRows(rows: any[], ref: {capitalTypes: string[], capitalSubTypes: string[], refData: any}): {isValid: boolean, invalidRows?: {row: any, remark: string}[]} {
@@ -133,13 +131,14 @@ export function validateExcelRows(rows: any[], ref: {capitalTypes: string[], cap
     
     let invalidRows: any[] = [];
 
-    for(let i:number = 0; i < rows.length; i+=1){
-        let res = validateRow(rows[i]);
-
-        if(res.isValid)
+    for(let i:number = 0; i < rows.length; i+=1){ 
+        invalidMsg = ''
+        validateRow(rows[i]);
+ 
+        if(invalidMsg === '')
             continue;
         else
-            invalidRows.push({row: rows[i], remark: res.remark});
+            invalidRows.push({row: rows[i], remark: invalidMsg});
     }
     
     if(invalidRows === [])

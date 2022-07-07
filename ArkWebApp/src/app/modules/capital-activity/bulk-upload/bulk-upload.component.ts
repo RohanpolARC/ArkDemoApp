@@ -33,6 +33,7 @@ import {
 import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 
 import { validateColumns, validateExcelRows } from './validation';
+import { DataService } from 'src/app/core/services/data.service';
 
 @Component({
   selector: 'app-bulk-upload',
@@ -90,29 +91,53 @@ export class BulkUploadComponent implements OnInit {
   isFailure: boolean;
   disableSubmit: boolean;
 
+  tooltipShowDelay:number = 0;
+  
   constructor(public dialogRef: MatDialogRef<BulkUploadComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialog: MatDialog,
     private capitalActivityService: CapitalActivityService, 
-    private msalService: MsalUserService,
+    private dataService: DataService,
     private httpClient: HttpClient) { }
 
   columnDefs: ColDef[] = [
+    {field: 'Cash Flow Date', maxWidth: 150, valueFormatter: dateFormatter, allowedAggFuncs: ['Min', 'Max']},
+    {field: 'Call Date', maxWidth: 150, valueFormatter: dateFormatter, allowedAggFuncs: ['Min', 'Max']},
     {field: 'Fund Hedging', maxWidth: 150},
-    {field: 'Cash Flow Date', maxWidth: 150, valueFormatter: dateFormatter},
+    {field: 'Fund Currency', headerName: 'Fund Ccy', maxWidth: 150},
+    {field: 'Position Currency', headerName: 'Position Ccy', maxWidth: 150},
+    {field: 'GIR (Pos - Fund ccy)', headerName: 'GIR (Pos -> Fund)', maxWidth: 300,  allowedAggFuncs: ['sum', 'avg', 'first', 'last', 'count', 'min', 'max']},    
+    {field: 'Amount', headerName: 'Amount', maxWidth: 150, cellClass: 'ag-right-aligned-cell', valueFormatter: amountFormatter, allowedAggFuncs: [ 'sum', 'avg', 'first', 'last', 'count', 'min', 'max']},
     {field: 'Capital Type', maxWidth: 150},
-    {field: 'Capital Subtype', maxWidth: 150},
-    {field: 'Fund Currency', maxWidth: 100},
-    {field: 'Amount (fund ccy)', headerName: 'Amount', maxWidth: 150, cellClass: 'ag-right-aligned-cell', valueFormatter: amountFormatter},
-    {field: 'Wso Issuer ID', headerName: 'WSO Issuer ID'},
-    {field: 'Issuer Short Name(optional)', headerName: 'Issuer Short Name'},
+    {field: 'Capital Subtype', maxWidth: 170},
+    // {field: 'Wso Issuer ID', headerName: 'WSO Issuer ID'},
+    // {field: 'Issuer Short Name(optional)', headerName: 'Issuer Short Name'},
+    {field: 'Wso Asset ID', headerName: 'WSO Asset ID'},
     {field: 'Asset (optional)', maxWidth: 150, headerName: 'Asset'},
     {field: 'Narative (optional)', maxWidth: 150, headerName: 'Narrative'},
-    {field: 'remark', maxWidth: 500},
-    {field: '_COLUMN_TITLE', headerName: 'Column', maxWidth: 300},
+    {field: 'remark', width: 500, tooltipField: 'remark'},
+    {field: '_COLUMN_TITLE', headerName: 'Col', maxWidth: 100},
     // {field: 'Action', maxWidth: 150}
   ]
    
+  aggFuncs = {
+    'Min': params => {
+      let minDate = new Date(8640000000000000);
+      params.values.forEach(value => {
+        if(value < minDate)
+          minDate = value
+      })
+      return minDate
+    },
+    'Max': params => {
+      let maxDate = new Date(-8640000000000000);
+      params.values.forEach(value => {
+        if(value > maxDate)
+          maxDate = value
+      })
+      return maxDate
+    } 
+  }
   bulkRowData = [];
   invalidRowData = [];
 
@@ -122,19 +147,18 @@ export class BulkUploadComponent implements OnInit {
     let bulkUploadData: CapitalActivityModel[] = this.makeBulkCapitalActivity();
     this.subscriptions.push(this.capitalActivityService.bulkPutCapitalActivity(bulkUploadData).subscribe({
       next : response =>{
-        this.disableSubmit = true;
-        this.updateMsg = "Capital Activity(s) added";
-        this.isSuccess = true;
-        this.isFailure = false;
-
         if(response.isSuccess){
-          addToGrid(this.data.adaptableApiInvestor, bulkUploadData, response.data, 'capitalID');
+          this.disableSubmit = true;
+          this.updateMsg = `Capital Activity(s) Inserted (${response.data[0].value}), Updated (${response.data[1].value})`;
+          this.isSuccess = true;
+          this.isFailure = false;
+          return;
         }
-        else console.error("Failed to add capital activities");
+        else console.error("Failed to add/update capital activities");
       },
       error: error => {
         this.disableSubmit = false;
-        this.updateMsg = "Failed to bulk add capital activities";
+        this.updateMsg = "Failed to bulk add/update capital activities";
         this.isSuccess = false;
         this.isFailure = true;
 
@@ -156,20 +180,25 @@ export class BulkUploadComponent implements OnInit {
 
     let model = <CapitalActivityModel>{};
     model.valueDate = new Date(moment(obj['Cash Flow Date'], 'DD/MM/YYYY').format('YYYY-MM-DD'))
-    model.callDate = new Date(moment(obj['Cash Flow Date'], 'DD/MM/YYYY').format('YYYY-MM-DD'))
+    model.callDate = new Date(moment(obj['Call Date'], 'DD/MM/YYYY').format('YYYY-MM-DD'))
     model.narrative = obj['Narative (optional)'];
     model.capitalType = obj['Capital Type'];
     model.capitalSubType = obj['Capital Subtype'];
     model.fundHedging = obj['Fund Hedging'];
-    model.totalAmount = Number(obj['Amount (fund ccy)']);
-    model.issuerShortName = obj['Issuer Short Name(optional)'];
+    model.totalAmount = Number(obj['Amount']);
+    // model.issuerShortName = obj['Issuer Short Name(optional)'];
     model.asset = obj['Asset (optional)'];
     model.fundCcy = obj['Fund Currency'];
-    model.wsoIssuerID = obj['Wso Issuer ID'];
-//    model.action = obj['Action'];
+    // model.wsoIssuerID = Number(obj['Wso Issuer ID']);
+    // model.action = obj['Action'];
 
-    model.createdBy = model.modifiedBy = this.msalService.getUserName();
+    model.wsoAssetID = Number(obj['Wso Asset ID']);
+    model.posCcy = obj['Position Currency'];
+    model.fxRate = Number(obj['GIR (Pos - Fund ccy)']);
+    model.createdBy = model.modifiedBy = this.dataService.getCurrentUserName();
     model.createdOn = model.modifiedOn = new Date();
+    model.source = 'ArkUI - template';
+    model.sourceID = 3;
     return model;    
   }
 
@@ -184,7 +213,9 @@ export class BulkUploadComponent implements OnInit {
         AdaptableToolPanel: AdaptableToolPanelAgGridComponent
       },
       columnDefs: this.columnDefs,
-      allowContextMenuWithControlKey:true
+      allowContextMenuWithControlKey:true,
+      rowGroupPanelShow: 'always',
+      aggFuncs: this.aggFuncs
     }
 
     this.updateMsg = null;
@@ -192,23 +223,59 @@ export class BulkUploadComponent implements OnInit {
     this.disableSubmit = true;
   }
 
+  async getSharedEntities(adaptableId){
+    return new Promise(resolve => {
+      this.subscriptions.push(this.dataService.getAdaptableState(adaptableId).subscribe({
+        next: state => {
+          try {
+
+            state = state.split('|').join('"')
+            resolve(JSON.parse(state) ||'[]')
+          } catch (e) {
+            console.log("Failed to parse")
+            resolve([])
+          }
+        }
+      }));
+    })
+  }
+
+  async setSharedEntities(adaptableId, sharedEntities): Promise<void>{
+
+    return new Promise(resolve => {
+      this.subscriptions.push(
+        this.dataService.saveAdaptableState(adaptableId, JSON.stringify(sharedEntities).replace(/"/g,'|')).subscribe({
+        next: data => {
+          resolve();
+        }
+      }));
+    })
+  }
+
   public adaptableOptions: AdaptableOptions = {
     autogeneratePrimaryKey: true,
      primaryKey:'',
-     userName: 'TestUser',
-     adaptableId: "",
-     adaptableStateKey: `Bulk Update Key`,
+     userName: this.dataService.getCurrentUserName(),
+     adaptableId: "Capital Activity - Bulk Upload",
+     adaptableStateKey: `Bulk Upload Key`,
  
      toolPanelOptions: {
        toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
      },
      
+     teamSharingOptions: {
+      enableTeamSharing: true,
+      setSharedEntities: this.setSharedEntities.bind(this),
+      getSharedEntities: this.getSharedEntities.bind(this)
+
+    },
 
      predefinedConfig: {
        Dashboard: {
-         ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
+         ModuleButtons: ['TeamSharing', 'Export', 'Layout','ConditionalStyle'],
          IsCollapsed: true,
          Tabs: [],
+         DashboardTitle: ' '
        },
        FormatColumn: {
         FormatColumns: [
@@ -227,17 +294,21 @@ export class BulkUploadComponent implements OnInit {
          Layouts: [{
            Name: 'Bulk Grid',
            Columns: [
-             'Fund Hedging',
-             'Cash Flow Date',
-             'Capital Type',
-             'Capital Subtype',
-             'Fund Currency',
-             'Amount (fund ccy)',
-             'Wso Issuer ID',
-             'Issuer Short Name(optional)',
-             'Asset (optional)',
-             'Narative (optional)',
-             '_COLUMN_TITLE',
+            'Cash Flow Date',
+            'Call Date',
+            'Fund Hedging',
+            'Fund Currency',
+            'Position Currency',
+            'GIR (Pos - Fund ccy)',
+            'Amount',
+            'Capital Type',
+            'Capital Subtype',
+          //  'Wso Issuer ID',
+          //  'Issuer Short Name(optional)',
+            'Wso Asset ID',
+            'Asset (optional)',
+            'Narative (optional)',
+            '_COLUMN_TITLE',
            ],
            PinnedColumnsMap: {
             _COLUMN_TITLE: 'left'
@@ -250,14 +321,18 @@ export class BulkUploadComponent implements OnInit {
          {
            Name: 'Invalid Excel Grid',
            Columns: [
-            'Fund Hedging',
             'Cash Flow Date',
+            'Call Date',
+            'Fund Hedging',
+            'Fund Currency',
+            'Position Currency',
+            'GIR (Pos - Fund ccy)',
+            'Amount',
             'Capital Type',
             'Capital Subtype',
-            'Fund Currency',
-            'Amount (fund ccy)',
-            'Wso Issuer ID',
-            'Issuer Short Name(optional)',
+          //  'Wso Issuer ID',
+          //  'Issuer Short Name(optional)',
+            'Wso Asset ID',
             'Asset (optional)',
             'Narative (optional)',
             'remark',
@@ -352,6 +427,14 @@ export class BulkUploadComponent implements OnInit {
 
        let extractedCols: string[] = rawTransposed[0];
 
+       for(let i = 1; i < rawTransposed.length; i++){       // Skipping header's row
+         for(let j = 0; j < rawTransposed[i].length; j++){
+           if(['GIR (Pos - Fund ccy)', 'Amount'].includes(rawTransposed[0][j])){
+             rawTransposed[i][j] = parseFloat(String(rawTransposed[i][j]).replace(/,/g,''));      // Remove commas, blanks from number read from excel
+           }
+         }
+       }
+
       if(validateColumns(extractedCols).isValid){
         
         let wb = XLSX.utils.book_new()
@@ -360,6 +443,13 @@ export class BulkUploadComponent implements OnInit {
         XLSX.utils.book_append_sheet(wb, ws, "Capital Activity");
 
         let jsonRowData = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]).filter(row => row['Cash Flow Date'] !== undefined && row['Cash Flow Date'] !== null);
+
+        for(let i:number = 0; i < jsonRowData.length; i+=1){
+          jsonRowData[i]['Amount'] = parseFloat(jsonRowData[i]['Amount'])
+          jsonRowData[i]['Call Date'] = moment(jsonRowData[i]['Call Date'], 'DD/MM/YYYY').toDate()
+          jsonRowData[i]['Cash Flow Date'] = moment(jsonRowData[i]['Cash Flow Date'], 'DD/MM/YYYY').toDate()
+          jsonRowData[i]['GIR (Pos - Fund ccy)'] = parseFloat(jsonRowData[i]['GIR (Pos - Fund ccy)'])
+        }
 
         for(let i:number = 0; i < jsonRowData.length; i+=1){
           jsonRowData[i]['_COLUMN_TITLE'] = getColumnTitle(i+2);
@@ -378,7 +468,7 @@ export class BulkUploadComponent implements OnInit {
           this.invalidRowData = [];
           this.isValid = true;  
           this.disableSubmit = false;
-          this.adapTableApi.layoutApi.setLayout('Bulk Grid');
+          this.adapTableApi?.layoutApi.setLayout('Bulk Grid');
         }
         else{
           this.bulkRowData = [];
@@ -419,6 +509,10 @@ export class BulkUploadComponent implements OnInit {
       this.readFile(this.selectedFile);
     }
       
+  }
+
+  closeDialog(): any{
+    this.dialogRef.close({isSuccess: this.isSuccess})
   }
 
 }

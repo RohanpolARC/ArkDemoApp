@@ -1,4 +1,4 @@
-* {
+:host {
     padding: 0;
     margin: 0;
     font-size: 62.5% /* = 10px*/;
@@ -97,4 +97,8 @@
   .accordion-headers .mat-expansion-panel-header-description {
     justify-content: space-between;
     align-items: center;
+  }
+
+  .tooltip-capital{
+    font-size: 1rem;
   }

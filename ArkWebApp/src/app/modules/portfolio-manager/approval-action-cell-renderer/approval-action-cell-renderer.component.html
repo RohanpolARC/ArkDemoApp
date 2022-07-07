@@ -1,0 +1,40 @@
+
+<ng-container *ngIf="params.node.data?.state === 'Requested' && ['Pending', 'Rejected'].includes(params.node.data?.status)">
+
+    <span *ngIf="!(componentParent.getSelectedRowID() === params.node.rowIndex)"
+        (click)="onEditClick()"
+        matTooltip="Edit">
+        <mat-icon class="edit">edit</mat-icon>
+    </span>
+
+    <span *ngIf="(componentParent.getSelectedRowID() === params.node.rowIndex)"
+        (click)="onSave()">
+        <mat-icon class="save">save</mat-icon>
+    </span>
+
+    <span *ngIf="(componentParent.getSelectedRowID() === params.node.rowIndex)"
+        (click)="undoEdit()">
+        <mat-icon class="undo">cancel</mat-icon>
+    </span>
+
+</ng-container>
+
+<ng-container *ngIf="componentParent.access.approvalAccess">
+    <ng-container *ngIf="!(componentParent.getSelectedRowID() === params.node.rowIndex)">
+        <ng-container *ngIf="!params.node.group && params.node.data?.state === 'Requested' && params.node.data?.status === 'Pending'">
+    
+            <span
+                (click)="onAction('approve')"
+                matTooltip="Approve">
+                <mat-icon class="approve" >done</mat-icon>
+            </span>
+    
+            <span
+                (click)="onAction('reject')"
+                matTooltip="Reject">
+                <mat-icon class="reject" >close</mat-icon>
+            </span>
+    
+        </ng-container>
+    </ng-container>
+</ng-container>
