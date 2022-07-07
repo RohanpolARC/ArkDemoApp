@@ -92,11 +92,17 @@
         </mat-expansion-panel-header>
   
         <mat-list>
-          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Portfolio')" [ngStyle]="GIREditorStyle">
+          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('GIREditor')" [ngStyle]="GIREditorStyle">
             <div class="list-item-text">Going In Rates Editor</div>
           </mat-list-item>
         </mat-list>
-  
+
+        <mat-list>
+          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Portfolio Mapping')" [ngStyle]="PortfolioMappingStyle">
+            <div class="list-item-text">Portfolio Mapping</div>
+          </mat-list-item>
+        </mat-list>
+
       </mat-expansion-panel>
     </mat-accordion>
 

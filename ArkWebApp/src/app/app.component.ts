@@ -77,6 +77,7 @@ export class AppComponent {
   LiquiditySummaryStyle: any = {};
   AccessControlStyle: any = {};
   PortfolioModellerStyle: any = {};
+  PortfolioMappingStyle: any = {}
 
   constructor(private http: HttpClient,
     private dataService: DataService,
@@ -203,7 +204,7 @@ export class AppComponent {
     }
       /** If GIR Editor screen is directly loaded */
     else if(this.location.path() === '/portfolio-history'){
-      this.updateSelection('Portfolio')
+      this.updateSelection('GIREditor')
     }
       /** If Capital Activity is directly loaded */
     else if(this.location.path() === '/capital-activity'){
@@ -223,6 +224,9 @@ export class AppComponent {
     /** If IRR is direclty loaded */
     else if(this.location.path() === '/irr/portfoliomodeller'){
       this.updateSelection('Portfolio Modeller')
+    }
+    else if(this.location.path() === '/portfolio-mapping'){
+      this.updateSelection('Portfolio Mapping')
     }
     else this.updateSelection('')
   }
@@ -270,11 +274,11 @@ export class AppComponent {
     this.dataService.changeSearchTextValues(null);
     this.dataService.changeNumberField(null);
     
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle =  this.notSelectedElement;
 
     this.lastClickedTabRoute = this.location.path();
 
-    if(screen === 'Portfolio'){
+    if(screen === 'GIREditor'){
       this.GIREditorStyle = this.selectedElement;
       this.router.navigate(['/portfolio-history']);
     }
@@ -356,6 +360,10 @@ export class AppComponent {
       this.asOfDate = moment(this.getLastBusinessDay()).format('YYYY-MM-DD')
       this.filterApply();
       this.router.navigate(['/irr/portfoliomodeller'])
+    }
+    else if(screen === 'Portfolio Mapping'){
+      this.PortfolioMappingStyle = this.selectedElement
+      this.router.navigate(['/portfolio-mapping'])
     }
     else if(screen === 'Access Control'){
       this.AccessControlStyle = this.selectedElement;

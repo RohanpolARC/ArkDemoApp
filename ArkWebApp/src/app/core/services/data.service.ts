@@ -8,12 +8,20 @@ import { APIConfig } from 'src/app/configs/api-config';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { DetailedView } from 'src/app/shared/models/GeneralModel';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 @Injectable({  
     providedIn: 'root'  
 })  
 export class DataService {  
+
+    constructor(
+        private http: HttpClient, 
+        private msalService: MsalUserService,
+        public snackBar: MatSnackBar
+    ) { }  
+    
     httpOptions = {  
         headers: new HttpHeaders({  
             'Content-Type': 'application/json'  
@@ -51,8 +59,6 @@ export class DataService {
         this.numberFieldMessage.next(value);
     }
 
-    constructor(private http: HttpClient, private msalService: MsalUserService  
-    ) { }  
   
     getCurrentUserInfo(){  
        return this.msalService.getCurrentUserInfo();  
@@ -73,6 +79,10 @@ export class DataService {
             catchError((ex) => throwError(ex)));      
     }
 
+    getWSOPortfolioRef(){
+        return this.http.get<any[]>(`${APIConfig.REFDATA_GET_WSOPORTFOLIO_API}`, this.httpOptions).pipe(
+            catchError((ex) => throwError(ex)));
+    }
     getDetailedView(model: DetailedView){
         return this.http.post<any[]>(`${APIConfig.GET_DETAILED_VIEW}`, model, this.httpOptions).pipe(
             catchError((ex) => throwError(ex)));      
@@ -89,4 +99,12 @@ export class DataService {
             catchError((ex) => throwError(ex))
         );
     }
+
+    setWarningMsg(message: string, action: string, type: 'ark-theme-snackbar-normal' | 'ark-theme-snackbar-warning' | 'ark-theme-snackbar-error' | 'ark-theme-snackbar-success' = 'ark-theme-snackbar-normal'){
+        this.snackBar.open(message, action, {
+          duration: 5000,
+          panelClass: [type]
+        });
+      }
+    
 }

@@ -1,0 +1,58 @@
+<div class="parent">
+    <div class="header">
+        <div class="title">
+            Portfolio Mapping
+        </div>
+        <div class="action">
+
+        </div>
+    </div>
+
+    <div class="content">
+        <mat-card class="mat-content">
+
+            <mat-accordion>
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Pending For Approval
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+
+                        <app-approval
+                            [refreshApproval] = "refreshApproval"
+                            (refreshMappingsEvent) = "refreshMappings($event)"
+                            [access] = "accessObj"
+                        ></app-approval>                        
+                    
+    
+                </mat-expansion-panel>
+            </mat-accordion>
+    
+            <mat-accordion>
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Mappings
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <ag-grid-angular
+                        [context]="context"
+                        [rowData] = "rowData"
+                        [gridOptions] = "gridOptions"
+                        [adaptableOptions] = "adaptableOptions"
+                        [modules] = "agGridModules"
+                        (adaptableReady)="onAdaptableReady($event)"
+                        (gridReady)="onGridReady($event)"
+                        class="ag-theme-alpine ag-grid"
+                    >
+                    </ag-grid-angular> 
+    
+                </mat-expansion-panel>
+            </mat-accordion>
+
+        </mat-card>
+    </div>
+</div>
