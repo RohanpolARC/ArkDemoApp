@@ -374,6 +374,9 @@ export class PortfolioManagerComponent implements OnInit {
   ) {
     this.adapTableApi = adaptableApi;
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel()
+
+    this.portfolioMapDataSvc.mappingsAdaptableApi = adaptableApi
+
   }
 
   onGridReady(params: GridReadyEvent){
@@ -383,6 +386,8 @@ export class PortfolioManagerComponent implements OnInit {
     }
 
     this.fetchPortfolioMapping();
+
+    this.portfolioMapDataSvc.mappingsGridApi = params.api
   }
 
   fetchPortfolioMapping(){

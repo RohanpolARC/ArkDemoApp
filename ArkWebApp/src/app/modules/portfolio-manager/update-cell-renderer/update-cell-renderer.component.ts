@@ -58,7 +58,7 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
     let data = this.params.node.data
 
     if(!(data.wsoPortfolioID && data.fund && data.fundLegalEntity && data.fundHedging && data.fundStrategy && (data.fundSMA === true || data.fundSMA === false) && 
-    data.fundInvestor && data.fundCcy && data.fundAdmin && data.portfolioAUMMethod && 
+    data.fundInvestor && data.fundCcy && data.fundAdmin && data.portfolioAUMMethod && data.fundPipeline &&
     (data.isCoinvestment === true || data.isCoinvestment === false) && 
     (data.excludeFxExposure === true || data.excludeFxExposure === false))){
       this.dataSvc.setWarningMsg('Please finish editing the mapping first', 'Dismiss', 'ark-theme-snackbar-warning')

@@ -492,7 +492,7 @@ export class ApprovalComponent implements OnInit {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel()
 
-    this.portfolioMapDataSvc.mappingsAdaptableApi = adaptableApi
+    this.portfolioMapDataSvc.approvalAdaptableApi = adaptableApi
   }
 
   onGridReady(params: GridReadyEvent){
@@ -501,7 +501,7 @@ export class ApprovalComponent implements OnInit {
       componentParent: this
     }
 
-    this.portfolioMapDataSvc.mappingsGridApi = params.api;
+    this.portfolioMapDataSvc.approvalGridApi = params.api;
 
   }
 
