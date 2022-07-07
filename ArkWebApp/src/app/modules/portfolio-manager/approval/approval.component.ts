@@ -88,6 +88,13 @@ export class ApprovalComponent implements OnInit {
   getPortfolioNameParams = getPortfolioNameParams.bind(this)
   getUniqueParamsFromGrid = getUniqueParamsFromGrid.bind(this)
 
+  /**
+   * To find other node in case of state `UPDATE` and status `Pending`, to highlight it 
+   * 
+   * @param stagingID To find other node based on `stagingID`
+   * @param rowState To find other node based on `rowState`
+   * @returns `otherNode`
+   */
 
   getOtherNodeForID(stagingID: number, rowState: 'Current' | 'Requested'): any{
     let otherNode
@@ -102,8 +109,14 @@ export class ApprovalComponent implements OnInit {
     return otherNode;
   }
 
+  /**
+   * 
+   * @param col Grid column in context. Cells with `col` = `wsoPortfolioID`, `portfolioName` are not editable. Hence, no editable style is passed for them.
+   * @param params Row params used to find if the row is editable and in valid state for coloring 
+   * @returns Applicable cell style 
+   */
 
-  getPendingCellStyle(col, params) {
+  getCellStyle(col, params) {
 
     let onlyEdit = { 'border-color': '#0590ca' }
     let current = { 'background-color': 'rgb(253,100,100)' }
@@ -150,6 +163,12 @@ export class ApprovalComponent implements OnInit {
     return null
   }
 
+  /**
+   * NOT IN USE as not allowing edit for `wsoPortfolioID`, `portfolioName` on approval grid.
+   * 
+   * To validate & update entered `wsoPortfolioID`, `portfolioName`.
+   * @param params Cell params to validate updated cell
+   */
   validateAndUpdate(params: CellValueChangedEvent){
 
     let wsoRef = this.portfolioMapDataSvc.getWSOPortfolioRef()
@@ -184,6 +203,8 @@ export class ApprovalComponent implements OnInit {
       this.validateAndUpdate(params)    
     }
 
+    // Refreshing cells after every value change on the grid
+
     this.gridOptions?.api?.refreshCells({
       force: true,
       suppressFlash: true
@@ -200,126 +221,126 @@ export class ApprovalComponent implements OnInit {
       { field: 'status', type: 'abColDefString', filter: true},
       { field: 'actionType', type: 'abColDefString'},
       { field: 'fund', type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'fund'),
+        cellStyle: this.getCellStyle.bind(this, 'fund'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fund'),
       },
       { field: "fundLegalEntity", type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'fundLegalEntity'),
+        cellStyle: this.getCellStyle.bind(this, 'fundLegalEntity'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundLegalEntity'),
       },
       { field: "fundHedging", type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'fundHedging'),
+        cellStyle: this.getCellStyle.bind(this, 'fundHedging'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundHedging'),
       },
       { field: "fundStrategy", type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'fundStrategy'),
+        cellStyle: this.getCellStyle.bind(this, 'fundStrategy'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundStrategy'),
       },
       { field: "fundPipeline2", type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'fundPipeline2'),
+        cellStyle: this.getCellStyle.bind(this, 'fundPipeline2'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundPipeline2'),
 
       },
       { field: "fundSMA", type: 'abColDefBoolean',
-        cellStyle: this.getPendingCellStyle.bind(this, 'fundSMA'),
+        cellStyle: this.getCellStyle.bind(this, 'fundSMA'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundSMA'),
 
       },
       { field: "fundInvestor", type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'fundInvestor'),
+        cellStyle: this.getCellStyle.bind(this, 'fundInvestor'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundInvestor'),
 
       },
       { field: "wsoPortfolioID", type: 'abColDefNumber',
-        cellStyle: this.getPendingCellStyle.bind(this, 'wsoPortfolioID'),
+        cellStyle: this.getCellStyle.bind(this, 'wsoPortfolioID'),
         // editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'wsoPortfolioID'),
 
       },
       { field: "portfolioName", type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'portfolioName'),
+        cellStyle: this.getCellStyle.bind(this, 'portfolioName'),
         // editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'portfolioName'),
 
       },
       { field: "solvencyPortfolioName",  type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'solvencyPortfolioName'),
+        cellStyle: this.getCellStyle.bind(this, 'solvencyPortfolioName'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'solvencyPortfolioName'),
 
       },
       { field: "fundPipeline",  type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'fundPipeline'),
+        cellStyle: this.getCellStyle.bind(this, 'fundPipeline'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundPipeline'),
 
       },
       { field: "fundCcy",  type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'fundCcy'),
+        cellStyle: this.getCellStyle.bind(this, 'fundCcy'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundCcy'),
 
       },
       { field: "fundAdmin",  type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'fundAdmin'),
+        cellStyle: this.getCellStyle.bind(this, 'fundAdmin'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundAdmin'),
 
       },
       { field: "portfolioAUMMethod",  type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'portfolioAUMMethod'),
+        cellStyle: this.getCellStyle.bind(this, 'portfolioAUMMethod'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'portfolioAUMMethod'),
 
       },
       { field: "fundRecon",  type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'fundRecon'),
+        cellStyle: this.getCellStyle.bind(this, 'fundRecon'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'fundRecon'),
 
       },
       { field: "legalEntityName",  type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'legalEntityName'),
+        cellStyle: this.getCellStyle.bind(this, 'legalEntityName'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'legalEntityName'),
       },
       { field: "lei", headerName: 'LEI',  type: 'abColDefString',
-        cellStyle: this.getPendingCellStyle.bind(this, 'lei'),
+        cellStyle: this.getCellStyle.bind(this, 'lei'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'lei'),
       },
       { field: "isCoinvestment",  type: 'abColDefBoolean',
-        cellStyle: this.getPendingCellStyle.bind(this, 'isCoinvestment'),
+        cellStyle: this.getCellStyle.bind(this, 'isCoinvestment'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'isCoinvestment'),
       },
       { field: "excludeFxExposure", type: 'abColDefBoolean',
-        cellStyle: this.getPendingCellStyle.bind(this, 'excludeFxExposure'),
+        cellStyle: this.getCellStyle.bind(this, 'excludeFxExposure'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'excludeFxExposure'),
@@ -337,8 +358,6 @@ export class ApprovalComponent implements OnInit {
       enableValue: true,
       enableRowGroup: true,
       enablePivot: false,
-      // sortable: true,
-      // filter: true,
       autosize:true,
       floatingFilter: false
     }
@@ -407,7 +426,7 @@ export class ApprovalComponent implements OnInit {
         },  
 
         Layout: {
-          Revision: 17,
+          Revision: 18,
           CurrentLayout: 'Default Approval Layout',
           Layouts: [{
             Name: 'Default Approval Layout',
@@ -445,7 +464,7 @@ export class ApprovalComponent implements OnInit {
               action: 'right'
             },
             ColumnWidthMap:{
-              action: 150,
+              action: 170,
             },
             RowGroupedColumns: ['actionType', 'status', 'portfolioName']            
 
@@ -488,6 +507,9 @@ export class ApprovalComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges){
 
+    
+    //To refresh approval grid, when something changes on the mappings grid
+    
     if(changes.refreshApproval){
       this.fetchPortfolioMappingStaging();
     }

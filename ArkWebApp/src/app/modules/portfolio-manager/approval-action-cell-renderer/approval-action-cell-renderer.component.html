@@ -4,17 +4,17 @@
     <span *ngIf="!(componentParent.getSelectedRowID() === params.node.rowIndex)"
         (click)="onEditClick()"
         matTooltip="Edit">
-        <mat-icon [ngStyle]="{'margin-left': '10px', color:'#285170','cursor':'pointer'}" >edit</mat-icon>
+        <mat-icon class="edit">edit</mat-icon>
     </span>
 
     <span *ngIf="(componentParent.getSelectedRowID() === params.node.rowIndex)"
         (click)="onSave()">
-        <mat-icon [ngStyle]="{'margin-left': '10px', color:'#0590ca','cursor':'pointer'}">save</mat-icon>
+        <mat-icon class="save">save</mat-icon>
     </span>
 
     <span *ngIf="(componentParent.getSelectedRowID() === params.node.rowIndex)"
         (click)="undoEdit()">
-        <mat-icon [ngStyle]="{'margin-left':'10px',color:'#102439','cursor':'pointer'}">cancel</mat-icon>
+        <mat-icon class="undo">cancel</mat-icon>
     </span>
 
 </ng-container>
@@ -26,13 +26,13 @@
             <span
                 (click)="onAction('approve')"
                 matTooltip="Approve">
-                <mat-icon [ngStyle]="{'margin-left': '10px', color:'green','cursor':'pointer'}" >done</mat-icon>
+                <mat-icon class="approve" >done</mat-icon>
             </span>
     
             <span
                 (click)="onAction('reject')"
                 matTooltip="Reject">
-                <mat-icon [ngStyle]="{'margin-left': '10px', color:'red','cursor':'pointer'}" >close</mat-icon>
+                <mat-icon class="reject" >close</mat-icon>
             </span>
     
         </ng-container>

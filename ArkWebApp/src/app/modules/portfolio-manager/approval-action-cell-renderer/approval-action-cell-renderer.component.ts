@@ -38,7 +38,11 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
     private dialog:MatDialog
   ) { }
 
-
+/**
+ * When user confirms the action of `approve` or `reject`. This makes a request to save the requested action
+ * @param action `approve` or `reject`
+ * @param remark based on action, if any
+ */
   onConfirm(action: 'approve' | 'reject', remark: string){
 
     let model: PortfolioMappingApproval = <PortfolioMappingApproval>{};
@@ -93,6 +97,9 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
   }
 
   onEditClick() {
+
+    // Checks if user has edit access on approval grid, received from portfolio mapping as @Input() to approval grid component
+
     if(this.componentParent.access.editOnApproval){
       this.startEditing();
     }
@@ -105,7 +112,8 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
     if(this.componentParent.getSelectedRowID() === null){
       this.componentParent.setSelectedRowID(this.params.node.rowIndex);
 
-            // getRowNode().data returns references to the cell, so update in grid gets reflected here, JSON.parse(JSON.stringify()) just creates the copy of the object data, instead of reference.
+    // getRowNode().data returns references to the cell, so update in grid gets reflected here, JSON.parse(JSON.stringify()) just creates the copy of the object data, instead of reference.
+
       this.originalRowNodeData = JSON.parse(JSON.stringify(this.params.api.getRowNode(this.params.node.id).data));
       this.originalRowNodeID = this.params.node.id;
     }
@@ -119,6 +127,8 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
   onSave(){
     let data = this.params.node.data
 
+    // Check if the mapping is incomplete
+
     if(!(data.wsoPortfolioID && data.fund && data.fundLegalEntity && data.fundHedging && data.fundStrategy && (data.fundSMA === true || data.fundSMA === false) && 
     data.fundInvestor && data.fundCcy && data.fundAdmin && data.portfolioAUMMethod && 
     (data.isCoinvestment === true || data.isCoinvestment === false) && 
@@ -127,6 +137,8 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
       return
     }
 
+    // Check if mapping has been changed
+    
     if(JSON.stringify(data) === JSON.stringify(this.originalRowNodeData)){
       this.dataSvc.setWarningMsg('No change in mapping', 'Dismiss', 'ark-theme-snackbar-warning')
       return

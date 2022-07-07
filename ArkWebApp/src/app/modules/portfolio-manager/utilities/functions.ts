@@ -2,6 +2,14 @@ import { AdaptableApi } from "@adaptabletools/adaptable-angular-aggrid";
 import { CellValueChangedEvent, GridApi } from "@ag-grid-community/all-modules";
 import { PortfolioMappingDataService } from "src/app/core/services/PortfolioManager/portfolio-mapping-data.service";
 
+/**
+ * Returns live Ag-grid data
+ * 
+ * Uses provided gridApi callback to iterate through live data
+ * 
+ * @param gridApi Ag-grid api
+ * @returns Live grid data
+ */
 export function getGridData(gridApi: GridApi){
     let liveData: any[] = []
     gridApi.forEachLeafNode(node => {
@@ -9,6 +17,16 @@ export function getGridData(gridApi: GridApi){
     })
     return liveData;
 }
+
+/**
+ * Validing updated `wsoPortfolioID`, `portfolioName`.
+ * 
+ * Make sure `DataService` has been imported as `dataSvc` in order to get appropriate validation snackbar messages.
+ * 
+ * @param portfolioMapDataSvc Portfolio Mapping Data Service (Provides `wsoPortfolioRef`, `adaptableApi` in context etc).
+ * @param toUpdateGrid Grid on which editing changes are happening on (`Mappings` or `Approval`). i.e. This grid will have data changes applied to it based on the validation result. 
+ * @param params Ag-grid params of cell that has been updated.
+ */
 
 export function validateAndUpdate(
   portfolioMapDataSvc: PortfolioMappingDataService,
@@ -117,10 +135,21 @@ export function getPortfolioNameParams(){
   }
 }
 
+/**
+ * For mappings grid only.
+ * 
+ * Finds unique values available for that particular `field`.
+ * 
+ * Make sure that `PortfolioMappingDataService` has been imported as `portfolioMapDataSvc` in the calling component
+ * 
+ * @param field Column for which we need to find unique values.
+ * @returns all truthy unique values from the supplied ag-grid field.
+ */
 export function getUniqueParamsFromGrid(field: string){
   return {
     options: [...new Set(getGridData(this.portfolioMapDataSvc.mappingsGridApi).map(e => 
       {
+        // Removes all blank spaces from string values
         if(typeof e[field] === 'string')
           return String(e[field]).replace(/\s/g,'')
         else return e[field]
