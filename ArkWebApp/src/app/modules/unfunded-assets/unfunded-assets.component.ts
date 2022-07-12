@@ -4,6 +4,7 @@ import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule,
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
+import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
 import { amountFormatter, dateFormatter, dateTimeFormatter } from 'src/app/shared/functions/formatter';
@@ -18,6 +19,7 @@ import { EditorFormComponent } from './editor-form/editor-form.component';
 })
 export class UnfundedAssetsComponent implements OnInit {
 
+  isWriteAccess: boolean
   subscriptions: Subscription[] = []
   assetFundingDetails: any[]
   rowData: any[]
@@ -43,11 +45,20 @@ export class UnfundedAssetsComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     private unfundedAssetsSvc: UnfundedAssetsService,
-    private dataSvc: DataService
+    private dataSvc: DataService,
+    private accessSvc: AccessService
   ) { }
 
   ngOnInit(): void {
-    
+
+    this.isWriteAccess = false;
+    for(let i: number = 0; i < this.accessSvc.accessibleTabs?.length; i+= 1){
+      if(this.accessSvc.accessibleTabs[i].tab === 'Unfunded Assets' && this.accessSvc.accessibleTabs[i].isWrite){
+        this.isWriteAccess = true
+        break;
+      }        
+    }
+
     this.fetchAssetFundingDetails();
 
     this.columnDefs = [
@@ -192,9 +203,16 @@ export class UnfundedAssetsComponent implements OnInit {
 
   openDialog(rowData = null){
 
+    // Check isWrite Access
+    
+    if(!this.isWriteAccess){
+      this.dataSvc.setWarningMsg('No access', 'Dismiss', 'ark-theme-snackbar-warning')
+      return;
+    }
+
     const dialogRef = this.dialog.open(EditorFormComponent, {
       maxHeight: '90vh',
-      width: '80vw',
+      width: '60vw',
       maxWidth: '1200px',
       minWidth: '400px',
       data: {
