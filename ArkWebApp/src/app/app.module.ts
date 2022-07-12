@@ -43,6 +43,7 @@ import { AccessControlComponent } from './shared/components/access-control/acces
 import { MatSelectModule } from '@angular/material/select';
 import { IrrCalculationModule } from './modules/irr-calculation/irr-calculation.module';
 import { PortfolioManagerModule } from './modules/portfolio-manager/portfolio-manager.module';
+import { AmountInputDirective } from './shared/directives/amount-input.directive';
 
 export const protectedResourceMap: any =  
   [  
@@ -52,7 +53,7 @@ export const protectedResourceMap: any =
   
 @NgModule({  
   declarations: [  
-    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent
+    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent, AmountInputDirective
   ],  
   imports: [  
     MsalModule.forRoot({  

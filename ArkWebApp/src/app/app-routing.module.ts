@@ -115,6 +115,10 @@ const routes: Routes = [
       tab: 'Portfolio Mapping'
     }
   },
+  { path: 'unfunded-assets', 
+    loadChildren: () => 
+    import('./modules/unfunded-assets/unfunded-assets.module').then(m => m.UnfundedAssetsModule) 
+  },
 ];
 
 @NgModule({  
