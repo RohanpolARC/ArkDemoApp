@@ -77,7 +77,8 @@ export class AppComponent {
   LiquiditySummaryStyle: any = {};
   AccessControlStyle: any = {};
   PortfolioModellerStyle: any = {};
-  PortfolioMappingStyle: any = {}
+  PortfolioMappingStyle: any = {};
+  UnfundedAssetsStyle: any = {};
 
   constructor(private http: HttpClient,
     private dataService: DataService,
@@ -228,6 +229,9 @@ export class AppComponent {
     else if(this.location.path() === '/portfolio-mapping'){
       this.updateSelection('Portfolio Mapping')
     }
+    else if(this.location.path() === '/unfunded-assets'){
+      this.updateSelection('Unfunded Assets')
+    }
     else this.updateSelection('')
   }
 
@@ -274,7 +278,7 @@ export class AppComponent {
     this.dataService.changeSearchTextValues(null);
     this.dataService.changeNumberField(null);
     
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle =  this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.notSelectedElement;
 
     this.lastClickedTabRoute = this.location.path();
 
@@ -364,6 +368,10 @@ export class AppComponent {
     else if(screen === 'Portfolio Mapping'){
       this.PortfolioMappingStyle = this.selectedElement
       this.router.navigate(['/portfolio-mapping'])
+    }
+    else if(screen === 'Unfunded Assets'){
+      this.UnfundedAssetsStyle = this.selectedElement
+      this.router.navigate(['/unfunded-assets'])
     }
     else if(screen === 'Access Control'){
       this.AccessControlStyle = this.selectedElement;

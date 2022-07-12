@@ -1,4 +1,4 @@
-<h3 mat-dialog-title> Add </h3>
+<h3 mat-dialog-title> {{ action }} </h3>
 
 <div *ngIf="isSuccess || isFailure"
     [class.success-msg]="isSuccess"
@@ -9,7 +9,8 @@
 
 <mat-dialog-content>
 
-    <form [formGroup]="form" autocomplete="off">
+    <form *ngIf="form"
+    [formGroup]="form" autocomplete="off">
 
         <div class="container">
 

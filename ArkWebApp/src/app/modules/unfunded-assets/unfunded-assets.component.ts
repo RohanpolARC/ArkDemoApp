@@ -1,5 +1,5 @@
-import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
-import { ClientSideRowModelModule, ColDef, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/all-modules';
+import { ActionColumnButtonContext, AdaptableApi, AdaptableButton, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
+import { ClientSideRowModelModule, ColDef, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/all-modules';
 import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -8,6 +8,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
 import { amountFormatter, dateFormatter, dateTimeFormatter } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { getGridData } from '../portfolio-manager/utilities/functions';
 import { EditorFormComponent } from './editor-form/editor-form.component';
 
 @Component({
@@ -52,7 +53,9 @@ export class UnfundedAssetsComponent implements OnInit {
     this.columnDefs = [
       { field: 'rowID', type: 'abColDefNumber' },
       { field: 'asset', type: 'abColDefString' },
+      { field: 'assetID', type: 'abColDefNumber' },
       { field: 'issuerShortName', type: 'abColDefString' },
+      { field: 'ccy', type: 'abColDefString'},
       { field: 'commitmentAmount', type: 'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
       { field: 'fundedAmount', type: 'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
       { field: 'unfundedAmount', type: 'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
@@ -65,6 +68,7 @@ export class UnfundedAssetsComponent implements OnInit {
     ]
 
     this.gridOptions = {
+      enableRangeSelection: true,
       columnDefs: this.columnDefs,
       rowData: this.rowData,
       sideBar: true,
@@ -99,6 +103,31 @@ export class UnfundedAssetsComponent implements OnInit {
   
       },
 
+      userInterfaceOptions: {
+        actionColumns: [
+          {            
+            columnId: 'actionEdit',
+            friendlyName: "actionEdit",
+            actionColumnButton: {
+              onClick: (
+                button: AdaptableButton<ActionColumnButtonContext>,
+                context: ActionColumnButtonContext
+              ) => {
+
+                let rowData = context.rowNode.data
+                this.openDialog(rowData);
+              },
+              icon: {
+                src: '../assets/img/edit.svg',
+                style: {
+                  height: 25, width: 25
+                }
+              }
+            }
+          }
+        ]
+      },
+
       predefinedConfig: {
         Dashboard: {
           Revision: 1,
@@ -112,19 +141,28 @@ export class UnfundedAssetsComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 3,
+          Revision: 6,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
             Columns: [
+              'issuerShortName',            
               'asset',
-              'issuerShortName',
+              'assetID',
+              'ccy',
               'commitmentAmount',
               'fundedAmount',
               'unfundedAmount',
               'tobefundedAmount',
-              'fundingDate'
-            ]
+              'fundingDate',
+              'actionEdit'
+            ],
+            PinnedColumnsMap: {
+              actionEdit: "right"
+            },
+            ColumnWidthMap: {
+              actionEdit: 20
+            }
 
           }]
         }
@@ -133,13 +171,37 @@ export class UnfundedAssetsComponent implements OnInit {
 
   }
 
-  openDialog(){
+  refreshStaticAssetRef(api: GridApi, refDetails: any[]): any[]{
+
+    let liveGrid: any[] = getGridData(api);
+
+    refDetails = refDetails.filter(ref => {
+
+      for(let i: number = 0; i < liveGrid?.length; i+= 1){
+        if(liveGrid[i]['issuerShortName'] === ref['issuerShortName']
+        && liveGrid[i]['asset'] === ref['asset'] 
+        && liveGrid[i]['assetID'] === ref['assetID']){
+          return false
+        }
+      }
+      return true;
+    })
+
+    return refDetails;
+  }
+
+  openDialog(rowData = null){
+
     const dialogRef = this.dialog.open(EditorFormComponent, {
       maxHeight: '90vh',
       width: '80vw',
+      maxWidth: '1200px',
+      minWidth: '400px',
       data: {
-        assetRef: this.assetFundingDetails,
-        adaptableApi: this.adaptableApi 
+        assetRef: this.refreshStaticAssetRef(this.gridOptions.api, this.assetFundingDetails),
+        adaptableApi: this.adaptableApi,
+        rowData: rowData,
+        action: (rowData === null) ? 'ADD' : 'EDIT' 
       }
     })
   }
@@ -167,7 +229,6 @@ export class UnfundedAssetsComponent implements OnInit {
     this.subscriptions.push(this.unfundedAssetsSvc.getAssetFundingDetails().subscribe({
       next: (resp) => {
         this.assetFundingDetails = resp;
-        console.log(this.assetFundingDetails)
       },
       error: (error) => {
         console.error(`Failed to fetch the funding details: ${error}`)
@@ -186,8 +247,6 @@ export class UnfundedAssetsComponent implements OnInit {
         }
         else this.rowData = resp
         this.gridOptions.api?.hideOverlay();
-
-        console.log(this.rowData)
 
         this.gridOptions.api.setRowData(this.rowData)
       },

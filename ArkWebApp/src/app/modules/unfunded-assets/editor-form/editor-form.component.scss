@@ -1,26 +1,30 @@
 .container{
     display: flex;
     justify-content: space-between;
-    gap: 5rem;
+    gap: 30%;
 }
 
 .col{
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
+    max-width: 300px;
 }
 
 .form-field{
-    width: 50%;
-    // max-width: 300px;
+    flex-grow: 1;
+    flex-basis: 0;
+
+    width: 100%;
 }
 
 .success-msg{
     color: rgb(8, 204, 90);
-    padding: 5px
+    margin-bottom: 1em;
 }
 
 .failure-msg{
     color: red;
-    padding: 5px;
+    margin-bottom: 1em;
 }
