@@ -1,7 +1,7 @@
 import { ColumnFilter, AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent, CheckboxColumnClickedInfo } from '@adaptabletools/adaptable-angular-aggrid';
 import { FiltersToolPanelModule } from '@ag-grid-enterprise/filter-tool-panel';
 import { ClientSideRowModelModule, ColDef, EditableCallbackParams, GridOptions, RowSelectedEvent, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi } from '@ag-grid-community/all-modules';
-import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, Module,ExcelExportModule } from '@ag-grid-enterprise/all-modules';
+import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, Module,ExcelExportModule, ClipboardModule, RangeSelectionModule, SideBarModule } from '@ag-grid-enterprise/all-modules';
 import { Component, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -14,6 +14,7 @@ import { IRRCalcParams, VPortfolioLocalOverrideModel } from 'src/app/shared/mode
 import { EventEmitter } from '@angular/core';
 import { AggridMaterialDatepickerComponent } from '../../facility-detail/aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/portfolio-save-run-model.component';
+import { getLastBusinessDay, getMomentDate, getMomentDateStr, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 
 @Component({
   selector: 'app-portfolio-modeller',
@@ -23,7 +24,7 @@ import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/port
 export class PortfolioModellerComponent implements OnInit {
 
   constructor(
-    private dataService: DataService,
+    private dataSvc: DataService,
     private irrCalcService: IRRCalcService,
     public dialog: MatDialog
   ) { }
@@ -34,7 +35,7 @@ export class PortfolioModellerComponent implements OnInit {
   dropdownSettings: IDropdownSettings = null;
   selectedDropdownData: any = null;
 
-  asOfDate: string
+  asOfDate: string = getMomentDateStr(getLastBusinessDay())
   selectedModelID: number
   isAutomatic: FormControl
   isLocal: FormControl
@@ -51,14 +52,18 @@ export class PortfolioModellerComponent implements OnInit {
   localOverrides
 
   agGridModules: Module[] = [
-    ClientSideRowModelModule,
-    RowGroupingModule,
-    SetFilterModule,
-    ColumnsToolPanelModule,
-    MenuModule,
-    ExcelExportModule,
-    FiltersToolPanelModule
+    ClientSideRowModelModule, RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule
   ];
+
+  editableCellStyle = (params) => {
+    return (this.isLocal.value && !params.node.group) ? 
+    {
+      'border-color': '#0590ca',
+    } : {
+      'border-color': '#fff'
+    };
+  }
+
   columnDefs: ColDef[] = [    
   {field: 'positionID', width:100, tooltipField: 'positionID', type:'abColDefNumber'},
   {field: 'fundHedging', width:150, tooltipField: 'fundHedging', rowGroup: true, pinned: 'left'}, 
@@ -75,121 +80,53 @@ export class PortfolioModellerComponent implements OnInit {
    width: 135},
   {field: 'benchMarkIndex', width: 161},
   { 
-    field: 'spread', 
-    width: 94,
-    cellClass: 'ag-right-aligned-cell', 
-    valueFormatter: removeDecimalFormatter, type:'abColDefNumber'
+    field: 'spread', width: 94, cellClass: 'ag-right-aligned-cell', valueFormatter: removeDecimalFormatter, type:'abColDefNumber'
   },
   {
-    field: 'pikmargin', 
-    width: 120,
-    headerName: 'PIK Margin',
-    cellClass: 'ag-right-aligned-cell',
-    valueFormatter: removeDecimalFormatter, type:'abColDefNumber'
-  },
-  {field: 'unfundedMargin', 
-   width: 160,
-  valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber'},
-  {field: 'floorRate', 
-  width: 113,
-  valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber'},
-  { field: 'expectedDate', 
-    maxWidth: 150,
-    width: 150,
-    // valueFormatter: dateFormatter,
-    type: 'abColDefDate',
-    enableCellChangeFlash: true,
-    cellEditor: 'agGridMaterialDatepicker',
-    editable: (params: EditableCallbackParams) => {
-      return this.isLocal.value
-    },
-    cellStyle: (params) => {
-      return (this.isLocal.value && !params.node.group) ? 
-      {
-        'border-color': '#0590ca',
-      } : {
-        'border-color': '#fff'
-      };
-    }
-  },
-  { field: 'expectedPrice', 
-    width: 140,
-    valueFormatter: amountFormatter, 
-    cellClass: 'ag-right-aligned-cell',
-    type: 'abColDefNumber',
-    enableCellChangeFlash: true,
-    editable: (params: EditableCallbackParams) => {
-      return this.isLocal.value
-    },
-    cellStyle: (params) => {
-      return (this.isLocal.value && !params.node.group) ? 
-      {
-        'border-color': '#0590ca',
-      } : {
-        'border-color': '#fff'
-      };
-    }
-  },
-  { field: 'maturityPrice', 
-    width: 136,
-    valueFormatter: amountFormatter, 
-    cellClass: 'ag-right-aligned-cell', type:'abColDefNumber'
+    field: 'pikmargin', width: 120, headerName: 'PIK Margin', cellClass: 'ag-right-aligned-cell', valueFormatter: removeDecimalFormatter, type:'abColDefNumber'
   },
   {
-    headerName: 'Spread Discount',
-    width: 151,
-    field: 'spreadDiscount',
-    enableCellChangeFlash: true,
-    valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
-    editable: (params: EditableCallbackParams) => {
-      return this.isLocal.value
-    },
-    cellStyle: (params) => {
-      return (this.isLocal.value && !params.node.group) ? 
-      {
-        'border-color': '#0590ca',
-      } : {
-        'border-color': '#fff'
-      };
-    }
+    field: 'unfundedMargin', width: 160, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber'
   },
   {
-    field: 'positionPercent',
-    width: 150,
-    headerName: 'Position Percent',
-    enableCellChangeFlash: true,
-    valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
+    field: 'floorRate', width: 113, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber'
+  },
+  { field: 'expectedDate', maxWidth: 150, width: 150, type: 'abColDefDate', enableCellChangeFlash: true,           cellEditor: 'agGridMaterialDatepicker',
     editable: (params: EditableCallbackParams) => {
       return this.isLocal.value
     },
-    cellStyle: (params) => {
-      return (this.isLocal.value && !params.node.group) ? 
-      {
-        'border-color': '#0590ca',
-      } : {
-        'border-color': '#fff'
-      };
-    }
+    cellStyle: this.editableCellStyle.bind(this)
+  },
+  { field: 'expectedPrice', width: 140, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber', enableCellChangeFlash: true,
+    editable: (params: EditableCallbackParams) => {
+      return this.isLocal.value
+    },
+    cellStyle: this.editableCellStyle.bind(this)
+  },
+  { 
+    field: 'maturityPrice', width: 136,valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber'
+  },
+  {
+    headerName: 'Spread Discount', width: 151, field: 'spreadDiscount', enableCellChangeFlash: true, valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
+    editable: (params: EditableCallbackParams) => {
+      return this.isLocal.value
+    },
+    cellStyle: this.editableCellStyle.bind(this)
+  },
+  {
+    field: 'positionPercent', width: 150, headerName: 'Position Percent', enableCellChangeFlash: true, valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
+    editable: (params: EditableCallbackParams) => {
+      return this.isLocal.value
+    },
+    cellStyle: this.editableCellStyle.bind(this)
   },
   { field: 'assetClass', width: 145 },
   { field: 'capStructureTranche', width: 145 },
   { field: 'securedUnsecured', width: 145 },
   { field: 'seniority', width: 145 },
-  { field: 'IsChecked', width: 50, headerName: 'Checked', type: 'abColDefBoolean',
-  //  editable: true, 
-    checkboxSelection: true,
-  // cellRenderer: "checkboxRenderer"
-  }
+  { field: 'IsChecked', width: 50, headerName: 'Checked', type: 'abColDefBoolean', checkboxSelection: true }
 ]
-  defaultColDef = {
-    resizable: true,
-    enableValue: true,
-    enableRowGroup: true,
-    enablePivot: true,
-    sortable: true,
-    filter: true,
-    autosize:true,
-  };
+
   autoGroupColumnDef: {
     pinned: 'left',
     cellRendererParams: {
@@ -200,35 +137,6 @@ export class PortfolioModellerComponent implements OnInit {
   gridApi: GridApi;
   adapTableApi: AdaptableApi;
   adaptableOptions: AdaptableOptions;
-
-  async getSharedEntities(adaptableId){
-    return new Promise(resolve => {
-      this.subscriptions.push(this.dataService.getAdaptableState(adaptableId).subscribe({
-        next: state => {
-          try {
-
-            state = state.split('|').join('"')
-            resolve(JSON.parse(state) ||'[]')
-          } catch (e) {
-            console.log("Failed to parse")
-            resolve([])
-          }
-        }
-      }));
-    })
-  }
-
-  async setSharedEntities(adaptableId, sharedEntities): Promise<void>{
-
-    return new Promise(resolve => {
-      this.subscriptions.push(
-        this.dataService.saveAdaptableState(adaptableId, JSON.stringify(sharedEntities).replace(/"/g,'|')).subscribe({
-        next: data => {
-          resolve();
-        }
-      }));
-    })
-  }
 
   fetchIRRPostions() {
     if(this.asOfDate !== null){
@@ -263,7 +171,6 @@ export class PortfolioModellerComponent implements OnInit {
               this.modelMap[this.selectedModelID].positionIDs?.forEach(posID => {
                 let node: RowNode = this.adapTableApi.gridApi.getRowNodeForPrimaryKey(posID)
                 node.setSelected(true);
-                // this.selectedPositionIDs = []
                 this.selectedPositionIDs = this.modelMap[this.selectedModelID].positionIDs
               })
             }
@@ -283,7 +190,7 @@ export class PortfolioModellerComponent implements OnInit {
   }
 
   fetchPortfolioModels(modelID?: number, context: string = 'SaveRun'){
-    this.subscriptions.push(this.irrCalcService.getPortfolioModels(this.dataService.getCurrentUserName()).subscribe({
+    this.subscriptions.push(this.irrCalcService.getPortfolioModels(this.dataSvc.getCurrentUserName()).subscribe({
       next: data => {
         this.parseFetchedModels(data);
         this.InitModelMap()
@@ -346,7 +253,14 @@ export class PortfolioModellerComponent implements OnInit {
       enableRangeSelection: true,
       sideBar: true,
       columnDefs: this.columnDefs,
-      defaultColDef: this.defaultColDef,
+      defaultColDef: {
+        resizable: true,
+        enableValue: true,
+        enableRowGroup: true,
+        enablePivot: true,
+        sortable: true,
+        filter: true
+      },
       components: {
         AdaptableToolPanel: AdaptableToolPanelAgGridComponent
       },
@@ -358,24 +272,20 @@ export class PortfolioModellerComponent implements OnInit {
       suppressAggFuncInHeader: true,
       enableGroupEdit: true,
       autoGroupColumnDef: this.autoGroupColumnDef,
-      frameworkComponents: frameworkComponents,
-      // groupMultiAutoColumn: true
-      // frameworkComponents: {
-      //   checkboxRenderer: CheckboxRenderer
-      // }
+      frameworkComponents: frameworkComponents
     }
 
     this.adaptableOptions = {
       primaryKey: 'positionID',
-      userName: this.dataService.getCurrentUserName(),
+      userName: this.dataSvc.getCurrentUserName(),
       adaptableId: 'IRR Calc - positions',
       adaptableStateKey: 'IRR Calc key',
       
 
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: this.setSharedEntities.bind(this),
-        getSharedEntities: this.getSharedEntities.bind(this)
+        setSharedEntities: setSharedEntities.bind(this),
+        getSharedEntities: getSharedEntities.bind(this)
   
       },
 
@@ -383,7 +293,6 @@ export class PortfolioModellerComponent implements OnInit {
         dateInputOptions: {
           dateFormat: 'dd/MM/yyyy',
           locale: 'en-GB'
-
         }
       },
 
@@ -479,9 +388,6 @@ export class PortfolioModellerComponent implements OnInit {
     this.changeListeners()
   }
 
-  onRowSelected(event: RowSelectedEvent){
-  }
-
   rows: number[]
   setNodes(node: RowNode, rows: any[] = []){
     /** Get all filtered children nodes recursively (Depth First Search)*/
@@ -494,7 +400,7 @@ export class PortfolioModellerComponent implements OnInit {
         rows.push(node.data.positionID);
     }
     return rows;
-}
+  }
 
   onCellValueChanged(params: CellValueChangedEvent){
     /** Updating all the filtered children nodes as Ag/Adaptable isn't doing itself */
@@ -505,7 +411,6 @@ export class PortfolioModellerComponent implements OnInit {
   
       let updates = [];
       for(let i: number = 0; i < node.allLeafChildren.length; i++){
-      //  node.childrenAfterFilter[i].setDataValue(colID, colVal);
        let nodeData = node.allLeafChildren[i].data;
        nodeData[colID] = colVal
        updates.push(nodeData)
@@ -520,7 +425,6 @@ export class PortfolioModellerComponent implements OnInit {
 
     let gridData = []
     this.gridApi.forEachLeafNode((node) => gridData.push(node.data))
-    // this.gridApi.getRow .gridApi.getVendorGrid().rowData;
 
     for(let i = 0 ; i < gridData.length; i++){
 
@@ -608,10 +512,7 @@ export class PortfolioModellerComponent implements OnInit {
   }
 
   onSavePortfolio(context = 'Save'){
-    /**
-     * 
-     * 
-     */
+
     if(this.selectedDropdownData.length === 0 || this.selectedDropdownData === null){
       this.selectedModelID = null
     }
@@ -651,18 +552,16 @@ export class PortfolioModellerComponent implements OnInit {
           this.selectedModelID = dialogRef.componentInstance.modelID
           this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context);
           this.updateLocalFields()
-        }
-        
+        }        
       }
     }))
   }
 
+  /** 
+   * Opening new tab for IRR Result in IRR Calculation and sending IRRCalcParams as `@Input` to `<app-irr-result>` component.
+   *  Portfolio Modeller -> IRR Calculation -> IRR Result 
+  */
   calcIRR(){
-    /** 
-     * 
-     * Opening new tab for IRR Result in IRR Calculation and sending IRRCalcParams as `@Input` to `<app-irr-result>` component.
-     *  Portfolio Modeller -> IRR Calculation -> IRR Result 
-    */
 
     let calcParams: IRRCalcParams = <IRRCalcParams>{};
     calcParams.asOfDate = this.asOfDate;
@@ -711,30 +610,27 @@ export class PortfolioModellerComponent implements OnInit {
       let node: RowNode = this.adapTableApi.gridApi.getRowNodeForPrimaryKey(posID)
       if(colName === 'expectedDate'){
         node.setDataValue('expectedDate', val)
-        // node.setDataValue('old_expectedDate', val)
       }
       if(colName === 'expectedPrice'){
         node.setDataValue('expectedPrice', Number(val))
-        // node.setDataValue('old_expectedPrice', Number(val))
       }
     }
   }
 
   overridenPositionIDs = {}
 
-    /** 
-   * We have a set of 3 columns for each override column:
-   *  Eg: expectedPrice
-   *    We receive, `<expectedPrice,localExpectedPrice,globalExpectedPrice>`. expectedPrice is the column that is visible and editable on grid.
-   *  To get overrides, we compare `expectedPrice` with `localExpectedPrice`.
-   * 
-   * To clear overrides, we simply set `expectedPrice = globalExpectedPrice` on the UI. 
-   * 
-   * */
+  /** 
+ * We have a set of 3 columns for each override column:
+ *  Eg: expectedPrice
+ *    We receive, `<expectedPrice,localExpectedPrice,globalExpectedPrice>`. expectedPrice is the column that is visible and editable on grid.
+ *  To get overrides, we compare `expectedPrice` with `localExpectedPrice`.
+ * 
+ * To clear overrides, we simply set `expectedPrice = globalExpectedPrice` on the UI. 
+ * 
+ * */
 
   updateGridOverrides(context: 'Clear' | 'Set' = 'Clear'){
 
-    // let gridData: any[] = this.adapTableApi.gridApi.getVendorGrid().rowData;
     if(this.selectedModelID == null && context === 'Set')
       return
 
@@ -753,13 +649,10 @@ export class PortfolioModellerComponent implements OnInit {
       updates.push(gridData[i])
     }
     this.gridApi.applyTransaction({ update: updates})
-    // this.rowData = gridData
-    // this.gridApi.setRowData(gridData)
     this.gridApi.refreshCells({
       force: true,
       suppressFlash: true
     })
-    // this.adapTableApi.gridApi.loadGridData(gridData);  
   }
 
   fetchOverridesForModel(modelID: number){
@@ -773,20 +666,20 @@ export class PortfolioModellerComponent implements OnInit {
       }
     }))
   }
+
+  /** On portfolio model select, clearing out all exisiting selected positions & applied filters 
+ * and apply the ones from the model.
+ *  A model is associated to either rules/positionIDs
+ *  A model is associated to either having local overrides 
+ * 
+ * Based on the selected model, fetch its overrides values and apply them onto the grid.
+*/
+
   onPortfolioModelSelect(event){
     this.selectedModelID = event.modelID
 
-    /** On portfolio model select, clearing out all exisiting selected positions & applied filters 
-     * and apply the ones from the model.
-     *  A model is associated to either rules/positionIDs
-     *  A model is associated to either having local overrides 
-     * 
-     * 
-     * Based on the selected model, fetch its overrides values and apply them onto the grid.
-    */
     this.adapTableApi.filterApi.clearAllColumnFilter();
     this.selectedPositionIDs = []
-//    this.clearGridOverrides();
 
     if(this.modelMap[this.selectedModelID].rules){
       this.adapTableApi.filterApi.setColumnFilter(this.modelMap[this.selectedModelID].rules)
@@ -838,9 +731,6 @@ export class PortfolioModellerComponent implements OnInit {
   ) {
     this.adapTableApi = adaptableApi;
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel()
-    adaptableApi.eventApi.on('SelectionChanged', selection => {
-      // do stuff
-    });
 
     this.adapTableApi.filterApi.clearAllColumnFilter();
   }
@@ -848,11 +738,11 @@ export class PortfolioModellerComponent implements OnInit {
   onGridReady(params: GridReadyEvent){
     this.gridApi = params.api;
 
-    this.subscriptions.push(this.dataService.currentSearchDate.subscribe(asOfDate => {
+    this.subscriptions.push(this.dataSvc.currentSearchDate.subscribe(asOfDate => {
       this.asOfDate = asOfDate;
     }));
 
-    this.subscriptions.push(this.dataService.filterApplyBtnState.subscribe(isHit => {
+    this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if(isHit){
         this.onReset()
         this.fetchIRRPostions();
@@ -885,5 +775,4 @@ export class PortfolioModellerComponent implements OnInit {
       }
     }
   }
-
 }

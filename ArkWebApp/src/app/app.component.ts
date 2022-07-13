@@ -14,6 +14,7 @@ import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from './core/services/FacilityDetails/facility-detail.service';
 import { MsalUserService } from './core/services/Auth/msaluser.service';
+import { getLastBusinessDay } from './shared/functions/utilities';
 
 @Component({  
   selector: 'app-root',  
@@ -95,16 +96,6 @@ export class AppComponent {
     return this.accessService.accessibleTabs;
   }
 
-  getLastBusinessDay(){
-    let workday = moment();
-    let day = workday.day();
-    let diff = 1;  // returns yesterday
-    if (day == 0 || day == 1){  // is Sunday or Monday
-      diff = day + 2;  // returns Friday
-    }
-    return workday.subtract(diff, 'days').toDate();
-  }
-
   fetchTabs(){
     if(!this.accessService.accessibleTabs){
       this.subscriptions.push(this.accessService.getTabs().subscribe({
@@ -179,10 +170,13 @@ export class AppComponent {
     }
 
     if(['/irr/portfoliomodeller'].includes(this.location.path())){
-      this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
-      this.dataService.changeSearchDate(this.asOfDate);
-      this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['rule']));
-      this.dataService.changeFilterApplyBtnState(true);
+      setTimeout(() => {
+        this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
+        this.dataService.changeSearchDate(this.asOfDate);
+        this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['rule']));
+        this.dataService.changeFilterApplyBtnState(true);
+  
+      }, 1350)
     }
 
     this.rightSidebarOpened = false
@@ -289,8 +283,8 @@ export class AppComponent {
     else if(screen === 'Cash Balance'){
       this.filterPane.AsOfDateRange = true;
       this.range = {
-        start: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
-        end: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
+        start: moment(getLastBusinessDay()).format('YYYY-MM-DD'),
+        end: moment(getLastBusinessDay()).format('YYYY-MM-DD'),
       }
 
       this.searchDateRange.setValue({
@@ -313,7 +307,7 @@ export class AppComponent {
 
       this.multiSelectPlaceHolder = 'Select Fund(s)'
 
-      this.asOfDate = moment(this.getLastBusinessDay()).format('YYYY-MM-DD')
+      this.asOfDate = moment(getLastBusinessDay()).format('YYYY-MM-DD')
       
       this.fetchFacilityFunds();
 
@@ -339,7 +333,7 @@ export class AppComponent {
       this.LiquiditySummaryStyle = this.selectedElement;
 
       this.multiSelectPlaceHolder = 'Select FundHedging(s)';
-      this.asOfDate = moment(this.getLastBusinessDay()).format('YYYY-MM-DD')
+      this.asOfDate = moment(getLastBusinessDay()).format('YYYY-MM-DD')
       this.numberField = 10;
 
       this.fetchFundHedgingsRef();
@@ -361,7 +355,7 @@ export class AppComponent {
       this.filterPane.AsOfDate = true;
       this.filterPane.TextValueSelect = false;
 
-      this.asOfDate = moment(this.getLastBusinessDay()).format('YYYY-MM-DD')
+      this.asOfDate = moment(getLastBusinessDay()).format('YYYY-MM-DD')
       this.filterApply();
       this.router.navigate(['/irr/portfoliomodeller'])
     }

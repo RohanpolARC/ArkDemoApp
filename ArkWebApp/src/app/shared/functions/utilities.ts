@@ -88,7 +88,25 @@ export function _filter(options: string[], value:string): string []{
  * @param date Date that needs to be stablised
  * @returns Stable `Date` | string: `Invalid Date`
  */
-export function getMomentDate(date: Date){
+export function getMomentDate(date: Date): Date{
 
   return new Date(moment(date).format('YYYY-MM-DD'));
 }
+
+export function getMomentDateStr(date: Date): string{
+  return moment(date).format('YYYY-MM-DD');
+}
+/**
+ * 
+ * @returns Returns last business date from today
+ */
+export function getLastBusinessDay(){
+  let workday = moment();
+  let day = workday.day();
+  let diff = 1;  // returns yesterday
+  if (day == 0 || day == 1){  // is Sunday or Monday
+    diff = day + 2;  // returns Friday
+  }
+  return workday.subtract(diff, 'days').toDate();
+}
+

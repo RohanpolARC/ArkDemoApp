@@ -3,6 +3,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { VPortfolioModel } from 'src/app/shared/models/IRRCalculationsModel';
@@ -19,6 +20,8 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   isAutomatic: boolean
   subscriptions: Subscription[] = []
   adaptableApi: AdaptableApi
+
+  originalModelName: string // To keep track if the model name has been changed or not.
   selectedModelName: string
   disableUpdate: boolean
   disableSubmit: boolean
@@ -73,6 +76,9 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     this.isSuccess = this.isFailure = false;
     this.adaptableApi = this.data.adaptableApi;
     this.selectedModelName = this.data.model?.modelName;
+
+    this.originalModelName = this.selectedModelName;
+    
     this.asOfDate = this.data.asOfDate;
       /**
        * If no model is selected then disable slide toggle to update.
@@ -119,11 +125,27 @@ export class PortfolioSaveRunModelComponent implements OnInit {
 
   changeListeners(){
 
-    this.subscriptions.push(this.modelForm.get('isUpdate').valueChanges.subscribe(isUpdate => {
+    this.subscriptions.push(this.modelForm.get('isUpdate').valueChanges.
+    pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(isUpdate => {
       if(isUpdate === false){
         this.modelForm.get('modelName').reset()
         this.modelForm.get('modelDesc').reset()
         this.modelForm.get('aggregationType').reset()
+      }
+    }))
+
+    this.subscriptions.push(this.modelForm.get('modelName').valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(modelName => {
+      if(modelName !== this.originalModelName){
+        this.modelForm.patchValue({ isUpdate: false }, { emitEvent: false });
+      }
+      else if(modelName === this.originalModelName){
+        this.modelForm.patchValue({ isUpdate: true }, { emitEvent: false })
       }
     }))
   }

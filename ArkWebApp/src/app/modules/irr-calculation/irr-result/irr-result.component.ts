@@ -8,6 +8,7 @@ import { switchMap, takeUntil } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { amountFormatter, noDecimalAmountFormatter, nonAmountNumberFormatter2Dec } from 'src/app/shared/functions/formatter';
+import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/utilities';
 import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 
 @Component({
@@ -152,8 +153,8 @@ export class IrrResultComponent implements OnInit {
 
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: this.setSharedEntities.bind(this),
-        getSharedEntities: this.getSharedEntities.bind(this)
+        setSharedEntities: setSharedEntities.bind(this),
+        getSharedEntities: getSharedEntities.bind(this)
   
       },
 
@@ -268,35 +269,6 @@ export class IrrResultComponent implements OnInit {
 
 
     }
-  }
-
-  async getSharedEntities(adaptableId){
-    return new Promise(resolve => {
-      this.subscriptions.push(this.dataSvc.getAdaptableState(adaptableId).subscribe({
-        next: state => {
-          try {
-
-            state = state.split('|').join('"')
-            resolve(JSON.parse(state) ||'[]')
-          } catch (e) {
-            console.log("Failed to parse")
-            resolve([])
-          }
-        }
-      }));
-    })
-  }
-
-  async setSharedEntities(adaptableId, sharedEntities): Promise<void>{
-
-    return new Promise(resolve => {
-      this.subscriptions.push(
-        this.dataSvc.saveAdaptableState(adaptableId, JSON.stringify(sharedEntities).replace(/"/g,'|')).subscribe({
-        next: data => {
-          resolve();
-        }
-      }));
-    })
   }
 
   ngOnInit(): void {

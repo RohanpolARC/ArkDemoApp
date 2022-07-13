@@ -47,13 +47,11 @@
             <ag-grid-angular
             [adaptableOptions]="adaptableOptions"
             [gridOptions]="gridOptions"
-            [defaultColDef]="defaultColDef"
             [modules]="agGridModules"
             [rowData]="rowData"
             class="ag-theme-alpine ag-grid"
             (adaptableReady)="onAdaptableReady($event)"
             (cellValueChanged)="onCellValueChanged($event)"
-            (rowSelected)="onRowSelected($event)"
             (gridReady)="onGridReady($event)"
             >
             </ag-grid-angular>
