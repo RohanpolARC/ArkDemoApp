@@ -1,4 +1,4 @@
-<h3 mat-dialog-title>{{ data.action }}</h3>
+<h3 mat-dialog-title>{{ data.action === "ADD" ? "Add" : "Edit"}} attribute</h3>
 
 <div>
     <div class="success-msg" *ngIf="isSuccess">

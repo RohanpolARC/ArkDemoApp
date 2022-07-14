@@ -74,7 +74,7 @@ export class AttributeGroupRendererComponent implements ICellRendererAngularComp
         })  
   
         this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
-          if(result.event === 'Close with success'){
+          if(result?.event === 'Close with success'){
     
             // Re-fetch attributes & IDs for newly added attributes
             this.componentParent.fetchLiquiditySummaryRef();

@@ -1,0 +1,100 @@
+<h3 mat-dialog-title> {{ action === "ADD" ? "Add" : "Edit"}} unfunded asset</h3>
+
+<div *ngIf="isSuccess || isFailure"
+    [class.success-msg]="isSuccess"
+    [class.failure-msg]="isFailure"
+>
+    {{ updateMsg }}
+</div>
+
+<mat-dialog-content>
+
+    <form *ngIf="form"
+    [formGroup]="form" autocomplete="off">
+
+        <div class="container">
+
+            <div class="col">
+                <mat-form-field class="form-field" appearance="outline">
+                    <mat-label>Issuer Short Name</mat-label>
+                    <input matInput type="text" formControlName="issuerShortName" [matAutocomplete]="issuerSNAutocomplete" matAutocompletePosition="below">
+                    <mat-error *ngIf="form.get('issuerShortName').invalid">Please select issuer from the list</mat-error>
+                    <mat-autocomplete autoActiveFirstOption #issuerSNAutocomplete="matAutocomplete" (optionSelected)="onIssuerSelect($event)" panelWidth="auto">
+                        <mat-option
+                            *ngFor="let issuerSN of issuerSNFilteredOptions | async"
+                            [value]="issuerSN"
+                        >
+                            {{ issuerSN }}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+
+
+                <mat-form-field class="form-field" appearance="outline">
+                    <mat-label>Commitment Amount</mat-label>
+                    <input matInput type="text" formControlName="commitmentAmount" readonly="readonly">
+                </mat-form-field>
+
+                <mat-form-field class="form-field" appearance="outline">
+                    <mat-label>Expected Funded Amount</mat-label>
+                    <input matInput type="text" formControlName="fundedAmount" readonly="readonly">
+                </mat-form-field>
+
+                <mat-form-field class="form-field" appearance="outline">
+                    <mat-label>Unfunded Amount</mat-label>
+                    <input matInput type="text" formControlName="unfundedAmount" readonly="readonly">
+                </mat-form-field>    
+
+            </div>
+
+            <div class="col">
+                <mat-form-field class="form-field" appearance="outline">
+                    <mat-label>Asset</mat-label>
+                    <input matInput type="text" formControlName="asset" [matAutocomplete]="assetAutocomplete" matAutocompletePosition="below">
+                    <span matSuffix *ngIf="!!assetID"> ({{ assetID }})</span>
+                    <mat-error *ngIf="form.get('asset').invalid">Please select asset from the list</mat-error>
+                    <mat-autocomplete autoActiveFirstOption #assetAutocomplete="matAutocomplete" panelWidth="auto">
+                        <mat-option
+                            *ngFor="let asset of assetFilteredOptions | async"
+                            [value]="asset"
+                        >
+                            {{ asset }}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+
+                <mat-form-field class="form-field" appearance="outline">
+                    <mat-label>Ccy</mat-label>
+                    <input matInput type="text" formControlName="ccy" readonly="readonly">
+                </mat-form-field>
+
+                <mat-form-field class="form-field" appearance="outline">
+                    <mat-label>To be funded amount</mat-label>
+                    <input matInput type="text" formControlName="tobeFundedAmount">
+                </mat-form-field>
+
+                <mat-form-field class="form-field" appearance="outline">
+                    <mat-label>Expected Funding Date</mat-label>
+                    <input matInput [matDatepicker]="datePicker" formControlName="fundingDate">
+                    <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #datePicker></mat-datepicker>
+                </mat-form-field>
+
+            </div>
+
+        </div>
+    </form>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" type="submit" 
+        [disabled] = "disableSubmit"
+        (click)="onSubmit()">
+        Submit
+    </button>
+
+    <button mat-raised-button type="button" (click)="onClose()">
+        Cancel
+    </button>
+</mat-dialog-actions>

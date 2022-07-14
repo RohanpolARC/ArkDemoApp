@@ -4,6 +4,7 @@ import {
   CellClickedEvent,
   ColDef,
   EditableCallbackParams,
+  GridApi,
   GridOptions,
   IAggFuncParams,
   IsGroupOpenByDefaultParams,
@@ -29,6 +30,10 @@ import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DetailedView } from 'src/app/shared/models/GeneralModel';
 import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
 import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
+import { UnfundedAssetsEditorComponent } from './unfunded-assets-editor/unfunded-assets-editor.component';
+import { getMomentDateStr } from 'src/app/shared/functions/utilities';
+import { ClipboardModule, FiltersToolPanelModule, RangeSelectionModule, SideBarModule } from '@ag-grid-enterprise/all-modules';
+import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
 
 @Component({
   selector: 'app-liquidity-summary',
@@ -38,13 +43,27 @@ import { AttributeGroupRendererComponent } from './attribute-group-renderer/attr
 export class LiquiditySummaryComponent implements OnInit {
 
   subscriptions: Subscription[] = [];
+  assetFundingDetails: any[];
+  unfundedAssets: any;
   constructor(private liquiditySummarySvc: LiquiditySummaryService,
+              private unfundedAssetsSvc: UnfundedAssetsService,
               private dataSvc: DataService,
               private accessSvc: AccessService,
               private warningMsgPopUp: MatSnackBar,
               public dialog: MatDialog) { }
 
-  agGridModules: Module[] = [ClientSideRowModelModule,RowGroupingModule,SetFilterModule,ColumnsToolPanelModule,MenuModule, ExcelExportModule];
+  agGridModules: Module[] = [    
+    ClientSideRowModelModule,
+    RowGroupingModule,
+    SetFilterModule,
+    ColumnsToolPanelModule,
+    MenuModule,
+    ExcelExportModule,
+    FiltersToolPanelModule,
+    ClipboardModule,
+    SideBarModule,
+    RangeSelectionModule
+];
 
   gridOptions: GridOptions;
 
@@ -166,10 +185,18 @@ export class LiquiditySummaryComponent implements OnInit {
               }
             })
           }
+          else if(params.rowNode.key === 'Known Outflows Funding'){
+  
+            this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+              if(['Known Outflows Funding'].includes(rowNode.data?.['attrType'])){
+                sum += Number(rowNode.data?.[colName]);
+              }
+            })
+          }
           else if(params.rowNode.key === 'Cash Post Known Outflows'){
   
             this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
-              if(['Current Cash', 'Net Cash', 'Liquidity','Known Outflows Unsettled','Known Outflows Pipeline'].includes(rowNode.data?.['attrType'])){
+              if(['Current Cash', 'Net Cash', 'Liquidity','Known Outflows Unsettled', 'Known Outflows Funding','Known Outflows Pipeline'].includes(rowNode.data?.['attrType'])){
                 sum += Number(rowNode.data?.[colName]);
               }
             })
@@ -221,7 +248,23 @@ export class LiquiditySummaryComponent implements OnInit {
         field: 'subAttr',
         tooltipField: 'subAttr',
         width: 200,
-        pinned: 'left'
+        pinned: 'left',
+        cellStyle: (params) => {
+
+          if(!params.node.group && params.data?.['attr'] === "To be funded asset" && params.data?.['attrType'] === "Known Outflows Funding")  {
+            return {
+              color: '#0590ca'
+            }
+          }     
+          return null;
+        },
+        onCellClicked: (params: CellClickedEvent) => {
+
+          if(!params.node.group && params.data?.['attr'] === "To be funded asset" && params.data?.['attrType'] === "Known Outflows Funding")  {
+
+            this.onUnfundedAssetClick(params.data, 'EDIT')
+          }     
+        }
       },
       {
         headerName: 'Is Manual',
@@ -318,30 +361,32 @@ export class LiquiditySummaryComponent implements OnInit {
       this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryPivoted(this.asOfDate, this.fundHedgings, this.days).subscribe({
         next: summary => {
   
-          this.gridOptions.api.hideOverlay();
-          
-          if(summary.length > 0){
-            this.createColumnDefs(summary[0]);
-            this.rowData = this.parseFetchedSummary(summary); 
-            this.gridOptions.api.setColumnDefs(this.columnDefs);
+          setTimeout(() => {
+            this.gridOptions.api.hideOverlay();
+            
+            if(summary.length > 0){
+              this.createColumnDefs(summary[0]);
+              this.rowData = this.parseFetchedSummary(summary); 
+              this.gridOptions.api?.setColumnDefs(this.columnDefs);
 
-            this.gridOptions.columnApi.applyColumnState(
-              {
-                state: [
-                  {
-                  colId: 'date',
-                  sort: 'asc'
-                  }
-                ]
-              }
-            )
-          }
-          else{
-            this.gridOptions.api.showNoRowsOverlay();
-            this.createColumnDefs();
-            this.rowData = [];
-          }
-          
+              this.gridOptions.columnApi.applyColumnState(
+                {
+                  state: [
+                    {
+                    colId: 'date',
+                    sort: 'asc'
+                    }
+                  ]
+                }
+              )
+            }
+            else{
+              this.gridOptions.api.showNoRowsOverlay();
+              this.createColumnDefs();
+              this.rowData = [];
+            }
+          }, 500)
+
         },
         error: error => {
           this.gridOptions.api.showNoRowsOverlay();
@@ -354,8 +399,79 @@ export class LiquiditySummaryComponent implements OnInit {
       console.warn("Component loaded without setting date in filter pane");
   }
 
+  fetchAssetFundingDetails(){
+
+    this.subscriptions.push(this.unfundedAssetsSvc.getAssetFundingDetails().subscribe({
+      next: (resp) => {
+        this.assetFundingDetails = resp;
+      },
+      error: (error) => {
+        console.error(`Failed to fetch the funding details: ${error}`)
+      }
+    }))
+  }
+
   onGridReady(params: any){
     params.api.closeToolPanel();
+  }
+
+  getAssetId(subAttr: string): number {
+
+    let assetID: number = parseInt(subAttr.substring(subAttr.lastIndexOf('(') + 1, subAttr.length - 1));
+    return assetID;
+  }
+
+  onUnfundedAssetClick(row = null, action: 'EDIT' | 'ADD' = 'ADD'){
+
+    if(action === 'EDIT'){
+
+      let assetID: number = this.getAssetId(row['subAttr'])
+      let fundingDate: string = getMomentDateStr(row['date']);
+  
+      this.subscriptions.push(this.unfundedAssetsSvc.getUnfundedAssets(assetID, fundingDate).subscribe({
+        next: (unfundedAsset) => {
+          this.openAssetDialog(unfundedAsset[0]);
+        },
+        error: (error) => {
+          this.dataSvc.setWarningMsg("Failed to fetch unfunded asset details", "Dismiss", "ark-theme-snackbar-error")
+          console.error(`Failed to fetch unfunded asset details: ${error}`)
+        }
+  
+      }))
+  
+    }
+    else if(action === 'ADD'){
+      this.openAssetDialog();
+    }
+
+  }
+
+  openAssetDialog(unfundedAsset = null){
+
+    // Check isWrite Access
+    if(!this.isWriteAccess){
+      this.dataSvc.setWarningMsg('No access', 'Dismiss', 'ark-theme-snackbar-warning')
+      return;
+    }
+    
+    const dialogRef = this.dialog.open(UnfundedAssetsEditorComponent, {
+      maxHeight: '90vh',
+      width: '60vw',
+      maxWidth: '1200px',
+      minWidth: '400px',
+      data: {
+        assetRef: this.assetFundingDetails,
+        rowData: unfundedAsset,
+        action: (unfundedAsset === null) ? 'ADD' : 'EDIT' 
+      }
+    })
+
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(res => {
+      if(dialogRef.componentInstance.isSuccess){
+        this.fetchLiquiditySummary();
+      }
+    }))
+
   }
 
   openDialog(actionType: string = 'ADD'): void {
@@ -422,6 +538,7 @@ export class LiquiditySummaryComponent implements OnInit {
     }
 
     this.fetchLiquiditySummaryRef();
+    this.fetchAssetFundingDetails();
 
     /** Making this component available to child components in Ag-grid */
 
@@ -479,7 +596,7 @@ export class LiquiditySummaryComponent implements OnInit {
       if(isHit){
         this.columnDefs = null;
           /** Removes previous column order state, else new order of columnDefs is not persisted. (e.g. Sorting of FH columns))  */
-        this.gridOptions.api.setColumnDefs(null)
+        this.gridOptions.api?.setColumnDefs(null)
         this.fetchLiquiditySummary();
       }
     }))

@@ -34,8 +34,8 @@ export class UnfundedAssetsService {
     return this.http.post(`${APIConfig.UNFUNDED_ASSET_PUT_API}`, model, this.getHttpOptions());
   }
 
-  public getUnfundedAssets(){
-
-    return this.http.get(`${APIConfig.UNFUNDED_ASSET_GET_API}`, this.getHttpOptions());
+  public getUnfundedAssets(assetID: number = null, fundingDate: string = null){
+  
+    return this.http.get(`${APIConfig.UNFUNDED_ASSET_GET_API}/?assetID=${assetID}&fundingDate=${fundingDate}`, this.getHttpOptions());
   }
 }

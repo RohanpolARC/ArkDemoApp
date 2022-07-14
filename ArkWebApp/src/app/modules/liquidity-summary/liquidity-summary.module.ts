@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { LiquiditySummaryComponent } from './liquidity-summary.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AgGridModule } from '@ag-grid-community/angular';
@@ -18,6 +18,8 @@ import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
+import { UnfundedAssetsEditorComponent } from './unfunded-assets-editor/unfunded-assets-editor.component';
+import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
 
 @NgModule({
   declarations: [
@@ -25,6 +27,7 @@ import { AttributeGroupRendererComponent } from './attribute-group-renderer/attr
     AttributeEditorComponent,
     UpdateCellRendererComponent,
     AttributeGroupRendererComponent,
+    UnfundedAssetsEditorComponent,
   ],
   imports: [
     BrowserAnimationsModule,
@@ -42,6 +45,10 @@ import { AttributeGroupRendererComponent } from './attribute-group-renderer/attr
     MatAutocompleteModule,
     MatSlideToggleModule,
     MatSnackBarModule
+  ],
+  providers: [
+    DecimalPipe,
+    UnfundedAssetsService
   ]
 })
 export class LiquiditySummaryModule { }
