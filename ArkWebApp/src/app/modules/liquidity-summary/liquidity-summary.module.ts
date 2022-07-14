@@ -18,7 +18,6 @@ import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
-import { UnfundedAssetsEditorComponent } from './unfunded-assets-editor/unfunded-assets-editor.component';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
 
 @NgModule({
@@ -26,8 +25,7 @@ import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfu
     LiquiditySummaryComponent,
     AttributeEditorComponent,
     UpdateCellRendererComponent,
-    AttributeGroupRendererComponent,
-    UnfundedAssetsEditorComponent,
+    AttributeGroupRendererComponent
   ],
   imports: [
     BrowserAnimationsModule,

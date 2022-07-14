@@ -30,10 +30,10 @@ import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DetailedView } from 'src/app/shared/models/GeneralModel';
 import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
 import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
-import { UnfundedAssetsEditorComponent } from './unfunded-assets-editor/unfunded-assets-editor.component';
 import { getMomentDateStr } from 'src/app/shared/functions/utilities';
 import { ClipboardModule, FiltersToolPanelModule, RangeSelectionModule, SideBarModule } from '@ag-grid-enterprise/all-modules';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
+import { UnfundedAssetsEditorComponent } from '../unfunded-assets/unfunded-assets-editor/unfunded-assets-editor.component';
 
 @Component({
   selector: 'app-liquidity-summary',

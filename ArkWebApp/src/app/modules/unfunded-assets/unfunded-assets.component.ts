@@ -10,7 +10,7 @@ import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfu
 import { amountFormatter, dateFormatter, dateTimeFormatter } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { getGridData } from '../portfolio-manager/utilities/functions';
-import { EditorFormComponent } from './editor-form/editor-form.component';
+import { UnfundedAssetsEditorComponent } from './unfunded-assets-editor/unfunded-assets-editor.component';
 
 @Component({
   selector: 'app-unfunded-assets',
@@ -182,41 +182,22 @@ export class UnfundedAssetsComponent implements OnInit {
 
   }
 
-  refreshStaticAssetRef(api: GridApi, refDetails: any[]): any[]{
-
-    let liveGrid: any[] = getGridData(api);
-
-    refDetails = refDetails.filter(ref => {
-
-      for(let i: number = 0; i < liveGrid?.length; i+= 1){
-        if(liveGrid[i]['issuerShortName'] === ref['issuerShortName']
-        && liveGrid[i]['asset'] === ref['asset'] 
-        && liveGrid[i]['assetID'] === ref['assetID']){
-          return false
-        }
-      }
-      return true;
-    })
-
-    return refDetails;
-  }
-
   openDialog(rowData = null){
 
     // Check isWrite Access
-    
+
     if(!this.isWriteAccess){
       this.dataSvc.setWarningMsg('No access', 'Dismiss', 'ark-theme-snackbar-warning')
       return;
     }
 
-    const dialogRef = this.dialog.open(EditorFormComponent, {
+    const dialogRef = this.dialog.open(UnfundedAssetsEditorComponent, {
       maxHeight: '90vh',
       width: '60vw',
       maxWidth: '1200px',
       minWidth: '400px',
       data: {
-        assetRef: this.refreshStaticAssetRef(this.gridOptions.api, this.assetFundingDetails),
+        assetRef: this.assetFundingDetails,
         adaptableApi: this.adaptableApi,
         rowData: rowData,
         action: (rowData === null) ? 'ADD' : 'EDIT' 

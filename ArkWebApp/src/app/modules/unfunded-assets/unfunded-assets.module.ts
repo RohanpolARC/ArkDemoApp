@@ -5,7 +5,7 @@ import { UnfundedAssetsRoutingModule } from './unfunded-assets-routing.module';
 import { UnfundedAssetsComponent } from './unfunded-assets.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { EditorFormComponent } from './editor-form/editor-form.component';
+import { UnfundedAssetsEditorComponent } from './unfunded-assets-editor/unfunded-assets-editor.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -20,7 +20,7 @@ import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-
 @NgModule({
   declarations: [
     UnfundedAssetsComponent,
-    EditorFormComponent,
+    UnfundedAssetsEditorComponent,
   ],
   imports: [
     CommonModule,

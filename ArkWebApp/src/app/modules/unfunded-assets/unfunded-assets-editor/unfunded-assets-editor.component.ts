@@ -13,10 +13,10 @@ import { UnfundedAsset } from 'src/app/shared/models/UnfundedAssetModel';
 
 @Component({
   selector: 'app-unfunded-assets-editor',
-  templateUrl: './editor-form.component.html',
-  styleUrls: ['./editor-form.component.scss']
+  templateUrl: './unfunded-assets-editor.component.html',
+  styleUrls: ['./unfunded-assets-editor.component.scss']
 })
-export class EditorFormComponent implements OnInit {
+export class UnfundedAssetsEditorComponent implements OnInit {
 
   action: 'ADD' | 'EDIT'
   subscriptions: Subscription[] = []
@@ -36,7 +36,7 @@ export class EditorFormComponent implements OnInit {
   originalRowData
 
   constructor(
-    public dialogRef: MatDialogRef<EditorFormComponent>,
+    public dialogRef: MatDialogRef<UnfundedAssetsEditorComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private decimalPipe: DecimalPipe,
     private unfundedAssetsSvc: UnfundedAssetsService,
@@ -280,9 +280,9 @@ export class EditorFormComponent implements OnInit {
           this.updateMsg = `Successfully ${resp.returnMessage.toLowerCase()} the unfunded asset`;
           model.rowID = Number(resp.data);
           if(resp.returnMessage === 'Inserted')
-            this.adaptableApi.gridApi.addGridData([model])
+            this.adaptableApi?.gridApi.addGridData([model])
           else if(resp.returnMessage === 'Updated')
-            this.adaptableApi.gridApi.updateGridData([model])
+            this.adaptableApi?.gridApi.updateGridData([model])
 
           this.form.disable()
         }
