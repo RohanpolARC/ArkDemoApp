@@ -33,16 +33,21 @@
                 <mat-form-field class="form-field" appearance="outline">
                     <mat-label>Commitment Amount</mat-label>
                     <input matInput type="text" formControlName="commitmentAmount" readonly="readonly">
+                    <div matPrefix *ngIf="form.get('commitmentAmount').value">&euro;</div>
                 </mat-form-field>
 
                 <mat-form-field class="form-field" appearance="outline">
                     <mat-label>Expected Funded Amount</mat-label>
                     <input matInput type="text" formControlName="fundedAmount" readonly="readonly">
+                    <div matPrefix *ngIf="form.get('commitmentAmount').value">&euro;</div>
                 </mat-form-field>
 
                 <mat-form-field class="form-field" appearance="outline">
                     <mat-label>Unfunded Amount</mat-label>
-                    <input matInput type="text" formControlName="unfundedAmount" readonly="readonly">
+                    <input matInput type="text" 
+                    formControlName="unfundedAmount" readonly="readonly">
+                    <div matPrefix *ngIf="form.get('commitmentAmount').value">&euro;</div>
+
                 </mat-form-field>    
 
             </div>
@@ -65,7 +70,16 @@
 
                 <mat-form-field class="form-field" appearance="outline">
                     <mat-label>Ccy</mat-label>
-                    <input matInput type="text" formControlName="ccy" readonly="readonly">
+                    <input matInput type="text" formControlName="ccy" [matAutocomplete]="ccyAutocomplete" matAutocompletePosition="below">
+                    <mat-error *ngIf="form.get('ccy').invalid">Please select ccy from the list</mat-error>
+                    <mat-autocomplete autoActiveFirstOption #ccyAutocomplete="matAutocomplete" panelWidth="auto">
+                        <mat-option
+                            *ngFor="let ccy of ccyFilteredOptions | async"
+                            [value]="ccy"
+                        >
+                            {{ ccy }}
+                        </mat-option>
+                    </mat-autocomplete>
                 </mat-form-field>
 
                 <mat-form-field class="form-field" appearance="outline">

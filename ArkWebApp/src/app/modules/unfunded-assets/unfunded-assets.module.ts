@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 
 import { UnfundedAssetsRoutingModule } from './unfunded-assets-routing.module';
 import { UnfundedAssetsComponent } from './unfunded-assets.component';
@@ -41,7 +41,8 @@ import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-
   ],
   providers:[
     UnfundedAssetsService,
-    DecimalPipe
+    DecimalPipe,
+    CurrencyPipe
   ]
 })
 export class UnfundedAssetsModule { }

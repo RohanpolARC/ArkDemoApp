@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { LiquiditySummaryComponent } from './liquidity-summary.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AgGridModule } from '@ag-grid-community/angular';
@@ -46,6 +46,7 @@ import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfu
   ],
   providers: [
     DecimalPipe,
+    CurrencyPipe,
     UnfundedAssetsService
   ]
 })

@@ -25,7 +25,9 @@ export class UnfundedAssetsEditorComponent implements OnInit {
   assetOptions: string[]
   issuerSNFilteredOptions: Observable<string[]>
   assetFilteredOptions: Observable<string[]>
-
+  ccyOptions: string[] = ['CAD', 'EUR', 'JPY', 'GBP', 'USD']
+  ccyFilteredOptions: Observable<string[]>
+  
   assetID: number
   adaptableApi: AdaptableApi
   isSuccess: boolean
@@ -51,23 +53,24 @@ export class UnfundedAssetsEditorComponent implements OnInit {
 
     let isAssetValid: boolean = false;
     let isIssuerValid: boolean = false;
+    let isCcyValid: boolean = false;
     let istobefundedAmountValid: boolean = false;
     let isfundingDateValid: boolean = false;
 
     if(this.action === 'EDIT'){
       isAssetValid = this.assetOptions.includes(model.asset) || this.originalRowData?.['asset'] === model.asset;
       isIssuerValid = this.issuerSNOptions.includes(model.issuerShortName) || this.originalRowData?.['issuerShortName'] === model.issuerShortName;
-
     }
     else{
       isAssetValid = this.assetOptions.includes(model.asset);
       isIssuerValid = this.issuerSNOptions.includes(model.issuerShortName);
     }
 
+    isCcyValid = this.ccyOptions.includes(model.ccy)
     istobefundedAmountValid = !isNaN(getAmountNumber(model.tobefundedAmount));
     isfundingDateValid = !!model.fundingDate && (String(model.fundingDate) !== 'Invalid Date')
 
-    return isAssetValid && isIssuerValid && istobefundedAmountValid && isfundingDateValid ? { isValid: true } : { isValid: false};
+    return isAssetValid && isIssuerValid && isCcyValid && istobefundedAmountValid && isfundingDateValid ? { isValid: true } : { isValid: false};
   };
 
   initForm(){
@@ -218,6 +221,11 @@ export class UnfundedAssetsEditorComponent implements OnInit {
       startWith(''),
       map(value => _filter(this.assetOptions, value))
     )
+
+    this.ccyFilteredOptions = this.form.get('ccy').valueChanges.pipe(
+      startWith(''),
+      map(value => _filter(this.ccyOptions, value)),
+    );
   }
 
   setAssetOptions(issuer: string){
