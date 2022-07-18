@@ -14,6 +14,7 @@ import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from './core/services/FacilityDetails/facility-detail.service';
 import { MsalUserService } from './core/services/Auth/msaluser.service';
+import { getLastBusinessDay } from './shared/functions/utilities';
 
 @Component({  
   selector: 'app-root',  
@@ -77,7 +78,8 @@ export class AppComponent {
   LiquiditySummaryStyle: any = {};
   AccessControlStyle: any = {};
   PortfolioModellerStyle: any = {};
-  PortfolioMappingStyle: any = {}
+  PortfolioMappingStyle: any = {};
+  UnfundedAssetsStyle: any = {};
 
   constructor(private http: HttpClient,
     private dataService: DataService,
@@ -92,16 +94,6 @@ export class AppComponent {
 
   get getAccessibleTabs(){
     return this.accessService.accessibleTabs;
-  }
-
-  getLastBusinessDay(){
-    let workday = moment();
-    let day = workday.day();
-    let diff = 1;  // returns yesterday
-    if (day == 0 || day == 1){  // is Sunday or Monday
-      diff = day + 2;  // returns Friday
-    }
-    return workday.subtract(diff, 'days').toDate();
   }
 
   fetchTabs(){
@@ -178,10 +170,13 @@ export class AppComponent {
     }
 
     if(['/irr/portfoliomodeller'].includes(this.location.path())){
-      this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
-      this.dataService.changeSearchDate(this.asOfDate);
-      this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['rule']));
-      this.dataService.changeFilterApplyBtnState(true);
+      setTimeout(() => {
+        this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
+        this.dataService.changeSearchDate(this.asOfDate);
+        this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['rule']));
+        this.dataService.changeFilterApplyBtnState(true);
+  
+      }, 1350)
     }
 
     this.rightSidebarOpened = false
@@ -227,6 +222,9 @@ export class AppComponent {
     }
     else if(this.location.path() === '/portfolio-mapping'){
       this.updateSelection('Portfolio Mapping')
+    }
+    else if(this.location.path() === '/unfunded-assets'){
+      this.updateSelection('Unfunded Assets')
     }
     else this.updateSelection('')
   }
@@ -274,7 +272,7 @@ export class AppComponent {
     this.dataService.changeSearchTextValues(null);
     this.dataService.changeNumberField(null);
     
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle =  this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.notSelectedElement;
 
     this.lastClickedTabRoute = this.location.path();
 
@@ -285,8 +283,8 @@ export class AppComponent {
     else if(screen === 'Cash Balance'){
       this.filterPane.AsOfDateRange = true;
       this.range = {
-        start: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
-        end: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
+        start: moment(getLastBusinessDay()).format('YYYY-MM-DD'),
+        end: moment(getLastBusinessDay()).format('YYYY-MM-DD'),
       }
 
       this.searchDateRange.setValue({
@@ -309,7 +307,7 @@ export class AppComponent {
 
       this.multiSelectPlaceHolder = 'Select Fund(s)'
 
-      this.asOfDate = moment(this.getLastBusinessDay()).format('YYYY-MM-DD')
+      this.asOfDate = moment(getLastBusinessDay()).format('YYYY-MM-DD')
       
       this.fetchFacilityFunds();
 
@@ -335,7 +333,7 @@ export class AppComponent {
       this.LiquiditySummaryStyle = this.selectedElement;
 
       this.multiSelectPlaceHolder = 'Select FundHedging(s)';
-      this.asOfDate = moment(this.getLastBusinessDay()).format('YYYY-MM-DD')
+      this.asOfDate = moment(getLastBusinessDay()).format('YYYY-MM-DD')
       this.numberField = 10;
 
       this.fetchFundHedgingsRef();
@@ -357,13 +355,17 @@ export class AppComponent {
       this.filterPane.AsOfDate = true;
       this.filterPane.TextValueSelect = false;
 
-      this.asOfDate = moment(this.getLastBusinessDay()).format('YYYY-MM-DD')
+      this.asOfDate = moment(getLastBusinessDay()).format('YYYY-MM-DD')
       this.filterApply();
       this.router.navigate(['/irr/portfoliomodeller'])
     }
     else if(screen === 'Portfolio Mapping'){
       this.PortfolioMappingStyle = this.selectedElement
       this.router.navigate(['/portfolio-mapping'])
+    }
+    else if(screen === 'Unfunded Assets'){
+      this.UnfundedAssetsStyle = this.selectedElement
+      this.router.navigate(['/unfunded-assets'])
     }
     else if(screen === 'Access Control'){
       this.AccessControlStyle = this.selectedElement;

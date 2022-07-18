@@ -56,6 +56,11 @@
           </mat-list-item>
         </mat-list>  
 
+        <mat-list>
+          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Unfunded Assets');" [ngStyle]="UnfundedAssetsStyle">
+            <div class="list-item-text">Unfunded Assets</div>
+          </mat-list-item>
+        </mat-list>  
   
       </mat-expansion-panel>
   </mat-accordion>

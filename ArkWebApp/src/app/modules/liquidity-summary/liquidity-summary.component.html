@@ -6,8 +6,15 @@
         </div>
         <div class="action">
             <button mat-icon-button
+            (click)="openAssetDialog()"
+            matTooltip="Add unfunded asset"
+            matTooltipClass="tooltip-style">
+                <mat-icon class="material-icons-outlined">note_add</mat-icon>
+            </button>
+
+            <button mat-icon-button
             (click)="openDialog()"
-            matTooltip="Add"
+            matTooltip="Add attribute"
             matTooltipClass="tooltip-style">
                 <mat-icon class="material-icons-outlined">add_circle_outline</mat-icon>
             </button>

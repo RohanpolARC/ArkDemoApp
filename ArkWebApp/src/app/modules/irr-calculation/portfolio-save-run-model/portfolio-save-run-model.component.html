@@ -16,62 +16,74 @@
 
     <form [formGroup]="modelForm" autocomplete="off">
         <div class="form-container">
-            <div>
-                <div class="mat-slide-toggle-content">
-                    Create &nbsp;
+            <div class="row">
+                <div class="form-field">
+                    <div class="mat-slide-toggle-content">
+                        Create &nbsp;
+                    </div>
+                    <mat-slide-toggle [disabled]="disableUpdate || isSuccess"
+                    [color]="'primary'" formControlName="isUpdate">
+                        Update
+                    </mat-slide-toggle>
                 </div>
-                <mat-slide-toggle [disabled]="disableUpdate || isSuccess"
-                [color]="'primary'" formControlName="isUpdate">
-                    Update
-                </mat-slide-toggle>
+                <div class="form-field">
+                    <mat-slide-toggle
+                    [color]="'primary'" formControlName="isShared">
+                        Shared
+                    </mat-slide-toggle>
+                </div>               
+                <div class="form-field">
+
+                </div> 
+            </div>
+            
+            <div class="row">
+
+                <mat-form-field class="form-field" appearance="outline">
+                    <mat-label>Model Name</mat-label>
+                    <input matInput type="text" name="model-name" autocomplete="off" formControlName="modelName" required>
+                    <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="modelForm.get('modelName').reset()" [disabled]="isSuccess">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+                <mat-form-field class="form-field" appearance="outline">
+                    <mat-label>Model Description</mat-label>
+                    <input matInput type="text" name="model-desc" autocomplete="off" formControlName="modelDesc">
+                    <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="modelForm.get('modelDesc').reset()" [disabled]="isSuccess">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+
+                <mat-form-field class="form-field" appearance="outline">
+                    <mat-label>Aggregation Type</mat-label>
+                    <mat-select formControlName="aggregationType" required disableOptionCentering>
+                      <mat-option *ngFor="let aggr of aggregationTypes" [value]="aggr.type">
+                        {{aggr.type}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
             </div>
 
-            <div>
-                <mat-slide-toggle
-                [color]="'primary'" formControlName="isShared">
-                    Shared
-                </mat-slide-toggle>
+            <div class="row text">
+
+                <ng-container *ngIf="isAutomatic">
+                    Rules: <br>
+                    <div *ngFor="let rule of rules">
+                        Column: {{ rule.ColumnId }}, Values: {{ rule.Predicate.Inputs }}
+                    </div>
+                </ng-container>
+            
+                <ng-container *ngIf="!isAutomatic">
+                    Position IDs: <br>
+                    <ng-container *ngFor="let ID of positionIDs">
+                        {{ ID }}, 
+                    </ng-container>
+                </ng-container>
+            
             </div>
-            
-            <mat-form-field class="form-field" appearance="outline">
-                <mat-label>Model Name</mat-label>
-                <input matInput type="text" name="model-name" autocomplete="off" formControlName="modelName" required>
-                <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="modelForm.get('modelName').reset()" [disabled]="isSuccess">
-                    <mat-icon>close</mat-icon>
-                </button>
-            </mat-form-field>
-            <mat-form-field class="form-field" appearance="outline">
-                <mat-label>Model Description</mat-label>
-                <input matInput type="text" name="model-desc" autocomplete="off" formControlName="modelDesc">
-                <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="modelForm.get('modelDesc').reset()" [disabled]="isSuccess">
-                    <mat-icon>close</mat-icon>
-                </button>
-            </mat-form-field>
-            
-            <mat-form-field class="form-field" appearance="outline">
-                <mat-label>Aggregation Type</mat-label>
-                <mat-select formControlName="aggregationType" required disableOptionCentering>
-                  <mat-option *ngFor="let aggr of aggregationTypes" [value]="aggr.type">
-                    {{aggr.type}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
         </div>
     </form>
 
-    <ng-container *ngIf="isAutomatic">
-        Rules: <br>
-        <div *ngFor="let rule of rules">
-            Column: {{ rule.ColumnId }}, Values: {{ rule.Predicate.Inputs }}
-        </div>
-    </ng-container>
-
-    <ng-container *ngIf="!isAutomatic">
-        Position IDs: <br>
-        <ng-container *ngFor="let ID of positionIDs">
-            {{ ID }}, 
-        </ng-container>
-    </ng-container>
 
 </mat-dialog-content>
 

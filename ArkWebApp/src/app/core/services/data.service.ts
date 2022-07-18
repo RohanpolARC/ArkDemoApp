@@ -9,6 +9,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { DetailedView } from 'src/app/shared/models/GeneralModel';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { getLastBusinessDay, getMomentDateStr } from 'src/app/shared/functions/utilities';
 
 
 @Injectable({  
@@ -35,7 +36,7 @@ export class DataService {
 
     }
 
-    private searchDateMessage = new BehaviorSubject<string>(null)
+    private searchDateMessage = new BehaviorSubject<string>(getMomentDateStr(getLastBusinessDay()))
     currentSearchDate = this.searchDateMessage.asObservable();
     changeSearchDate(asOfDate: string){
         this.searchDateMessage.next(asOfDate);

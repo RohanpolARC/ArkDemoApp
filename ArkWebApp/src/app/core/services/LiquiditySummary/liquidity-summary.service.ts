@@ -5,6 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
 import { MsalUserService } from '../Auth/msaluser.service';
 import { LiquiditySummaryAttributeModel, LiquiditySummaryUpdateModel } from '../../../shared/models/LiquiditySummaryModel';
+import { UnfundedAsset } from 'src/app/shared/models/UnfundedAssetModel';
 
 @Injectable({
   providedIn: 'root'
@@ -48,5 +49,4 @@ export class LiquiditySummaryService {
         catchError((ex) => throwError(ex))
       )
     }
-
 }
