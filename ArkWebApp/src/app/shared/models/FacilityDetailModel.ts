@@ -17,6 +17,7 @@ export interface FacilityDetailModel{
     expectedPrice?: number,
     maturityPrice?: number,
     spreadDiscount?: number,
+    isOverride?: boolean,
 
     createdOn?: Date,
     createdBy?: string,

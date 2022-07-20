@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi } from '@ag-grid-community/all-modules';
+import { CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, ICellRendererParams } from '@ag-grid-community/all-modules';
 import {
   GridOptions,
   Module,
@@ -13,19 +13,20 @@ import { ExcelExportModule } from '@ag-grid-enterprise/excel-export';
 import {
   AdaptableOptions,
   AdaptableApi,
-  AdaptableButton,
-  ActionColumnButtonContext,
 } from '@adaptabletools/adaptable/types';
 import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from 'src/app/core/services/FacilityDetails/facility-detail.service';
 
-import { dateFormatter, amountFormatter, removeDecimalFormatter, formatDate, dateTimeFormatter } from 'src/app/shared/functions/formatter';
+import { amountFormatter, removeDecimalFormatter, formatDate, dateTimeFormatter } from 'src/app/shared/functions/formatter';
 import { ActionCellRendererComponent } from './action-cell-renderer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { AggridMaterialDatepickerComponent } from './aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { DataService } from 'src/app/core/services/data.service';
+import { CheckboxEditorComponent } from 'src/app/shared/components/checkbox-editor/checkbox-editor.component';
+import { FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
+import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/utilities';
 
 @Component({
   selector: 'app-facility-detail',
@@ -38,123 +39,11 @@ export class FacilityDetailComponent implements OnInit {
 
   subscriptions: Subscription[] = [];
 
-  agGridModules: Module[] = [ClientSideRowModelModule,RowGroupingModule,SetFilterModule,ColumnsToolPanelModule,MenuModule, ExcelExportModule];
+  agGridModules: Module[] = [
+    ClientSideRowModelModule, RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule
+  ];
 
-  columnDefs: ColDef[] = [
-    {field: 'issuerShortName', pinned: 'left', width: 170, tooltipField: 'issuerShortName'},
-    {field: 'asset', pinned: 'left', width: 240, tooltipField: 'asset'},
-    {field: 'assetID', width: 103},
-    {field: 'assetTypeName', width: 153},
-    {field: 'ccy', width: 80},
-    {field: 'faceValueIssue',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 150},
-    {field: 'costPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 110},
-    {field: 'mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 86},
-    {field: 'maturityDate', //valueFormatter: dateFormatter,
-     width: 135},
-    {field: 'benchMarkIndex', width: 161},
-    { 
-      field: 'spread', 
-      width: 94,
-      cellClass: 'ag-right-aligned-cell', 
-      valueFormatter: removeDecimalFormatter
-    },
-    {
-      field: 'pikmargin', 
-      width: 120,
-      headerName: 'PIK Margin',
-      cellClass: 'ag-right-aligned-cell',
-      valueFormatter: removeDecimalFormatter
-    },
-    {field: 'unfundedMargin', 
-     width: 160,
-    valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'floorRate', 
-    width: 113,
-    valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    { field: 'expectedDate', 
-      maxWidth: 150,
-      width: 150,
-    //  valueFormatter: dateFormatter, 
-
-      editable: (params: EditableCallbackParams) => {
-        return params.node.rowIndex === this.actionClickedRowID;
-      }, 
-      cellEditor: 'agGridMaterialDatepicker',
-      cellStyle: (params) => {
-        return (params.rowIndex === this.actionClickedRowID) ? 
-        {
-          'border-color': '#0590ca',
-        } : {
-          'border-color': '#fff'
-        };
-      },
-    },
-    { field: 'expectedPrice', 
-      width: 140,
-      valueFormatter: amountFormatter, 
-      cellClass: 'ag-right-aligned-cell', 
-      editable: (params: EditableCallbackParams) => {
-        return params.node.rowIndex === this.actionClickedRowID;
-      },
-      cellStyle: (params) => {
-        return (params.rowIndex === this.actionClickedRowID) ? 
-        {
-          'border-color': '#0590ca',
-        } : {
-          'border-color': '#fff'
-        };
-      }
-    },
-    { field: 'maturityPrice', 
-      width: 136,
-      valueFormatter: amountFormatter, 
-      cellClass: 'ag-right-aligned-cell',
-      editable: (params: EditableCallbackParams) => {
-        return params.node.rowIndex === this.actionClickedRowID;
-      }, 
-      cellStyle: (params) => {
-        return (params.rowIndex === this.actionClickedRowID) ? 
-        {
-          'border-color': '#0590ca',
-        } : {
-          'border-color': '#fff'
-        };
-      }
-    },
-    {
-      headerName: 'Spread Discount',
-      width: 151,
-      field: 'spreadDiscount',
-      editable:(params: EditableCallbackParams) => {
-        return params.node.rowIndex === this.actionClickedRowID;
-      }, 
-      cellStyle: (params) => {
-        return (params.rowIndex === this.actionClickedRowID) ? 
-        {
-          'border-color': '#0590ca',
-        } : {
-          'border-color': '#fff'
-        };
-      },
-      valueFormatter: removeDecimalFormatter
-    },
-    { headerName: 'Action', 
-      field: 'Action',
-      width: 130,
-      pinned: 'right',
-      pinnedRowCellRenderer: 'right',
-      cellRenderer: 'actionCellRenderer',
-      editable: false,
-      menuTabs: []
-    },
-
-    { field: 'assetClass', width: 145 },
-    { field: 'capStructureTranche', width: 145 },
-    { field: 'securedUnsecured', width: 145 },
-    { field: 'seniority', width: 145 },
-    { field: 'modifiedBy', width: 145 },
-    { field: 'modifiedOn', width: 150, valueFormatter: dateTimeFormatter }
-  ]
+  columnDefs: ColDef[]
     
   defaultColDef = {
     resizable: true,
@@ -170,9 +59,8 @@ export class FacilityDetailComponent implements OnInit {
 
   rowData: any[] = null;
   constructor(private facilityDetailsService: FacilityDetailService,
-    private warningMsgPopUp: MatSnackBar,
     private accessService: AccessService,
-    private dataService: DataService) { }
+    private dataSvc: DataService) { }
 
   adaptableOptions: AdaptableOptions;
   adapTableApi: AdaptableApi;
@@ -187,12 +75,16 @@ export class FacilityDetailComponent implements OnInit {
   
   isWriteAccess: boolean = false;
 
-  setWarningMsg(message: string, action: string, type: string = 'ark-theme-snackbar-normal'){
-    this.warningMsgPopUp.open(message, action, {
-      duration: 5000,
-      panelClass: [type]
-    });
+  editableCellStyle = (params) => {
+    return (params.rowIndex === this.actionClickedRowID) ? 
+    {
+      'border-color': '#0590ca',
+    } : null
   }
+
+  isEditable = (params: EditableCallbackParams) => {
+    return params.node.rowIndex === this.actionClickedRowID
+  } 
 
   checkValidation(newVal: any, columnID: string, rowData: any){
     // Expected Price
@@ -200,40 +92,82 @@ export class FacilityDetailComponent implements OnInit {
       if(<number>rowData['costPrice'] !== 0 &&
         (<number>newVal <  (0.75 * <number>rowData['costPrice']) 
       || <number>newVal > (1.5 * <number>rowData['costPrice'])) && rowData['assetTypeName'].toLowerCase().includes('loan')){
-        this.setWarningMsg(`Warning: Expected price not in range (Loan)`, 'Dismiss', 'ark-theme-snackbar-warning');
+        this.dataSvc.setWarningMsg(`Expected price not in range (Loan)`, 'Dismiss', 'ark-theme-snackbar-warning');
       }
       else if(<number>rowData['costPrice'] !== 0 &&
         (<number>newVal <  (0.5 * <number>rowData['costPrice']) 
       || <number>newVal > (3.0 * <number>rowData['costPrice'])) && rowData['assetTypeName'].toLowerCase().includes('equity')){
-        this.setWarningMsg(`Expected price not in range (Equity)`, 'Dismiss', 'ark-theme-snackbar-warning');
+        this.dataSvc.setWarningMsg(`Expected price not in range (Equity)`, 'Dismiss', 'ark-theme-snackbar-warning');
       }
     }
     if(columnID === 'expectedDate'){
       if(newVal != 'Invalid Date' || formatDate(newVal) !== 'NaN/NaN/NaN'){
         if(rowData['maturityDate']?.split('/')?.reverse()?.join('/') < newVal?.split('/')?.reverse()?.join('/')){
-          this.setWarningMsg(`Expected date greator than Maturity date`, `Dismiss`, 'ark-theme-snackbar-warning')
+          this.dataSvc.setWarningMsg(`Expected date greator than Maturity date`, `Dismiss`, 'ark-theme-snackbar-warning')
         }  
       }
     }
   }
 
+  toggleIsOverrideCheckbox(params: CellValueChangedEvent, newVal, column: string){
+
+    if(['expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount', 'isOverride'].includes(column)){
+
+      let isChanged: boolean = false;
+      if(['expectedPrice', 'maturityPrice', 'spreadDiscount'].includes(column)){
+        if(Number(params.newValue) !== Number(params.oldValue)){
+          isChanged = true
+        }
+      }
+      else if(column === 'expectedDate'){
+        if(params.newValue !== params.oldValue, true){
+          isChanged = true
+        }
+      }
+
+      if(isChanged){
+        let nodeData = params.data;
+        nodeData['isOverride'] = true
+        params.api.applyTransaction({ update: [nodeData] })
+  
+        params.api.refreshCells({
+          force: true,
+          columns: ['expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount', 'isOverride'],
+          rowNodes: [params.api.getRowNode(params.node.id)]
+        });
+  
+      }  
+    }
+  }
+
   onCellValueChanged(params: CellValueChangedEvent){
+
     let newVal = params.newValue;
     let column: string = params.column.getColId();
-    
+
+    this.toggleIsOverrideCheckbox(params, newVal, column);
     this.checkValidation(newVal, column, params.data);
   }
-  
+
+  onCheckboxChange(params: ICellRendererParams){
+
+    if(params.value == false){
+
+      let data = params.data;
+      data['expectedDate'] = formatDate(data?.['dealPFExpectedDate']);
+      data['expectedPrice'] = data?.['dealPFExpectedPrice'];
+      data['modifiedOn'] = data?.['dealPFModifiedOn'];
+      data['modifiedBy'] = data?.['dealPFModifiedBy'];
+
+      params.api.applyTransaction({
+        update: [data]
+      })
+    }
+  }
+
   setSelectedRowID(rowID: number){
     this.actionClickedRowID = rowID;
     if(this.actionClickedRowID === null){
-
-      /** 
-       *     (gridApi can be null on initial load, hence adding ? to not call stopEditing())
-       * 
-       *  If not adding ?, can give error and wouldn't call getFacilityDetails in filterBtnApplyState listener.
-       * */
-
       this.gridApi?.stopEditing(true);
     }
   }
@@ -252,7 +186,8 @@ export class FacilityDetailComponent implements OnInit {
 
   frameworkComponents = {
     actionCellRenderer: ActionCellRendererComponent,
-    agGridMaterialDatepicker: AggridMaterialDatepickerComponent
+    agGridMaterialDatepicker: AggridMaterialDatepickerComponent,
+    agGridCheckboxRenderer: CheckboxEditorComponent
   }
 
   ngOnDestroy(): void {
@@ -264,21 +199,113 @@ export class FacilityDetailComponent implements OnInit {
 
   ngOnInit(): void {
 
+    this.columnDefs = [
+      {field: 'issuerShortName', pinned: 'left', width: 170, tooltipField: 'issuerShortName', type: 'abColDefString'},
+      {field: 'asset', pinned: 'left', width: 240, tooltipField: 'asset', type: 'abColDefString'},
+      {field: 'assetID', width: 103, type: 'abColDefNumber'},
+      {field: 'assetTypeName', width: 153, type: 'abColDefString'},
+      {field: 'ccy', width: 80, type: 'abColDefString'},
+      {field: 'faceValueIssue',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 150, type: 'abColDefNumber'},
+      {field: 'costPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 110, type: 'abColDefNumber'},
+      {field: 'mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 86, type: 'abColDefNumber'},
+      {field: 'maturityDate', //valueFormatter: dateFormatter,
+       width: 135},
+      {field: 'benchMarkIndex', width: 161, type: 'abColDefString'},
+      { 
+        field: 'spread', 
+        width: 94,
+        cellClass: 'ag-right-aligned-cell', 
+        valueFormatter: removeDecimalFormatter, type: 'abColDefNumber'
+      },
+      {
+        field: 'pikmargin', 
+        width: 120,
+        headerName: 'PIK Margin',
+        cellClass: 'ag-right-aligned-cell',
+        valueFormatter: removeDecimalFormatter, type: 'abColDefNumber'
+      },
+      {field: 'unfundedMargin', 
+       width: 160,
+      valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+      {field: 'floorRate', 
+      width: 113,
+      valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+      { field: 'expectedDate', 
+        maxWidth: 150,
+        width: 150,
+      //  valueFormatter: dateFormatter, 
+  
+        editable: this.isEditable,
+        cellEditor: 'agGridMaterialDatepicker',
+        cellStyle: this.editableCellStyle
+      },
+      { field: 'expectedPrice', 
+        width: 140,
+        valueFormatter: amountFormatter, 
+        cellClass: 'ag-right-aligned-cell', 
+        editable: this.isEditable,
+        cellStyle: this.editableCellStyle, type: 'abColDefNumber'
+      },
+      { field: 'maturityPrice', 
+        width: 136,
+        valueFormatter: amountFormatter, 
+        cellClass: 'ag-right-aligned-cell',
+        editable: this.isEditable,
+        cellStyle: this.editableCellStyle,
+        type: 'abColDefNumber'
+      },
+      {
+        headerName: 'Spread Discount',
+        width: 151,
+        field: 'spreadDiscount',
+        editable: this.isEditable,
+        cellStyle: this.editableCellStyle,
+        valueFormatter: removeDecimalFormatter, type: 'abColDefNumber'
+      },
+      {
+        field: 'isOverride',
+        cellStyle: this.editableCellStyle,
+        cellRenderer: 'agGridCheckboxRenderer',
+        cellRendererParams: () => {
+          return {
+            editableRowID: this.getSelectedRowID(),
+            onCheckboxcolChanged: this.onCheckboxChange
+          }
+        },
+        width: 130
+      },
+      { headerName: 'Action', 
+        field: 'Action',
+        width: 130,
+        pinned: 'right',
+        pinnedRowCellRenderer: 'right',
+        cellRenderer: 'actionCellRenderer',
+        editable: false,
+        menuTabs: []
+      },
+  
+      { field: 'assetClass', width: 145, type: 'abColDefString' },
+      { field: 'capStructureTranche', width: 145, type: 'abColDefString' },
+      { field: 'securedUnsecured', width: 145, type: 'abColDefString' },
+      { field: 'seniority', width: 145, type: 'abColDefString' },
+      { field: 'modifiedBy', width: 145, type: 'abColDefString' },
+      { field: 'modifiedOn', width: 150, valueFormatter: dateTimeFormatter }
+    ]
     /** Making this component available to child components in Ag-grid */
     
     this.context = {
       componentParent: this
     }
 
-    this.subscriptions.push(this.dataService.currentSearchDate.subscribe(asOfDate => {
+    this.subscriptions.push(this.dataSvc.currentSearchDate.subscribe(asOfDate => {
       this.asOfDate = asOfDate
     }))
 
-    this.subscriptions.push(this.dataService.currentSearchTextValues.subscribe(funds => {
+    this.subscriptions.push(this.dataSvc.currentSearchTextValues.subscribe(funds => {
       this.funds = funds
     }))
 
-    this.subscriptions.push(this.dataService.filterApplyBtnState.subscribe(isHit => {
+    this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if(isHit){
         this.setSelectedRowID(null);
 
@@ -329,77 +356,30 @@ export class FacilityDetailComponent implements OnInit {
       },
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:true, 
+      onCellValueChanged: this.onCellValueChanged.bind(this)
     }
 
     this.adaptableOptions = {
-      autogeneratePrimaryKey: true,
-      primaryKey: '',
-      userName: 'TestUser',
-      adaptableId: "",
+      primaryKey: 'assetID',
+      userName: this.dataSvc.getCurrentUserName(),
+      adaptableId: "Facility Detail ID",
       adaptableStateKey: 'Facility Detail Key',
 
-      userInterfaceOptions: {
-        actionColumns: [
-          {
-            columnId: 'Save',
-            actionColumnButton: {
-             
-              
-              buttonStyle: (
-                button: AdaptableButton<ActionColumnButtonContext>,
-                context: ActionColumnButtonContext
-              ) => {
-                return {
-                  variant: 'raised',
-                }
-              },
-
-              onClick: (
-                button: AdaptableButton<ActionColumnButtonContext>,
-                context: ActionColumnButtonContext
-              ) => {
-                let rowData = context.rowNode?.data;
-              },
-              icon: {
-                src: '../assets/img/save_black_24dp.svg',
-                style: {
-                  height: 25,
-                  width: 25
-                } 
-              }
-            }
-          },
-          {
-            columnId: 'Undo',
-            actionColumnButton: {
-
-              onClick: (
-                button: AdaptableButton<ActionColumnButtonContext>,
-                context: ActionColumnButtonContext
-              ) => {
-                let pkey = context.primaryKeyValue;
-                this.gridOptions.api.undoCellEditing();
-              },
-              icon: {
-                src: '../assets/img/undo_black_24dp.svg',
-                style: {
-                  height: 25,
-                  width: 25
-                }
-              }
-
-
-            }
-          }
-        ]
+      teamSharingOptions: {
+        enableTeamSharing: true,
+        setSharedEntities: setSharedEntities.bind(this),
+        getSharedEntities: getSharedEntities.bind(this)
       },
 
       predefinedConfig: {
         Dashboard: {
-          ModuleButtons: ['Export', 'Layout', 'ConditionalStyle'],
-          Tabs: []
+          ModuleButtons: ['TeamSharing', 'Export', 'Layout', 'ConditionalStyle', 'Filter'],
+          Tabs: [],
+          DashboardTitle: ' ',
+          Revision: 2
         },
         Layout:{
+          Revision: 2,
           CurrentLayout: 'Basic Facility Detail',
           Layouts: [{
             Name: 'Basic Facility Detail',
@@ -421,12 +401,25 @@ export class FacilityDetailComponent implements OnInit {
               'expectedDate',
               'expectedPrice',
               'maturityPrice',
+              'spreadDiscount',
+              'isOverride',
+              'assetClass',
+              'capStructureTranche',
+              'securedUnsecured',
+              'seniority',
+              'modifiedBy',
+              'modifiedOn',
               'Action',
             ],
             PinnedColumnsMap:{
+              issuerShortName: 'left',
+              asset: 'left',
               Action: 'right'
             }
           }]
+        },
+        FormatColumn: {
+          Revision: 2
         }
       }
     }

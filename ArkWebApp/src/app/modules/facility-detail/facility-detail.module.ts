@@ -20,6 +20,8 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { InputDateAdapter } from 'src/app/shared/providers/date-adapter';
 import { Platform } from '@angular/cdk/platform';
 import { DateAdapter } from '@angular/material/core';
+import { CheckboxEditorComponent } from 'src/app/shared/components/checkbox-editor/checkbox-editor.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [
@@ -33,7 +35,8 @@ import { DateAdapter } from '@angular/material/core';
     AdaptableAngularAgGridModule,
     AgGridModule.withComponents([
       ActionCellRendererComponent,
-      AggridMaterialDatepickerComponent
+      AggridMaterialDatepickerComponent,
+      CheckboxEditorComponent
     ]),
     MatCardModule,
     MatIconModule,
@@ -45,7 +48,8 @@ import { DateAdapter } from '@angular/material/core';
     MatButtonModule,
     FormsModule,
     MatTooltipModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatCheckboxModule
   ],
   providers: [
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  
