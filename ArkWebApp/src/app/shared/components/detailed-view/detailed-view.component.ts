@@ -79,8 +79,8 @@ export class DetailedViewComponent implements OnInit {
       else if(['createdon','created on','modified on', 'modifiedon'].includes(col.toLowerCase())){
         colDef.valueFormatter = dateTimeFormatter
       }
-      else if(['account', 'accountid', 'account id'].includes(col.toLocaleLowerCase())){
-        continue; // Skipping amountFormatter
+      else if(['account', 'accountid', 'account id', 'issuer', 'id', 'positionid', 'issuerid', 'assetid'].includes(col.toLowerCase())){
+        colDef.valueFormatter = null;
       }
       else if(!isNaN(parseFloat(row[i].value))){
         colDef.valueFormatter = amountFormatter

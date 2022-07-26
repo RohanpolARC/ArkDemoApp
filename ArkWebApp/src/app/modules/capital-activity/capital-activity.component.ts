@@ -6,7 +6,8 @@ import { AddCapitalModalComponent } from './add-capital-modal/add-capital-modal.
 import {
   GridOptions,
   Module,
-  ColDef
+  ColDef,
+  CellClickedEvent
 } from '@ag-grid-community/all-modules';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
@@ -25,13 +26,15 @@ import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/C
 
 import { Subscription } from 'rxjs';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
-import { dateFormatter, dateTimeFormatter, amountFormatter, nullOrZeroFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, dateTimeFormatter, amountFormatter, nullOrZeroFormatter, formatDate } from 'src/app/shared/functions/formatter';
 
 import { getNodes, validateLinkSelect }from './utilities/functions';
 import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
-
+import { DetailedViewComponent } from '../../shared/components/detailed-view/detailed-view.component';
 import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
 import { DataService } from 'src/app/core/services/data.service';
+import { DetailedView } from 'src/app/shared/models/GeneralModel';
+import { FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 
 @Component({
   selector: 'app-capital-activity',
@@ -53,25 +56,64 @@ export class CapitalActivityComponent implements OnInit {
     SetFilterModule,
     ColumnsToolPanelModule,
     MenuModule,
-    ExcelExportModule
+    ExcelExportModule,
+    FiltersToolPanelModule,
+    ClipboardModule,
+    SideBarModule,
+    RangeSelectionModule
   ];
 
+  onTotalBaseClick(event: CellClickedEvent){
+    if(event.node.group){
+ 
+      let leafNodes: any[] = event.node.allLeafChildren.map(row => row?.['data']);      
+      let pIDcashDtTypeStr: string = '';
+      leafNodes.forEach(investment => {
+        pIDcashDtTypeStr += `${investment.positionID}|${formatDate(investment.cashDate, true)}:${investment.type},`
+      })
+      
+      if(pIDcashDtTypeStr.length)
+        pIDcashDtTypeStr = pIDcashDtTypeStr.slice(0, -1);
+  
+      let model: DetailedView = <DetailedView> {};
+      model.screen = 'Capital Activity';
+      model.param1 = pIDcashDtTypeStr;
+      model.param2 = model.param3 = model.param4 = model.param5 = '';
+
+      const dialogRef = this.dialog.open(DetailedViewComponent, {
+        data: {
+          detailedViewRequest: model
+        },
+        width: '90vw',
+        height: '80vh'
+      })
+
+    }
+  }
+
   columnDefsInvstmnt: ColDef[] = [
-    {field: 'positionID', headerName: 'Position ID'},
+    { field: 'unqiueID', type: 'abColDefNumber'},
+    {field: 'positionID', headerName: 'Position ID', type: 'abColDefNumber'},
     {field: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter},
-    {field: 'fund', headerName: 'Fund'},
-    {field: 'fundHedging', headerName: 'Fund Hedging'},
-    {field: 'portfolio', headerName: 'Portfolio'},
-    {field: 'issuerShortName', headerName: 'Issuer'},
-    {field: 'issuerID', headerName: 'Issuer ID'},
-    {field: 'asset', headerName: 'Asset'},
-    {field: 'assetID', headerName: 'AssetID'},
-    {field: 'fundCcy', headerName: 'Fund Ccy'},
-    {field: 'positionCcy', headerName: 'Position Ccy'},
-    {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'linkedAmount', headerName: 'Linked Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'totalEur', headerName: 'Total Eur', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
+    {field: 'fund', headerName: 'Fund', type: 'abColDefString'},
+    {field: 'fundHedging', headerName: 'Fund Hedging', type: 'abColDefString'},
+    {field: 'portfolio', headerName: 'Portfolio', type: 'abColDefString'},
+    {field: 'issuerShortName', headerName: 'Issuer', type: 'abColDefString'},
+    {field: 'issuerID', headerName: 'Issuer ID', type: 'abColDefNumber'},
+    {field: 'asset', headerName: 'Asset', type: 'abColDefString'},
+    {field: 'assetID', headerName: 'AssetID', type: 'abColDefNumber'},
+    {field: 'fundCcy', headerName: 'Fund Ccy', type: 'abColDefString'},
+    {field: 'positionCcy', headerName: 'Position Ccy', type: 'abColDefString'},
+    {field: 'amount', headerName: 'Total', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+    {field: 'linkedAmount', headerName: 'Linked Amount Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+    {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', onCellClicked: this.onTotalBaseClick.bind(this), 
+    cellStyle: (params) => {
+      if(params.node.group)
+        return { color: '#0590ca' };
+      return null;
+    }, type: 'abColDefNumber'},
+    {field: 'totalEur', headerName: 'Total Eur', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+    {field: 'type'}
   ]
 
   columnDefs: ColDef[] = [
@@ -83,17 +125,17 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
     { field: 'fundCcy', headerName: 'Fund Ccy', type:'abColDefString'},
     { field: 'posCcy', headerName: 'Position Ccy', type: 'abColDefString'},
-    { field: 'fxRate', headerName: 'FXRate', valueFormatter: nullOrZeroFormatter},
-    { field: 'totalAmount', headerName: 'Total Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'wsoIssuerID', headerName: 'WSO Issuer ID', valueFormatter: nullOrZeroFormatter},
+    { field: 'fxRate', headerName: 'FXRate', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
+    { field: 'totalAmount', headerName: 'Total Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+    {field: 'wsoIssuerID', headerName: 'WSO Issuer ID', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
     { field: 'issuerShortName', headerName: 'Issuer Short Name', type:'abColDefString'},
-    {field: 'wsoAssetID', headerName: 'WSO Asset ID', valueFormatter: nullOrZeroFormatter},
+    {field: 'wsoAssetID', headerName: 'WSO Asset ID', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
     { field: 'asset', headerName: 'Asset', type:'abColDefString'},
     { field: 'narrative', headerName: 'Narrative', type:'abColDefString'},
     { field: 'source', headerName: 'Source', type:'abColDefString'},
     { field: 'sourceID', headerName: 'Source ID', type:'abColDefNumber', valueFormatter: nullOrZeroFormatter},
     { field: 'isLinked', headerName: 'Is Linked', type:'abColDefBoolean'},
-    { field: 'linkedAmount', headerName: 'Linked Amount', type:'abColDefNumber', valueFormatter: amountFormatter},
+    { field: 'linkedAmount', headerName: 'Linked Total Base', type:'abColDefNumber', valueFormatter: amountFormatter},
     { field: 'createdOn', headerName: 'Created On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
     { field: 'createdBy', headerName: 'Created By', type:'abColDefString'},
     { field: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
@@ -133,17 +175,18 @@ export class CapitalActivityComponent implements OnInit {
   investorPanelOpenState = false;
 
   fetchInvestmentData(): void{
-    this.gridOptionsInvstmnt?.api?.showLoadingOverlay();
+    this.gridOptionsInvstmnt.api?.showLoadingOverlay();
     this.subscriptions.push(this.capitalActivityService.getCapitalInvestment().subscribe({
-      next: data => {
-        this.gridOptionsInvstmnt?.api?.hideOverlay();
+      next: (data: any[]) => {
+        this.gridOptionsInvstmnt.api?.hideOverlay();
         this.rowDataInvstmnt = data;
+        // this.gridOptionsInvstmnt.api?.applyTransaction({ update: data })
         this.adapTableApiInvstmnt.gridApi.loadGridData(this.rowDataInvstmnt);
       },
       error: error => {
         this.rowDataInvstmnt = [];
-        this.gridOptionsInvstmnt?.api?.hideOverlay();
-        console.error("Capital Investment Data fetch failed");
+        this.gridOptionsInvstmnt.api?.hideOverlay();
+        console.error("Capital Investment Data fetch failed" + error);
       }
     }))
   }
@@ -209,7 +252,7 @@ export class CapitalActivityComponent implements OnInit {
 
   ngOnInit(): void {
     this.gridOptions = {
-      enableRangeSelection: false,
+      enableRangeSelection: true,
       sideBar: true,
       suppressMenuHide: true,
       singleClickEdit: false,
@@ -217,7 +260,8 @@ export class CapitalActivityComponent implements OnInit {
         AdaptableToolPanel: AdaptableToolPanelAgGridComponent
       },
       columnDefs: this.columnDefs,
-      allowContextMenuWithControlKey:false
+      allowContextMenuWithControlKey:false,
+      suppressScrollOnNewData: true,
     }
 
     this.gridOptionsInvstmnt = JSON.parse(JSON.stringify(this.gridOptions));
@@ -233,10 +277,6 @@ export class CapitalActivityComponent implements OnInit {
       adaptableId: 'Capital Activity - Investor Cashflows',
       adaptableStateKey: `Capital Activity Key`,
       
-      layoutOptions: {
-        autoSaveLayouts: false
-      },
-  
       teamSharingOptions: {
         enableTeamSharing: true,
         setSharedEntities: this.setSharedEntities.bind(this),
@@ -283,8 +323,8 @@ export class CapitalActivityComponent implements OnInit {
   
       predefinedConfig: {
         Dashboard: {
-          Revision: 1,
-          ModuleButtons: ['TeamSharing','Export', 'Layout','ConditionalStyle'],
+          Revision: 2,
+          ModuleButtons: ['TeamSharing','Export', 'Layout','ConditionalStyle', 'Filter'],
           IsCollapsed: true,
           Tabs: [{
             Name:'Layout',
@@ -334,16 +374,12 @@ export class CapitalActivityComponent implements OnInit {
     }
 
     this.adaptableOptionsInvstmnt = {
-      primaryKey: '',
-      autogeneratePrimaryKey: true,
+      primaryKey: 'uniqueID',
+      // autogeneratePrimaryKey: true,
       userName: this.dataService.getCurrentUserName(),
       adaptableId: 'Capital Activity - Investment Cashflows',
       adaptableStateKey: `Investment CashFlow Key`,
       
-      layoutOptions: {
-        autoSaveLayouts: false
-      },
-  
       toolPanelOptions: {
         toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
       },
@@ -394,8 +430,8 @@ export class CapitalActivityComponent implements OnInit {
   
       predefinedConfig: {
         Dashboard: {
-          Revision: 1,
-          ModuleButtons: ['TeamSharing', 'Export', 'Layout','ConditionalStyle'],
+          Revision: 2,
+          ModuleButtons: ['TeamSharing', 'Export', 'Layout','ConditionalStyle', 'Filter'],
           IsCollapsed: true,
           Tabs: [{
             Name:'Layout',
@@ -405,12 +441,13 @@ export class CapitalActivityComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 7,
+          Revision: 11,
           Layouts:[{
             Name: 'Basic Investment Cashflow',
             Columns: [
               'positionID',
               'cashDate',
+              'type',
               'fund',
               'fundHedging',
               'portfolio',
@@ -427,7 +464,7 @@ export class CapitalActivityComponent implements OnInit {
             ColumnWidthMap:{
               ActionLink: 50,
             },
-            RowGroupedColumns: ['fundHedging', 'cashDate', 'issuerShortName', 'positionCcy'],
+            RowGroupedColumns: ['fundHedging', 'cashDate', 'issuerShortName', 'positionCcy', 'type'],
             PinnedColumnsMap: {
               'ActionLink': 'right'
             },
@@ -435,7 +472,6 @@ export class CapitalActivityComponent implements OnInit {
               totalBase: 'sum',
               totalEur: 'sum',
               linkedAmount: 'sum',
-              amount: 'sum'
             }
           }]
         }  

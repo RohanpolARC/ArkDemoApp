@@ -151,35 +151,38 @@ export class AppComponent {
   }
 
   filterApply(){
-    if(this.location.path() === '/facility-detail'){
 
-      this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
-      this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['fund']))
-      this.dataService.changeSearchDate(this.asOfDate);
+    setTimeout(() => {
+      if(this.location.path() === '/facility-detail'){
 
-      this.dataService.changeFilterApplyBtnState(true);
-    }
+        this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
+        this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['fund']))
+        this.dataService.changeSearchDate(this.asOfDate);
 
-    if(this.location.path() === '/liquidity-summary'){
+        this.dataService.changeFilterApplyBtnState(true);
+      }
 
-      this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
-      this.dataService.changeSearchDate(this.asOfDate);
-      this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['fundHedging']))
-      this.dataService.changeNumberField(this.numberField)
-      this.dataService.changeFilterApplyBtnState(true);
-    }
+      if(this.location.path() === '/liquidity-summary'){
 
-    if(['/irr/portfoliomodeller'].includes(this.location.path())){
-      setTimeout(() => {
         this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
         this.dataService.changeSearchDate(this.asOfDate);
-        this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['rule']));
+        this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['fundHedging']))
+        this.dataService.changeNumberField(this.numberField)
         this.dataService.changeFilterApplyBtnState(true);
-  
-      }, 1350)
-    }
+      }
 
-    this.rightSidebarOpened = false
+      if(['/irr/portfoliomodeller'].includes(this.location.path())){
+        setTimeout(() => {
+          this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
+          this.dataService.changeSearchDate(this.asOfDate);
+          this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['rule']));
+          this.dataService.changeFilterApplyBtnState(true);
+    
+        }, 1350)
+      }
+
+      this.rightSidebarOpened = false
+    }, 250)
   }
 
   showUserRoles(){

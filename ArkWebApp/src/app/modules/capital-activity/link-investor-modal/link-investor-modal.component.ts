@@ -68,15 +68,14 @@ export class LinkInvestorModalComponent implements OnInit {
     { field: 'capitalType', headerName: 'Capital Type', type:'abColDefString'},
     { field: 'capitalSubType', headerName: 'Capital Subtype', type:'abColDefString'},
     { field: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
-    { field: 'fundCcy', headerName: 'Currency', type:'abColDefString'},
+    { field: 'fundCcy', headerName: 'Base Ccy', type:'abColDefString'},
     { field: 'totalAmount', headerName: 'Total Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
     { field: 'issuerShortName', headerName: 'Issuer Short Name', type:'abColDefString'},
     { field: 'asset', headerName: 'Asset', type:'abColDefString'},
     { field: 'wsoAssetID', headerName: 'Asset ID', type:'abColDefNumber',valueFormatter: nonAmountNumberFormatter},
     { field: 'narrative', headerName: 'Narrative', type:'abColDefString'},
     { field: 'source', headerName: 'Source', type:'abColDefString'},
-    // { field: 'isLinked', headerName: 'Is Linked', type: 'abColDefBoolean'},
-    { field: 'linkedAmount', headerName: 'Linked Amount', type: 'abColDefNumber', valueFormatter: amountFormatter},
+    { field: 'linkedAmount', headerName: 'Linked Total Base', type: 'abColDefNumber', valueFormatter: amountFormatter},
     { field: 'Link', headerName: 'Link', type:'abColDefBoolean', editable: true},
     { field: 'resultCategory', headerName: 'Result Category', type:'abColDefString'},
     { field: 'isChecked', headerName: 'Link', type: 'abColDefBoolean', checkboxSelection: true}
@@ -202,19 +201,19 @@ export class LinkInvestorModalComponent implements OnInit {
 
   associate(capitalIDs?: number[], action?: string){
 
-    let pIDcashDtStr: string = '';
+    let pIDcashDtTypeStr: string = '';
     let amt: number = 0;
 
     this.message.investmentData.forEach(investment => {
-      pIDcashDtStr += `${investment.positionID}|${formatDate(investment.cashDate, true)},`
+      pIDcashDtTypeStr += `${investment.positionID}|${formatDate(investment.cashDate, true)}:${investment.type},`
       amt += Number(investment.amount)
     })
     
-    if(pIDcashDtStr.length)
-      pIDcashDtStr = pIDcashDtStr.slice(0, -1);
+    if(pIDcashDtTypeStr.length)
+      pIDcashDtTypeStr = pIDcashDtTypeStr.slice(0, -1);
     
     let model: AssociateInvestment = <AssociateInvestment> {};
-    model.positionIDCashdateStr = pIDcashDtStr;
+    model.positionIDCashdateTypeStr = pIDcashDtTypeStr;
     model.capitalIDs = this.checkedCapitalIDs;
     model.username = this.msalService.getUserName();
 
@@ -360,16 +359,17 @@ export class LinkInvestorModalComponent implements OnInit {
     
     this.checkedCapitalIDs = [];
     this.message.capitalAct.posCcy = this.message.investmentData[0].positionCcy;
-    this.message.capitalAct.positionIDs = '';
-    let ids: string = '';
-    for(let i: number = 0; i < this.message.investmentData.length; i+= 1){
-      ids += String(this.message.investmentData[i].positionID) + ','
-    }
-    ids = ids.slice(0, -1);
-    this.message.capitalAct.positionIDs = ids;
 
-    /** Assuming that investmentData has a valid cashDate on 1st row */
-    this.message.capitalAct.cashDate = new Date(moment(this.message.investmentData[0].cashDate).format('YYYY-MM-DD'));
+    let pIDcashDtTypeStr: string = '';
+
+    this.message.investmentData.forEach(investment => {
+      pIDcashDtTypeStr += `${investment.positionID}|${formatDate(investment.cashDate, true)}:${investment.type},`
+    })
+    
+    if(pIDcashDtTypeStr.length)
+      pIDcashDtTypeStr = pIDcashDtTypeStr.slice(0, -1);
+
+    this.message.capitalAct.positionIDCashdateTypeStr = pIDcashDtTypeStr  
 
     this.gridOptions?.api?.showLoadingOverlay();
     this.subscriptions.push(this.capitalActivityService.lookUpCapitalActivity(this.message.capitalAct).subscribe({

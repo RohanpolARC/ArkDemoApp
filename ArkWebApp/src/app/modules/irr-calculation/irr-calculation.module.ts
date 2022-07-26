@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IrrCalculationComponent } from './irr-calculation.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MatCardModule } from '@angular/material/card';
@@ -19,6 +18,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTabsModule } from '@angular/material/tabs';
 import { PortfolioModellerComponent } from './portfolio-modeller/portfolio-modeller.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { IrrCalculationRoutingModule } from './irr-calculation-routing.module';
+import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
+import { InputDateAdapter } from 'src/app/shared/providers/date-adapter';
+import { Platform } from '@angular/cdk/platform';
 
 @NgModule({
   declarations: [
@@ -29,7 +32,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   ],
   imports: [
     CommonModule,
-    BrowserAnimationsModule,
+    IrrCalculationRoutingModule,
+
     AdaptableAngularAgGridModule,
     AgGridModule.withComponents([]),
     MatCardModule,
@@ -46,6 +50,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatTabsModule,
     MatProgressSpinnerModule,
     MatSelectModule
+  ],
+  providers: [
+    {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  
+    {provide: DateAdapter, useClass: InputDateAdapter, deps: [MAT_DATE_LOCALE, Platform]}
   ]
 })
 export class IrrCalculationModule { }

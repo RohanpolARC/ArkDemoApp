@@ -9,7 +9,6 @@ import { DataService } from 'src/app/core/services/data.service';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
 import { amountFormatter, dateFormatter, dateTimeFormatter } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
-import { getGridData } from '../portfolio-manager/utilities/functions';
 import { UnfundedAssetsEditorComponent } from './unfunded-assets-editor/unfunded-assets-editor.component';
 
 @Component({
