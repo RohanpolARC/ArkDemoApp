@@ -82,7 +82,8 @@ export class CapitalActivityComponent implements OnInit {
 
       const dialogRef = this.dialog.open(DetailedViewComponent, {
         data: {
-          detailedViewRequest: model
+          detailedViewRequest: model,
+          failureMsg: leafNodes.length > 50 ? `Please select group having lesser child rows (Max 50)` : null
         },
         width: '90vw',
         height: '80vh'
@@ -92,54 +93,54 @@ export class CapitalActivityComponent implements OnInit {
   }
 
   columnDefsInvstmnt: ColDef[] = [
-    { field: 'unqiueID', type: 'abColDefNumber'},
-    {field: 'positionID', headerName: 'Position ID', type: 'abColDefNumber'},
-    {field: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter},
-    {field: 'fund', headerName: 'Fund', type: 'abColDefString'},
-    {field: 'fundHedging', headerName: 'Fund Hedging', type: 'abColDefString'},
-    {field: 'portfolio', headerName: 'Portfolio', type: 'abColDefString'},
-    {field: 'issuerShortName', headerName: 'Issuer', type: 'abColDefString'},
-    {field: 'issuerID', headerName: 'Issuer ID', type: 'abColDefNumber'},
-    {field: 'asset', headerName: 'Asset', type: 'abColDefString'},
-    {field: 'assetID', headerName: 'AssetID', type: 'abColDefNumber'},
-    {field: 'fundCcy', headerName: 'Fund Ccy', type: 'abColDefString'},
-    {field: 'positionCcy', headerName: 'Position Ccy', type: 'abColDefString'},
-    {field: 'amount', headerName: 'Total', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-    {field: 'linkedAmount', headerName: 'Linked Amount Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-    {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', onCellClicked: this.onTotalBaseClick.bind(this), 
-    cellStyle: (params) => {
-      if(params.node.group)
-        return { color: '#0590ca' };
-      return null;
-    }, type: 'abColDefNumber'},
-    {field: 'totalEur', headerName: 'Total Eur', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-    {field: 'type'}
+    { field: 'unqiueID', tooltipField: 'unqiueID', type: 'abColDefNumber'},
+    { field: 'positionID', tooltipField: 'positionID', headerName: 'Position ID', type: 'abColDefNumber'},
+    { field: 'cashDate', tooltipField: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter},
+    { field: 'fund', tooltipField: 'fund', headerName: 'Fund', type: 'abColDefString'},
+    { field: 'fundHedging', tooltipField: 'fundHedging', headerName: 'Fund Hedging', type: 'abColDefString'},
+    { field: 'portfolio', tooltipField: 'portfolio', headerName: 'Portfolio', type: 'abColDefString'},
+    { field: 'issuerShortName', tooltipField: 'issuerShortName', headerName: 'Issuer', type: 'abColDefString'},
+    { field: 'issuerID', tooltipField: 'issuerID', headerName: 'Issuer ID', type: 'abColDefNumber'},
+    { field: 'asset', tooltipField: 'asset', headerName: 'Asset', type: 'abColDefString'},
+    { field: 'assetID', tooltipField: 'assetID', headerName: 'AssetID', type: 'abColDefNumber'},
+    { field: 'fundCcy', tooltipField: 'fundCcy', headerName: 'Fund Ccy', type: 'abColDefString'},
+    { field: 'positionCcy', tooltipField: 'positionCcy', headerName: 'Position Ccy', type: 'abColDefString'},
+    { field: 'amount', tooltipField: 'amount', headerName: 'Total', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+    { field: 'linkedAmount', tooltipField: 'linkedAmount', headerName: 'Linked Amount Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+    { field: 'totalBase', tooltipValueGetter: (params) => { return "Detailed View" }, headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', onCellClicked: this.onTotalBaseClick.bind(this), 
+      cellStyle: (params) => {
+        if(params.node.group)
+          return { color: '#0590ca' };
+        return null;
+      }, type: 'abColDefNumber'},
+    { field: 'totalEur', headerName: 'Total Eur', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+    { field: 'type'}
   ]
 
   columnDefs: ColDef[] = [
-    {field: 'capitalID', headerName: 'Capital ID', type: 'abColDefNumber'},
-    { field: 'callDate', headerName: 'Call Date', type: 'abColDefDate', valueFormatter: dateFormatter },
-    { field: 'valueDate', headerName: 'Value Date', type: 'abColDefDate', valueFormatter: dateFormatter},
-    { field: 'capitalType', headerName: 'Capital Type', type:'abColDefString'},
-    { field: 'capitalSubType', headerName: 'Capital Subtype', type:'abColDefString'},
-    { field: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
-    { field: 'fundCcy', headerName: 'Fund Ccy', type:'abColDefString'},
-    { field: 'posCcy', headerName: 'Position Ccy', type: 'abColDefString'},
-    { field: 'fxRate', headerName: 'FXRate', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
-    { field: 'totalAmount', headerName: 'Total Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-    {field: 'wsoIssuerID', headerName: 'WSO Issuer ID', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
-    { field: 'issuerShortName', headerName: 'Issuer Short Name', type:'abColDefString'},
-    {field: 'wsoAssetID', headerName: 'WSO Asset ID', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
-    { field: 'asset', headerName: 'Asset', type:'abColDefString'},
-    { field: 'narrative', headerName: 'Narrative', type:'abColDefString'},
-    { field: 'source', headerName: 'Source', type:'abColDefString'},
-    { field: 'sourceID', headerName: 'Source ID', type:'abColDefNumber', valueFormatter: nullOrZeroFormatter},
-    { field: 'isLinked', headerName: 'Is Linked', type:'abColDefBoolean'},
-    { field: 'linkedAmount', headerName: 'Linked Total Base', type:'abColDefNumber', valueFormatter: amountFormatter},
-    { field: 'createdOn', headerName: 'Created On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
-    { field: 'createdBy', headerName: 'Created By', type:'abColDefString'},
-    { field: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
-    { field: 'modifiedBy', headerName: 'Modified By', type:'abColDefString'},
+    { field: 'capitalID', tooltipField: 'capitalID', headerName: 'Capital ID', type: 'abColDefNumber'},
+    { field: 'callDate', tooltipField: 'callDate', headerName: 'Call Date', type: 'abColDefDate', valueFormatter: dateFormatter },
+    { field: 'valueDate', tooltipField: 'valueDate', headerName: 'Value Date', type: 'abColDefDate', valueFormatter: dateFormatter},
+    { field: 'capitalType', tooltipField: 'capitalType', headerName: 'Capital Type', type:'abColDefString'},
+    { field: 'capitalSubType', tooltipField: 'capitalSubType', headerName: 'Capital Subtype', type:'abColDefString'},
+    { field: 'fundHedging', tooltipField: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
+    { field: 'fundCcy', tooltipField: 'fundCcy', headerName: 'Fund Ccy', type:'abColDefString'},
+    { field: 'posCcy', tooltipField: 'posCcy', headerName: 'Position Ccy', type: 'abColDefString'},
+    { field: 'fxRate', tooltipField: 'fxRate', headerName: 'FXRate', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
+    { field: 'totalAmount', tooltipField: 'totalAmount', headerName: 'Total Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+    { field: 'wsoIssuerID', tooltipField: 'wsoIssuerID', headerName: 'WSO Issuer ID', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
+    { field: 'issuerShortName', tooltipField: 'issuerShortName', headerName: 'Issuer Short Name', type:'abColDefString'},
+    { field: 'wsoAssetID', tooltipField: 'wsoAssetID', headerName: 'WSO Asset ID', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
+    { field: 'asset', tooltipField: 'asset', headerName: 'Asset', type:'abColDefString'},
+    { field: 'narrative', tooltipField: 'narrative', headerName: 'Narrative', type:'abColDefString'},
+    { field: 'source', tooltipField: 'source', headerName: 'Source', type:'abColDefString'},
+    { field: 'sourceID', tooltipField: 'sourceID', headerName: 'Source ID', type:'abColDefNumber', valueFormatter: nullOrZeroFormatter},
+    { field: 'isLinked', tooltipField: 'isLinked', headerName: 'Is Linked', type:'abColDefBoolean'},
+    { field: 'linkedAmount', tooltipField: 'linkedAmount', headerName: 'Linked Total Base', type:'abColDefNumber', valueFormatter: amountFormatter},
+    { field: 'createdOn', tooltipField: 'createdOn', headerName: 'Created On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
+    { field: 'createdBy', tooltipField: 'createdBy', headerName: 'Created By', type:'abColDefString'},
+    { field: 'modifiedOn', tooltipField: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
+    { field: 'modifiedBy', tooltipField: 'modifiedBy', headerName: 'Modified By', type:'abColDefString'},
 
   ]
 

@@ -1,7 +1,7 @@
 <h3>Detailed View</h3>
 
 <div class="content">
-    <ng-container *ngIf="rowData?.length > 0">
+    <ng-container *ngIf="rowData?.length > 0 && !failureMsg">
         <ag-grid-angular
         [gridOptions]="gridOptions"
         [defaultColDef]="defaultColDef"
@@ -14,9 +14,14 @@
         </ag-grid-angular>
     </ng-container>
     
-    <p *ngIf="rowData?.length === 0" class="no-content">
+    <p *ngIf="!!failureMsg" class="no-content">
+        {{ failureMsg }}
+    </p>
+    
+    <p *ngIf="rowData?.length === 0 && !failureMsg" class="no-content">
         No detailed view
     </p>
+
 </div>
 
 <mat-dialog-actions align="end">
