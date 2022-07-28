@@ -74,7 +74,7 @@ export class LiquiditySummaryComponent implements OnInit {
   fundHedgings: string[] = null;
   days: number = null;
 
-  rowData = null;
+  rowData = [];
   refData = null;
 
   columnDefs: ColDef[]

@@ -455,9 +455,10 @@ export class AddCapitalModalComponent implements OnInit{
   columnDefs: ColDef[] = [
     {field: 'positionID', headerName: 'Position ID', tooltipField: 'positionID'},
     {field: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter, tooltipField: 'cashDate'},
-    {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'amount'},
-    {field: 'linkedAmount', headerName: 'Linked Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'linkedAmount'},
+    {field: 'type', headerName: 'Type', tooltipField: 'type'},
+    {field: 'amount', headerName: 'Total', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'amount'},
     {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'totalBase'},
+    {field: 'linkedAmount', headerName: 'Linked Amount Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'linkedAmount'},
     {field: 'positionCcy', headerName: 'Position Ccy', tooltipField: 'positionCcy'},
     {field: 'portfolio', headerName: 'Portfolio', tooltipField: 'portfolio'},
     {field: 'issuerShortName', headerName: 'Issuer', tooltipField: 'issuerShortName'},
@@ -475,6 +476,7 @@ export class AddCapitalModalComponent implements OnInit{
   }
 
   gridOptions: GridOptions = {
+    enableRangeSelection: true,
     tooltipShowDelay: 0,
     columnDefs: this.columnDefs,
     defaultColDef: this.defaultColDef,

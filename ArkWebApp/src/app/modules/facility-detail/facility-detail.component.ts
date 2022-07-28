@@ -57,7 +57,7 @@ export class FacilityDetailComponent implements OnInit {
 
   gridOptions: GridOptions;
 
-  rowData: any[] = null;
+  rowData: any[] = [];
   constructor(private facilityDetailsService: FacilityDetailService,
     private accessService: AccessService,
     private dataSvc: DataService) { }

@@ -27,8 +27,7 @@ export interface CapitalActivityModel{
     linkedAmount: number;
     isLinked: boolean;
     
-    positionIDs: string;
-    cashDate: Date;
+    positionIDCashdateTypeStr: string,
 }
 
 export interface CapitalInvestment{
@@ -58,7 +57,7 @@ export interface CapitalInvestment{
 
 
 export interface AssociateInvestment{
-    positionIDCashdateStr: string,
+    positionIDCashdateTypeStr: string,
     capitalIDs: number[],
     username: string
 }

@@ -9,41 +9,35 @@ import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from '@angular/common
 import { MsalUserService } from './core/services/Auth/msaluser.service';  
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';  
 import { AgGridModule } from '@ag-grid-community/angular';
-import {MatToolbarModule} from '@angular/material/toolbar';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule} from '@angular/material/sidenav'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import {MatDialogModule} from '@angular/material/dialog';
-import {FormsModule,ReactiveFormsModule} from '@angular/forms'
-import {MatListModule} from '@angular/material/list';
-import {MatButtonModule} from '@angular/material/button';
-import {MatAutocompleteModule} from '@angular/material/autocomplete';
-import {MatCardModule} from '@angular/material/card';
-import {MatExpansionModule} from '@angular/material/expansion';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {PortfolioHistoryModule} from './modules/portfolio-history/portfolio-history.module'
-import {MatMenuModule} from '@angular/material/menu';
-import {MatSnackBarModule} from '@angular/material/snack-bar';
-import { CashBalanceModule } from './modules/cash-balance/cash-balance.module';
+import { MatDialogModule } from '@angular/material/dialog';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { MatListModule } from '@angular/material/list';
+import { MatButtonModule } from '@angular/material/button';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatCardModule } from '@angular/material/card';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
-import {MatDatepickerModule} from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { DateAdapter, MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
-import { CapitalActivityModule } from './modules/capital-activity/capital-activity.module';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized.component';
-import {HomeComponent} from '../app/home-component/home.component'
-import { FacilityDetailModule } from './modules/facility-detail/facility-detail.module';
+import { HomeComponent } from '../app/home-component/home.component'
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
-import { LiquiditySummaryModule } from './modules/liquidity-summary/liquidity-summary.module';
 import { DetailedViewComponent } from './shared/components/detailed-view/detailed-view.component';
-import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AccessControlComponent } from './shared/components/access-control/access-control.component';
 import { MatSelectModule } from '@angular/material/select';
-import { IrrCalculationModule } from './modules/irr-calculation/irr-calculation.module';
-import { PortfolioManagerModule } from './modules/portfolio-manager/portfolio-manager.module';
-import { CheckboxEditorComponent } from './shared/components/checkbox-editor/checkbox-editor.component';
+import { Platform } from '@angular/cdk/platform';
+import { InputDateAdapter } from './shared/providers/date-adapter';
 
 export const protectedResourceMap: any =  
   [  
@@ -53,7 +47,7 @@ export const protectedResourceMap: any =
   
 @NgModule({  
   declarations: [  
-    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent, CheckboxEditorComponent
+    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent
   ],  
   imports: [  
     MsalModule.forRoot({  
@@ -67,36 +61,29 @@ export const protectedResourceMap: any =
     AppRoutingModule,  
     HttpClientModule,
     AdaptableAngularAgGridModule, 
-  AgGridModule.withComponents([]),
-  MatToolbarModule,
-  MatIconModule,
-  BrowserAnimationsModule,
-  MatSidenavModule,
-  MatDialogModule,
-  FormsModule,
-  ReactiveFormsModule,
-  MatListModule,
-  MatButtonModule,
-  MatAutocompleteModule,
-  MatCardModule,
-  MatExpansionModule,
-  MatFormFieldModule,
-  PortfolioHistoryModule,
-  MatMenuModule,
-  MatSnackBarModule,
-  CashBalanceModule,
-  MatDatepickerModule,
-  MatNativeDateModule,
-  MatInputModule,
-  CapitalActivityModule,
-  MatTooltipModule,
-  FacilityDetailModule,
-  NgMultiSelectDropDownModule.forRoot(),
-  LiquiditySummaryModule,
-  MatCheckboxModule,
-  MatSelectModule,
-  IrrCalculationModule,
-  PortfolioManagerModule
+    AgGridModule.withComponents([]),
+    MatToolbarModule,
+    MatIconModule,
+    BrowserAnimationsModule,
+    MatSidenavModule,
+    MatDialogModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatListModule,
+    MatButtonModule,
+    MatAutocompleteModule,
+    MatCardModule,
+    MatExpansionModule,
+    MatFormFieldModule,
+    MatMenuModule,
+    MatSnackBarModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatInputModule,
+    MatTooltipModule,
+    NgMultiSelectDropDownModule.forRoot(),
+    MatCheckboxModule,
+    MatSelectModule,
   ],  
   providers: [  
     HttpClient,  
@@ -111,7 +98,8 @@ export const protectedResourceMap: any =
       Applicable to all Ng Material fields for this module.
     */
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  
-    
+    {provide: DateAdapter, useClass: InputDateAdapter, deps: [MAT_DATE_LOCALE, Platform]}
+
   ],  
   bootstrap: [AppComponent]  
 })  

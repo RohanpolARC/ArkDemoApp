@@ -18,6 +18,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { ReviewerConfirmComponent } from './reviewer-confirm/reviewer-confirm.component';
+import { PortfolioMappingRoutingModule } from './portfolio-mapping-routing.module';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,8 @@ import { ReviewerConfirmComponent } from './reviewer-confirm/reviewer-confirm.co
   ],
   imports: [
     CommonModule,
+    PortfolioMappingRoutingModule,
+    
     AdaptableAngularAgGridModule,
     AgGridModule.withComponents([
       UpdateCellRendererComponent, MatAutocompleteEditorComponent, ApprovalActionCellRendererComponent

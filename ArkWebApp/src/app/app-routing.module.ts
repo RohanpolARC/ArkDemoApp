@@ -1,18 +1,11 @@
 
 import { NgModule } from '@angular/core';  
-import { Routes, RouterModule } from '@angular/router';  
+import { Routes, RouterModule, PreloadAllModules } from '@angular/router';  
 import { MsalGuard } from '@azure/msal-angular'; 
-import { PortfolioHistoryComponent } from '../app/modules/portfolio-history/portfolio-history.component' 
-import { CashBalanceComponent } from './modules/cash-balance/cash-balance.component';
-import { CapitalActivityComponent } from './modules/capital-activity/capital-activity.component';
 import { RoleGuard } from './role.guard';
 import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized.component';
 import { HomeComponent } from './home-component/home.component';
-import { FacilityDetailComponent } from './modules/facility-detail/facility-detail.component';
-import { LiquiditySummaryComponent } from './modules/liquidity-summary/liquidity-summary.component';
 import { AccessControlComponent } from './shared/components/access-control/access-control.component';
-import { IrrCalculationComponent } from './modules/irr-calculation/irr-calculation.component';
-import { PortfolioManagerComponent } from './modules/portfolio-manager/portfolio-manager.component';
     
 const routes: Routes = [
   {
@@ -22,57 +15,13 @@ const routes: Routes = [
       MsalGuard
     ]
   },  
-  { path: 'portfolio-history',  
-    component: PortfolioHistoryComponent,  
-    canActivate: [
-      MsalGuard,
-      RoleGuard
-    ],
-    data: {
-      tab: 'Going in Rates Editor'
-    }  
-  },
-  { path: 'cash-balance', 
-    component: CashBalanceComponent, 
-    canActivate: [
-      MsalGuard, 
-      RoleGuard
-    ],
-    data: {
-      tab: 'Cash Balance'
-    }
-  },
-  { path: 'capital-activity', 
-    component: CapitalActivityComponent, 
-    canActivate: [
-      MsalGuard, 
-      RoleGuard
-    ], 
-    data: {
-      tab: 'Capital Activity'
-    }
-  },
-  {
-    path: 'facility-detail',
-    component: FacilityDetailComponent,
-    canActivate: [
-      MsalGuard,
-      RoleGuard
-    ],
-    data: {
-      tab: 'Asset Browser'
-    }
-  },
-  {
+  { path: 'portfolio-history', loadChildren: () => import('./modules/portfolio-history/portfolio-history.module').then(m => m.PortfolioHistoryModule) },
+  { path: 'cash-balance', loadChildren: () => import('./modules/cash-balance/cash-balance.module').then(m => m.CashBalanceModule) },
+  { path: 'capital-activity', loadChildren: () => import('./modules/capital-activity/capital-activity.module').then(m => m.CapitalActivityModule) },
+  { path: 'facility-detail', loadChildren: () => import('./modules/facility-detail/facility-detail.module').then(m => m.FacilityDetailModule) },
+  { 
     path: 'liquidity-summary',
-    component: LiquiditySummaryComponent,
-    canActivate: [
-      MsalGuard,
-      RoleGuard
-    ],
-    data: {
-      tab: 'Liquidity Summary'
-    }
+    loadChildren: () => import('./modules/liquidity-summary/liquidity-summary.module').then(m => m.LiquiditySummaryModule)
   },
   {
     path: 'access-control',
@@ -93,27 +42,13 @@ const routes: Routes = [
   },
   {
     path: 'irr',
-    children: [
-      { path: 'portfoliomodeller', component: IrrCalculationComponent}
-    ],
-    canActivate: [
-      MsalGuard,
-      RoleGuard
-    ],
-    data: {
-      tab: 'Portfolio Modeller'
-    }
+    loadChildren: () => 
+    import('./modules/irr-calculation/irr-calculation.module').then(m => m.IrrCalculationModule)
   },
   {
     path: 'portfolio-mapping',
-    component: PortfolioManagerComponent,
-    canActivate: [
-      MsalGuard,
-      RoleGuard
-    ],
-    data: {
-      tab: 'Portfolio Mapping'
-    }
+    loadChildren: () =>
+    import('./modules/portfolio-manager/portfolio-manager.module').then(m => m.PortfolioManagerModule)
   },
   { path: 'unfunded-assets', 
     loadChildren: () => 
@@ -122,7 +57,9 @@ const routes: Routes = [
 ];
 
 @NgModule({  
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, {
+    preloadingStrategy: PreloadAllModules
+  })],
   exports: [RouterModule],
 })
 export class AppRoutingModule {

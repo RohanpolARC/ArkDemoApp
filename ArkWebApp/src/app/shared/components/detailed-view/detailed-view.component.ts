@@ -22,6 +22,8 @@ export class DetailedViewComponent implements OnInit {
   defaultColDef: ColDef;
   agGridModules: Module[] = [ClientSideRowModelModule,RowGroupingModule,SetFilterModule,ColumnsToolPanelModule,MenuModule, ExcelExportModule];
 
+  failureMsg: string = null;
+
   constructor(
     public dialogRef: MatDialogRef<DetailedViewComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
@@ -54,6 +56,7 @@ export class DetailedViewComponent implements OnInit {
       },
       error: error => {
         console.error("Failed to fetch detailed view "+ error);
+        this.rowData = [];
       }
     }))
   }
@@ -79,8 +82,8 @@ export class DetailedViewComponent implements OnInit {
       else if(['createdon','created on','modified on', 'modifiedon'].includes(col.toLowerCase())){
         colDef.valueFormatter = dateTimeFormatter
       }
-      else if(['account', 'accountid', 'account id'].includes(col.toLocaleLowerCase())){
-        continue; // Skipping amountFormatter
+      else if(['account', 'accountid', 'account id', 'issuer', 'id', 'positionid', 'position id', 'issuerid', 'issuer id', 'asset id', 'assetid', 'extract id'].includes(col.toLowerCase())){
+        colDef.valueFormatter = null;
       }
       else if(!isNaN(parseFloat(row[i].value))){
         colDef.valueFormatter = amountFormatter
@@ -92,19 +95,25 @@ export class DetailedViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.request = this.data?.['detailedViewRequest'];
-    this.fetchDetailedView(this.request);
+    this.failureMsg = this.data?.['failureMsg'];
 
-    this.defaultColDef = {
-      resizable: true,
-      enableValue: true,
-      enableRowGroup: true,
-      sortable: true,
-      filter: true,
-    }
-    this.gridOptions = {
-      columnDefs: this.columnDefs,
-      defaultColDef: this.defaultColDef,
-      tooltipShowDelay: 0
+    // If failureMsg is not null, then component displays the failure message directly.
+    if(!this.failureMsg){
+
+      this.fetchDetailedView(this.request);
+
+      this.defaultColDef = {
+        resizable: true,
+        enableValue: true,
+        enableRowGroup: true,
+        sortable: true,
+        filter: true,
+      }
+      this.gridOptions = {
+        columnDefs: this.columnDefs,
+        defaultColDef: this.defaultColDef,
+        tooltipShowDelay: 0
+      }  
     }
   }
 

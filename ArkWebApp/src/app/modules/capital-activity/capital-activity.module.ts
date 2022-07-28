@@ -5,7 +5,6 @@ import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-
 import { AgGridModule } from '@ag-grid-community/angular';
 
 import { CapitalActivityComponent } from './capital-activity.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { AddCapitalModalComponent } from './add-capital-modal/add-capital-modal.component';
@@ -13,16 +12,17 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import {MatSelectModule} from '@angular/material/select';
+import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { LinkInvestorModalComponent } from './link-investor-modal/link-investor-modal.component';
-import {MatTooltipModule} from '@angular/material/tooltip';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
 import { DropzoneDirective } from './bulk-upload/dropzone.directive';
+import { CapitalActivityRoutingModule } from './capital-activity-routing.module';
 
 @NgModule({
   declarations: [
@@ -37,7 +37,8 @@ import { DropzoneDirective } from './bulk-upload/dropzone.directive';
   entryComponents: [AddCapitalModalComponent, UpdateConfirmComponent, BulkUploadComponent],
   imports: [
     CommonModule,
-    BrowserAnimationsModule,
+    CapitalActivityRoutingModule,
+
     MatIconModule,
     MatButtonModule,
     MatDialogModule,
