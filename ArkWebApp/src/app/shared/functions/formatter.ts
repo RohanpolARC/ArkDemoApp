@@ -1,8 +1,12 @@
 import * as moment from 'moment';
 
 export function dateFormatter(params) {
-    if(params.value != undefined && params.value != '0001-01-01T00:00:00')
-        return moment(params.value).format('DD/MM/YYYY')
+    if(params.value != undefined && params.value != '0001-01-01T00:00:00' && !!params.value){
+        let str: string = moment(params.value).format('DD/MM/YYYY');
+        if(str === 'Invalid date')
+            str = params.value
+        return str;
+    }
     else return ""
 }
     

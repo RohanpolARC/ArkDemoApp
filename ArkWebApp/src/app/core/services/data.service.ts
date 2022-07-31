@@ -5,7 +5,7 @@ import { MsalUserService } from './Auth/msaluser.service';
 import { BehaviorSubject } from 'rxjs';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { APIConfig } from 'src/app/configs/api-config';
-import { Observable, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { DetailedView } from 'src/app/shared/models/GeneralModel';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -60,6 +60,7 @@ export class DataService {
         this.numberFieldMessage.next(value);
     }
 
+
   
     getCurrentUserInfo(){  
        return this.msalService.getCurrentUserInfo();  
@@ -84,6 +85,12 @@ export class DataService {
         return this.http.get<any[]>(`${APIConfig.REFDATA_GET_WSOPORTFOLIO_API}`, this.httpOptions).pipe(
             catchError((ex) => throwError(ex)));
     }
+
+    getUniqueValuesForField(field: string){
+        return this.http.get<{id: number, value: string}[]>(`${APIConfig.REFDATA_GET_UNIQUE_VALUES_API}/?field=${field}`).pipe(
+            catchError((ex) => throwError(ex)));
+    }
+
     getDetailedView(model: DetailedView){
         return this.http.post<any[]>(`${APIConfig.GET_DETAILED_VIEW}`, model, this.httpOptions).pipe(
             catchError((ex) => throwError(ex)));      

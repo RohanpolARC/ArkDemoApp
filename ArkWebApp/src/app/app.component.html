@@ -95,7 +95,13 @@
            Misc.
           </mat-panel-title>
         </mat-expansion-panel-header>
-  
+
+        <mat-list>
+          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Contract History')" [ngStyle]="ContractHistoryStyle">
+            <div class="list-item-text">Contract History</div>
+          </mat-list-item>
+        </mat-list>
+
         <mat-list>
           <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('GIREditor')" [ngStyle]="GIREditorStyle">
             <div class="list-item-text">Going In Rates Editor</div>
@@ -137,15 +143,24 @@
       <button mat-raised-button id="apply-button"  
         *ngIf="[
         '/facility-detail', '/liquidity-summary', 
-        '/irr/portfoliomodeller', '/irr/runcalcs'].includes(location.path())" 
+        '/irr/portfoliomodeller', '/contracts-history'].includes(location.path())" 
         (click)="filterApply()">Apply</button>
+    </div>
+
+    <div *ngIf="location.path() === '/contracts-history'" class="dropdown">
+
+      <app-contract-history-filter class="funds-dropdown"
+        [funds] = "funds"
+      >
+      </app-contract-history-filter>
+
     </div>
 
     <ng-container *ngIf="filterPane.TextValueSelect">
       
       <div class="dropdown">
 
-        <ng-multiselect-dropdown class="funds-dropdown"
+        <ng-multiselect-dropdown
         [placeholder]="multiSelectPlaceHolder"
         [settings]="dropdownSettings"
         [data]="dropdownData"

@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';  
 import { DataService } from './core/services/data.service';  
 import { HttpClient } from '@angular/common/http';
-import {MatDialog} from '@angular/material/dialog';
-import { MatIconRegistry } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
 import * as moment from 'moment';
 import { FilterPane } from './shared/models/FilterPaneModel';
 import { Location } from '@angular/common';
-import {FormGroup, FormControl} from '@angular/forms';
+import { FormGroup, FormControl } from '@angular/forms';
 import { AsOfDateRange } from './shared/models/FilterPaneModel';
 import { AccessService } from './core/services/Auth/access.service';
 import { Router } from '@angular/router';
@@ -80,11 +79,13 @@ export class AppComponent {
   PortfolioModellerStyle: any = {};
   PortfolioMappingStyle: any = {};
   UnfundedAssetsStyle: any = {};
+  ContractHistoryStyle: any = {};
 
+  funds
+  
   constructor(private http: HttpClient,
     private dataService: DataService,
     public dialog: MatDialog,
-    iconRegistry:MatIconRegistry, 
     public location:Location,
     public accessService: AccessService,
     private router:Router,
@@ -181,6 +182,10 @@ export class AppComponent {
         }, 1350)
       }
 
+      if(this.location.path() === '/contracts-history'){
+        this.dataService.changeFilterApplyBtnState(true)
+      }
+
       this.rightSidebarOpened = false
     }, 250)
   }
@@ -229,6 +234,9 @@ export class AppComponent {
     else if(this.location.path() === '/unfunded-assets'){
       this.updateSelection('Unfunded Assets')
     }
+    else if(this.location.path() === '/contracts-history'){
+      this.updateSelection('Contract History')
+    }
     else this.updateSelection('')
   }
 
@@ -275,7 +283,7 @@ export class AppComponent {
     this.dataService.changeSearchTextValues(null);
     this.dataService.changeNumberField(null);
     
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.notSelectedElement;
 
     this.lastClickedTabRoute = this.location.path();
 
@@ -326,6 +334,20 @@ export class AppComponent {
       };
         this.router.navigate(['/facility-detail']);
 
+    }
+    else if(screen === 'Contract History'){
+
+      this.ContractHistoryStyle = this.selectedElement;
+      this.subscriptions.push(
+        this.dataService.getUniqueValuesForField('fund').subscribe({
+          next: (data: any[]) => {
+
+            this.funds = data.map(item => { return { fund: item.value, id: item.id } })
+
+        setTimeout(() => { this.filterApply() }, 250)
+      }}))
+
+      this.router.navigate(['/contracts-history'])
     }
     else if(screen === 'Liquidity Summary'){
 

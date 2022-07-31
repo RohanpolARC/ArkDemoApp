@@ -54,6 +54,9 @@ const routes: Routes = [
     loadChildren: () => 
     import('./modules/unfunded-assets/unfunded-assets.module').then(m => m.UnfundedAssetsModule) 
   },
+  { path: 'contracts-history', 
+    loadChildren: () => import('./modules/contracts-history/contracts-history.module').then(m => m.ContractsHistoryModule) 
+  },
 ];
 
 @NgModule({  
