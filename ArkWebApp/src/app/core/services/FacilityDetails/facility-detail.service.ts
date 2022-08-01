@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
 import { FacilityDetailModel } from 'src/app/shared/models/FacilityDetailModel';
@@ -17,6 +17,18 @@ export class FacilityDetailService {
         'Authorization': 'Bearer ' + this.msalService.GetAccessToken()  
     })
   };
+
+  private fundsMessage = new BehaviorSubject<any>(null)
+  currentfundValues = this.fundsMessage.asObservable();
+  changeFundValues(values: string[]){
+      this.fundsMessage.next(values);
+  }
+
+  private asOfDateMessage = new BehaviorSubject<string>(null)
+  currentSearchDate = this.asOfDateMessage.asObservable();
+  changeSearchDate(asOfDate: string){
+      this.asOfDateMessage.next(asOfDate);
+  }
 
   constructor(private http: HttpClient,
               private msalService: MsalUserService) { }

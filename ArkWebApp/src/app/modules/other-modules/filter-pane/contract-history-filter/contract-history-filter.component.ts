@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { ContractHistoryService } from 'src/app/core/services/ContractHistory/contract-history.service';
 
@@ -12,9 +11,7 @@ export class ContractHistoryFilterComponent implements OnInit, OnChanges {
 
   @Input() funds
   
-  contractTypes
   fundSettings: IDropdownSettings
-  contractTypeSettings: IDropdownSettings
   isLatest: boolean
   dropdownSettings: IDropdownSettings = {
     singleSelection: false,
@@ -28,25 +25,16 @@ export class ContractHistoryFilterComponent implements OnInit, OnChanges {
   };
 
   preSelectedFunds
-  preSelectedContractTypes
 
   constructor(private contractHistorySvc: ContractHistoryService) { }
 
   ngOnInit(): void {
-
-    this.contractTypes = [
-      { id: 1, contractType: 'Open' }, 
-      { id: 2, contractType: 'Close' }
-    ]
-
-    this.preSelectedContractTypes = [{ id: 1, contractType: 'Open' }], 
 
     this.isLatest = true
     this.onLatestToggle(true)  
 
 
     this.fundSettings = { ...this.dropdownSettings, ...{  textField: 'fund' } }
-    this.contractTypeSettings = { ...this.dropdownSettings, ...{  textField: 'contractType' } }
   }
 
   // ngOnChanges getting called before OnInit
@@ -59,10 +47,6 @@ export class ContractHistoryFilterComponent implements OnInit, OnChanges {
 
   onFundChange(values){
     this.contractHistorySvc.changeFundValues(values?.map(v => v.fund))
-  }
-
-  onContractTypeChange(values){
-    this.contractHistorySvc.changeContractTypeValues(values?.map(v => v.contractType))
   }
 
   onLatestToggle(isLatest){

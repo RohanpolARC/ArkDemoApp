@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
+import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 import { IrrResultComponent } from './irr-result/irr-result.component';
 
@@ -14,7 +15,8 @@ export class IrrCalculationComponent implements OnInit {
 
   asOfDate: string
   constructor(
-    private dataService: DataService
+    private dataSvc: DataService,
+    private irrCalcSvc: IRRCalcService 
   ) { }
 
   subscriptions: Subscription[] = []
@@ -37,11 +39,11 @@ export class IrrCalculationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.subscriptions.push(this.dataService.currentSearchDate.subscribe(asOfDate => {
+    this.subscriptions.push(this.irrCalcSvc.currentSearchDate.subscribe(asOfDate => {
       this.asOfDate = asOfDate;
     }));
 
-    this.subscriptions.push(this.dataService.filterApplyBtnState.subscribe(isHit => {
+    this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if(isHit){
         this.tabs = [{
           actualName: 'Portfolio Modeller',

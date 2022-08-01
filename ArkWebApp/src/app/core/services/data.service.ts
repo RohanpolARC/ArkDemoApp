@@ -33,35 +33,8 @@ export class DataService {
     filterApplyBtnState = this.filterApplyBtnHit.asObservable();
     changeFilterApplyBtnState(isHit: boolean){
         this.filterApplyBtnHit.next(isHit);
-
     }
 
-    private searchDateMessage = new BehaviorSubject<string>(getMomentDateStr(getLastBusinessDay()))
-    currentSearchDate = this.searchDateMessage.asObservable();
-    changeSearchDate(asOfDate: string){
-        this.searchDateMessage.next(asOfDate);
-    }
-
-    private searchDateRangeMessage = new BehaviorSubject<any>(null);
-    currentSearchDateRange = this.searchDateRangeMessage.asObservable();
-    changeSearchDateRange(range: AsOfDateRange){
-        this.searchDateRangeMessage.next(range);
-    }
-
-    private searchTextValuesMessage = new BehaviorSubject<any>(null)
-    currentSearchTextValues = this.searchTextValuesMessage.asObservable();
-    changeSearchTextValues(values: string[]){
-        this.searchTextValuesMessage.next(values);
-    }
-
-    private numberFieldMessage = new BehaviorSubject<number>(null)
-    currentNumberField = this.numberFieldMessage.asObservable();
-    changeNumberField(value: number){
-        this.numberFieldMessage.next(value);
-    }
-
-
-  
     getCurrentUserInfo(){  
        return this.msalService.getCurrentUserInfo();  
     }

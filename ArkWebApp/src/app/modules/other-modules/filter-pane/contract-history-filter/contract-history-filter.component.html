@@ -1,26 +1,21 @@
-Funds
-<app-multi-select 
-    [placeholder] = "'Select Fund(s)'"
-    [settings] = "fundSettings"
-    [dropdownData] = "funds"
-    [selectedDropdownData] = "preSelectedFunds"
-    (onNgModelChangeCallback) = "onFundChange($event)"
+<div class="element">
+    Latest
+    <mat-slide-toggle
+        [color] = "'primary'"
+        [(ngModel)] = "isLatest"
+        (ngModelChange) = "onLatestToggle($event)"
     >
-</app-multi-select>
+    </mat-slide-toggle>
+</div>
 
-Contract Type
-<app-multi-select
-    [placeholder] = "'Select Contract Type'"
-    [settings] = "contractTypeSettings"
-    [dropdownData] = "contractTypes"
-    [selectedDropdownData] = "preSelectedContractTypes"
-    (onNgModelChangeCallback) = "onContractTypeChange($event)"
-></app-multi-select>
-
-Latest
-<mat-slide-toggle
-    [color] = "'primary'"
-    [(ngModel)] = "isLatest"
-    (ngModelChange) = "onLatestToggle($event)"
->
-</mat-slide-toggle>
+<div class="element">
+    Funds
+    <app-multi-select
+        [placeholder] = "'Select Fund(s)'"
+        [settings] = "fundSettings"
+        [dropdownData] = "funds"
+        [selectedDropdownData] = "preSelectedFunds"
+        (onNgModelChangeCallback) = "onFundChange($event)"
+        >
+    </app-multi-select>
+</div>

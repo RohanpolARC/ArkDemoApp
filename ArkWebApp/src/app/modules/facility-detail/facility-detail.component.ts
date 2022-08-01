@@ -297,11 +297,11 @@ export class FacilityDetailComponent implements OnInit {
       componentParent: this
     }
 
-    this.subscriptions.push(this.dataSvc.currentSearchDate.subscribe(asOfDate => {
+    this.subscriptions.push(this.facilityDetailsService.currentSearchDate.subscribe(asOfDate => {
       this.asOfDate = asOfDate
     }))
 
-    this.subscriptions.push(this.dataSvc.currentSearchTextValues.subscribe(funds => {
+    this.subscriptions.push(this.facilityDetailsService.currentfundValues.subscribe(funds => {
       this.funds = funds
     }))
 

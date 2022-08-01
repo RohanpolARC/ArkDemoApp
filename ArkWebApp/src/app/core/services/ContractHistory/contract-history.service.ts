@@ -29,12 +29,6 @@ export class ContractHistoryService {
       this.fundsMessage.next(values);
   }
 
-  private contractTypeMessage = new BehaviorSubject<any>(null)
-  currentContractTypeValues = this.contractTypeMessage.asObservable();
-  changeContractTypeValues(values: string[]){
-      this.contractTypeMessage.next(values);
-  }
-
   private isLatestMessage = new BehaviorSubject<any>(null)
   currentisLatestValue = this.isLatestMessage.asObservable();
   changeisLatestValue(checked: boolean){
@@ -42,7 +36,7 @@ export class ContractHistoryService {
   }
 
   public getContractHistory(model: {
-    funds: string, contractTypes: string, isLatest: boolean
+    funds: string, isLatest: boolean
   }){
     return this.http.post<any[]>(`${APIConfig.CONTRACT_HISTORY_GET_API}`, model, this.getHttpOptions());
   }

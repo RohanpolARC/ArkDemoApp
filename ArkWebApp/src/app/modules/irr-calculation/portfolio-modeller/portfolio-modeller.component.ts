@@ -738,7 +738,7 @@ export class PortfolioModellerComponent implements OnInit {
   onGridReady(params: GridReadyEvent){
     this.gridApi = params.api;
 
-    this.subscriptions.push(this.dataSvc.currentSearchDate.subscribe(asOfDate => {
+    this.subscriptions.push(this.irrCalcService.currentSearchDate.subscribe(asOfDate => {
       this.asOfDate = asOfDate;
     }));
 

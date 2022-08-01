@@ -2,18 +2,14 @@ import { Component } from '@angular/core';
 import { DataService } from './core/services/data.service';  
 import { HttpClient } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
-import * as moment from 'moment';
 import { FilterPane } from './shared/models/FilterPaneModel';
 import { Location } from '@angular/common';
-import { FormGroup, FormControl } from '@angular/forms';
-import { AsOfDateRange } from './shared/models/FilterPaneModel';
 import { AccessService } from './core/services/Auth/access.service';
 import { Router } from '@angular/router';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from './core/services/FacilityDetails/facility-detail.service';
 import { MsalUserService } from './core/services/Auth/msaluser.service';
-import { getLastBusinessDay } from './shared/functions/utilities';
 
 @Component({  
   selector: 'app-root',  
@@ -22,31 +18,18 @@ import { getLastBusinessDay } from './shared/functions/utilities';
 })  
 export class AppComponent {  
   title = 'ARK';  
-
   subscriptions: Subscription[] = [];
-
   public userName:string;
   public rightSidebarOpened:boolean=false;
   public leftSIdebarOpened:boolean=false;
-
-  //Filter Pane 
-  searchDate: Date = null;
   filterPane:FilterPane = {
     AsOfDateRange: false,
     AsOfDate: false,
     TextValueSelect: false,
     NumberField: false
   };
-
-  searchDateRange = new FormGroup({
-    start: new FormControl(),
-    end: new FormControl(),
-  });
-
-  range:AsOfDateRange = null;
   asOfDate: string = null;
   numberField: number = null;
-
   multiSelectPlaceHolder: string = null;
   dropdownSettings: IDropdownSettings = null;
   dropdownData: any = null;
@@ -82,7 +65,8 @@ export class AppComponent {
   ContractHistoryStyle: any = {};
 
   funds
-  
+  fundHedgings
+
   constructor(private http: HttpClient,
     private dataService: DataService,
     public dialog: MatDialog,
@@ -113,79 +97,24 @@ export class AppComponent {
 
   lastClickedTabRoute: string = '/accessibility';
 
-  fetchFacilityFunds(){
-    this.subscriptions.push(this.facilityDetailSvc.getFacilityFunds().subscribe({
-      next: funds => {
-        this.dropdownData = this.selectedDropdownData = funds;
-
-
-        //   /**  Fetching details after getting funds*/
-                  // Apply on load
-      this.filterApply();
-
-      },
-      error: error => {
-        console.error("Failed to get funds for filtering");
-      }
-    }))
-  }
-
-  fetchFundHedgingsRef(){
-    this.subscriptions.push(this.dataService.getFundHedgingsRef().subscribe({
-      next: fundHedgings => {
-        this.dropdownData = fundHedgings;
-
-        this.selectedDropdownData = [];
-        for(let i: number = 0; i < fundHedgings.length; i+= 1){
-          if(String(fundHedgings[i]['fundHedging']).toUpperCase().includes('DL3')){
-            this.selectedDropdownData.push(fundHedgings[i]);
-          }
-        } 
-                  // Apply on load
-      this.filterApply();
-
-      },
-      error: error => {
-        console.error("Failed to get fund hedgings for filtering")
-      }
-    }))
-  }
-
   filterApply(){
 
     setTimeout(() => {
       if(this.location.path() === '/facility-detail'){
-
-        this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
-        this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['fund']))
-        this.dataService.changeSearchDate(this.asOfDate);
-
         this.dataService.changeFilterApplyBtnState(true);
       }
-
-      if(this.location.path() === '/liquidity-summary'){
-
-        this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
-        this.dataService.changeSearchDate(this.asOfDate);
-        this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['fundHedging']))
-        this.dataService.changeNumberField(this.numberField)
+      else if(this.location.path() === '/liquidity-summary'){
         this.dataService.changeFilterApplyBtnState(true);
       }
-
-      if(['/irr/portfoliomodeller'].includes(this.location.path())){
-        setTimeout(() => {
-          this.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
-          this.dataService.changeSearchDate(this.asOfDate);
-          this.dataService.changeSearchTextValues(this.selectedDropdownData.map(x => x['rule']));
-          this.dataService.changeFilterApplyBtnState(true);
-    
-        }, 1350)
-      }
-
-      if(this.location.path() === '/contracts-history'){
+      else if(['/irr/portfoliomodeller'].includes(this.location.path())){
         this.dataService.changeFilterApplyBtnState(true)
       }
-
+      else if(this.location.path() === '/contract-history'){
+        this.dataService.changeFilterApplyBtnState(true)
+      }
+      else if(this.location.path() === '/cash-balance'){
+        this.dataService.changeFilterApplyBtnState(true)
+      }
       this.rightSidebarOpened = false
     }, 250)
   }
@@ -234,7 +163,7 @@ export class AppComponent {
     else if(this.location.path() === '/unfunded-assets'){
       this.updateSelection('Unfunded Assets')
     }
-    else if(this.location.path() === '/contracts-history'){
+    else if(this.location.path() === '/contract-history'){
       this.updateSelection('Contract History')
     }
     else this.updateSelection('')
@@ -244,45 +173,10 @@ export class AppComponent {
     this.dataService.logout();  
   }  
 
-  getSearchDateRange(){
-
-    this.range.start = moment(this.searchDateRange.get('start').value).format("YYYY-MM-DD");
-    this.range.end = moment(this.searchDateRange.get('end').value).format("YYYY-MM-DD");
-
-    if(this.range.end === 'Invalid date')
-      this.range.end = this.range.start;
-
-    this.searchDateRange.setValue({
-      start: this.range.start, 
-      end: this.range.end,
-    })
-    
-    this.dataService.changeSearchDateRange(this.range);
-
-    if(this.location.path() === '/cash-balance'){
-      this.rightSidebarOpened = false
-    }
-  }
-
   updateSelection(screen: string): void{
 
       /** On Subsequent Load (Dynamic) */
 
-    this.filterPane.AsOfDateRange = false;
-    this.filterPane.AsOfDate = false;
-    this.filterPane.TextValueSelect = false;
-    this.filterPane.NumberField = false;
-
-    this.multiSelectPlaceHolder = null;
-    this.dropdownSettings = null;
-    this.dropdownData = [];
-    this.selectedDropdownData = [];
-
-    this.dataService.changeSearchDate(null);
-    this.dataService.changeSearchDateRange(null);
-    this.dataService.changeSearchTextValues(null);
-    this.dataService.changeNumberField(null);
-    
     this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.notSelectedElement;
 
     this.lastClickedTabRoute = this.location.path();
@@ -292,17 +186,6 @@ export class AppComponent {
       this.router.navigate(['/portfolio-history']);
     }
     else if(screen === 'Cash Balance'){
-      this.filterPane.AsOfDateRange = true;
-      this.range = {
-        start: moment(getLastBusinessDay()).format('YYYY-MM-DD'),
-        end: moment(getLastBusinessDay()).format('YYYY-MM-DD'),
-      }
-
-      this.searchDateRange.setValue({
-        start: this.range.start,
-        end: this.range.end,
-      })
-      this.getSearchDateRange();
       this.CashBalanceStyle = this.selectedElement;
       this.router.navigate(['/cash-balance']);
     }
@@ -311,29 +194,16 @@ export class AppComponent {
       this.router.navigate(['/capital-activity']);
     }
     else if(screen === 'Facility Detail'){
-      this.filterPane.AsOfDate = true;
-      this.filterPane.TextValueSelect = true;
 
       this.FacilityDetailStyle = this.selectedElement
+      this.subscriptions.push(
+        this.dataService.getUniqueValuesForField('fund').subscribe({
+          next: (data: any[]) => {
+            this.funds = data.map(item => { return { fund: item.value, id: item.id } })
+        setTimeout(() => { this.filterApply() }, 250)
+      }}))
 
-      this.multiSelectPlaceHolder = 'Select Fund(s)'
-
-      this.asOfDate = moment(getLastBusinessDay()).format('YYYY-MM-DD')
-      
-      this.fetchFacilityFunds();
-
-      this.dropdownSettings = {
-        singleSelection: false,
-        idField: 'id',
-        textField: 'fund',
-        selectAllText: 'Select All',
-        unSelectAllText: 'Unselect All',
-        itemsShowLimit: 2,
-        allowSearchFilter: true,
-        
-      };
-        this.router.navigate(['/facility-detail']);
-
+      this.router.navigate(['/facility-detail'])
     }
     else if(screen === 'Contract History'){
 
@@ -341,46 +211,25 @@ export class AppComponent {
       this.subscriptions.push(
         this.dataService.getUniqueValuesForField('fund').subscribe({
           next: (data: any[]) => {
-
             this.funds = data.map(item => { return { fund: item.value, id: item.id } })
-
         setTimeout(() => { this.filterApply() }, 250)
       }}))
 
-      this.router.navigate(['/contracts-history'])
+      this.router.navigate(['/contract-history'])
     }
     else if(screen === 'Liquidity Summary'){
-
-      this.filterPane.AsOfDate = true;
-      this.filterPane.TextValueSelect = true;
-      this.filterPane.NumberField = true;
-
       this.LiquiditySummaryStyle = this.selectedElement;
+      this.subscriptions.push(
+        this.dataService.getUniqueValuesForField('fundHedging').subscribe({
+          next: (data: any[]) => {
+            this.fundHedgings = data.map(item => { return { fundHedging: item.value, id: item.id } })
+        setTimeout(() => { this.filterApply() }, 250)
+      }}))
 
-      this.multiSelectPlaceHolder = 'Select FundHedging(s)';
-      this.asOfDate = moment(getLastBusinessDay()).format('YYYY-MM-DD')
-      this.numberField = 10;
-
-      this.fetchFundHedgingsRef();
-
-      this.dropdownSettings = {
-        singleSelection: false,
-        idField: 'id',
-        textField: 'fundHedging',
-        selectAllText: 'Select All',
-        unSelectAllText: 'Unselect All',
-        itemsShowLimit: 2,
-        allowSearchFilter: true,
-        
-      };
       this.router.navigate(['/liquidity-summary'])
     }
     else if(screen === 'Portfolio Modeller'){
       this.PortfolioModellerStyle = this.selectedElement;
-      this.filterPane.AsOfDate = true;
-      this.filterPane.TextValueSelect = false;
-
-      this.asOfDate = moment(getLastBusinessDay()).format('YYYY-MM-DD')
       this.filterApply();
       this.router.navigate(['/irr/portfoliomodeller'])
     }
@@ -397,5 +246,4 @@ export class AppComponent {
       this.router.navigate(['/access-control'])
     }
   }
-
 } 

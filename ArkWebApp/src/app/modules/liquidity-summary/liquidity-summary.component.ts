@@ -579,16 +579,15 @@ export class LiquiditySummaryComponent implements OnInit {
       groupMultiAutoColumn: true
     }
 
-    this.subscriptions.push(this.dataSvc.currentSearchDate.subscribe(asOfDate => {
+    this.subscriptions.push(this.liquiditySummarySvc.currentSearchDate.subscribe(asOfDate => {
       this.asOfDate = asOfDate;
-
     }));
 
-    this.subscriptions.push(this.dataSvc.currentSearchTextValues.subscribe(fundHedgings => {
+    this.subscriptions.push(this.liquiditySummarySvc.currentfundHedgingValues.subscribe(fundHedgings => {
       this.fundHedgings = fundHedgings;
     }))
 
-    this.subscriptions.push(this.dataSvc.currentNumberField.subscribe(days => {
+    this.subscriptions.push(this.liquiditySummarySvc.currentnoofdaysValues.subscribe(days => {
       this.days = days;
     }))
 

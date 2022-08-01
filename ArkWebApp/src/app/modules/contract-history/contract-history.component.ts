@@ -1,5 +1,5 @@
-import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent, Layout } from '@adaptabletools/adaptable-angular-aggrid';
-import { ClientSideRowModelModule, ClipboardModule, ColDef, ColumnsToolPanelModule, ExcelExportModule, FiltersToolPanelModule, GridApi, GridOptions, GridReadyEvent, IServerSideDatasource, MenuModule, Module, RangeSelectionModule, ServerSideRowModelModule, ServerSideStoreType, SetFilterModule, SideBarModule } from '@ag-grid-enterprise/all-modules';
+import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
+import { ClientSideRowModelModule, ClipboardModule, ColDef, ColumnsToolPanelModule, ExcelExportModule, FiltersToolPanelModule, GridApi, GridOptions, GridReadyEvent, MenuModule, Module, RangeSelectionModule, SetFilterModule, SideBarModule } from '@ag-grid-enterprise/all-modules';
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
@@ -9,16 +9,16 @@ import { createColumnDefs, GENERAL_FORMATTING_EXCEPTIONS, parseFetchedData, save
 import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/utilities';
 
 @Component({
-  selector: 'app-contracts-history',
-  templateUrl: './contracts-history.component.html',
-  styleUrls: ['./contracts-history.component.scss']
+  selector: 'app-contract-history',
+  templateUrl: './contract-history.component.html',
+  styleUrls: ['../../shared/styles/grid-page.layout.scss','./contract-history.component.scss']
 })
-export class ContractsHistoryComponent implements OnInit {
+
+export class ContractHistoryComponent implements OnInit {
 
   subscriptions: Subscription[] = []
   agGridModules: Module[] = [
     ClientSideRowModelModule,
-    // RowGroupingModule,
     SetFilterModule,
     ColumnsToolPanelModule,
     MenuModule,
@@ -30,6 +30,11 @@ export class ContractsHistoryComponent implements OnInit {
   ];
   
   columnDefs: ColDef[] = []
+  gridApi: GridApi;
+  gridColumnApi: any;
+  adaptableApi: AdaptableApi;
+  funds
+  isLatest
 
   rowData = null
 
@@ -51,8 +56,6 @@ export class ContractsHistoryComponent implements OnInit {
     rowData: this.rowData,
     sideBar: true
   }
-  gridApi: GridApi;
-  gridColumnApi: any;
 
   adaptableOptions: AdaptableOptions = {
     primaryKey: '',
@@ -91,23 +94,14 @@ export class ContractsHistoryComponent implements OnInit {
     }
   }
 
-  adaptableApi: AdaptableApi;
-
   constructor(
     private contractHistorySvc: ContractHistoryService,
     private dataSvc: DataService
   ) { }
 
-  funds
-  contractTypes
-  isLatest
-
   changeListeners() {
     this.subscriptions.push(this.contractHistorySvc.currentfundValues.subscribe(funds => {
       this.funds = funds
-    }))
-    this.subscriptions.push(this.contractHistorySvc.currentContractTypeValues.subscribe(contractTypes => {
-      this.contractTypes = contractTypes
     }))
     this.subscriptions.push(this.contractHistorySvc.currentisLatestValue.subscribe(isLatest => {
       this.isLatest = isLatest
@@ -116,12 +110,10 @@ export class ContractsHistoryComponent implements OnInit {
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if(isHit){
 
-        console.log(this.funds, this.contractTypes, this.isLatest)
         this.gridApi?.showLoadingOverlay()
         this.subscriptions.push(
             this.contractHistorySvc.getContractHistory({
-              funds: this.funds?.join(','), 
-              contractTypes: this.contractTypes?.join(','),
+              funds: this.funds?.join(','),
               isLatest: this.isLatest
           }).pipe(first()).subscribe({
           next: data => {

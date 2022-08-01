@@ -2,7 +2,7 @@ import { AdaptableApi, Layout } from "@adaptabletools/adaptable-angular-aggrid";
 import { ColDef, ValueFormatterParams } from "@ag-grid-community/all-modules";
 import { amountFormatter, dateFormatter, dateTimeFormatter } from "./formatter";
 
-const GENERAL_FORMATTING_EXCEPTIONS = ['account', 'accountid', 'account id', 'issuer', 'id', 'positionid', 'position id', 'issuerid', 'issuer id', 'asset id', 'assetid', 'extract id'];
+const GENERAL_FORMATTING_EXCEPTIONS = ['account', 'accountid', 'account id', 'issuer', 'id', 'positionid', 'position id', 'issuerid', 'issuer id', 'asset id', 'assetid', 'extract id', 'loanxid'];
 
 const GENERAL_DATETIME_FORMATTING_COLUMNS = ['createdon','created on','modified on', 'modifiedon']
 
@@ -18,7 +18,7 @@ export function saveAndSetLayout(columnDefs: ColDef[], adaptableApi: AdaptableAp
   // Existing layout doesn't get updated is the layout object doesnt exactly match properties(existing layout) = properties (new layout). To update an exisiting layout, you need to have it's Uuid as well. Only layout name is not enough.
 
   let layout: Layout, existingLayout: Layout = adaptableApi?.layoutApi.getLayoutByName(layoutName);
-  if(existingLayout !== null){
+  if(existingLayout != null){
     layout = existingLayout     // Will have Uuid and other dynamically added properties.
     layout.Columns = columnDefs.map(col => col.field)
   }
