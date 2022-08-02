@@ -81,6 +81,12 @@ export class DataService {
         );
     }
 
+    getGridDynamicColumns(grid: string){
+        return this.http.get<any[]>(`${APIConfig.GRID_DYNAMIC_COLUMNS_GET_API}/?grid=${grid}`, this.httpOptions).pipe(
+            catchError((ex) => throwError(ex))
+        );
+    }
+
     setWarningMsg(message: string, action: string, type: 'ark-theme-snackbar-normal' | 'ark-theme-snackbar-warning' | 'ark-theme-snackbar-error' | 'ark-theme-snackbar-success' = 'ark-theme-snackbar-normal'){
         this.snackBar.open(message, action, {
           duration: 5000,

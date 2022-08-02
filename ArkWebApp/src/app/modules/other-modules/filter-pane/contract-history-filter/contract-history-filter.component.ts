@@ -41,7 +41,7 @@ export class ContractHistoryFilterComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges){
 
     if(changes?.['funds']){
-      this.preSelectedFunds = changes['funds'].currentValue?.filter(x => String(x?.['fund']).toLowerCase().includes('dl3'))
+      this.preSelectedFunds = changes['funds'].currentValue
     }
   }
 

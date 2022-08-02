@@ -1,7 +1,7 @@
 import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
 import { ClientSideRowModelModule, ClipboardModule, ColDef, ColumnsToolPanelModule, ExcelExportModule, FiltersToolPanelModule, GridApi, GridOptions, GridReadyEvent, MenuModule, Module, RangeSelectionModule, SetFilterModule, SideBarModule } from '@ag-grid-enterprise/all-modules';
 import { Component, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { ContractHistoryService } from 'src/app/core/services/ContractHistory/contract-history.service';
 import { DataService } from 'src/app/core/services/data.service';
@@ -36,8 +36,9 @@ export class ContractHistoryComponent implements OnInit {
   funds
   isLatest
 
-  rowData = null
+  rowData = []
 
+  preSelectedColumns: string[] = []
   gridOptions: GridOptions = {
     enableRangeSelection: true,
     columnDefs: this.columnDefs,
@@ -107,35 +108,6 @@ export class ContractHistoryComponent implements OnInit {
       this.isLatest = isLatest
     }))
 
-    this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
-      if(isHit){
-
-        this.gridApi?.showLoadingOverlay()
-        this.subscriptions.push(
-            this.contractHistorySvc.getContractHistory({
-              funds: this.funds?.join(','),
-              isLatest: this.isLatest
-          }).pipe(first()).subscribe({
-          next: data => {
-            if(data.length > 0)
-              this.columnDefs = createColumnDefs(data[0].columnValues, [...GENERAL_FORMATTING_EXCEPTIONS, 'name'])
-            this.rowData = parseFetchedData(data)
-            
-            this.gridApi?.setColumnDefs(this.columnDefs);
-            this.gridColumnApi?.autoSizeAllColumns(true);
-
-            this.gridApi?.hideOverlay();
-
-            saveAndSetLayout(this.columnDefs, this.adaptableApi);
-            this.gridApi?.setRowData(this.rowData)
-          },
-          error: error => {
-            console.error(error)
-            this.gridApi?.hideOverlay();
-          }
-        }))
-      }
-    }))
 
   }
 
@@ -148,16 +120,62 @@ export class ContractHistoryComponent implements OnInit {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
+  refreshGrid(){
+    this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
+      if(isHit){
+
+        this.gridApi?.showLoadingOverlay()
+        this.subscriptions.push(forkJoin(
+            this.contractHistorySvc.getContractHistory({
+              funds: this.funds?.join(','),
+              isLatest: this.isLatest
+            }),
+            this.dataSvc.getGridDynamicColumns('Contract History'))
+          .pipe(first()).subscribe({
+          next: data => {
+            let contractData = data[0]
+            let dynamicColumns = parseFetchedData(data[1])
+
+            this.preSelectedColumns = dynamicColumns.filter(r => r?.['IsDefault'] === 'True').map(r => r?.['Column'].toLowerCase())
+            let doNotFormat: string[] = dynamicColumns.filter(r => r?.['EscapeGridFormat'] === 'True').map(r => r?.['Column'].toLowerCase());
+
+            if(contractData.length > 0)
+              this.columnDefs = createColumnDefs(contractData[0].columnValues, [...GENERAL_FORMATTING_EXCEPTIONS, ...doNotFormat])
+            
+            this.rowData = parseFetchedData(contractData)
+            
+            this.gridApi?.setColumnDefs(this.columnDefs);
+            this.gridColumnApi?.autoSizeAllColumns(true);
+
+            this.gridApi?.hideOverlay();
+
+            let selectedColDef: ColDef[] = [];
+            this.preSelectedColumns.forEach(colName => {
+              let colDefs: ColDef[] = this.columnDefs.filter(def => def.field.toLowerCase() === colName)
+              if(colDefs.length > 1){
+                console.warn(`Duplicate columnDefs for field: ${colName}`)
+              }
+              if(colDefs.length > 0)
+                selectedColDef.push(colDefs[0])
+            })
+            saveAndSetLayout(selectedColDef, this.adaptableApi);
+            this.gridApi?.setRowData(this.rowData)
+          },
+          error: error => {
+            console.error(error)
+            this.gridApi?.hideOverlay();
+          }
+        }))
+      }
+    }))
+
+  }
+
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
 
-    this.gridApi.setColumnDefs(this.columnDefs);
-    this.gridColumnApi.autoSizeAllColumns(true);
-    this.gridApi?.hideOverlay();
-    this.gridApi?.setRowData(this.rowData)
-
-    saveAndSetLayout(this.columnDefs, this.adaptableApi);
+    this.refreshGrid();
     params.api.closeToolPanel()
   }
 
