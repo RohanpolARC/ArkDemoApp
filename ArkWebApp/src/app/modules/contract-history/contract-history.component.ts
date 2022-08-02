@@ -126,12 +126,14 @@ export class ContractHistoryComponent implements OnInit {
 
         this.gridApi?.showLoadingOverlay()
         this.subscriptions.push(forkJoin(
+          [
             this.contractHistorySvc.getContractHistory({
               funds: this.funds?.join(','),
               isLatest: this.isLatest
             }),
-            this.dataSvc.getGridDynamicColumns('Contract History'))
-          .pipe(first()).subscribe({
+            this.dataSvc.getGridDynamicColumns('Contract History')
+          ]
+          ).pipe(first()).subscribe({
           next: data => {
             let contractData = data[0]
             let dynamicColumns = parseFetchedData(data[1])
