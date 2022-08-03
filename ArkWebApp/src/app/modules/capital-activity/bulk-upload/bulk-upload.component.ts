@@ -372,8 +372,11 @@ export class BulkUploadComponent implements OnInit {
           for(let j: number= 0; j < extractedCols.length; j+= 1){
             if(['GIR (Pos - Fund ccy)', 'Amount'].includes(extractedCols[j]))
               obj[extractedCols[j]] = parseFloat(data[i][j])
-            else if(['Call Date', 'Cash Flow Date'].includes(extractedCols[j]))
-              obj[extractedCols[j]] = moment(data[i][j], 'DD/MM/YYYY').toDate()
+            else if(['Call Date', 'Cash Flow Date'].includes(extractedCols[j])){
+              obj[extractedCols[j]] = moment(data[i][j], 'DD/MM/YYYY', true).toDate()
+              if(obj[extractedCols[j]] == 'Invalid Date')
+                obj[extractedCols[j]] = null 
+            }
             else
               obj[extractedCols[j]] = data[i][j];
 
