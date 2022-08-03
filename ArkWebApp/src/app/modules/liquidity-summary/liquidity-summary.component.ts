@@ -357,12 +357,12 @@ export class LiquiditySummaryComponent implements OnInit {
     this.setSelectedRowID(null);
     if(this.asOfDate !== null){
 
-      this.gridOptions.api.showLoadingOverlay();
+      this.gridOptions.api?.showLoadingOverlay();
       this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryPivoted(this.asOfDate, this.fundHedgings, this.days).subscribe({
         next: summary => {
   
           setTimeout(() => {
-            this.gridOptions.api.hideOverlay();
+            this.gridOptions.api?.hideOverlay();
             
             if(summary.length > 0){
               this.createColumnDefs(summary[0]);
@@ -381,7 +381,7 @@ export class LiquiditySummaryComponent implements OnInit {
               )
             }
             else{
-              this.gridOptions.api.showNoRowsOverlay();
+              this.gridOptions.api?.showNoRowsOverlay();
               this.createColumnDefs();
               this.rowData = [];
             }
@@ -389,7 +389,7 @@ export class LiquiditySummaryComponent implements OnInit {
 
         },
         error: error => {
-          this.gridOptions.api.showNoRowsOverlay();
+          this.gridOptions.api?.showNoRowsOverlay();
           console.error("Error in fetching liquidity summary" + error);
           this.rowData = [];
         }

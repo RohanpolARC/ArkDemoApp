@@ -42,9 +42,4 @@ export class FacilityDetailService {
     return this.http.post<any>(`${APIConfig.FACILITY_DETAILS_PUT_API}`, model, this.httpOptions).pipe(
       catchError((ex) => throwError(ex)));
   }
-
-  public getFacilityFunds(){
-    return this.http.get<any[]>(`${APIConfig.FACILITY_DETAILS_GET_FUNDS_API}`, this.httpOptions).pipe(
-      catchError((ex) => throwError(ex)));
-  }
 }

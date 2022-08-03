@@ -2,13 +2,10 @@ import { Component } from '@angular/core';
 import { DataService } from './core/services/data.service';  
 import { HttpClient } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
-import { FilterPane } from './shared/models/FilterPaneModel';
 import { Location } from '@angular/common';
 import { AccessService } from './core/services/Auth/access.service';
 import { Router } from '@angular/router';
-import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Subscription } from 'rxjs';
-import { FacilityDetailService } from './core/services/FacilityDetails/facility-detail.service';
 import { MsalUserService } from './core/services/Auth/msaluser.service';
 
 @Component({  
@@ -22,18 +19,6 @@ export class AppComponent {
   public userName:string;
   public rightSidebarOpened:boolean=false;
   public leftSIdebarOpened:boolean=false;
-  filterPane:FilterPane = {
-    AsOfDateRange: false,
-    AsOfDate: false,
-    TextValueSelect: false,
-    NumberField: false
-  };
-  asOfDate: string = null;
-  numberField: number = null;
-  multiSelectPlaceHolder: string = null;
-  dropdownSettings: IDropdownSettings = null;
-  dropdownData: any = null;
-  selectedDropdownData: any = null;
 
   notSelectedElement = {
 
@@ -73,7 +58,6 @@ export class AppComponent {
     public location:Location,
     public accessService: AccessService,
     private router:Router,
-    private facilityDetailSvc: FacilityDetailService,
     private msalSvc: MsalUserService
   ) {}   
 
@@ -100,21 +84,7 @@ export class AppComponent {
   filterApply(){
 
     setTimeout(() => {
-      if(this.location.path() === '/facility-detail'){
-        this.dataService.changeFilterApplyBtnState(true);
-      }
-      else if(this.location.path() === '/liquidity-summary'){
-        this.dataService.changeFilterApplyBtnState(true);
-      }
-      else if(['/irr/portfoliomodeller'].includes(this.location.path())){
-        this.dataService.changeFilterApplyBtnState(true)
-      }
-      else if(this.location.path() === '/contract-history'){
-        this.dataService.changeFilterApplyBtnState(true)
-      }
-      else if(this.location.path() === '/cash-balance'){
-        this.dataService.changeFilterApplyBtnState(true)
-      }
+      this.dataService.changeFilterApplyBtnState(true)
       this.rightSidebarOpened = false
     }, 250)
   }
@@ -129,31 +99,26 @@ export class AppComponent {
     this.fetchTabs();
     this.userName=this.dataService.getCurrentUserName();
 
-      /** On Initial Load */
+      /** On Initial Load (If screen is directly loaded from the url)*/
       /** If Cash Balance screen is directly loaded */
     if(this.location.path() === '/cash-balance'){
       this.updateSelection('Cash Balance')
     }
-      /** If GIR Editor screen is directly loaded */
     else if(this.location.path() === '/portfolio-history'){
       this.updateSelection('GIREditor')
     }
-      /** If Capital Activity is directly loaded */
     else if(this.location.path() === '/capital-activity'){
       this.updateSelection('Capital Activity')
     }
-      /** If Facility Details is directly loaded */
     else if(this.location.path() === '/facility-detail'){
       this.updateSelection('Facility Detail')
     }
-    /** If Liquidity Summary is directly loaded */
     else if(this.location.path() === '/liquidity-summary'){
       this.updateSelection('Liquidity Summary')
     }
     else if(this.location.path() === '/access-control'){
       this.updateSelection('Access Control')
     }
-    /** If IRR is direclty loaded */
     else if(this.location.path() === '/irr/portfoliomodeller'){
       this.updateSelection('Portfolio Modeller')
     }
@@ -230,7 +195,6 @@ export class AppComponent {
     }
     else if(screen === 'Portfolio Modeller'){
       this.PortfolioModellerStyle = this.selectedElement;
-      this.filterApply();
       this.router.navigate(['/irr/portfoliomodeller'])
     }
     else if(screen === 'Portfolio Mapping'){
@@ -246,4 +210,4 @@ export class AppComponent {
       this.router.navigate(['/access-control'])
     }
   }
-} 
+}
