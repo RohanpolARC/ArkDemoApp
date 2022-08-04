@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
 import { MsalUserService } from '../Auth/msaluser.service';
@@ -18,6 +18,24 @@ export class LiquiditySummaryService {
         'Authorization': 'Bearer ' + this.msalService.GetAccessToken()  
     })
   };
+
+  private fundHedgingMessage = new BehaviorSubject<any>(null)
+  currentfundHedgingValues = this.fundHedgingMessage.asObservable();
+  changeFundHedgingValues(values: string[]){
+      this.fundHedgingMessage.next(values);
+  }
+
+  private asOfDateMessage = new BehaviorSubject<string>(null)
+  currentSearchDate = this.asOfDateMessage.asObservable();
+  changeSearchDate(asOfDate: string){
+      this.asOfDateMessage.next(asOfDate);
+  }
+
+  private noofdaysMessage = new BehaviorSubject<number>(null)
+  currentnoofdaysValues = this.noofdaysMessage.asObservable();
+  changenoofdaysValues(value: number){
+      this.noofdaysMessage.next(value);
+  }
 
   constructor(private http: HttpClient,
               private msalService: MsalUserService) { }

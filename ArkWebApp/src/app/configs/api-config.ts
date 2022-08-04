@@ -22,6 +22,7 @@ export class APIConfig {
     public static PORTFOLIO_HISTORY_BULK_PUT_API: string = APIConfig.BASEURL + "/api/AssetGIR/putbulk";
     public static PORTFOLIO_HISTORY_DELETE_API: string = APIConfig.BASEURL + "/api/AssetGIR/delete";
 
+    public static GRID_DYNAMIC_COLUMNS_GET_API: string = APIConfig.BASEURL + "/api/General/GetGridDynamicColumns";
     public static SAVE_ADAPTABLE_STATE_API: string = APIConfig.BASEURL + "/api/General/SaveAdaptableState";
     public static GET_ADAPTABLE_STATE_API: string = APIConfig.BASEURL + "/api/General/GetAdaptableState";
 
@@ -44,6 +45,7 @@ export class APIConfig {
     public static LIQUIDITY_SUMMARY_REF_GET_API: string = APIConfig.BASEURL + "/api/LiquiditySummary/GetRef";
     public static LIQUIDITY_SUMMARY_PUT_UPDATE_API: string = APIConfig.BASEURL + "/api/LiquiditySummary/Update";
 
+    public static REFDATA_GET_UNIQUE_VALUES_API: string = APIConfig.BASEURL + "/api/GetRef/GetUnqiueValuesForField";
     public static REFDATA_GET_FUNDHEDGINGS_API: string = APIConfig.BASEURL + "/api/GetRef/GetFundHedgings";
     public static REFDATA_GET_WSOPORTFOLIO_API: string = APIConfig.BASEURL + "/api/GetRef/GetWSOPortfolioRef";
 
@@ -61,4 +63,6 @@ export class APIConfig {
     public static ASSET_FUNDING_DETAILS_GET_API: string = APIConfig.BASEURL + "/api/UnfundedAssets/GetAssetFundingDetails";
     public static UNFUNDED_ASSET_PUT_API: string = APIConfig.BASEURL + "/api/UnfundedAssets/PutUnfundedAsset";
     public static UNFUNDED_ASSET_GET_API: string = APIConfig.BASEURL + "/api/UnfundedAssets/GetUnfundedAssets";
+
+    public static CONTRACT_HISTORY_GET_API: string = APIConfig.BASEURL + "/api/ContractHistory/GetContractHistory";
 }

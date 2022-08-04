@@ -18,6 +18,12 @@ export class IRRCalcService {
     })
   };
   
+  private asOfDateMessage = new BehaviorSubject<string>(null)
+  currentSearchDate = this.asOfDateMessage.asObservable();
+  changeSearchDate(asOfDate: string){
+      this.asOfDateMessage.next(asOfDate);
+  }
+
   constructor(private http: HttpClient,
     private msalService: MsalUserService) { }
 

@@ -1,31 +1,31 @@
-<div class="asset-grid">
-    <div class="header-container">
-        <span class="title">
-            Cash Balance        
-        </span>
-        <span *ngIf="sDate" class="label-date">
-            <mat-icon class="date-range">date_range</mat-icon>
-            <mat-label matTooltip="Please visit Filter Pane to change As Of Date" matTooltipClass="date-tooltip">From: {{sDate.start | date:"dd MMM yyyy"}} To: {{sDate.end | date:"dd MMM yyyy"}}</mat-label>
-        </span>
+<div class="parent">
+    <div class="header">
+        <div class="title">
+            Cash Balance
+        </div>
+        <div class="action">
+            <div class="date-cont">
+                <mat-icon class="date-range">date_range</mat-icon>
+                <mat-label matTooltip="Please visit Filter Pane to change As Of Date" matTooltipClass="date-tooltip">From: {{sDate?.start | date:"dd/MM/yyyy"}}  - To: {{sDate?.end | date:"dd/MM/yyyy"}}</mat-label>
+            </div>
+        </div>
     </div>
 
-    <mat-card class="grid-parent">
-    
-    <div class="grid-component h-100 w-100">
+    <div class="content">
+        <mat-card class="mat-content">
 
-    <ag-grid-angular
-        [adaptableOptions]="adaptableOptions"
-        [gridOptions]="gridOptions"
-        [defaultColDef]="defaultColDef"
-        [rowGroupPanelShow]="rowGroupPanelShow"
-        [modules]="agGridModules"
-        [rowData]="rowData"
-        [sideBar]="'columns'"
-        (adaptableReady)="onAdaptableReady($event)"
-        class="ag-theme-alpine h-100 w-100"
-    >
-    </ag-grid-angular>
-</div>
-</mat-card>
-
+            <ag-grid-angular
+            [adaptableOptions]="adaptableOptions"
+            [gridOptions]="gridOptions"
+            [defaultColDef]="defaultColDef"
+            [rowGroupPanelShow]="rowGroupPanelShow"
+            [modules]="agGridModules"
+            [rowData]="rowData"
+            [sideBar]="'columns'"
+            (adaptableReady)="onAdaptableReady($event)"
+            class="ag-theme-alpine ag-grid"
+            >
+            </ag-grid-angular>
+        </mat-card>
+    </div>
 </div>

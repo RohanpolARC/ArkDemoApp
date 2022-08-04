@@ -5,7 +5,7 @@ import { MsalUserService } from './Auth/msaluser.service';
 import { BehaviorSubject } from 'rxjs';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { APIConfig } from 'src/app/configs/api-config';
-import { Observable, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { DetailedView } from 'src/app/shared/models/GeneralModel';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -33,34 +33,8 @@ export class DataService {
     filterApplyBtnState = this.filterApplyBtnHit.asObservable();
     changeFilterApplyBtnState(isHit: boolean){
         this.filterApplyBtnHit.next(isHit);
-
     }
 
-    private searchDateMessage = new BehaviorSubject<string>(getMomentDateStr(getLastBusinessDay()))
-    currentSearchDate = this.searchDateMessage.asObservable();
-    changeSearchDate(asOfDate: string){
-        this.searchDateMessage.next(asOfDate);
-    }
-
-    private searchDateRangeMessage = new BehaviorSubject<any>(null);
-    currentSearchDateRange = this.searchDateRangeMessage.asObservable();
-    changeSearchDateRange(range: AsOfDateRange){
-        this.searchDateRangeMessage.next(range);
-    }
-
-    private searchTextValuesMessage = new BehaviorSubject<any>(null)
-    currentSearchTextValues = this.searchTextValuesMessage.asObservable();
-    changeSearchTextValues(values: string[]){
-        this.searchTextValuesMessage.next(values);
-    }
-
-    private numberFieldMessage = new BehaviorSubject<number>(null)
-    currentNumberField = this.numberFieldMessage.asObservable();
-    changeNumberField(value: number){
-        this.numberFieldMessage.next(value);
-    }
-
-  
     getCurrentUserInfo(){  
        return this.msalService.getCurrentUserInfo();  
     }
@@ -84,6 +58,12 @@ export class DataService {
         return this.http.get<any[]>(`${APIConfig.REFDATA_GET_WSOPORTFOLIO_API}`, this.httpOptions).pipe(
             catchError((ex) => throwError(ex)));
     }
+
+    getUniqueValuesForField(field: string){
+        return this.http.get<{id: number, value: string}[]>(`${APIConfig.REFDATA_GET_UNIQUE_VALUES_API}/?field=${field}`).pipe(
+            catchError((ex) => throwError(ex)));
+    }
+
     getDetailedView(model: DetailedView){
         return this.http.post<any[]>(`${APIConfig.GET_DETAILED_VIEW}`, model, this.httpOptions).pipe(
             catchError((ex) => throwError(ex)));      
@@ -97,6 +77,12 @@ export class DataService {
 
     getAdaptableState(adaptableID: string){
         return this.http.get<string>(`${APIConfig.GET_ADAPTABLE_STATE_API}/?adaptableID=${adaptableID}`, this.httpOptions).pipe(
+            catchError((ex) => throwError(ex))
+        );
+    }
+
+    getGridDynamicColumns(grid: string){
+        return this.http.get<any[]>(`${APIConfig.GRID_DYNAMIC_COLUMNS_GET_API}/?grid=${grid}`, this.httpOptions).pipe(
             catchError((ex) => throwError(ex))
         );
     }

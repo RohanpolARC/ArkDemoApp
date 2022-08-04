@@ -42,21 +42,12 @@
           <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Liquidity Summary');" [ngStyle]="LiquiditySummaryStyle">
             <div class="list-item-text"> Liquidity Summary </div>
             </mat-list-item>
-          </mat-list>
-
-        <mat-list>
           <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Cash Balance');" [ngStyle]="CashBalanceStyle">
             <div class="list-item-text"> Cash Balance </div>
             </mat-list-item>
-          </mat-list>
-  
-        <mat-list>
           <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Capital Activity');" [ngStyle]="CapitalActivityStyle">
             <div class="list-item-text">Capital Activity</div>
           </mat-list-item>
-        </mat-list>  
-
-        <mat-list>
           <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Unfunded Assets');" [ngStyle]="UnfundedAssetsStyle">
             <div class="list-item-text">Unfunded Assets</div>
           </mat-list-item>
@@ -77,9 +68,6 @@
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Facility Detail')" [ngStyle]="FacilityDetailStyle">
           <div class="list-item-text">Asset Browser</div>
         </mat-list-item>
-      </mat-list>
-
-      <mat-list>
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Portfolio Modeller')" [ngStyle]="PortfolioModellerStyle">
           <div class="list-item-text">Portfolio Modeller</div>
         </mat-list-item>
@@ -95,14 +83,14 @@
            Misc.
           </mat-panel-title>
         </mat-expansion-panel-header>
-  
+
         <mat-list>
+          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Contract History')" [ngStyle]="ContractHistoryStyle">
+            <div class="list-item-text">Contract History</div>
+          </mat-list-item>
           <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('GIREditor')" [ngStyle]="GIREditorStyle">
             <div class="list-item-text">Going In Rates Editor</div>
           </mat-list-item>
-        </mat-list>
-
-        <mat-list>
           <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Portfolio Mapping')" [ngStyle]="PortfolioMappingStyle">
             <div class="list-item-text">Portfolio Mapping</div>
           </mat-list-item>
@@ -137,86 +125,39 @@
       <button mat-raised-button id="apply-button"  
         *ngIf="[
         '/facility-detail', '/liquidity-summary', 
-        '/irr/portfoliomodeller', '/irr/runcalcs'].includes(location.path())" 
+        '/irr/portfoliomodeller', '/contract-history', '/cash-balance'].includes(location.path())" 
         (click)="filterApply()">Apply</button>
     </div>
 
-    <ng-container *ngIf="filterPane.TextValueSelect">
-      
-      <div class="dropdown">
-
-        <ng-multiselect-dropdown class="funds-dropdown"
-        [placeholder]="multiSelectPlaceHolder"
-        [settings]="dropdownSettings"
-        [data]="dropdownData"
-        [(ngModel)]="selectedDropdownData"
-        >
-        </ng-multiselect-dropdown>
-    
-      </div>
-
-    </ng-container>
-
-    <ng-container *ngIf="filterPane.AsOfDate">
-
-      <div class="filter-options">
-        <mat-form-field appearance="outline">
-          <mat-label>As Of Date</mat-label>
-          <input autocomplete="off"  matInput [matDatepicker]="Datepicker" [(ngModel)]="asOfDate">
-          <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
-          <mat-datepicker #Datepicker></mat-datepicker>
-        </mat-form-field>
-      </div>
-
-    </ng-container>
-
-    <ng-container *ngIf="filterPane.NumberField">
-
-      <div class="filter-options">
-        <mat-form-field appearance="outline">
-          <mat-label>FX PnL days</mat-label>
-          <input type="number" autocomplete="off" matInput [(ngModel)]="numberField">
-        </mat-form-field>
-      </div>
-
-    </ng-container>
-
-  <div *ngIf="filterPane.AsOfDateRange">
-    <div class="form-input">
-  
-      <mat-form-field appearance="outline" class="date-form-field" color="primary">
-        <mat-label>As of Date</mat-label>
-        <mat-date-range-input [formGroup]="searchDateRange" [rangePicker]="picker">
-          <input matStartDate formControlName="start" placeholder="Start date">
-          <input matEndDate formControlName="end" placeholder="End date">
-        </mat-date-range-input>
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-date-range-picker #picker>
-          <mat-date-range-picker-actions>
-            <button mat-button matDateRangePickerCancel>Cancel</button>
-            <button mat-raised-button color="primary" (click)="getSearchDateRange();" matDateRangePickerApply>Apply</button>
-          </mat-date-range-picker-actions>
-        </mat-date-range-picker>
-  
-        <mat-error *ngIf="searchDateRange.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
-        <mat-error *ngIf="searchDateRange.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
-      </mat-form-field>
-  
+    <div *ngIf="location.path() === '/cash-balance'" class="filter-element">
+      <app-cash-balance-filter></app-cash-balance-filter>
     </div>
-  </div>
-  
+    
+    <div *ngIf="location.path() === '/contract-history'" class="filter-element">
+      <app-contract-history-filter [funds] = "funds"></app-contract-history-filter>
+    </div>
+
+    <div *ngIf="location.path() === '/facility-detail'" class="filter-element">
+      <app-facility-detail-filter [funds] = "funds"></app-facility-detail-filter>
+    </div>
+
+    <div *ngIf="location.path() === '/liquidity-summary'" class="filter-element">
+      <app-liquidity-summary-filter [fundHedgings] = "fundHedgings"></app-liquidity-summary-filter>
+    </div>
+
+    <div *ngIf="location.path() === '/irr/portfoliomodeller'" class="filter-element">
+      <app-irr-calculation-filter></app-irr-calculation-filter>
+    </div>
+
   </mat-sidenav>
-  <mat-sidenav-content>
-  
+
+  <mat-sidenav-content>  
     <div class="filter-btn-row">
       <mat-icon class="filter-btn" (click)="rightSidebarOpened=!rightSidebarOpened">
         filter_alt
         </mat-icon>
     </div>
-  
-  <router-outlet></router-outlet>
-  
+
+    <router-outlet></router-outlet>
   </mat-sidenav-content>
-  
-  
-  </mat-sidenav-container>
+</mat-sidenav-container>

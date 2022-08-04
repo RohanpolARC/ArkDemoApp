@@ -35,6 +35,7 @@ import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
 import { DataService } from 'src/app/core/services/data.service';
 import { DetailedView } from 'src/app/shared/models/GeneralModel';
 import { FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
+import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 
 @Component({
   selector: 'app-capital-activity',
@@ -163,7 +164,7 @@ export class CapitalActivityComponent implements OnInit {
 
   constructor(public dialog:MatDialog, 
     private capitalActivityService: CapitalActivityService,
-    private dataService: DataService) { 
+    private dataSvc: DataService) { 
   }
 
 
@@ -181,7 +182,6 @@ export class CapitalActivityComponent implements OnInit {
       next: (data: any[]) => {
         this.gridOptionsInvstmnt.api?.hideOverlay();
         this.rowDataInvstmnt = data;
-        // this.gridOptionsInvstmnt.api?.applyTransaction({ update: data })
         this.adapTableApiInvstmnt.gridApi.loadGridData(this.rowDataInvstmnt);
       },
       error: error => {
@@ -222,35 +222,6 @@ export class CapitalActivityComponent implements OnInit {
     }));
   }
 
-  async getSharedEntities(adaptableId){
-    return new Promise(resolve => {
-      this.subscriptions.push(this.dataService.getAdaptableState(adaptableId).subscribe({
-        next: state => {
-          try {
-
-            state = state.split('|').join('"')
-            resolve(JSON.parse(state) ||'[]')
-          } catch (e) {
-            console.log("Failed to parse")
-            resolve([])
-          }
-        }
-      }));
-    })
-  }
-
-  async setSharedEntities(adaptableId, sharedEntities): Promise<void>{
-
-    return new Promise(resolve => {
-      this.subscriptions.push(
-        this.dataService.saveAdaptableState(adaptableId, JSON.stringify(sharedEntities).replace(/"/g,'|')).subscribe({
-        next: data => {
-          resolve();
-        }
-      }));
-    })
-  }
-
   ngOnInit(): void {
     this.gridOptions = {
       enableRangeSelection: true,
@@ -262,7 +233,7 @@ export class CapitalActivityComponent implements OnInit {
       },
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:false,
-      suppressScrollOnNewData: true,
+      suppressScrollOnNewData: true
     }
 
     this.gridOptionsInvstmnt = JSON.parse(JSON.stringify(this.gridOptions));
@@ -274,14 +245,14 @@ export class CapitalActivityComponent implements OnInit {
 
     this.adaptableOptions = {
       primaryKey: 'capitalID',
-      userName: this.dataService.getCurrentUserName(),
+      userName: this.dataSvc.getCurrentUserName(),
       adaptableId: 'Capital Activity - Investor Cashflows',
       adaptableStateKey: `Capital Activity Key`,
       
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: this.setSharedEntities.bind(this),
-        getSharedEntities: this.getSharedEntities.bind(this)
+        setSharedEntities: setSharedEntities.bind(this),
+        getSharedEntities: getSharedEntities.bind(this)
   
       },
   
@@ -352,7 +323,6 @@ export class CapitalActivityComponent implements OnInit {
               'totalAmount',
               'localAmount',
               'fxRate',
-              // 'wsoIssuerID',
               'wsoAssetID',
               'narrative',
               'source',
@@ -376,8 +346,7 @@ export class CapitalActivityComponent implements OnInit {
 
     this.adaptableOptionsInvstmnt = {
       primaryKey: 'uniqueID',
-      // autogeneratePrimaryKey: true,
-      userName: this.dataService.getCurrentUserName(),
+      userName: this.dataSvc.getCurrentUserName(),
       adaptableId: 'Capital Activity - Investment Cashflows',
       adaptableStateKey: `Investment CashFlow Key`,
       
@@ -387,8 +356,8 @@ export class CapitalActivityComponent implements OnInit {
 
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: this.setSharedEntities.bind(this),
-        getSharedEntities: this.getSharedEntities.bind(this)
+        setSharedEntities: setSharedEntities.bind(this),
+        getSharedEntities: getSharedEntities.bind(this)
   
       },
   
@@ -427,7 +396,6 @@ export class CapitalActivityComponent implements OnInit {
           }
         ]
       },
-
   
       predefinedConfig: {
         Dashboard: {
@@ -482,7 +450,6 @@ export class CapitalActivityComponent implements OnInit {
     this.fetchCapitalActivityData();
     this.fetchInvestmentData();
     this.fetchCapitalRefData();
-
   }
 
   ngOnDestroy(): void{
@@ -504,7 +471,7 @@ export class CapitalActivityComponent implements OnInit {
     })
     this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
       // Bulk Upload Dialog Closed.
-      if(result.isSuccess){
+      if(result?.isSuccess){
         this.fetchCapitalActivityData();
       }
     }))
@@ -571,6 +538,4 @@ export class CapitalActivityComponent implements OnInit {
 /* Closes right sidebar on start */
     adaptableApi.toolPanelApi.closeAdapTableToolPanel();
   }
-
-
 }
