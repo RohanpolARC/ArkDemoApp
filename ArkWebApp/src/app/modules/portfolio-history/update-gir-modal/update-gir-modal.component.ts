@@ -4,13 +4,15 @@ import { Inject } from '@angular/core';
 import {AssetGIRModel} from '../../../shared/models/AssetGIRModel'
 import {DataService} from '../../../core/services/data.service'
 import { PortfolioHistoryService } from 'src/app/core/services/PortfolioHistory/portfolio-history.service';
-import { RowNode } from '@ag-grid-community/core';
 
 import { ColDef } from '@ag-grid-community/core';
 
-import { MatSnackBar } from '@angular/material/snack-bar';
 import * as moment from 'moment';
 import { Subscription } from 'rxjs';
+import { dateFormatter } from 'src/app/shared/functions/formatter';
+import { GridApi, RowNode } from '@ag-grid-enterprise/all-modules';
+import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
+import { getNodes } from '../../capital-activity/utilities/functions';
 
 
 @Component({
@@ -22,19 +24,18 @@ export class UpdateGirModalComponent implements OnInit {
 
   subscriptions: Subscription[] = [];
 
-  action:string;
-  rowData:any;
-  asset:string;
-  issuer:string;
-  fundhedging:string;
-  fundCcy:string;
-  positionCcy:string;
-  goingInRate:any;
-  tradeDate:string;
+  action: string;
+  rowData: any;
+  asset: string;
+  issuer: string;
+  fundhedging: string;
+  fundCcy: string;
+  positionCcy: string;
+  goingInRate: any;
+  tradeDate: string;
   assetGIR: AssetGIRModel;
-  currentUserName:string;
+  currentUserName: string;
 
-  allLeafChildren: any[];   // Rows of a selected group.
   allLeafChildrenData: any[];
   bulkRowData: any[]; // Data for Ag-grid in bulk update modal.
 
@@ -42,8 +43,8 @@ export class UpdateGirModalComponent implements OnInit {
   isGroupSelectedValid: boolean;  // If selected group is valid.
 
   updateMsg: string;
-  isSuccessMsgAvailable: boolean;
-  isFailureMsgAvailable: boolean;
+  isSuccess: boolean;
+  isFailure: boolean;
 
   gridData: any; // To hold data for pop up modal grid display. 
   // Ag-grid variables.
@@ -55,18 +56,21 @@ export class UpdateGirModalComponent implements OnInit {
   gridColumnApi;
 
   columnDefs: ColDef[] = [
-    {headerName:'Issuer Short Name', field:'issuerShortName'},
-    {headerName:'Asset', field:'asset'},
-    {headerName:'Trade Date', field:'tradeDate', valueFormatter: this.dateFormatter},
-    {headerName:'Type', field:'typeDesc'},
-    {headerName:'Position Ccy', field:'positionCcy'},
-    {headerName:'Fund Ccy', field:'fundCcy'},
-    {headerName:'Fund Hedging', field:'fundHedging'},
-    // {headerName:'FXRateBaseEffective', field:'fxRateBaseEffective'},
+    {headerName:'Issuer Short Name', field:'issuerShortName', tooltipField: 'issuerShortName'},
+    {headerName:'Asset', field:'asset', tooltipField: 'asset'},
+    {headerName:'Trade Date', field:'tradeDate', valueFormatter: dateFormatter, tooltipField: 'tradeDate'},
+    {headerName:'Type', field:'typeDesc', tooltipField: 'typeDesc'},
+    {headerName:'Position Ccy', field:'positionCcy', tooltipField: 'positionCcy'},
+    {headerName:'Fund Ccy', field:'fundCcy', tooltipField: 'fundCcy'},
+    {headerName:'Fund Hedging', field:'fundHedging', tooltipField: 'fundHedging'}
   ];
 
   constructor(  public dialogRef: MatDialogRef<UpdateGirModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,private dataService:DataService, private portfolioHistoryService:PortfolioHistoryService, public updateMsgSnackBar: MatSnackBar ) { 
+    @Inject(MAT_DIALOG_DATA) public data: {
+      node: RowNode,
+      adaptableApi: AdaptableApi,
+      gridApi: GridApi
+    },private dataService:DataService, private portfolioHistoryService:PortfolioHistoryService ) { 
 
       this.assetGIR=new AssetGIRModel()
 
@@ -79,7 +83,7 @@ export class UpdateGirModalComponent implements OnInit {
   }
   
   initEditRow(): void{
-    this.rowData=this.data.data
+    this.rowData=this.data.node.data
 
     this.asset=this.rowData.asset
     this.issuer=this.rowData.issuerShortName
@@ -94,10 +98,7 @@ export class UpdateGirModalComponent implements OnInit {
 
   initLeafChildrenData(): void{
     
-    this.allLeafChildren = this.data.childrenAfterFilter; // Filtered data.
-    this.allLeafChildrenData = this.allLeafChildren.map(row => {
-      return row.data;
-    })    
+    this.allLeafChildrenData = getNodes(this.data.node)
   }
 
   isGroupValid(allLeafChildrenData: any[]): boolean{
@@ -120,11 +121,11 @@ export class UpdateGirModalComponent implements OnInit {
     this.isEditAllowed = false;
     this.isUpdateAllowed = false;
 
-    this.isSuccessMsgAvailable = false;
-    this.isFailureMsgAvailable = false;
+    this.isSuccess = false;
+    this.isFailure = false;
 
     this.currentUserName=this.dataService.getCurrentUserInfo().name
-    this.isGroupSelected = this.data.group;
+    this.isGroupSelected = this.data.node.group;
 
       /* When no group is selected. */
     if(this.isGroupSelected == false){
@@ -151,26 +152,10 @@ export class UpdateGirModalComponent implements OnInit {
   ngOnDestroy(): void{
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
-
-  openUpdateMsgSnackBar(message: string, action: string){
-    this.updateMsgSnackBar.open(message, action, {
-      duration: 5000,
-      horizontalPosition: "end",
-      verticalPosition: "top"
-    });
-  }
-
-  dateFormatter(params) {
-    if(params.value==undefined || params.value=="0001-01-01T00:00:00")
-      return ""
-    else 
-      return moment(params.value).format('DD/MM/YYYY');
-  }
   
   doAction(){
 
     this.isUpdateAllowed = false;
-
     this.isEditAllowed = false;
     
     if(this.isGroupSelected && this.isGroupSelectedValid)
@@ -178,63 +163,50 @@ export class UpdateGirModalComponent implements OnInit {
       this.action='Update in Bulk';
       let bulkAssetGIR: AssetGIRModel [] = [];
       
-      let uniqueAssetsCountMap = new Map();
-
       for(let i = 0; i < this.allLeafChildrenData.length; i+= 1){
         
-        if(uniqueAssetsCountMap.has(this.allLeafChildrenData[i].assetId))
-          continue;
-
-        uniqueAssetsCountMap.set(this.allLeafChildrenData[i].assetId, true);
-
-        let bufferAssetGIR: AssetGIRModel = new AssetGIRModel();
-        bufferAssetGIR.WSOAssetid = this.allLeafChildrenData[i].assetId;
-        bufferAssetGIR.AsOfDate = this.allLeafChildrenData[i].asOfDate;
-        bufferAssetGIR.Ccy = 0;    // ?
-        bufferAssetGIR.Rate = this.goingInRate;       // Updated GIR.
-        bufferAssetGIR.last_update = new Date();
-        bufferAssetGIR.CcyName = this.allLeafChildrenData[i].positionCcy;
-        bufferAssetGIR.Text = this.allLeafChildrenData[i].asset;
-        bufferAssetGIR.CreatedBy = this.currentUserName;
-        bufferAssetGIR.ModifiedBy = this.currentUserName;
-        bufferAssetGIR.CreatedOn = new Date(); 
-        bufferAssetGIR.ModifiedOn = new Date();
-        bufferAssetGIR.TradeDate = this.allLeafChildrenData[i].tradeDate;
-        bufferAssetGIR.FundHedging = this.allLeafChildrenData[i].fundHedging;
+        let model: AssetGIRModel = new AssetGIRModel();
+        model.WSOAssetid = this.allLeafChildrenData[i].assetId;
+        model.AsOfDate = this.allLeafChildrenData[i].asOfDate;
+        model.Ccy = 0;    // ?
+        model.Rate = this.goingInRate;       // Updated GIR.
+        model.last_update = new Date();
+        model.CcyName = this.allLeafChildrenData[i].fundCcy;
+        model.Text = this.allLeafChildrenData[i].asset;
+        model.CreatedBy = this.currentUserName;
+        model.ModifiedBy = this.currentUserName;
+        model.CreatedOn = new Date(); 
+        model.ModifiedOn = new Date();
+        model.TradeDate = this.allLeafChildrenData[i].tradeDate;
+        model.FundHedging = this.allLeafChildrenData[i].fundHedging;
 
         this.allLeafChildrenData[i].goingInRate = this.goingInRate;
 
-        bulkAssetGIR.push(bufferAssetGIR);
+        bulkAssetGIR.push(model);
       }
-
-
-      this.subscriptions.push(this.portfolioHistoryService.putBulkAssetGIR(bulkAssetGIR).subscribe({
+      
+      this.subscriptions.push(this.portfolioHistoryService.putAssetGIR(bulkAssetGIR).subscribe({
         next: data => {
 
-          this.isSuccessMsgAvailable = true;
-          this.isFailureMsgAvailable = false;
-          this.updateMsg = "Updated going in rate for " + this.allLeafChildrenData.length + (this.allLeafChildrenData.length > 1 ? " assets." : " asset.");
+          this.isSuccess = true;
+          this.isFailure = false;
+          this.updateMsg = "Updated going in rate for " + this.allLeafChildrenData.length + " assets"
 
-          // this.dialogRef.close({event: this.action, data: this.allLeafChildrenData});
+          let updatedData = this.allLeafChildrenData.map(nodeData => {
+            nodeData['fxRateBaseEffective'] = this.goingInRate,
+            nodeData['modifiedOn'] = new Date();
+            nodeData['modifiedBy'] = this.currentUserName;
+            nodeData['isEdited'] = true
 
-          
-
-          for(let i = 0; i < this.allLeafChildren.length; i+= 1){
-            // this.data.allLeafChildren[i].data.fxRateBaseEffective = this.goingInRate;
-
-            
-
-            this.data.allLeafChildren[i].setDataValue('fxRateBaseEffective', this.goingInRate);
-            this.data.allLeafChildren[i].setDataValue('modifiedOn', new Date());
-            this.data.allLeafChildren[i].setDataValue('modifiedBy', this.dataService.getCurrentUserName());
-
-            this.data.allLeafChildren[i].setDataValue('isEdited', true);
-          }
-          this.openUpdateMsgSnackBar("Updated going in rate for " + this.allLeafChildrenData.length + (uniqueAssetsCountMap.size > 1 ? " assets" : " asset"), "Dismiss");
+            return nodeData
+          })
+          this.data.gridApi.applyTransaction({
+            update: updatedData
+          }) 
         },
         error: error => {
-          this.isFailureMsgAvailable = true;
-          this.isSuccessMsgAvailable = false;
+          this.isFailure = true;
+          this.isSuccess = false;
           this.updateMsg = "Update Failed.";
         }
       }));
@@ -242,44 +214,47 @@ export class UpdateGirModalComponent implements OnInit {
     else{
     this.action='Update'
 
+    console.log(this.allLeafChildrenData)
     this.rowData.fxRateBaseEffective=this.goingInRate
 
-    this.assetGIR.id=0;
-    this.assetGIR.WSOAssetid=this.rowData.assetId;
-    this.assetGIR.AsOfDate=this.rowData.asOfDate,
-    this.assetGIR.Ccy=0,
-    this.assetGIR.Rate=this.rowData.fxRateBaseEffective,
-    this.assetGIR.last_update=new Date(),
-    this.assetGIR.CcyName=this.rowData.positionCcy,
-    this.assetGIR.Text=this.rowData.asset,
-    this.assetGIR.CreatedBy=this.currentUserName,
-    this.assetGIR.ModifiedBy=this.currentUserName,
-    this.assetGIR.CreatedOn=new Date(),
-    this.assetGIR.ModifiedOn=new Date(),
-    this.assetGIR.TradeDate = this.rowData.tradeDate;
+    this.assetGIR.id = 0;
+    this.assetGIR.WSOAssetid = this.rowData.assetId;
+    this.assetGIR.AsOfDate = this.rowData.asOfDate,
+    this.assetGIR.Ccy = 0,
+    this.assetGIR.Rate = this.rowData.fxRateBaseEffective,
+    this.assetGIR.last_update = new Date(),
+    this.assetGIR.CcyName = this.rowData.fundCcy,   // Changed from positionCcy based on request.
+    this.assetGIR.Text = this.rowData.asset,
+    this.assetGIR.CreatedBy = this.currentUserName,
+    this.assetGIR.ModifiedBy = this.currentUserName,
+    this.assetGIR.CreatedOn = new Date(),
+    this.assetGIR.ModifiedOn = new Date(),
+    this.assetGIR.TradeDate   = this.rowData.tradeDate;
 
     this.assetGIR.FundHedging = this.rowData.fundHedging;
 
-    this.subscriptions.push(this.portfolioHistoryService.putAssetGIR(this.assetGIR).subscribe({
+    this.subscriptions.push(this.portfolioHistoryService.putAssetGIR([this.assetGIR]).subscribe({
           next: data => {     
             
-            this.isSuccessMsgAvailable = true;
-            this.isFailureMsgAvailable = false;
-            
+            this.isSuccess = true;
+            this.isFailure = false;            
             this.updateMsg = "Going in rate updated successfully.";
 
-            // this.dialogRef.close({event:this.action,data:this.rowData});
-            this.data.setDataValue('fxRateBaseEffective', this.goingInRate);
-            this.data.setDataValue('modifiedOn', new Date());
-            this.data.setDataValue('modifiedBy', this.dataService.getCurrentUserName());
+            let updatedData = [{...this.data.node.data, ...{
+              'fxRateBaseEffective': this.goingInRate,
+              'modifiedOn': new Date(),
+              'modifiedBy': this.currentUserName,
+              'isEdited': true
+            }}]
 
-            this.data.setDataValue('isEdited', true);
-            this.data.isEdited = true;
+            this.data.gridApi.applyTransaction({
+              update: updatedData
+            }) 
           },
           error: error => {
               console.error('There was an error!', error);
-              this.isFailureMsgAvailable = true;
-              this.isSuccessMsgAvailable = false;
+              this.isFailure = true;
+              this.isSuccess = false;
               this.updateMsg = "Update Failed.";
           }
     
@@ -291,7 +266,6 @@ export class UpdateGirModalComponent implements OnInit {
   closeDialog(){
 
     this.action='Close';
-
     this.dialogRef.close({event:this.action});
   }
 
