@@ -214,7 +214,6 @@ export class UpdateGirModalComponent implements OnInit {
     else{
     this.action='Update'
 
-    console.log(this.allLeafChildrenData)
     this.rowData.fxRateBaseEffective=this.goingInRate
 
     this.assetGIR.id = 0;

@@ -2,6 +2,35 @@ import { AdaptableApi } from "@adaptabletools/adaptable-angular-aggrid";
 import { CellValueChangedEvent, GridApi } from "@ag-grid-community/all-modules";
 import { PortfolioMappingDataService } from "src/app/core/services/PortfolioManager/portfolio-mapping-data.service";
 
+const MANDATORY_FIELDS: string[] = ['wsoPortfolioID', 'fund', 'fundLegalEntity', 'fundHedging', 'fundStrategy', 'fundSMA', 'fundInvestor', 'fundCcy', 'fundAdmin', 'portfolioAUMMethod', 'isCoinvestment', 'excludeFxExposure']
+
+const BOOLEAN_FIELDS: string[] = ['isCoinvestment', 'fundSMA', 'excludeFxExposure']
+
+export { MANDATORY_FIELDS, BOOLEAN_FIELDS }
+
+/**
+ * 
+ * @param column ColumnName from the grid (i.e. ColDef.field)
+ * @param nodeData Individual node data (i.e. params.node.data)
+ * @returns if the field is valid or not (based on if it has value or not)
+ * 
+ * NOTE: This only checks if the field is mandatory & if it has a value. (Doesnt validate the value itself)
+ */
+export function isFieldValid(column: string, nodeData: any): boolean{
+  if(MANDATORY_FIELDS.includes(column)){
+    if(BOOLEAN_FIELDS.includes(column) && ![true, false].includes(nodeData?.[column])){
+      return false;
+    }
+    else if(!BOOLEAN_FIELDS.includes(column) && !nodeData?.[column])
+      return false;
+  }
+
+  if(BOOLEAN_FIELDS.includes(column) && ![true, false].includes(nodeData?.[column]))
+    return false;
+
+  return true;
+}
+
 /**
  * Returns live Ag-grid data
  * 
