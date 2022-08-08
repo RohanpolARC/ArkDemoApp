@@ -17,6 +17,7 @@ export class MatAutocompleteEditorComponent implements ICellEditorAngularComp, O
   filteredOptions: Observable<string[]>
   params: ICellEditorParams;
   subscriptions: Subscription[] = []
+  isStrict: boolean = false
 
   constructor() { }
 
@@ -24,11 +25,14 @@ export class MatAutocompleteEditorComponent implements ICellEditorAngularComp, O
 
     this.params = params;
     this.options = params?.['options'];
+    this.isStrict = params?.['isStrict'] ? true : false;
     this.field.setValue(params.value, { emitEvent: false })
   }
 
   getValue() {
-    return this.field.value;  
+    if(this.isStrict && !this.options.includes(this.field.value))
+      return null;
+    else return this.field.value;  
   }
 
   _filter(value: string): string[] {

@@ -1,39 +1,36 @@
-<div class="asset-grid">
-
-    <div class="title">
-    
-      Portfolio History - Going In Rates Editor
-        
-    </div>
-        
-    <mat-card class="grid-parent">
-    
-      <div>
+<div class="parent">
+  <div class="header">
+      <div class="title">
+        Portfolio History - Going In Rates Editor
       </div>
-    <div class="grid-component h-100 w-100">
-      
-    <ag-grid-angular
-       
-        class="ag-theme-alpine ag-grid-portfolio-history"
-        [rowData]="rowData"
-        [columnDefs]="columnDefs"
-        [defaultColDef]="defaultColDef"
-        [modules]="modules"
-        (gridReady)="onGridReady($event)"
-        [autoGroupColumnDef]="autoGroupColumnDef"
-        [getRowNodeId]="getRowNodeId"  
-        [suppressClickEdit]="true"
-        [rowGroupPanelShow]="rowGroupPanelShow"
-        toolPanel='columns'
-        [sideBar]="sideBar"
-        (adaptableReady)="onAdaptableReady($event)"
-        [adaptableOptions]="adaptableOptions"
-        [frameworkComponents]="frameworkComponents"
-        [gridOptions]="gridOptions"
-    >
-    </ag-grid-angular>
-    
-    </div>
-    </mat-card>
-    
-    </div>
+      <div class="action">
+      </div>
+  </div>
+
+  <div class="content">
+      <mat-card class="mat-content">
+
+        <ag-grid-angular
+          [rowData]="rowData"
+          [columnDefs]="columnDefs"
+          [defaultColDef]="defaultColDef"
+          [modules]="modules"
+          (gridReady)="onGridReady($event)"
+          [autoGroupColumnDef]="autoGroupColumnDef"
+          [getRowNodeId]="getRowNodeId"  
+          [suppressClickEdit]="true"
+          [rowGroupPanelShow]="rowGroupPanelShow"
+          toolPanel='columns'
+          [sideBar]="sideBar"
+          (adaptableReady)="onAdaptableReady($event)"
+          [adaptableOptions]="adaptableOptions"
+          [frameworkComponents]="frameworkComponents"
+          [gridOptions]="gridOptions"
+          class="ag-theme-alpine ag-grid"
+        >
+        </ag-grid-angular>
+
+      </mat-card>
+  </div>
+</div>
+

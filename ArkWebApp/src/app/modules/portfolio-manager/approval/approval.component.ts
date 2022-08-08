@@ -267,14 +267,12 @@ export class ApprovalComponent implements OnInit {
       },
       { field: "wsoPortfolioID", type: 'abColDefNumber',
         cellStyle: this.getCellStyle.bind(this, 'wsoPortfolioID'),
-        // editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'wsoPortfolioID'),
 
       },
       { field: "portfolioName", type: 'abColDefString',
         cellStyle: this.getCellStyle.bind(this, 'portfolioName'),
-        // editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'portfolioName'),
 
@@ -311,8 +309,10 @@ export class ApprovalComponent implements OnInit {
         cellStyle: this.getCellStyle.bind(this, 'portfolioAUMMethod'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
-        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'portfolioAUMMethod'),
-
+        cellEditorParams:() => { return {
+          ...this.getUniqueParamsFromGrid('portfolioAUMMethod'),
+          isStrict: true
+        }}
       },
       { field: "fundRecon",  type: 'abColDefString',
         cellStyle: this.getCellStyle.bind(this, 'fundRecon'),

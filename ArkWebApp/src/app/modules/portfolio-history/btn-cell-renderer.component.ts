@@ -2,6 +2,9 @@ import { Component, OnDestroy } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import {UpdateGirModalComponent} from './update-gir-modal/update-gir-modal.component'
+import { ICellRendererParams } from '@ag-grid-community/all-modules';
+import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'btn-cell-renderer',
@@ -13,38 +16,43 @@ import {UpdateGirModalComponent} from './update-gir-modal/update-gir-modal.compo
   `,
 })
 export class BtnCellRenderer implements ICellRendererAngularComp, OnDestroy {
-  private params: any;
-  public data: any; 
-  public dialogRef;
-  public rowData;
+  private params: ICellRendererParams;
+  data: any; 
+  rowData;
+  adaptableApi: AdaptableApi
 
-  public gridApi
-  
-  constructor(public dialog: MatDialog){
+  subscription: Subscription
+  constructor(public dialog: MatDialog){ }
 
-  }
-
-  agInit(params: any): void {
+  agInit(params: any): void {    
     this.params = params;
-    this.data=params.data;
-   
+    this.data = params.data;
+    this.adaptableApi = params.context.adaptableApi
   }
-
 
   openUpdateGirModal(){
-
-  this.dialogRef = this.dialog.open(UpdateGirModalComponent,{data: this.params.node })
-  this.dialogRef.afterClosed().subscribe(result => {
-  });
-}
+    const dialogRef = this.dialog.open(UpdateGirModalComponent,{ 
+      data: {
+        node: this.params.node,
+        adaptableApi: this.adaptableApi,
+        gridApi: this.params.api
+      }
+    })
+    this.subscription = dialogRef.afterClosed().subscribe(result => {
+      if(dialogRef.componentInstance.isSuccess){
+        this.params.api.refreshCells({
+          force: true,
+          suppressFlash: true
+        })  
+      }
+    });
+  }
 
   refresh(){
     return true
   }
 
   ngOnDestroy() {
-    // no need to remove the button click handler 
-    // https://stackoverflow.com/questions/49083993/does-angular-automatically-remove-template-event-listeners
+    this.subscription?.unsubscribe();
   }
-
 }

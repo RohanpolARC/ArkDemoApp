@@ -10,7 +10,7 @@ import { PortfolioMappingDataService } from 'src/app/core/services/PortfolioMana
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-renderer.component';
-import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, validateAndUpdate } from './utilities/functions';
+import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, isFieldValid, validateAndUpdate } from './utilities/functions';
 
 @Component({
   selector: 'app-portfolio-manager',
@@ -183,8 +183,11 @@ export class PortfolioManagerComponent implements OnInit {
       { field: "portfolioAUMMethod", 
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
-        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'portfolioAUMMethod'),
-        cellStyle: this.getEditableCellStyle.bind(this),
+        cellEditorParams: () => { return {
+          ...this.getUniqueParamsFromGrid('portfolioAUMMethod'),
+          isStrict: true
+        }},
+        cellStyle: this.getEditableCellStyle.bind(this)      
       },
       { field: "fundRecon", 
         editable: this.isEditable.bind(this),
@@ -343,10 +346,13 @@ export class PortfolioManagerComponent implements OnInit {
   }
 
   getEditableCellStyle (params) {
-    return (params.rowIndex === this.actionClickedRowID) ? 
-    {
-      'border-color': '#0590ca',
-    } : null
+    if(params.rowIndex === this.actionClickedRowID) {
+      
+      if(isFieldValid(params.column.getColId(), params.data))
+        return { 'border-color': '#0590ca' }
+      else return { 'border-color': 'red' }
+    }
+    return null;
   }
 
   getGridData(){
@@ -396,7 +402,7 @@ export class PortfolioManagerComponent implements OnInit {
       next: resp => {
         this.rowData = resp
         this.portfolioMapDataSvc.setMappings(resp);
-        this.gridOptions.api?.hideOverlay();
+        this.gridOptions?.api?.hideOverlay();
       },
       error: error => {
         this.rowData = [];

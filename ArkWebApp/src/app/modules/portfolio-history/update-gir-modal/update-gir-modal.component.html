@@ -18,13 +18,13 @@
                     </div>
                 </div>
 
-                <div class="success-msg" *ngIf="isSuccessMsgAvailable">
-                   {{ updateMsg }}
-                </div>
-                <div class="failure-msg" *ngIf="isFailureMsgAvailable">
+                <div *ngIf="isSuccess || isFailure"
+                    [class.success-msg]="isSuccess"
+                    [class.failure-msg]="isFailure"
+                >
                     {{ updateMsg }}
                 </div>
-
+            
                 <div class="popup-cont-1">
                     <ag-grid-angular
                     style="width: 1100px; height: 200px;"
@@ -41,15 +41,14 @@
             
         </div>
         <div class="invalid-grouping-message" *ngIf="!isGroupSelectedValid && isGroupSelected">
-            Fund currency and position currency not natching for all rows.
+            Fund currency and position currency is not matching for all rows.
             <button mat-raised-button (click)="closeDialog()" >Cancel</button>
         </div>
     </div>
 
 </mat-dialog-content>
-    <mat-dialog-actions align="end" *ngIf="isGroupSelectedValid || !isGroupSelected">
-    
-        <button class="btn-update" [disabled]="!isUpdateAllowed" mat-raised-button (click)="doAction()" color="primary">Update</button>
-        <button mat-raised-button (click)="closeDialog()" >Close</button>
-            
-    <mat-dialog-actions>
+
+<mat-dialog-actions align="end" *ngIf="isGroupSelectedValid || !isGroupSelected">
+    <button class="btn-update" [disabled]="!isUpdateAllowed" mat-raised-button (click)="doAction()" color="primary">Update</button>
+    <button mat-raised-button (click)="closeDialog()" >Close</button>            
+<mat-dialog-actions>
