@@ -48,9 +48,11 @@ export class AppComponent {
   PortfolioMappingStyle: any = {};
   UnfundedAssetsStyle: any = {};
   ContractHistoryStyle: any = {};
+  FeeCalculationStyle: any = {}
 
   funds
   fundHedgings
+  entities
 
   constructor(private http: HttpClient,
     private dataService: DataService,
@@ -131,6 +133,9 @@ export class AppComponent {
     else if(this.location.path() === '/contract-history'){
       this.updateSelection('Contract History')
     }
+    else if(this.location.path() === '/fee-calculation'){
+      this.updateSelection('Fee Calculation')
+    }
     else this.updateSelection('')
   }
 
@@ -142,7 +147,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.FeeCalculationStyle = this.notSelectedElement;
 
     this.lastClickedTabRoute = this.location.path();
 
@@ -192,6 +197,18 @@ export class AppComponent {
       }}))
 
       this.router.navigate(['/liquidity-summary'])
+    }
+    else if(screen === 'Fee Calculation'){
+      this.FeeCalculationStyle = this.selectedElement;
+      this.subscriptions.push(
+        this.dataService.getUniqueValuesForField('Fee-Calculation-Entities').subscribe({
+          next: (data: any[]) => {
+            this.entities = data.map(item => { return { entity: item.value, id: item.id } })
+        setTimeout(() => { this.filterApply() }, 250)
+          }
+        })
+      )
+      this.router.navigate(['/fee-calculation'])
     }
     else if(screen === 'Portfolio Modeller'){
       this.PortfolioModellerStyle = this.selectedElement;
