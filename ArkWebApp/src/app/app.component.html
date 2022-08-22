@@ -71,14 +71,25 @@
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Portfolio Modeller')" [ngStyle]="PortfolioModellerStyle">
           <div class="list-item-text">Portfolio Modeller</div>
         </mat-list-item>
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Fee Calculation')" [ngStyle]="FeeCalculationStyle">
-          <div class="list-item-text">Fee Calculation</div>
-        </mat-list-item>
       </mat-list>
 
     </mat-expansion-panel>
   </mat-accordion>
 
+  <mat-accordion>
+    <mat-expansion-panel [expanded]="false" >
+      <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
+        <mat-panel-title> Fees </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <mat-list>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Fee Calculation')" [ngStyle]="FeeCalculationStyle">
+          <div class="list-item-text">Fee Calculation</div>
+        </mat-list-item>          
+      </mat-list>
+    </mat-expansion-panel>
+  </mat-accordion>
+  
   <mat-accordion>
       <mat-expansion-panel [expanded]="false" >
         <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
