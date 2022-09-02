@@ -39,11 +39,12 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   isSuccess: boolean
   isFailure: boolean
   modelForm: FormGroup
-  context: "Save" | "SaveRun"  
+  context: "Save" | "SaveRun"
   aggregationTypes: {
     type: string,
     levels: string[]
   }[] = []
+  baseMeasures
 
   constructor(
     public dialogRef: MatDialogRef<PortfolioSaveRunModelComponent>,
@@ -59,9 +60,16 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   }
   
   ngOnInit(): void {
-    this.Init();
-    this.changeListeners();
-    this.modelForm.updateValueAndValidity()
+
+    this.subscriptions.push(
+      this.dataService.getUniqueValuesForField('Returns-Base-Measures').subscribe({
+        next: (data: any[]) => {
+          this.baseMeasures = data.map(item => { return { baseMeasure: item.value, id: item.id } })
+
+          this.Init();
+          this.changeListeners();
+          this.modelForm.updateValueAndValidity()      
+    }}))
   }
 
   ngOnDestroy(){
@@ -107,9 +115,9 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       modelDesc: new FormControl(this.data.model?.modelDesc),
       isUpdate: new FormControl(!!this.modelID, Validators.required),
       isShared: new FormControl(!!this.data.isShared, Validators.required),
-      aggregationType: new FormControl(this.data.aggregationType, Validators.required)
-    }
-    )
+      aggregationType: new FormControl(this.data.aggregationType, Validators.required),
+      baseMeasure: new FormControl(this.baseMeasures[0]?.value, Validators.required)
+    })
 
     this.aggregationTypes = [
       {
@@ -230,6 +238,14 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     }))
   }
   
+  onReturnsClick(){
+    this.dialogRef.close({ 
+      context: 'Returns',
+      isSuccess: false, /// Since didn't perform any DB update operation here.
+      baseMeasure: this.modelForm.get('baseMeasure').value
+    });
+  }
+
   recursiveRemoveKey = (object, deleteKey) => {
     delete object[deleteKey];
     

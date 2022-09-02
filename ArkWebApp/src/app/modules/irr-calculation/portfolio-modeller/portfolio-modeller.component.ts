@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { amountFormatter, removeDecimalFormatter, formatDate } from 'src/app/shared/functions/formatter';
-import { IRRCalcParams, VPortfolioLocalOverrideModel } from 'src/app/shared/models/IRRCalculationsModel';
+import { IRRCalcParams, MonthlyReturnsCalcParams, VPortfolioLocalOverrideModel } from 'src/app/shared/models/IRRCalculationsModel';
 import { EventEmitter } from '@angular/core';
 import { AggridMaterialDatepickerComponent } from '../../facility-detail/aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/portfolio-save-run-model.component';
@@ -30,6 +30,7 @@ export class PortfolioModellerComponent implements OnInit {
   ) { }
 
   @Output() calcParamsEmitter = new EventEmitter<IRRCalcParams>();
+  @Output() returnsParamsEmitter = new EventEmitter<MonthlyReturnsCalcParams>();
 
   multiSelectPlaceHolder: string = null;
   dropdownSettings: IDropdownSettings = null;
@@ -539,7 +540,7 @@ export class PortfolioModellerComponent implements OnInit {
     })
 
     this.subscriptions.push(dialogRef.afterClosed().subscribe(res => {
-      if(dialogRef.componentInstance.isSuccess){
+      if(dialogRef.componentInstance.isSuccess || res.context === 'Returns'){
         if(this.isAutomatic.value){
           this.selectedPositionIDs = [];
           this.gridApi.forEachNodeAfterFilter(node => 
@@ -548,13 +549,36 @@ export class PortfolioModellerComponent implements OnInit {
                 this.selectedPositionIDs.push(node.data?.positionID)
             })  
         }
-        if(res.isSuccess){
+        if(res.isSuccess && res.context !== 'Returns'){
           this.selectedModelID = dialogRef.componentInstance.modelID
           this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context);
           this.updateLocalFields()
-        }        
+        }
+        else if(res.context === 'Returns'){
+          this.calcReturns(res?.['baseMeasure']);
+        }     
       }
     }))
+  }
+
+  /** 
+   * Opening new tab for Monthly Return in IRR Calculation and sending MonthlyReturnCalcParams as `@Input` to `<app-monthly-returns>` component.
+   *  Portfolio Modeller -> IRR Calculation -> Monthly Returns
+  */
+  calcReturns(baseMeasure: string){
+
+    let calcParams: MonthlyReturnsCalcParams = <MonthlyReturnsCalcParams> {};
+    calcParams.baseMeasure = baseMeasure;
+
+    let positionIDsSTR: string = ''
+    this.selectedPositionIDs.forEach(posID => {
+      positionIDsSTR += String(posID) + ','
+    })
+    positionIDsSTR = positionIDsSTR.slice(0, -1) // Remove last delimeter
+
+    calcParams.positionIDs = positionIDsSTR;
+
+    this.returnsParamsEmitter.emit(calcParams)
   }
 
   /** 

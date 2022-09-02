@@ -67,4 +67,5 @@ export class APIConfig {
     public static CONTRACT_HISTORY_GET_API: string = APIConfig.BASEURL + "/api/ContractHistory/GetContractHistory";
 
     public static FEE_RUN_CALCS_API: string = APIConfig.ARK_FUNCTION_BASEURL + "/api/FeeCalculatorFunction_HttpTrigger";
+    public static MONTHLY_RETURNS_CALC_API: string = APIConfig.BASEURL + "/api/MonthlyReturns/GetMonthlyReturn";
 }
