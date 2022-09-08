@@ -1,15 +1,29 @@
+<div class="parent">
+    <div class="header">
+        <div class="title">
+            Monthly Returns
+        </div>
+        <div class="action">
+            <div>
+                As Of Date : <b>{{ asOfDate | date:"dd MMM yyyy" }}</b>
+            </div>
 
-<div class="cont">
-    <ag-grid-angular
-        [gridOptions] = "gridOptionsMonthlyRets"
-        [rowData] = "monthlyReturns"
-        class="ag-theme-alpine grid"
-    >
-    </ag-grid-angular>
-    <ag-grid-angular
-        [gridOptions] = "gridOptionsIssuerRets"
-        [rowData] = "issuerReturns"
-        class="ag-theme-alpine grid"
-    >
-    </ag-grid-angular>
+            <div>
+                Model : <b>{{ modelName }}</b>
+            </div>
+            <div>Base Measure: <b>{{ baseMeasure }}</b></div>
+        </div>
+    </div>
+
+    <div class="content">
+        <mat-card class="mat-content">
+            <ag-grid-angular
+            [gridOptions] = "gridOptionsMonthlyRets"
+            [rowData] = "monthlyReturns"
+            class="ag-theme-alpine grid"
+            >
+            </ag-grid-angular>
+        </mat-card>
+    </div>
+
 </div>

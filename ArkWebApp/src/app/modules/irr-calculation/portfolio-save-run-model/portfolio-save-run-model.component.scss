@@ -8,12 +8,20 @@
     width: 30%;
 }
 
+.big-row {
+    width: 20%;
+}
+
+.short-field {
+    width: 15%;
+}
+
 .form-container {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 
-    gap: 1.5em;
+    gap: 0.8em; // Gap between two rows
 }
 
 .row{
@@ -40,4 +48,13 @@ mat-form-field{
 .failure-msg{
     color: red;
     padding: 5px;
+}
+
+.end-button{
+    display: flex;
+    justify-content: flex-start;
+}
+
+.elements-list{
+    width: 70%;
 }

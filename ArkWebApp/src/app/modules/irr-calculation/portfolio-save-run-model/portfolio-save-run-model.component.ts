@@ -39,12 +39,13 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   isSuccess: boolean
   isFailure: boolean
   modelForm: FormGroup
-  context: "Save" | "SaveRun"
+  context: "Save" | "SaveRunIRR" | "SaveRunMReturns"
   aggregationTypes: {
     type: string,
     levels: string[]
   }[] = []
   baseMeasures
+  readMore: boolean = false;
 
   constructor(
     public dialogRef: MatDialogRef<PortfolioSaveRunModelComponent>,
@@ -116,7 +117,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       isUpdate: new FormControl(!!this.modelID, Validators.required),
       isShared: new FormControl(!!this.data.isShared, Validators.required),
       aggregationType: new FormControl(this.data.aggregationType, Validators.required),
-      baseMeasure: new FormControl(this.baseMeasures[0]?.value, Validators.required)
+      baseMeasure: new FormControl(this.baseMeasures[0]?.baseMeasure, Validators.required)
     })
 
     this.aggregationTypes = [
@@ -158,7 +159,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     }))
   }
 
-  onProceed(context: 'Save' | 'SaveRun' = 'Save'){
+  onProceed(context: 'Save' | 'SaveRunIRR' | 'SaveRunMReturns' = 'Save'){
     this.context = context
 
     let model: VPortfolioModel = <VPortfolioModel> {};
@@ -216,11 +217,18 @@ export class PortfolioSaveRunModelComponent implements OnInit {
             this.modelID = result.data[0].value;
           }
 
-          if(context === 'SaveRun'){
+          if(context === 'SaveRunIRR'){
             this.dialogRef.close({ 
-              context: 'SaveRun',
+              context: 'SaveRunIRR',
               isSuccess: true
              });
+          }
+          else if(context === 'SaveRunMReturns'){
+            this.dialogRef.close({ 
+              context: 'SaveRunMReturns',
+              isSuccess: true,
+              baseMeasure: this.modelForm.get('baseMeasure').value
+            });  
           }
         }
         else{
@@ -236,14 +244,6 @@ export class PortfolioSaveRunModelComponent implements OnInit {
         this.updateMsg = 'Failed to update model';
       }
     }))
-  }
-  
-  onReturnsClick(){
-    this.dialogRef.close({ 
-      context: 'Returns',
-      isSuccess: false, /// Since didn't perform any DB update operation here.
-      baseMeasure: this.modelForm.get('baseMeasure').value
-    });
   }
 
   recursiveRemoveKey = (object, deleteKey) => {

@@ -30,5 +30,9 @@ export interface IRRCalcParams{
 export interface MonthlyReturnsCalcParams {
     positionIDs: string,
     baseMeasure: string,
-    baseMeasureID: number
+    baseMeasureID: number,
+
+    modelID?: number,
+    modelName?: string,
+    asOfDate?: string
 }

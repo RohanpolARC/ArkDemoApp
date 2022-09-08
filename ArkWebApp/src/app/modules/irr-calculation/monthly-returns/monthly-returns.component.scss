@@ -1,11 +1,13 @@
-.cont {
+.grid {
     height: 100%;
-    width: 100%;
-    display: flex;
 }
 
-.grid{
-    height: 100%;
-    width: 100%;
-    font-size: 0.8rem;
+.action{
+    margin-right: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  
+    gap: 1em;
+    font-size: 0.9rem;  
 }

@@ -83,10 +83,10 @@ export class IrrCalculationComponent implements OnInit {
   returnsParamsReceived(params: MonthlyReturnsCalcParams){
     /** Return params received from Portfolio Modeller. Now creating a new tab for these params with Monthly Returns inside it */
 
-    let cnt: number = this.tabs.filter(tab => tab.actualName === 'Returns').length;
+    let cnt: number = this.tabs.filter(tab => tab.actualName === 'Monthly Returns').length;
     let newTab = {
-      displayName: (cnt !== 0) ? `Returns ${cnt + 1}`: `Returns`,
-      actualName: `Returns`,
+      displayName: (cnt !== 0) ? `Monthly Returns ${cnt + 1}`: `Monthly Returns`,
+      actualName: `Monthly Returns`,
       status: 'Loading',
       resultType: 'MonthlyReturns'
     }

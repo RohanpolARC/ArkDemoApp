@@ -1,15 +1,16 @@
-import { ColDef, GridOptions, GridReadyEvent, ValueFormatterParams } from '@ag-grid-community/all-modules';
+import { ColDef, GridOptions, GridReadyEvent, IAggFuncParams, ValueFormatterParams } from '@ag-grid-community/all-modules';
 import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { MonthlyReturnsService } from 'src/app/core/services/MonthlyReturns/monthly-returns.service';
-import { amountFormatter, dateFormatter, percentFormatter } from 'src/app/shared/functions/formatter';
+import { amountFormatter } from 'src/app/shared/functions/formatter';
 import { MonthlyReturnsCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
+import { getNodes } from '../../capital-activity/utilities/functions';
 
 @Component({
   selector: 'app-monthly-returns',
   templateUrl: './monthly-returns.component.html',
-  styleUrls: ['./monthly-returns.component.scss'],
+  styleUrls: ['../../../shared/styles/grid-page.layout.scss', './monthly-returns.component.scss'],
   providers: []
 })
 export class MonthlyReturnsComponent implements OnInit {
@@ -19,49 +20,42 @@ export class MonthlyReturnsComponent implements OnInit {
   
   subscriptions: Subscription[] = []
   columnDefsMonthlyRets: ColDef[]
-  columnDefsIssuerRets: ColDef[]
   gridOptionsMonthlyRets: GridOptions
-  gridOptionsIssuerRets: GridOptions
-  issuerReturns
   monthlyReturns
 
+  modelName: string
+  baseMeasure: string
+  asOfDate: string
+
   constructor(private monthlyReturnSvc: MonthlyReturnsService,
-    private dtPipe: DatePipe
+    private dtPipe: DatePipe,
   ) { }
 
   ngOnChanges(changes: SimpleChanges){
-    console.log(changes)
 
     let params = changes.calcParams.currentValue;
+    this.baseMeasure = params?.['baseMeasure'];
+    this.modelName = params?.['modelName'];
+    this.asOfDate = params?.['asOfDate'];
+    
     params['baseMeasureID'] = 3;
     this.subscriptions.push(this.monthlyReturnSvc.getMonthlyReturns(params).subscribe({
       next: (data: any[]) => {
         this.status.emit('Loaded')
 
-        // Issuer Returns
-
-        let issuerReturns = [];
-        data?.['issuerReturns'].forEach(ret => {
-          console.log(ret)
+        let monthlyReturns = []
+        data?.forEach(ret => {
           let row = { ...ret, ...ret?.['mReturns'] }
           delete row['mReturns'];
 
-          issuerReturns.push(row);
+          monthlyReturns.push(row)
         })
 
-        this.issuerReturns = issuerReturns
-
-        let monthlyReturns = [];
-        data?.['monthlyReturns'].forEach(ret => {
-          let row = { ...ret, ...ret?.['mReturns'] }
-          delete row['mReturns'];
-
-          monthlyReturns.push(row);
-        })
-
-        this.monthlyReturns = monthlyReturns
+        this.monthlyReturns = monthlyReturns        
       },
       error: (error) => {
+        console.error(`Failed to get returns : ${error}`)
+        this.monthlyReturns = []
         this.status.emit('Failed')
       }
     }))
@@ -69,29 +63,46 @@ export class MonthlyReturnsComponent implements OnInit {
   }
 
   dateFormatter(params: ValueFormatterParams): string{
-
-    console.log(this.dtPipe.transform(params.value, 'MMM-yy'))
     return this.dtPipe.transform(params.value, 'MMM-yy');
   }
 
+  aggFuncs = {
+    'Return': (params: IAggFuncParams) => {
+
+      let childData: any[] = getNodes(params.rowNode, [])
+
+      let sumPnL: number  = childData.reduce((n, {monthlyPnL}) => n + monthlyPnL, 0)
+      let sumBaseMeasure: number = childData.reduce((n, {baseMeasure}) => n + baseMeasure, 0)
+
+      if(sumBaseMeasure === 0)
+        return 0.00
+      else 
+        return Number(Number(sumPnL / sumBaseMeasure));
+      
+    },
+    'Sum': (params: IAggFuncParams) => {
+      if(params.column.getColId() === 'monthlyPnL' || params.column.getColId() === 'baseMeasure'){
+        return params.values.reduce((a, b) => Number(a) + Number(b), 0)
+      }
+    }
+  }
+
+  // Not using shared percentFormatter since it doesnt apply on grouped cells
+  percentFormatter(params: ValueFormatterParams){
+    return `${Number(params.value * 100).toFixed(2)}%`;
+  }
+
   ngOnInit(): void {
-    console.log("Inside Monthly Returns component");
 
     this.columnDefsMonthlyRets = [
-      { field: 'asofDate', valueFormatter: this.dateFormatter.bind(this), headerName: 'As Of Date', sort: 'desc' },
-      { field: 'monthlyPnL', valueFormatter: amountFormatter, headerName: 'Monthly P&L' },
-      { field: 'baseMeasure', valueFormatter: amountFormatter },
-      { field: 'returns', valueFormatter: percentFormatter },
-      // { field: 'accFeesEur', valueFormatter: amountFormatter },
-      // { field: 'accInterestEur', valueFormatter: amountFormatter },
-    ]
-    this.columnDefsIssuerRets = [
-      { field: 'issuerShortName' },
-      { field: 'monthlyPnL', valueFormatter: amountFormatter, headerName: 'Monthly P&L' },
-      { field: 'baseMeasure', valueFormatter: amountFormatter },
-      { field: 'returns', valueFormatter: percentFormatter },
-      { field: 'accFeesEur', valueFormatter: amountFormatter },
-      { field: 'accInterestEur', valueFormatter: amountFormatter },
+      { field: 'asofDate', valueFormatter: this.dateFormatter.bind(this), headerName: 'As Of Date', rowGroup: true, allowedAggFuncs: [] },
+      { field: 'issuerShortName', allowedAggFuncs: [] },
+      { field: 'monthlyPnL', valueFormatter: amountFormatter, headerName: 'Monthly P&L', aggFunc: 'Sum', allowedAggFuncs: ['Sum'] },
+      { field: 'baseMeasure', valueFormatter: amountFormatter, aggFunc: 'Sum', allowedAggFuncs: ['Sum'] },
+      { field: 'returns', valueFormatter: this.percentFormatter, aggFunc: 'Return', allowedAggFuncs: ['Return'] },
+      // { field: 'cumulativeReturn', valueFormatter: this.percentFormatter, aggFunc: 'Return', allowedAggFuncs: ['Return'] },
+      { field: 'accFeesEur', valueFormatter: amountFormatter, aggFunc: 'sum', headerName: 'Fees' },
+      { field: 'accInterestEur', valueFormatter: amountFormatter, aggFunc: 'sum', headerName: 'Interest' },
     ]
 
     this.gridOptionsMonthlyRets = {
@@ -100,29 +111,18 @@ export class MonthlyReturnsComponent implements OnInit {
       columnDefs: this.columnDefsMonthlyRets,
       suppressAggFuncInHeader: true,
       rowData: this.monthlyReturns,
+      autoGroupColumnDef: {
+        sort: 'desc'
+      },
+      aggFuncs: this.aggFuncs,
       defaultColDef: {
         resizable: true,
         sortable: true,
         filter: true,
-        lockPosition: true
+        lockPosition: true,
+        enableValue: true
       },
-      onGridReady: (params: GridReadyEvent) => {
-        params.api.closeToolPanel()
-      }
-    }
-
-    this.gridOptionsIssuerRets = {
-      enableRangeSelection: true,
-      sideBar: true,
-      columnDefs: this.columnDefsIssuerRets,
-      suppressAggFuncInHeader: true,
-      rowData: this.issuerReturns,
-      defaultColDef: {
-        resizable: true,
-        sortable: true,
-        filter: true,
-        lockPosition: true
-      },
+      rowGroupPanelShow: 'always',
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel()
       }

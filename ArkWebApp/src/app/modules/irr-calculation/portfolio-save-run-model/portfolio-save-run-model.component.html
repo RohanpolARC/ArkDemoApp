@@ -1,7 +1,7 @@
 <ng-container *ngIf="baseMeasures?.length > 0">
-    <h3>
-        Portfolio Rules Editor
-    </h3>
+    <h2>
+        Portfolio Model Editor
+    </h2>
     
     <div *ngIf="isSuccess || isFailure"
     [class.success-msg]="isSuccess"
@@ -27,29 +27,22 @@
                             Update
                         </mat-slide-toggle>
                     </div>
+
                     <div class="form-field">
                         <mat-slide-toggle
                         [color]="'primary'" formControlName="isShared">
                             Shared
                         </mat-slide-toggle>
                     </div>
-    
-                    <mat-form-field class="form-field" appearance="outline">
-                        <mat-label>Returns Base Measure</mat-label>
-                        <mat-select formControlName="baseMeasure" required disableOptionCentering>
-                          <mat-option *ngFor="let bM of baseMeasures" [value]="bM.baseMeasure">
-                            {{bM.baseMeasure}}
-                          </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-    
-                    <div class="form-field">
-    
+
+                    <div class="form-field big-row end-button">
+                        <button mat-raised-button [disabled]="modelForm.invalid ? true : isSuccess" type="button"
+                        color="primary" (click)="onProceed('Save')">Save</button>
                     </div>
                 </div>
-    
+
                 <div class="row">
-    
+                
                     <mat-form-field class="form-field" appearance="outline">
                         <mat-label>Model Name</mat-label>
                         <input matInput type="text" name="model-name" autocomplete="off" formControlName="modelName" required>
@@ -57,6 +50,27 @@
                             <mat-icon>close</mat-icon>
                         </button>
                     </mat-form-field>
+
+                    <mat-form-field class="form-field" appearance="outline">
+                        <mat-label>IRR Aggregation Type</mat-label>
+                        <mat-select formControlName="aggregationType" required disableOptionCentering>
+                          <mat-option *ngFor="let aggr of aggregationTypes" [value]="aggr.type">
+                            {{aggr.type}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+
+                      <div class="form-field big-row end-button">    
+                        <button mat-raised-button [disabled]="modelForm.invalid ? true : isSuccess" type="button"
+                        color="primary" (click)="onProceed('SaveRunIRR')">Save & Run IRR</button>
+                    </div>
+
+
+
+                </div>
+
+                <div class="row">
+
                     <mat-form-field class="form-field" appearance="outline">
                         <mat-label>Model Description</mat-label>
                         <input matInput type="text" name="model-desc" autocomplete="off" formControlName="modelDesc">
@@ -64,50 +78,67 @@
                             <mat-icon>close</mat-icon>
                         </button>
                     </mat-form-field>
-    
+
                     <mat-form-field class="form-field" appearance="outline">
-                        <mat-label>Aggregation Type</mat-label>
-                        <mat-select formControlName="aggregationType" required disableOptionCentering>
-                          <mat-option *ngFor="let aggr of aggregationTypes" [value]="aggr.type">
-                            {{aggr.type}}
+                        <mat-label>Monthly Returns Base Measure</mat-label>
+                        <mat-select formControlName="baseMeasure" required disableOptionCentering>
+                          <mat-option *ngFor="let bM of baseMeasures" [value]="bM.baseMeasure">
+                            {{bM.baseMeasure}}
                           </mat-option>
                         </mat-select>
-                      </mat-form-field>
+                    </mat-form-field>
+
+                    <div class="form-field big-row end-button">
+                        <button mat-raised-button [disabled]="modelForm.invalid ? true : isSuccess" type="button"
+                        color="primary" (click)="onProceed('SaveRunMReturns')">Save & Run Monthly Returns</button>
+                    </div>
+
+                </div>
+                <div class="row">
+
+                    <div class="form-field">
+
+                    </div>
+
+
                 </div>
     
-                <div class="row text">
+                <div class="row">
     
-                    <ng-container *ngIf="isAutomatic">
-                        Rules: <br>
+                    <div *ngIf="isAutomatic" class="form-field elements-list">
+                        Rules:
                         <div *ngFor="let rule of rules">
                             Column: {{ rule.ColumnId }}, Values: {{ rule.Predicate.Inputs }}
                         </div>
-                    </ng-container>
+                    </div>
     
-                    <ng-container *ngIf="!isAutomatic">
-                        Position IDs: <br>
-                        <ng-container *ngFor="let ID of positionIDs">
-                            {{ ID }},
+                    <div *ngIf="!isAutomatic" class="elements-list">
+                        Position IDs: &nbsp;
+                        <ng-container *ngIf="positionIDs?.length > 50 && !readMore">
+                            <ng-container *ngFor="let ID of positionIDs.slice(0, 50)">
+                                {{ ID }},
+                            </ng-container>
+                            <a (click)="readMore = true">...read more</a>                                
                         </ng-container>
-                    </ng-container>
-    
+                        
+
+                        <ng-container *ngIf="readMore || positionIDs?.length <= 50">
+                            <ng-container *ngFor="let ID of positionIDs">
+                                {{ ID }},
+                            </ng-container>
+                            <a *ngIf="readMore" (click)="readMore = false">...read less</a>                                
+                        </ng-container>
+
+                    </div>
+
+                    <div class="form-field big-row end-button">
+                        <button mat-raised-button (click)="onClose()" type="button">Cancel</button>
+                    </div>
+
                 </div>
+
             </div>
         </form>
-    
-    
-    </mat-dialog-content>
-    
-    <mat-dialog-actions align="end">
-    
-        <button mat-raised-button type="button"
-        color="primary" (click)="onReturnsClick()">Returns</button>
-    
-        <button mat-raised-button [disabled]="modelForm.invalid ? true : isSuccess" type="button"
-        color="primary" (click)="onProceed('Save')">Save</button>
-    
-        <button mat-raised-button [disabled]="modelForm.invalid ? true : isSuccess" type="button"
-        color="primary" (click)="onProceed('SaveRun')">Save & Run</button>
-        <button mat-raised-button (click)="onClose()" type="button">Cancel</button>
-    </mat-dialog-actions>
+        
+    </mat-dialog-content>    
 </ng-container>

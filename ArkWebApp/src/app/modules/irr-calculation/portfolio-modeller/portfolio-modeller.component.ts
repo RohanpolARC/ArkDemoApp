@@ -190,14 +190,19 @@ export class PortfolioModellerComponent implements OnInit {
     }
   }
 
-  fetchPortfolioModels(modelID?: number, context: string = 'SaveRun'){
+  fetchPortfolioModels(modelID?: number, context: string = 'SaveRunIRR', contextData: {
+    baseMeasure: string
+  } = null){
     this.subscriptions.push(this.irrCalcService.getPortfolioModels(this.dataSvc.getCurrentUserName()).subscribe({
       next: data => {
         this.parseFetchedModels(data);
         this.InitModelMap()
         this.setSelectedModel(modelID)
-        if(!!modelID && context === 'SaveRun'){
+        if(!!modelID && context === 'SaveRunIRR'){
             this.calcIRR();
+        }
+        else if(!!modelID && context === 'SaveRunMReturns'){
+          this.calcReturns(contextData?.baseMeasure);
         }
       },
       error: error => {
@@ -473,7 +478,7 @@ export class PortfolioModellerComponent implements OnInit {
 
     let positionIDs = this.modelMap[modelID]?.positionIDs
     this.adapTableApi?.gridApi?.deselectAll();
-    if(positionIDs != null || positionIDs != []){
+    if(positionIDs != null || positionIDs?.length != 0){
       positionIDs.forEachLeafNode(posID => {
         let node: RowNode = this.adapTableApi?.gridApi?.getRowNodeForPrimaryKey(posID);
         node.setSelected(posID)
@@ -540,7 +545,7 @@ export class PortfolioModellerComponent implements OnInit {
     })
 
     this.subscriptions.push(dialogRef.afterClosed().subscribe(res => {
-      if(dialogRef.componentInstance.isSuccess || res.context === 'Returns'){
+      if(dialogRef.componentInstance?.isSuccess){
         if(this.isAutomatic.value){
           this.selectedPositionIDs = [];
           this.gridApi.forEachNodeAfterFilter(node => 
@@ -549,14 +554,16 @@ export class PortfolioModellerComponent implements OnInit {
                 this.selectedPositionIDs.push(node.data?.positionID)
             })  
         }
-        if(res.isSuccess && res.context !== 'Returns'){
+        if(res?.isSuccess){
           this.selectedModelID = dialogRef.componentInstance.modelID
-          this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context);
+
+          if(res?.context === 'SaveRunIRR')
+            this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context);
+          if(res?.context === 'SaveRunMReturns')
+            this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context, { baseMeasure: res?.['baseMeasure']});
+
           this.updateLocalFields()
         }
-        else if(res.context === 'Returns'){
-          this.calcReturns(res?.['baseMeasure']);
-        }     
       }
     }))
   }
@@ -577,6 +584,9 @@ export class PortfolioModellerComponent implements OnInit {
     positionIDsSTR = positionIDsSTR.slice(0, -1) // Remove last delimeter
 
     calcParams.positionIDs = positionIDsSTR;
+    calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
+    calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
+    calcParams.asOfDate = this.asOfDate
 
     this.returnsParamsEmitter.emit(calcParams)
   }
@@ -598,7 +608,7 @@ export class PortfolioModellerComponent implements OnInit {
   }
 
   runIRRCalc(){
-    this.onSavePortfolio('SaveRun');
+    this.onSavePortfolio('SaveRunIRR');
 
   }
 
