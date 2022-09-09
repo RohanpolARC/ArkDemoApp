@@ -8,14 +8,6 @@
     width: 30%;
 }
 
-.big-row {
-    width: 20%;
-}
-
-.short-field {
-    width: 15%;
-}
-
 .form-container {
     display: flex;
     flex-direction: column;
@@ -56,5 +48,26 @@ mat-form-field{
 }
 
 .elements-list{
-    width: 70%;
+    width: 100%;
+}
+
+.action-btn{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.sub-cont{
+    width: 100%;
+    display: flex;
+    justify-content: left;
+}
+
+.sub-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-left {
+    padding-left: 2em;
 }
