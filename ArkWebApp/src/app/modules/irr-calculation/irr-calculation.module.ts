@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { IrrCalculationComponent } from './irr-calculation.component';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
 import { AgGridModule } from '@ag-grid-community/angular';
@@ -22,13 +22,15 @@ import { IrrCalculationRoutingModule } from './irr-calculation-routing.module';
 import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 import { InputDateAdapter } from 'src/app/shared/providers/date-adapter';
 import { Platform } from '@angular/cdk/platform';
+import { MonthlyReturnsComponent } from './monthly-returns/monthly-returns.component';
 
 @NgModule({
   declarations: [
     IrrCalculationComponent,
     PortfolioSaveRunModelComponent,
     IrrResultComponent,
-    PortfolioModellerComponent
+    PortfolioModellerComponent,
+    MonthlyReturnsComponent
   ],
   imports: [
     CommonModule,
@@ -53,7 +55,9 @@ import { Platform } from '@angular/cdk/platform';
   ],
   providers: [
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  
-    {provide: DateAdapter, useClass: InputDateAdapter, deps: [MAT_DATE_LOCALE, Platform]}
-  ]
+    {provide: DateAdapter, useClass: InputDateAdapter, deps: [MAT_DATE_LOCALE, Platform]},
+    DatePipe
+  ],
+  exports: []
 })
 export class IrrCalculationModule { }

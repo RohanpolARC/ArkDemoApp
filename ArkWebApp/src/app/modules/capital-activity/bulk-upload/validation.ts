@@ -8,7 +8,7 @@ let actualCols: string[] = [
     'Fund Currency',
     'Position Currency',
     'GIR (Pos - Fund ccy)',
-    'Amount',
+    'Amount (in Fund Ccy)',
     'Capital Type',
     'Capital Subtype',
     'Wso Asset ID',
@@ -59,9 +59,9 @@ export function validateRowValueRange(row: any): void{
         invalidMsg += ` Calldate cannot be < 2012`
     }
 
-    if(Number(row['Amount']) === 0){
+    if(Number(row['Amount (in Fund Ccy)']) === 0){
         invalidMsg += (invalidMsg === '') ? '' : ','
-        invalidMsg += ` Amount cannot be 0`
+        invalidMsg += ` Amount (in Fund Ccy) cannot be 0`
     }
 
     if(Number(row['GIR (Pos - Fund ccy)']) <= 0){
@@ -124,7 +124,7 @@ export function validateExcelRows(rows: any[], ref: {capitalTypes: string[], cap
             invalidRows.push({row: rows[i], remark: invalidMsg});
     }
     
-    if(invalidRows === [])
+    if(invalidRows.length === 0)
         return {
             isValid: true
         }

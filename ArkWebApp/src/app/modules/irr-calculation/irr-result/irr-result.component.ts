@@ -1,8 +1,7 @@
 import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
 import { ClientSideRowModelModule, ColDef, ColGroupDef, GridOptions, Module, ValueFormatterParams } from '@ag-grid-community/all-modules';
 import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule } from '@ag-grid-enterprise/all-modules';
-import { Component, ElementRef, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
 import { Subject, Subscription, timer } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
@@ -14,7 +13,7 @@ import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 @Component({
   selector: 'app-irr-result',
   templateUrl: './irr-result.component.html',
-  styleUrls: ['./irr-result.component.scss']
+  styleUrls: ['../../../shared/styles/grid-page.layout.scss', './irr-result.component.scss']
 })
 export class IrrResultComponent implements OnInit {
 
@@ -72,7 +71,7 @@ export class IrrResultComponent implements OnInit {
       enablePivot: true,
       sortable: true,
       filter: true,
-      autosize:true,
+      autosize:true
     };
 
     this.columnDefs = [
