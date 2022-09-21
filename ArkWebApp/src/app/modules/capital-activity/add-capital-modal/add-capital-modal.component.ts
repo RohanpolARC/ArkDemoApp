@@ -8,7 +8,7 @@ import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import * as moment from 'moment';
 import { UpdateConfirmComponent } from '../update-confirm/update-confirm.component';
 import { Observable } from 'rxjs';
-import { startWith, map } from 'rxjs/operators';
+import { startWith, map, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { ColDef, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 
@@ -73,6 +73,7 @@ export class AddCapitalModalComponent implements OnInit{
   }; // To be sent to link investor component.
   isAlreadyLinked: boolean = null;
   linkStatus
+  fxRateSource: string;
 
   validateField(options: string[], control: AbstractControl, field: string): string | null{
       //  Validates individual fields and returns fetched value if it's an allowed value.
@@ -108,6 +109,9 @@ export class AddCapitalModalComponent implements OnInit{
 
     let totalAmount: number = control.get('totalAmount').value;
     let fxRate: number  = control.get('fxRate').value;
+    
+    // fxRateOverride will be always valid since it can be either true/false (checked/unchecked). So, not considering it here.
+
     let localAmount: number = control.get('localAmount').value;
 
     let CD: boolean = (callDate !== null && callDate !== 'Invalid date')
@@ -163,6 +167,7 @@ export class AddCapitalModalComponent implements OnInit{
 
     localAmount: new FormControl(null, Validators.required),
     fxRate: new FormControl(null, Validators.required),
+    fxRateOverride: new FormControl(null, Validators.required),
     posCcy: new FormControl(null, Validators.required),
   },{
     validators: this.capitalValidator
@@ -366,29 +371,51 @@ export class AddCapitalModalComponent implements OnInit{
 
   changeListeners(): void{
 
-    /** For LINK-ADD, update Total Amount, based on changes in FX RATE, LOCAL AMOUNT */
-    if(this.data.actionType === 'LINK-ADD'){
+    this.subscriptions.push(this.capitalActivityForm.get('fxRate').valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(GIR => {
 
-      this.dialogRef.beforeClosed().subscribe(() => {
-        this.closePopUp();
-      })
-      
-      this.capitalActivityForm.get('localAmount').valueChanges.subscribe(LA => {
-        this.capitalActivityForm.patchValue({
-          totalAmount: LA * this.capitalActivityForm.get('fxRate').value
-        })
-      })
+      if(this.data?.rowData?.fxRate === GIR && this.capitalActivityForm.get('fxRateOverride').value){      // Old GIR != new GIR and Overide
+        this.fxRateSource = this.data?.rowData?.fxRateSource      
+      }
+      else this.fxRateSource = 'CapitalActivity';
 
-      this.capitalActivityForm.get('fxRate').valueChanges.subscribe(GIR => {
+      if(this.data.actionType === 'LINK-ADD'){
         this.capitalActivityForm.patchValue({
           totalAmount: GIR * this.capitalActivityForm.get('localAmount').value
         })
-      })
+      }
+    }))
+
+    this.subscriptions.push(this.capitalActivityForm.get('fxRateOverride').valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(fxRateOverride => {
+      if(fxRateOverride && this.capitalActivityForm.get('fxRate').value === this.data?.rowData?.fxRate){
+        this.fxRateSource = this.data?.rowData?.fxRateSource;
+      }
+      else if(fxRateOverride && this.capitalActivityForm.get('fxRate').value !== this.data?.rowData?.fxRate)
+        this.fxRateSource = 'CapitalActivity';
+    }))
+
+    /** For LINK-ADD, update Total Amount, based on changes in FX RATE, LOCAL AMOUNT */
+    if(this.data.actionType === 'LINK-ADD'){
+
+      this.subscriptions.push(this.dialogRef.beforeClosed().subscribe(() => {
+        this.closePopUp();
+      }))
+      
+      this.subscriptions.push(this.capitalActivityForm.get('localAmount').valueChanges.subscribe(LA => {
+        this.capitalActivityForm.patchValue({
+          totalAmount: LA * this.capitalActivityForm.get('fxRate').value
+        })
+      }))
     }
 
     /** _ since statusChanges returns INVALID form even when it is valid. Hence, using custom cross field validator: `capitalValidator` */
 
-    this.capitalActivityForm.statusChanges.subscribe(_ => {
+    this.subscriptions.push(this.capitalActivityForm.statusChanges.subscribe(_ => {
 
       if(this.data.actionType === 'LINK-ADD'){
         this.placeHolderGIR = `${this.data.rowData[0].positionCcy} -> ${this.capitalActivityForm.get('fundCcy').value}`;
@@ -410,9 +437,7 @@ export class AddCapitalModalComponent implements OnInit{
         disable: !this.capitalActivityForm.errors?.['validated']
       }
 
-    })
-
-
+    }))
 
     /** Listening for changing the autocomplete options, based on search */
     
@@ -565,7 +590,8 @@ export class AddCapitalModalComponent implements OnInit{
 
       this.selectedIssuerID = this.data.rowData.wsoIssuerID;  // Issuer ID for the EDIT row;
       this.selectedAssetID = this.data.rowData.wsoAssetID;
-
+      this.fxRateSource = this.data.rowData.fxRateSource;
+      
       // Dynamic options for EDIT
       this.setDynamicOptions(this.data.rowData.fundHedging, this.data.rowData.issuerShortName, this.data.rowData.asset);
       this.capitalActivityForm.patchValue({
@@ -582,7 +608,8 @@ export class AddCapitalModalComponent implements OnInit{
         posCcy: this.data.rowData.posCcy,
 
         localAmount: this.data.rowData.localAmount,
-        fxRate: this.data.rowData.fxRate
+        fxRate: this.data.rowData.fxRate,
+        fxRateOverride: this.data.rowData.fxRateOverride
       })
 
         /* totalAmount wasn't getting set from the above patch statement. Hence, manually setting it up */
@@ -615,6 +642,8 @@ export class AddCapitalModalComponent implements OnInit{
 
     this.capitalAct.localAmount = this.capitalActivityForm.get('localAmount').value;
     this.capitalAct.fxRate = this.capitalActivityForm.get('fxRate').value;
+    this.capitalAct.fxRateOverride = this.capitalActivityForm.get('fxRateOverride').value;
+    this.capitalAct.fxRateSource = this.fxRateSource;
 
     this.capitalAct.posCcy = (this.data.actionType === 'LINK-ADD') 
                               ? this.data.rowData[0].positionCcy 

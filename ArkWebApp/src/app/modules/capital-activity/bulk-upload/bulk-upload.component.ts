@@ -83,6 +83,7 @@ export class BulkUploadComponent implements OnInit {
     { field: 'Fund Currency', headerName: 'Fund Ccy', maxWidth: 150, tooltipField: 'Fund Currency'},
     { field: 'Position Currency', headerName: 'Position Ccy', maxWidth: 150, tooltipField: 'Position Currency'},
     { field: 'GIR (Pos - Fund ccy)', headerName: 'GIR (Pos -> Fund)', maxWidth: 300,  allowedAggFuncs: ['sum', 'avg', 'first', 'last', 'count', 'min', 'max'], tooltipField: 'GIR (Pos - Fund ccy)'},
+    { field: 'GIR Override', maxWidth: 150 },
     { field: 'Amount (in Fund Ccy)', headerName: 'Amount (in Fund Ccy)', maxWidth: 150, cellClass: 'ag-right-aligned-cell', valueFormatter: amountFormatter, allowedAggFuncs: [ 'sum', 'avg', 'first', 'last', 'count', 'min', 'max'], tooltipField:'Amount (in Fund Ccy)'},
     { field: 'Capital Type', maxWidth: 150, tooltipField:'Capital Type'},
     { field: 'Capital Subtype', maxWidth: 170, tooltipField:'Capital Subtype'},
@@ -164,6 +165,7 @@ export class BulkUploadComponent implements OnInit {
     model.wsoAssetID = Number(obj['Wso Asset ID']);
     model.posCcy = obj['Position Currency'];
     model.fxRate = Number(obj['GIR (Pos - Fund ccy)']);
+    model.fxRateOverride = Boolean(obj['GIR Override'] === 'Yes');
     model.createdBy = model.modifiedBy = this.dataSvc.getCurrentUserName();
     model.createdOn = model.modifiedOn = new Date();
     model.source = 'ArkUI - template';
@@ -230,7 +232,7 @@ export class BulkUploadComponent implements OnInit {
         ]
       },
        Layout: {
-         Revision: 3,
+         Revision: 4,
          CurrentLayout: 'Bulk Grid',
          Layouts: [{
            Name: 'Bulk Grid',
@@ -241,6 +243,7 @@ export class BulkUploadComponent implements OnInit {
             'Fund Currency',
             'Position Currency',
             'GIR (Pos - Fund ccy)',
+            'GIR Override',
             'Amount (in Fund Ccy)',
             'Capital Type',
             'Capital Subtype',
@@ -266,6 +269,7 @@ export class BulkUploadComponent implements OnInit {
             'Fund Currency',
             'Position Currency',
             'GIR (Pos - Fund ccy)',
+            'GIR Override',
             'Amount (in Fund Ccy)',
             'Capital Type',
             'Capital Subtype',
