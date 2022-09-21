@@ -97,6 +97,9 @@ export class PortfolioHistoryComponent implements OnInit {
     type:'abColDefObject'
   },
   { headerName: "GIR Edited", field:'isEdited', type:'abColDefBoolean'},
+  { headerName: 'GIR Override', field: 'isOverride', type: 'abColDefBoolean' },
+  { headerName: 'GIR Source', field: 'girSource', type: 'abColDfString' },
+  { headerName: 'GIR SourceID', field: 'girSourceID', type: 'abColDefNumber' },
   { field:'uniqueID', type:'abColDefNumber'},
   { field: 'pgh_FXRateBaseEffective', headerName: 'Par History GIR'}
 ];

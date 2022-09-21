@@ -128,6 +128,8 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'fundCcy', tooltipField: 'fundCcy', headerName: 'Fund Ccy', type:'abColDefString'},
     { field: 'posCcy', tooltipField: 'posCcy', headerName: 'Position Ccy', type: 'abColDefString'},
     { field: 'fxRate', tooltipField: 'fxRate', headerName: 'FXRate', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
+    { field: 'fxRateOverride', tooltipField: 'fxRateOverride', headerName: 'FXRate Override', type: 'abColDefBoolean' },
+    { field: 'fxRateSource', tooltipField: 'fxRateSource', type: 'abColDefString' },
     { field: 'totalAmount', tooltipField: 'totalAmount', headerName: 'Total Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
     { field: 'wsoIssuerID', tooltipField: 'wsoIssuerID', headerName: 'WSO Issuer ID', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
     { field: 'issuerShortName', tooltipField: 'issuerShortName', headerName: 'Issuer Short Name', type:'abColDefString'},

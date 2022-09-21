@@ -170,6 +170,7 @@ export class UpdateGirModalComponent implements OnInit {
         model.AsOfDate = this.allLeafChildrenData[i].asOfDate;
         model.Ccy = 0;    // ?
         model.Rate = this.goingInRate;       // Updated GIR.
+        model.fxRateOverride = true          // GIR is always overriden if update happens from GIREditor.
         model.last_update = new Date();
         model.CcyName = this.allLeafChildrenData[i].fundCcy;
         model.Text = this.allLeafChildrenData[i].asset;
@@ -218,16 +219,17 @@ export class UpdateGirModalComponent implements OnInit {
 
     this.assetGIR.id = 0;
     this.assetGIR.WSOAssetid = this.rowData.assetId;
-    this.assetGIR.AsOfDate = this.rowData.asOfDate,
-    this.assetGIR.Ccy = 0,
-    this.assetGIR.Rate = this.rowData.fxRateBaseEffective,
-    this.assetGIR.last_update = new Date(),
-    this.assetGIR.CcyName = this.rowData.fundCcy,   // Changed from positionCcy based on request.
-    this.assetGIR.Text = this.rowData.asset,
-    this.assetGIR.CreatedBy = this.currentUserName,
-    this.assetGIR.ModifiedBy = this.currentUserName,
-    this.assetGIR.CreatedOn = new Date(),
-    this.assetGIR.ModifiedOn = new Date(),
+    this.assetGIR.AsOfDate = this.rowData.asOfDate;
+    this.assetGIR.Ccy = 0;
+    this.assetGIR.Rate = this.rowData.fxRateBaseEffective;
+    this.assetGIR.fxRateOverride = true;            // GIR is always overriden if update happens from GIREditor.
+    this.assetGIR.last_update = new Date();
+    this.assetGIR.CcyName = this.rowData.fundCcy;   // Changed from positionCcy based on request.
+    this.assetGIR.Text = this.rowData.asset;
+    this.assetGIR.CreatedBy = this.currentUserName;
+    this.assetGIR.ModifiedBy = this.currentUserName;
+    this.assetGIR.CreatedOn = new Date();
+    this.assetGIR.ModifiedOn = new Date();
     this.assetGIR.TradeDate   = this.rowData.tradeDate;
 
     this.assetGIR.FundHedging = this.rowData.fundHedging;
