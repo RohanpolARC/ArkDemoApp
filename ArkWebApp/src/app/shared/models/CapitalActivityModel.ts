@@ -27,7 +27,9 @@ export interface CapitalActivityModel{
     linkedAmount: number;
     isLinked: boolean;
     
-    positionIDCashdateTypeStr: string,
+    positionIDCashdateTypeStr: string;
+    fxRateOverride: boolean;
+    fxRateSource: string;
 }
 
 export interface CapitalInvestment{

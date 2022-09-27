@@ -4,34 +4,29 @@
             Access Control           
         </div>
     </div>
-    <div class="content">
-        <ng-container *ngIf="isFormReady">
-          <form [formGroup]="form">
-              <table>
-                <thead>
-                  <th>
-                  </th>
-                  <th *ngFor="let role of allRoles">
-                     {{ role }}
-                  </th>
-                </thead>
-                <tbody formArrayName="association">
-                  <tr *ngFor="let tab of allTabs; let tabIndex=index">
-                    <td> {{ tab }} </td>
-                    <ng-container formArrayName="{{tabIndex}}">
-                      <td *ngFor="let role of allRoles; let roleIndex=index">
-                        <mat-checkbox type="checkbox" [color]="'primary'" formControlName="{{roleIndex}}" ></mat-checkbox>
-                      </td>
-                    </ng-container>
-                  </tr>
-                </tbody>
-              </table>
-          
-              <button mat-raised-button color="primary" type="submit" [disabled]="form.pristine" (click)="onSubmit()"> Submit </button>
+      <ng-container *ngIf="isFormReady">
+        <table mat-table [dataSource]="data" class="mat-elevation-z8">
+          <ng-container matColumnDef="tab">
+            <th mat-header-cell *matHeaderCellDef>Tab</th>
+            <td mat-cell *matCellDef="let element">{{ element.tab }}</td>
+          </ng-container>
 
-            </form>
-        </ng-container>
-    </div>
+          <ng-container *ngFor="let role of allRoles">
+            <ng-container matColumnDef="{{role}}">
+              <th mat-header-cell *matHeaderCellDef>{{ role }}</th>
+              <td mat-cell *matCellDef="let element; let i = index">
+                <mat-checkbox type="checkbox" (change)="onCheckboxChange($event, role, i)" [color]="'primary'" [checked]="element[role]">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+        </table>
+      </ng-container>
+
+      <div><button mat-raised-button color="primary" type="submit" [disabled]="!mappings?.length" (click)="onSubmit()"> Submit </button></div>
 </div>
 
 

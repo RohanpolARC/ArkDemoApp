@@ -38,8 +38,8 @@ import { AccessControlComponent } from './shared/components/access-control/acces
 import { MatSelectModule } from '@angular/material/select';
 import { Platform } from '@angular/cdk/platform';
 import { InputDateAdapter } from './shared/providers/date-adapter';
-import { MultiSelectComponent } from './shared/components/multi-select/multi-select.component';
 import { FilterPaneModule } from './modules/other-modules/filter-pane/filter-pane.module';
+import { MatTableModule } from '@angular/material/table';
 
 export const protectedResourceMap: any =  
   [  
@@ -88,6 +88,7 @@ export const protectedResourceMap: any =
     NgMultiSelectDropDownModule.forRoot(),
     MatCheckboxModule,
     MatSelectModule,
+    MatTableModule,
 
     FilterPaneModule,
 

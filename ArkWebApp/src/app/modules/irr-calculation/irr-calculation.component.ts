@@ -3,7 +3,7 @@ import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
-import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
+import { IRRCalcParams, MonthlyReturnsCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 import { IrrResultComponent } from './irr-result/irr-result.component';
 
 @Component({
@@ -23,11 +23,13 @@ export class IrrCalculationComponent implements OnInit {
   tabs : {
     actualName: string, 
     displayName: string,
-    status: string    // Loaded, Loading, Failed
+    status: string,    // Loaded, Loading, Failed
+    resultType: string    //'IRR' | 'MonthlyReturn' | 'PortfolioModeller'
   }[] = [{
     actualName: 'Portfolio Modeller',
     displayName: 'Portfolio Modeller',
-    status: 'Loaded'
+    status: 'Loaded',
+    resultType: 'PortfolioModeller'
   }];
 
   selected = new FormControl(0);
@@ -48,7 +50,8 @@ export class IrrCalculationComponent implements OnInit {
         this.tabs = [{
           actualName: 'Portfolio Modeller',
           displayName: 'Portfolio Modeller',
-          status: 'Loaded'
+          status: 'Loaded',
+          resultType: 'PortfolioModeller'
         }]
       }
     }))
@@ -69,11 +72,28 @@ export class IrrCalculationComponent implements OnInit {
     let newTab = {
       displayName: (cnt !== 0) ? `${params.modelName} ${cnt + 1}`: `${params.modelName}`,
       actualName: `${params.modelName}`,
-      status: 'Loading'
+      status: 'Loading',
+      resultType: 'IRR'
     }
     this.tabs.push(newTab);    
     this.selected.setValue(this.tabs.indexOf(newTab))
     this.calcParamsMap[newTab.displayName] = params;
+  }
+
+  returnsParamsReceived(params: MonthlyReturnsCalcParams){
+    /** Return params received from Portfolio Modeller. Now creating a new tab for these params with Monthly Returns inside it */
+
+    let cnt: number = this.tabs.filter(tab => tab.actualName === 'Monthly Returns').length;
+    let newTab = {
+      displayName: (cnt !== 0) ? `Monthly Returns ${cnt + 1}`: `Monthly Returns`,
+      actualName: `Monthly Returns`,
+      status: 'Loading',
+      resultType: 'MonthlyReturns'
+    }
+    this.tabs.push(newTab);    
+    this.selected.setValue(this.tabs.indexOf(newTab))
+    this.calcParamsMap[newTab.displayName] = params;
+
   }
 
   reRun(index: number){

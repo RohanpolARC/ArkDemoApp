@@ -8,7 +8,8 @@ let actualCols: string[] = [
     'Fund Currency',
     'Position Currency',
     'GIR (Pos - Fund ccy)',
-    'Amount',
+    'GIR Override',
+    'Amount (in Fund Ccy)',
     'Capital Type',
     'Capital Subtype',
     'Wso Asset ID',
@@ -41,7 +42,8 @@ export function validateRowForEmptiness(row: any): void{
             'Narative (optional)', 
             // 'Wso Issuer ID', 
             'Wso Asset ID',
-            'Fund Currency'
+            'Fund Currency',
+            'GIR Override'
         ].indexOf(actualCols[i]) === -1){
             invalidMsg += (invalidMsg === '') ? `${actualCols[i]} cannot be empty` :  `, ${actualCols[i]} cannot be empty`;
         }
@@ -49,6 +51,7 @@ export function validateRowForEmptiness(row: any): void{
 }
 
 export function validateRowValueRange(row: any): void{
+
     if(Number(new Date(moment(row['Cash Flow Date']).format('YYYY-MM-DD')).getFullYear) < 2012){
         invalidMsg += (invalidMsg === '') ? '' : ','
         invalidMsg += ` Cashflow date cannot be < 2012`
@@ -59,9 +62,9 @@ export function validateRowValueRange(row: any): void{
         invalidMsg += ` Calldate cannot be < 2012`
     }
 
-    if(Number(row['Amount']) === 0){
+    if(Number(row['Amount (in Fund Ccy)']) === 0){
         invalidMsg += (invalidMsg === '') ? '' : ','
-        invalidMsg += ` Amount cannot be 0`
+        invalidMsg += ` Amount (in Fund Ccy) cannot be 0`
     }
 
     if(Number(row['GIR (Pos - Fund ccy)']) <= 0){
@@ -69,6 +72,11 @@ export function validateRowValueRange(row: any): void{
         invalidMsg += ` GIR should be > 0`
     }
         
+    if(!['Yes', 'No'].includes(String(row['GIR Override']))){
+        invalidMsg += (invalidMsg === '') ? '' : ','
+        invalidMsg += ` GIR Override can be either Yes/No`
+    }
+
     if(!!row['Fund Hedging'] && (refOptions.fundHedgings.indexOf(String(row['Fund Hedging']).trim()) === -1)){
         invalidMsg += (invalidMsg === '') ? '' : ','
         invalidMsg += ` Fund Hedging ${String(row['Fund Hedging'])} not in range`
@@ -124,7 +132,7 @@ export function validateExcelRows(rows: any[], ref: {capitalTypes: string[], cap
             invalidRows.push({row: rows[i], remark: invalidMsg});
     }
     
-    if(invalidRows === [])
+    if(invalidRows.length === 0)
         return {
             isValid: true
         }

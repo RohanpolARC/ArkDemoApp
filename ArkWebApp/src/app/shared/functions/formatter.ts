@@ -1,3 +1,4 @@
+import { ValueFormatterParams } from '@ag-grid-community/all-modules';
 import * as moment from 'moment';
 
 export function dateFormatter(params) {
@@ -96,4 +97,12 @@ export function formatDate(inputFormat, forCompare: boolean = false) {
     return forCompare 
         ? [d.getFullYear(), pad(d.getMonth()+1), pad(d.getDate())].join('/') // YYYY-MM-DD
         : [pad(d.getDate()), pad(d.getMonth()+1), d.getFullYear()].join('/')  // DD-MM_YYYY
+}
+
+export function percentFormatter(params : ValueFormatterParams) {
+    if(params.node.group)
+      return " "
+    else{
+      return `${Number(params.value * 100).toFixed(2)}%`
+    }
 }

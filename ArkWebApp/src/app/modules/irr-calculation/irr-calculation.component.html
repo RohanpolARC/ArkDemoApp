@@ -27,17 +27,25 @@
                     </ng-template>
 
                     <app-portfolio-modeller
-                        *ngIf="index === 0" 
-                        style="display: block; height: calc(100vh - 64px - 50px); width: 100%;"
-                        (calcParamsEmitter)="irrCalcParamsReceived($event)">
+                        *ngIf = "index === 0" 
+                        style = "display: block; height: calc(100vh - 64px - 50px); width: 100%;"
+                        (calcParamsEmitter) = "irrCalcParamsReceived($event)"
+                        (returnsParamsEmitter) = "returnsParamsReceived($event)">
                     </app-portfolio-modeller>
 
                     <app-irr-result 
-                        *ngIf="index !== 0" 
+                        *ngIf="index !== 0 && tab.resultType === 'IRR'" 
                         style="display: block; height: calc(100vh - 64px - 50px);"
                         (status)="statusReceived($event, index)"
                         [calcParams] = "calcParamsMap[tab.displayName]"
                     ></app-irr-result>
+
+                    <app-monthly-returns
+                        *ngIf="index !== 0 && tab.resultType === 'MonthlyReturns'"
+                        style="display: block; height: calc(100vh - 64px - 50px);"
+                        (status)="statusReceived($event, index)"
+                        [calcParams] = "calcParamsMap[tab.displayName]"
+                    ></app-monthly-returns>
                </mat-tab>
             </mat-tab-group>
 
