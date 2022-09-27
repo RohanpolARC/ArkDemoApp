@@ -57,8 +57,6 @@ const routes: Routes = [
   { path: 'contract-history', 
     loadChildren: () => import('./modules/contract-history/contract-history.module').then(m => m.ContractHistoryModule) 
   },
-  { path: 'fee-calculation', 
-    loadChildren: () => import('./modules/fee-calculation/fee-calculation.module').then(m => m.FeeCalculationModule) },
 ];
 
 @NgModule({  

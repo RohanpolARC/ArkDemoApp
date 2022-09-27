@@ -23,7 +23,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
 import { DropzoneDirective } from './bulk-upload/dropzone.directive';
 import { CapitalActivityRoutingModule } from './capital-activity-routing.module';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [
@@ -55,7 +54,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatAutocompleteModule,
     MatExpansionModule,
     MatTooltipModule,
-    MatCheckboxModule
   ],
   exports:[CapitalActivityComponent]
 })

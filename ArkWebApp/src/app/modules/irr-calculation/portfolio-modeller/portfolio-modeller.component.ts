@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { amountFormatter, removeDecimalFormatter, formatDate } from 'src/app/shared/functions/formatter';
-import { IRRCalcParams, MonthlyReturnsCalcParams, VPortfolioLocalOverrideModel } from 'src/app/shared/models/IRRCalculationsModel';
+import { IRRCalcParams, VPortfolioLocalOverrideModel } from 'src/app/shared/models/IRRCalculationsModel';
 import { EventEmitter } from '@angular/core';
 import { AggridMaterialDatepickerComponent } from '../../facility-detail/aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/portfolio-save-run-model.component';
@@ -30,7 +30,6 @@ export class PortfolioModellerComponent implements OnInit {
   ) { }
 
   @Output() calcParamsEmitter = new EventEmitter<IRRCalcParams>();
-  @Output() returnsParamsEmitter = new EventEmitter<MonthlyReturnsCalcParams>();
 
   multiSelectPlaceHolder: string = null;
   dropdownSettings: IDropdownSettings = null;
@@ -190,19 +189,14 @@ export class PortfolioModellerComponent implements OnInit {
     }
   }
 
-  fetchPortfolioModels(modelID?: number, context: string = 'SaveRunIRR', contextData: {
-    baseMeasure: string
-  } = null){
+  fetchPortfolioModels(modelID?: number, context: string = 'SaveRun'){
     this.subscriptions.push(this.irrCalcService.getPortfolioModels(this.dataSvc.getCurrentUserName()).subscribe({
       next: data => {
         this.parseFetchedModels(data);
         this.InitModelMap()
         this.setSelectedModel(modelID)
-        if(!!modelID && context === 'SaveRunIRR'){
+        if(!!modelID && context === 'SaveRun'){
             this.calcIRR();
-        }
-        else if(!!modelID && context === 'SaveRunMReturns'){
-          this.calcReturns(contextData?.baseMeasure);
         }
       },
       error: error => {
@@ -478,7 +472,7 @@ export class PortfolioModellerComponent implements OnInit {
 
     let positionIDs = this.modelMap[modelID]?.positionIDs
     this.adapTableApi?.gridApi?.deselectAll();
-    if(positionIDs != null || positionIDs?.length != 0){
+    if(positionIDs != null || positionIDs != []){
       positionIDs.forEachLeafNode(posID => {
         let node: RowNode = this.adapTableApi?.gridApi?.getRowNodeForPrimaryKey(posID);
         node.setSelected(posID)
@@ -545,7 +539,7 @@ export class PortfolioModellerComponent implements OnInit {
     })
 
     this.subscriptions.push(dialogRef.afterClosed().subscribe(res => {
-      if(dialogRef.componentInstance?.isSuccess){
+      if(dialogRef.componentInstance.isSuccess){
         if(this.isAutomatic.value){
           this.selectedPositionIDs = [];
           this.gridApi.forEachNodeAfterFilter(node => 
@@ -554,41 +548,13 @@ export class PortfolioModellerComponent implements OnInit {
                 this.selectedPositionIDs.push(node.data?.positionID)
             })  
         }
-        if(res?.isSuccess){
+        if(res.isSuccess){
           this.selectedModelID = dialogRef.componentInstance.modelID
-
-          if(res?.context === 'SaveRunIRR')
-            this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context);
-          if(res?.context === 'SaveRunMReturns')
-            this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context, { baseMeasure: res?.['baseMeasure']});
-
+          this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context);
           this.updateLocalFields()
-        }
+        }        
       }
     }))
-  }
-
-  /** 
-   * Opening new tab for Monthly Return in IRR Calculation and sending MonthlyReturnCalcParams as `@Input` to `<app-monthly-returns>` component.
-   *  Portfolio Modeller -> IRR Calculation -> Monthly Returns
-  */
-  calcReturns(baseMeasure: string){
-
-    let calcParams: MonthlyReturnsCalcParams = <MonthlyReturnsCalcParams> {};
-    calcParams.baseMeasure = baseMeasure;
-
-    let positionIDsSTR: string = ''
-    this.selectedPositionIDs.forEach(posID => {
-      positionIDsSTR += String(posID) + ','
-    })
-    positionIDsSTR = positionIDsSTR.slice(0, -1) // Remove last delimeter
-
-    calcParams.positionIDs = positionIDsSTR;
-    calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
-    calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
-    calcParams.asOfDate = this.asOfDate
-
-    this.returnsParamsEmitter.emit(calcParams)
   }
 
   /** 
@@ -608,7 +574,7 @@ export class PortfolioModellerComponent implements OnInit {
   }
 
   runIRRCalc(){
-    this.onSavePortfolio('SaveRunIRR');
+    this.onSavePortfolio('SaveRun');
 
   }
 

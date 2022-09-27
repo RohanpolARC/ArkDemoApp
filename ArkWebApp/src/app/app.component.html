@@ -77,20 +77,6 @@
   </mat-accordion>
 
   <mat-accordion>
-    <mat-expansion-panel [expanded]="false" >
-      <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
-        <mat-panel-title> Fees </mat-panel-title>
-      </mat-expansion-panel-header>
-
-      <mat-list>
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Fee Calculation')" [ngStyle]="FeeCalculationStyle">
-          <div class="list-item-text">Fee Calculation</div>
-        </mat-list-item>          
-      </mat-list>
-    </mat-expansion-panel>
-  </mat-accordion>
-  
-  <mat-accordion>
       <mat-expansion-panel [expanded]="false" >
         <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
           <mat-panel-title>
@@ -138,7 +124,7 @@
       <span>Filter Pane</span>
       <button mat-raised-button id="apply-button"  
         *ngIf="[
-        '/facility-detail', '/liquidity-summary', '/fee-calculation',
+        '/facility-detail', '/liquidity-summary', 
         '/irr/portfoliomodeller', '/contract-history', '/cash-balance'].includes(location.path())" 
         (click)="filterApply()">Apply</button>
     </div>
@@ -161,10 +147,6 @@
 
     <div *ngIf="location.path() === '/irr/portfoliomodeller'" class="filter-element">
       <app-irr-calculation-filter></app-irr-calculation-filter>
-    </div>
-
-    <div *ngIf="location.path() === '/fee-calculation'" class="filter-element">
-      <app-fee-calculation-filter [entities] = "entities"></app-fee-calculation-filter>
     </div>
 
   </mat-sidenav>

@@ -26,13 +26,3 @@ export interface IRRCalcParams{
     modelName: string,
     irrAggrType: string // single type
 }
-
-export interface MonthlyReturnsCalcParams {
-    positionIDs: string,
-    baseMeasure: string,
-    baseMeasureID: number,
-
-    modelID?: number,
-    modelName?: string,
-    asOfDate?: string
-}

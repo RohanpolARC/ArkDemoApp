@@ -83,8 +83,7 @@ export class BulkUploadComponent implements OnInit {
     { field: 'Fund Currency', headerName: 'Fund Ccy', maxWidth: 150, tooltipField: 'Fund Currency'},
     { field: 'Position Currency', headerName: 'Position Ccy', maxWidth: 150, tooltipField: 'Position Currency'},
     { field: 'GIR (Pos - Fund ccy)', headerName: 'GIR (Pos -> Fund)', maxWidth: 300,  allowedAggFuncs: ['sum', 'avg', 'first', 'last', 'count', 'min', 'max'], tooltipField: 'GIR (Pos - Fund ccy)'},
-    { field: 'GIR Override', maxWidth: 150 },
-    { field: 'Amount (in Fund Ccy)', headerName: 'Amount (in Fund Ccy)', maxWidth: 150, cellClass: 'ag-right-aligned-cell', valueFormatter: amountFormatter, allowedAggFuncs: [ 'sum', 'avg', 'first', 'last', 'count', 'min', 'max'], tooltipField:'Amount (in Fund Ccy)'},
+    { field: 'Amount', headerName: 'Amount', maxWidth: 150, cellClass: 'ag-right-aligned-cell', valueFormatter: amountFormatter, allowedAggFuncs: [ 'sum', 'avg', 'first', 'last', 'count', 'min', 'max'], tooltipField:'Amount'},
     { field: 'Capital Type', maxWidth: 150, tooltipField:'Capital Type'},
     { field: 'Capital Subtype', maxWidth: 170, tooltipField:'Capital Subtype'},
     { field: 'Wso Asset ID', headerName: 'WSO Asset ID', tooltipField:'Wso Asset ID'},
@@ -159,13 +158,12 @@ export class BulkUploadComponent implements OnInit {
     model.capitalType = obj['Capital Type'];
     model.capitalSubType = obj['Capital Subtype'];
     model.fundHedging = obj['Fund Hedging'];
-    model.totalAmount = Number(obj['Amount (in Fund Ccy)']);
+    model.totalAmount = Number(obj['Amount']);
     model.asset = obj['Asset (optional)'];
     model.fundCcy = obj['Fund Currency'];
     model.wsoAssetID = Number(obj['Wso Asset ID']);
     model.posCcy = obj['Position Currency'];
     model.fxRate = Number(obj['GIR (Pos - Fund ccy)']);
-    model.fxRateOverride = Boolean(obj['GIR Override'] === 'Yes');
     model.createdBy = model.modifiedBy = this.dataSvc.getCurrentUserName();
     model.createdOn = model.modifiedOn = new Date();
     model.source = 'ArkUI - template';
@@ -232,7 +230,7 @@ export class BulkUploadComponent implements OnInit {
         ]
       },
        Layout: {
-         Revision: 4,
+         Revision: 2,
          CurrentLayout: 'Bulk Grid',
          Layouts: [{
            Name: 'Bulk Grid',
@@ -243,8 +241,7 @@ export class BulkUploadComponent implements OnInit {
             'Fund Currency',
             'Position Currency',
             'GIR (Pos - Fund ccy)',
-            'GIR Override',
-            'Amount (in Fund Ccy)',
+            'Amount',
             'Capital Type',
             'Capital Subtype',
             'Wso Asset ID',
@@ -269,8 +266,7 @@ export class BulkUploadComponent implements OnInit {
             'Fund Currency',
             'Position Currency',
             'GIR (Pos - Fund ccy)',
-            'GIR Override',
-            'Amount (in Fund Ccy)',
+            'Amount',
             'Capital Type',
             'Capital Subtype',
             'Wso Asset ID',
@@ -362,7 +358,7 @@ export class BulkUploadComponent implements OnInit {
 
        for(let i = 1; i < data.length; i++){       // Skipping header's row
          for(let j = 0; j < data[i].length; j++){
-           if(['GIR (Pos - Fund ccy)', 'Amount (in Fund Ccy)'].includes(data[0][j])){
+           if(['GIR (Pos - Fund ccy)', 'Amount'].includes(data[0][j])){
              data[i][j] = parseFloat(String(data[i][j]).replace(/,/g,''));      // Remove commas, blanks from number read from excel
            }
          }
@@ -374,7 +370,7 @@ export class BulkUploadComponent implements OnInit {
         for(let i: number = 1; i < data.length; i+=1){
           let obj = {}
           for(let j: number= 0; j < extractedCols.length; j+= 1){
-            if(['GIR (Pos - Fund ccy)', 'Amount (in Fund Ccy)'].includes(extractedCols[j]))
+            if(['GIR (Pos - Fund ccy)', 'Amount'].includes(extractedCols[j]))
               obj[extractedCols[j]] = parseFloat(data[i][j])
             else if(['Call Date', 'Cash Flow Date'].includes(extractedCols[j])){
               obj[extractedCols[j]] = moment(data[i][j], 'DD/MM/YYYY', true).toDate()

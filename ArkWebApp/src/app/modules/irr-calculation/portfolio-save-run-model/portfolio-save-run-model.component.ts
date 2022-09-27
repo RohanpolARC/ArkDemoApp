@@ -39,13 +39,11 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   isSuccess: boolean
   isFailure: boolean
   modelForm: FormGroup
-  context: "Save" | "SaveRunIRR" | "SaveRunMReturns"
+  context: "Save" | "SaveRun"  
   aggregationTypes: {
     type: string,
     levels: string[]
   }[] = []
-  baseMeasures
-  readMore: boolean = false;
 
   constructor(
     public dialogRef: MatDialogRef<PortfolioSaveRunModelComponent>,
@@ -61,16 +59,9 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   }
   
   ngOnInit(): void {
-
-    this.subscriptions.push(
-      this.dataService.getUniqueValuesForField('Returns-Base-Measures').subscribe({
-        next: (data: any[]) => {
-          this.baseMeasures = data.map(item => { return { baseMeasure: item.value, id: item.id } })
-
-          this.Init();
-          this.changeListeners();
-          this.modelForm.updateValueAndValidity()      
-    }}))
+    this.Init();
+    this.changeListeners();
+    this.modelForm.updateValueAndValidity()
   }
 
   ngOnDestroy(){
@@ -116,9 +107,9 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       modelDesc: new FormControl(this.data.model?.modelDesc),
       isUpdate: new FormControl(!!this.modelID, Validators.required),
       isShared: new FormControl(!!this.data.isShared, Validators.required),
-      aggregationType: new FormControl(this.data.aggregationType, Validators.required),
-      baseMeasure: new FormControl(this.baseMeasures[0]?.baseMeasure, Validators.required)
-    })
+      aggregationType: new FormControl(this.data.aggregationType, Validators.required)
+    }
+    )
 
     this.aggregationTypes = [
       {
@@ -159,7 +150,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     }))
   }
 
-  onProceed(context: 'Save' | 'SaveRunIRR' | 'SaveRunMReturns' = 'Save'){
+  onProceed(context: 'Save' | 'SaveRun' = 'Save'){
     this.context = context
 
     let model: VPortfolioModel = <VPortfolioModel> {};
@@ -217,18 +208,11 @@ export class PortfolioSaveRunModelComponent implements OnInit {
             this.modelID = result.data[0].value;
           }
 
-          if(context === 'SaveRunIRR'){
+          if(context === 'SaveRun'){
             this.dialogRef.close({ 
-              context: 'SaveRunIRR',
+              context: 'SaveRun',
               isSuccess: true
              });
-          }
-          else if(context === 'SaveRunMReturns'){
-            this.dialogRef.close({ 
-              context: 'SaveRunMReturns',
-              isSuccess: true,
-              baseMeasure: this.modelForm.get('baseMeasure').value
-            });  
           }
         }
         else{
@@ -245,7 +229,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       }
     }))
   }
-
+  
   recursiveRemoveKey = (object, deleteKey) => {
     delete object[deleteKey];
     
