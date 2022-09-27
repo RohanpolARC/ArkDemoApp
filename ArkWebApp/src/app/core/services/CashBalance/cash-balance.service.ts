@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { APIConfig } from 'src/app/configs/api-config';
 import { HttpClient, HttpParams,HttpHeaders } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { BehaviorSubject, throwError } from 'rxjs';
 import { MsalUserService } from '../Auth/msaluser.service';  
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 
@@ -17,7 +17,13 @@ export class CashBalanceService {
     headers: new HttpHeaders({  
         'Content-Type': 'application/json'  
     })
-  };  
+  };
+
+  private searchDateRangeMessage = new BehaviorSubject<any>(null);
+  currentSearchDateRange = this.searchDateRangeMessage.asObservable();
+  changeSearchDateRange(range: AsOfDateRange){
+      this.searchDateRangeMessage.next(range);
+  }
 
   constructor(private http: HttpClient,private msalService: MsalUserService) { }
 
