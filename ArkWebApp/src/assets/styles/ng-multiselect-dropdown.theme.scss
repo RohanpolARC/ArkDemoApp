@@ -1,6 +1,6 @@
 // Custom theme for ng multiselect dropdown in filter pane
 
-$base-color: #0288D1 !important;    // Changing default theme color to Ark theme color
+$base-color: #0590ca !important;    // Changing default theme color to Ark theme color
 
 
 $disable-background-color: #eceeef;
@@ -72,11 +72,6 @@ $disable-background-color: #eceeef;
   background: #fff;
   margin-top: 10px;
   box-shadow: 0px 1px 5px #959595;
-
-  // Causes overflow vertically in parent container when dropdown is opened. Use this to remove the scroll bar vertically
-  // Reference: https://github.com/NileshPatel17/ng-multiselect-dropdown/issues/248
-  overflow-y: hidden;
-
   ul {
     padding: 0px;
     list-style: none;

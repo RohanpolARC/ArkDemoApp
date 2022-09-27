@@ -6,14 +6,14 @@ import { FacilityDetailModel } from 'src/app/shared/models/FacilityDetailModel';
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from 'src/app/core/services/FacilityDetails/facility-detail.service';
 import {MsalUserService} from '../../core/services/Auth/msaluser.service'
-import { DataService } from 'src/app/core/services/data.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-action-cell-renderer',
   templateUrl: './action-cell-renderer.component.html',
   styleUrls: ['./action-cell-renderer.component.scss']
 })
-export class ActionCellRendererComponent implements ICellRendererAngularComp {
+export class ActionCellRendererComponent implements ICellRendererAngularComp,OnInit {
 
   subscriptions: Subscription[] = [];
   params: ICellRendererParams;
@@ -30,8 +30,7 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp {
   }
 
   constructor(private facilityDetailService: FacilityDetailService,
-              private msalUserService: MsalUserService,
-              private dataSvc: DataService) { }
+              private msalUserService: MsalUserService) { }
 
   originalRowNodeData: any;
   originalRowNodeID: any;
@@ -45,7 +44,7 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp {
       this.startEditing();
     }
     else{
-      this.dataSvc.setWarningMsg('Unauthorized', 'Dismiss', 'ark-theme-snackbar-error')   
+      this.componentParent.setWarningMsg('Unauthorized', 'Dismiss', 'ark-theme-snackbar-error')   
     }
   }
 
@@ -60,7 +59,6 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp {
 
     if(this.componentParent.getSelectedRowID() === null || (this.componentParent.getSelectedRowID() === this.params.node.rowIndex)){
 
-      this.params.columnApi.setColumnsVisible(['expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount', 'isOverride'], true)
       this.params.api.startEditingCell({ 
         rowIndex: this.params.node.rowIndex, colKey: 'expectedPrice'
       });    
@@ -73,18 +71,10 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp {
       this.params.api.startEditingCell({ 
         rowIndex: this.params.node.rowIndex, colKey: 'expectedDate'
       });
-      this.params.api.startEditingCell({
-        rowIndex: this.params.node.rowIndex, colKey: 'isOverride'
-      })
-
-      this.params.api.refreshCells({
-        force: true,
-        suppressFlash: true
-      })
 
     }
     else{
-      this.dataSvc.setWarningMsg('Please save the existing entry', 'Dismiss', 'ark-theme-snackbar-warning')   
+      this.componentParent.setWarningMsg('Please save the existing entry', 'Dismiss', 'ark-theme-snackbar-warning')   
     }
   }
 
@@ -94,15 +84,21 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp {
     this.componentParent.setSelectedRowID(null);
     this.params.api.refreshCells({
       force: true,
-      suppressFlash: true
-    })
+      columns: ['expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount'],
+      rowNodes: [this.params.api.getRowNode(this.params.node.id)]
+    });
   }
 
   getModel(): FacilityDetailModel{
     let model: FacilityDetailModel = <FacilityDetailModel>{};
     let data = this.params.data;
 
-    if(data.expectedDate != null){  
+    if(data.expectedDate != null){
+      let yr = data.expectedDate.split('/')[2];
+      let mon = data.expectedDate.split('/')[1] - 1;
+      let day = data.expectedDate.split('/')[0];
+      let hrs = 0;
+  
       model.expectedDate = (data.expectedDate === null) ? null : data.expectedDate.split('/').reverse().join('/');  
     }
     else model.expectedDate = null
@@ -111,7 +107,6 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp {
     model.expectedPrice = (data.expectedPrice === null) ? null : parseFloat(data.expectedPrice);
     model.maturityPrice = (data.maturityPrice === null) ? null : parseFloat(data.maturityPrice);
     model.spreadDiscount = (data.spreadDiscount === null) ? null : parseFloat(data.spreadDiscount);
-    model.isOverride = Boolean(data.isOverride);
     model.modifiedOn = new Date();
     model.modifiedBy = this.msalUserService.getUserName();
     return model;
@@ -126,22 +121,23 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp {
           this.originalRowNodeData = this.originalRowNodeID = null;
           this.componentParent.setSelectedRowID(null);
 
-          if(this.getModel().isOverride){
-            this.params.api.getRowNode(this.params.node.id).setDataValue('modifiedBy', this.msalUserService.getUserName());
-            this.params.api.getRowNode(this.params.node.id).setDataValue('modifiedOn', new Date());  
-          }
+          this.params.api.getRowNode(this.params.node.id).setDataValue('modifiedBy', this.msalUserService.getUserName());
+          this.params.api.getRowNode(this.params.node.id).setDataValue('modifiedOn', new Date());
           this.params.api.refreshCells({
             force: true,
-            suppressFlash: true
-          })
-          this.dataSvc.setWarningMsg(`Saved successfully`, 'Dismiss', 'ark-theme-snackbar-success');  
+            columns: ['expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount', 'modifiedBy', 'modifiedOn'],
+            rowNodes: [this.params.api.getRowNode(this.params.node.id)]
+          });  
+          
+          this.componentParent.setWarningMsg(`Saved successfully`, 'Dismiss', 'ark-theme-snackbar-success');  
         }
       },
       error: error => {
-        console.error(error)
-        this.dataSvc.setWarningMsg(`Failed to save`, 'Dismiss', 'ark-theme-snackbar-error'); 
+        this.componentParent.setWarningMsg(`Failed to save`, 'Dismiss', 'ark-theme-snackbar-error'); 
       }
     }))
   }
 
+  ngOnInit(): void {
+  }
 }

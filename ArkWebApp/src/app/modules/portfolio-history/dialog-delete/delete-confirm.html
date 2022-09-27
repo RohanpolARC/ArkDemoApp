@@ -9,14 +9,14 @@
         <div *ngIf="isDeletable">
             <span> Are you sure to delete this GIR? </span>
             
-                <div *ngIf="isSuccess || isFailure"
-                    [class.success-msg]="isSuccess"
-                    [class.failure-msg]="isFailure"
-                >
-                    {{ updateMsg }}
-                </div>
+            <div class="success-msg" *ngIf="isSuccessMsgAvailable">
+                {{updateMsg}}
+            </div>
+            <div class="failure-msg" *ngIf="isFailureMsgAvailable">
+                {{updateMsg}}
+            </div>
             <div mat-dialog-actions align="end">
-              <button mat-raised-button (click)="this.performDelete(true);" color="primary" [disabled]="isSuccess">Confirm</button>
+              <button mat-raised-button (click)="this.performDelete(true);" color="primary" [disabled]="isSuccessMsgAvailable">Confirm</button>
               <button mat-raised-button cdkFocusInitial (click)="this.closeDialog()">Close</button>
             </div>
         </div>

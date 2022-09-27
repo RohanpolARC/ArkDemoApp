@@ -11,9 +11,12 @@ let actualCols: string[] = [
     'Amount',
     'Capital Type',
     'Capital Subtype',
+    // 'Wso Issuer ID',
+    // 'Issuer Short Name(optional)',
     'Wso Asset ID',
     'Asset (optional)',
     'Narative (optional)',
+    // 'Action'
 ]
 
 let refOptions;
@@ -22,7 +25,7 @@ let invalidMsg: string = '';
 export function validateColumns(fileColumns: string[]): {isValid: boolean, col?: string} {
 
     for(let i: number = 0; i<fileColumns.length; i+=1){
-        if(actualCols.indexOf(fileColumns[i]) !== -1 || fileColumns[i] === '_ROW_ID')
+        if(actualCols.indexOf(fileColumns[i]) !== -1 || fileColumns[i] === '_COLUMN_TITLE')
             continue;
         else 
             return {isValid: false, col: fileColumns[i]};   // Invalid col found
@@ -56,7 +59,7 @@ export function validateRowValueRange(row: any): void{
 
     if(Number(new Date(moment(row['Call Date']).format('YYYY-MM-DD')).getFullYear) < 2012){
         invalidMsg += (invalidMsg === '') ? '' : ','
-        invalidMsg += ` Calldate cannot be < 2012`
+        invalidMsg += ` Calldate cannot be < 2021`
     }
 
     if(Number(row['Amount']) === 0){
@@ -77,7 +80,7 @@ export function validateRowValueRange(row: any): void{
 
     if(!!row['Fund Currency'] && (refOptions.fundCcys.indexOf(String(row['Fund Currency']).trim()) === -1)){
         invalidMsg += (invalidMsg === '') ? '' : ','
-        invalidMsg += ` Fund Currency ${String(row['Fund Currency'])} not in range`
+        invalidMsg += ` Fund Currnecy ${String(row['Fund Currency'])} not in range`
     }
 
     // Set(posCcy) = Set(fundCcy)
@@ -100,8 +103,22 @@ export function validateRowValueRange(row: any): void{
     if(!!row['Wso Asset ID'] && (refOptions.wsoAssetIDs.indexOf(parseInt(row['Wso Asset ID'])) === -1)){
         invalidMsg += (invalidMsg === '') ? '' : ','
         invalidMsg += ` Wso Asset ID '${String(row['Wso Asset ID'])}' doesn't exist.`
-    }    
+    }
+
+    // Subtype is 'Investment', 'Income' && WsoIssuerID is null
+    
+    // if(!row['Wso Issuer ID']){
+    //     if(['Investment', 'Income'].indexOf(String(row['Capital Subtype']).trim()) !== -1){
+    //         return {
+    //             isValid: false,
+    //             remark: `Wso Issuer ID cannot be empty for subtype '${String(row['Capital Subtype'])}'`
+    //         };  
+    //     }
+    // }
+    
 }
+
+
 
 export function validateRow(row: any):void {
     validateRowForEmptiness(row);

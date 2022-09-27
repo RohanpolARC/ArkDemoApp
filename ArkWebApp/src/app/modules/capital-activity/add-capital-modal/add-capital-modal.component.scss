@@ -3,13 +3,7 @@
     font-size: 14px;
     display: flex;
     justify-content: space-between;
-    height: 100%
-}
-
-.input-field > div {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    max-width: 500px;
 }
 
 .edit{
@@ -47,6 +41,15 @@
     padding: 5px;
 }
 
+.last-col{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.main-content{
+    min-height: 325px;
+}
 .mat-option{
     font-size: 13px !important;
 }

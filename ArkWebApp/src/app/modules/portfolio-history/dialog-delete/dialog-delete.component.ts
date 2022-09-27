@@ -15,8 +15,8 @@ import { AdaptableApi } from '@adaptabletools/adaptable/types';
 export class DialogDeleteComponent{
     isDeletable:boolean = false;
     
-    isSuccess: boolean;
-    isFailure: boolean;
+    isSuccessMsgAvailable:boolean;
+    isFailureMsgAvailable:boolean;
     subscriptions: Subscription[] = [];
     updateMsg: string;
   
@@ -26,7 +26,7 @@ export class DialogDeleteComponent{
         private portfolioHistoryService: PortfolioHistoryService) { } 
   
     closeDialog(){
-      this.dialogRef.close({message: this.isSuccess ? 'Deleted Successfully' : 'Not Deleted'});
+      this.dialogRef.close({message: this.isSuccessMsgAvailable ? 'Deleted Successfully' : 'Not Deleted'});
     }
   
     performDelete(confirmation: boolean){
@@ -39,7 +39,7 @@ export class DialogDeleteComponent{
         AssetGIR.Ccy = 0;    // ?
         AssetGIR.Rate = this.data.rowData.fxRateBaseEffective;       // Updated GIR.
         AssetGIR.last_update = new Date();
-        AssetGIR.CcyName = this.data.rowData.fundCcy;
+        AssetGIR.CcyName = this.data.rowData.positionCcy;
         AssetGIR.Text = this.data.rowData.asset;
         AssetGIR.CreatedBy = this.dataService.getCurrentUserInfo().name;
         AssetGIR.ModifiedBy = this.dataService.getCurrentUserInfo().name;
@@ -51,21 +51,26 @@ export class DialogDeleteComponent{
         this.subscriptions.push(
           this.portfolioHistoryService.deleteAssetGIR(AssetGIR).subscribe({
             next: message => {
-              this.isSuccess = true;
-              this.isFailure = false;
+              this.isSuccessMsgAvailable = true;
+              this.isFailureMsgAvailable = false;
               this.updateMsg = "GIR successfully deleted";
               
               this.data.rowData.isEdited = false;
 
-              this.data.rowData.fxRateBaseEffective = this.data.rowData?.['pgh_FXRateBaseEffective'];
+              this.data.rowData.fxRateBaseEffective = ' ';
               this.data.rowData.modifiedBy = ' ';
               this.data.rowData.modifiedOn = null;
+            
+              /* Uncomment this to actually delete the row from the grid */
+
+            //   this.data.adapTableApi.gridApi.deleteGridData([this.data.rowData]);
+
             },
             error: error => {
-              this.isFailure = true;
-              this.isSuccess = false;
+              this.isFailureMsgAvailable = true;
+              this.isSuccessMsgAvailable = false;
               this.updateMsg = "GIR Delete Failed";
-              console.error("Error deleting row." + error);
+              console.error("Error deleting row.");
             }
           }));
       }
@@ -74,8 +79,8 @@ export class DialogDeleteComponent{
     ngOnInit(): void{
       this.isDeletable = this.data.rowData.isEdited;  
 
-      this.isSuccess = false;
-      this.isFailure = false;
+      this.isSuccessMsgAvailable = false;
+      this.isFailureMsgAvailable = false;
       this.updateMsg = '';
     }
   
