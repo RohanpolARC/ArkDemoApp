@@ -11,11 +11,10 @@
       <mat-card class="mat-content">
 
         <ag-grid-angular
-          [rowData]="rowData"
+          [rowData]="rowData | async"
           [columnDefs]="columnDefs"
           [defaultColDef]="defaultColDef"
           [modules]="modules"
-          (gridReady)="onGridReady($event)"
           [autoGroupColumnDef]="autoGroupColumnDef"
           [getRowNodeId]="getRowNodeId"  
           [suppressClickEdit]="true"

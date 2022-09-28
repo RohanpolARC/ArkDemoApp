@@ -63,6 +63,12 @@ export function noDecimalAmountFormatter(params){
     }
 }
 
+/**
+ * 
+ * Returns only upto 3 decimals. Eg: 0.971242427825928 -> 0.971
+ * @param params ValueFormatterParams
+ * @returns 
+ */
 export function nullOrZeroFormatter(params){
     if(params.value == null || Number(params.value) == 0)
         return "";

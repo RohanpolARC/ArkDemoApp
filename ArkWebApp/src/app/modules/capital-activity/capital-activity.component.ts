@@ -26,7 +26,7 @@ import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/C
 
 import { Subscription } from 'rxjs';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
-import { dateFormatter, dateTimeFormatter, amountFormatter, nullOrZeroFormatter, formatDate } from 'src/app/shared/functions/formatter';
+import { dateFormatter, dateTimeFormatter, amountFormatter, nullOrZeroFormatter, formatDate, nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
 
 import { getNodes, validateLinkSelect }from './utilities/functions';
 import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
@@ -127,7 +127,7 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'fundHedging', tooltipField: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
     { field: 'fundCcy', tooltipField: 'fundCcy', headerName: 'Fund Ccy', type:'abColDefString'},
     { field: 'posCcy', tooltipField: 'posCcy', headerName: 'Position Ccy', type: 'abColDefString'},
-    { field: 'fxRate', tooltipField: 'fxRate', headerName: 'FXRate', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
+    { field: 'fxRate', tooltipField: 'fxRate', headerName: 'FXRate', valueFormatter: nonAmountNumberFormatter, type: 'abColDefNumber'},
     { field: 'fxRateOverride', tooltipField: 'fxRateOverride', headerName: 'FXRate Override', type: 'abColDefBoolean' },
     { field: 'fxRateSource', tooltipField: 'fxRateSource', type: 'abColDefString' },
     { field: 'totalAmount', tooltipField: 'totalAmount', headerName: 'Total Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},

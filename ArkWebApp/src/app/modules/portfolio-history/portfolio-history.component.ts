@@ -6,7 +6,7 @@ import {
 } from '@ag-grid-community/all-modules';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
-import { Subscription} from 'rxjs';
+import { Observable, Subscription} from 'rxjs';
 import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
 import { MenuModule } from '@ag-grid-enterprise/menu';
 import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
@@ -25,9 +25,10 @@ import {MatDialog } from '@angular/material/dialog';
 import {DialogDeleteComponent} from './dialog-delete/dialog-delete.component';
 
 import { ExcelExportModule } from "@ag-grid-enterprise/excel-export";
-import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, dateTimeFormatter, amountFormatter, nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
+import { map } from 'rxjs/operators';
 
 let adapTableApi: AdaptableApi;
 
@@ -40,7 +41,7 @@ let adapTableApi: AdaptableApi;
 
 export class PortfolioHistoryComponent implements OnInit {
 
-  rowData: any[];
+  rowData: Observable<any[]>;
 
   modules: Module[] = [    
     ClientSideRowModelModule,
@@ -66,28 +67,28 @@ export class PortfolioHistoryComponent implements OnInit {
 
   public subscriptions: Subscription[] = [];
 
-  columnDefs:ColDef[] = [
-  { headerName:"Position Id",field: 'positionId',hide: true, type:'abColDefNumber' },
-  { headerName:"Asset Id",field: 'assetId',hide: true, type:'abColDefNumber'},
-  { headerName:"Issuer Short Name",field: 'issuerShortName',enableValue: true, type:'abColDefString' },
-  { headerName:"Asset",field: 'asset',enableValue: true, type:'abColDefString' },
-  { headerName:"Fund",field: 'fund', type:'abColDefString' },
-  { headerName:"Fund Hedging",field: 'fundHedging', type:'abColDefString' },
-  { headerName:"Fund Ccy", field: 'fundCcy', type:'abColDefString' },
-  { headerName:"As Of Date", field: 'asOfDate',  valueFormatter: dateFormatter,hide: true, type:'abColDefDate' },
-  { headerName:"Trade Date",field: 'tradeDate', rowGroup: true, hide: true, valueFormatter: dateFormatter, type:'abColDefDate' },
-  { headerName:"Type", field: 'typeDesc', type:'abColDefString'},
-  { headerName:"Settle Date",field: 'settleDate',  valueFormatter: dateFormatter, type:'abColDefDate' },
-  { headerName:"Position Ccy",field: 'positionCcy', type:'abColDefString'},
-  { headerName:"Amount",field: 'amount',enableValue: true ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
-  { headerName:"Par Amount",field: 'parAmount' ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
-  { headerName:"ParAmountLocal",field: 'parAmountLocal' ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-  { headerName:"FundedParAmountLocal",field: 'fundedParAmountLocal' ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-  { headerName:"CostAmountLocal",field: 'costAmountLocal',  valueFormatter: amountFormatter , type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-  { headerName:"FundedCostAmountLocal",field: 'fundedCostAmountLocal',  valueFormatter: amountFormatter , type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-  { headerName:"Going In Rate",field: 'fxRateBaseEffective',editable:true , type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-  { headerName:"Modified By", field: 'modifiedBy', type:'abColDefString'},
-  { headerName:"Modified On", field: "modifiedOn", valueFormatter: dateTimeFormatter, type:'abColDefDate'},
+  columnDefs: ColDef[] = [
+  { headerName: "Position Id", field: 'positionId',hide: true, type:'abColDefNumber' },
+  { headerName: "Asset Id", field: 'assetId',hide: true, type:'abColDefNumber'},
+  { headerName: "Issuer Short Name ",field: 'issuerShortName',enableValue: true, type:'abColDefString' },
+  { headerName: "Asset",field : 'asset',enableValue: true, type:'abColDefString' },
+  { headerName: "Fund",field : 'fund', type:'abColDefString' },
+  { headerName: "Fund Hedging", field: 'fundHedging', type:'abColDefString' },
+  { headerName: "Fund Ccy",  field: 'fundCcy', type:'abColDefString' },
+  { headerName: "As Of Date ", field: 'asOfDate',  valueFormatter: dateFormatter,hide: true, type:'abColDefDate' },
+  { headerName: "Trade Date", field: 'tradeDate', rowGroup: true, hide: true, valueFormatter: dateFormatter, type:'abColDefDate' },
+  { headerName: "Type", field : 'typeDesc', type:'abColDefString'},
+  { headerName: "Settle Date", field: 'settleDate',  valueFormatter: dateFormatter, type:'abColDefDate' },
+  { headerName: "Position Ccy", field: 'positionCcy', type:'abColDefString'},
+  { headerName: "Amount",field : 'amount',enableValue: true ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
+  { headerName: "Par Amount", field: 'parAmount' ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
+  { headerName: "ParAmountLocal",field : 'parAmountLocal' ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+  { headerName: "FundedParAmountLocal",field : 'fundedParAmountLocal' ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+  { headerName: "CostAmountLocal",field : 'costAmountLocal',  valueFormatter: amountFormatter , type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+  { headerName: "FundedCostAmountLocal",field : 'fundedCostAmountLocal',  valueFormatter: amountFormatter , type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+  { headerName: "Edited Going In Rate",field: 'fxRateBaseEffective',editable:true , type:'abColDefNumber', cellClass: 'ag-right-aligned-cell', valueFormatter: nonAmountNumberFormatter},
+  { headerName: "Modified By",  field: 'modifiedBy', type:'abColDefString'},
+  { headerName: "Modified On",  field: "modifiedOn", valueFormatter: dateTimeFormatter, type:'abColDefDate'},
   {
     headerName:"",
     field: 'actionNew',
@@ -96,12 +97,12 @@ export class PortfolioHistoryComponent implements OnInit {
     width: 40,
     type:'abColDefObject'
   },
-  { headerName: "GIR Edited", field:'isEdited', type:'abColDefBoolean'},
-  { headerName: 'GIR Override', field: 'isOverride', type: 'abColDefBoolean' },
+  { headerName: "GIR Edited", field:'isEdited', type:'abColDefString'},
+  { headerName: 'GIR Override', field: 'isOverride', type: 'abColDefString' },
   { headerName: 'GIR Source', field: 'girSource', type: 'abColDfString' },
-  { headerName: 'GIR SourceID', field: 'girSourceID', type: 'abColDefNumber' },
+  { headerName: 'GIR SourceID', field: 'girSourceID', type: 'abColDefNumber', valueFormatter: nonAmountNumberFormatter },
   { field:'uniqueID', type:'abColDefNumber'},
-  { field: 'pgh_FXRateBaseEffective', headerName: 'Par History GIR'}
+  { field: 'pgh_FXRateBaseEffective', headerName: 'Effective Going In Rate', valueFormatter: nonAmountNumberFormatter, cellClass: 'ag-right-aligned-cell'}
 ];
 
   constructor(
@@ -155,14 +156,14 @@ export class PortfolioHistoryComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.subscriptions.push(this.portfolioHistoryService.getPortfolioHistory().subscribe({
-      next: data => {
-        this.rowData = data;
-      },
-      error: error => {
-        console.error("Error in fetching the data: " + error);
-      }
-    }));
+    this.rowData = this.portfolioHistoryService.getPortfolioHistory()
+      .pipe(
+        map((historyData: any[]) => historyData.map(row => {
+          row['isEdited'] = row['isEdited'] ? 'Yes' : 'No';
+          row['isOverride'] = row['isOverride'] ? 'Yes' : 'No';
+          return row;
+        }))
+      )
   }
 
   ngOnDestroy(): void{
@@ -203,7 +204,7 @@ export class PortfolioHistoryComponent implements OnInit {
                 }});
               this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
                 if(dialogRef.componentInstance.isSuccess)
-                  this.gridOptions.api?.refreshCells({ force: true, rowNodes: [context.rowNode], columns: ['fxRateBaseEffective', 'isEdited', 'modifiedOn', 'modifiedBy'] })
+                  this.gridOptions.api?.refreshCells({ force: true, rowNodes: [context.rowNode], columns: ['fxRateBaseEffective', 'isEdited', 'modifiedOn', 'modifiedBy', 'isOverride', 'girSource', 'girSourceID'] })
               }));
             },
             icon:{
@@ -271,6 +272,7 @@ export class PortfolioHistoryComponent implements OnInit {
       },
     
       Layout:{
+        Revision: 2,
         CurrentLayout: 'Basic Portfolio History',
         Layouts: [{
           Name: 'Basic Portfolio History',
@@ -284,6 +286,7 @@ export class PortfolioHistoryComponent implements OnInit {
             'positionCcy',
             'fundCcy',
             'fxRateBaseEffective',
+            'pgh_FXRateBaseEffective',
             'amount',
             'parAmount',
             'parAmountLocal',
@@ -293,6 +296,10 @@ export class PortfolioHistoryComponent implements OnInit {
             'assetId',
             'modifiedBy',
             'modifiedOn',
+            'isEdited',
+            'isOverride',
+            'girSource',
+            'girSourceID',
             'actionNew',
             'ActionDelete',
           ],
@@ -300,7 +307,7 @@ export class PortfolioHistoryComponent implements OnInit {
             actionNew: 'right',
             ActionDelete: 'right',
           },
-          RowGroupedColumns: ['tradeDate'],
+          RowGroupedColumns: ['tradeDate', 'fundCcy', 'positionCcy'],
           ColumnWidthMap:{
             ActionDelete: 50,
           },
@@ -317,9 +324,6 @@ export class PortfolioHistoryComponent implements OnInit {
     }
   
   }
-    
-  onGridReady(params) {
-  }
 
   onAdaptableReady(
     {
@@ -335,5 +339,4 @@ export class PortfolioHistoryComponent implements OnInit {
     /* Close right sidebar toolpanel by default */
     adaptableApi.toolPanelApi.closeAdapTableToolPanel();
   }
-
 }

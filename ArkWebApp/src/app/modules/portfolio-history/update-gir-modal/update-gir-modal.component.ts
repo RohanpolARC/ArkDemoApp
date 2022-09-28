@@ -197,7 +197,8 @@ export class UpdateGirModalComponent implements OnInit {
             nodeData['fxRateBaseEffective'] = this.goingInRate,
             nodeData['modifiedOn'] = new Date();
             nodeData['modifiedBy'] = this.currentUserName;
-            nodeData['isEdited'] = true
+            nodeData['isEdited'] = 'Yes'
+            nodeData['isOverride'] = 'Yes'
 
             return nodeData
           })
@@ -245,7 +246,8 @@ export class UpdateGirModalComponent implements OnInit {
               'fxRateBaseEffective': this.goingInRate,
               'modifiedOn': new Date(),
               'modifiedBy': this.currentUserName,
-              'isEdited': true
+              'isEdited': 'Yes',
+              'isOverride': 'Yes'
             }}]
 
             this.data.gridApi.applyTransaction({
