@@ -4,7 +4,7 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';  
 import { AppComponent } from './app.component';  
 import { environment } from 'src/environments/environment';  
-import { MsalModule, MsalInterceptor, MsalGuard, MsalService, MsalGuardConfiguration, MsalInterceptorConfiguration, MSAL_INSTANCE, MSAL_GUARD_CONFIG, MSAL_INTERCEPTOR_CONFIG } from '@azure/msal-angular';  
+import { MsalModule, MsalInterceptor, MsalGuard, MsalService, MsalGuardConfiguration, MsalInterceptorConfiguration, MSAL_INSTANCE, MSAL_GUARD_CONFIG, MSAL_INTERCEPTOR_CONFIG, MsalBroadcastService } from '@azure/msal-angular';  
 import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';  
 import { MsalUserService } from './core/services/Auth/msaluser.service';  
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';  
@@ -46,7 +46,7 @@ import { MsalHttpInterceptor } from './core/interceptors/msal-http.interceptor';
 
 export const protectedResourceMap: any =  
   [  
-    ["https://graph.microsoft.com/v1.0/me", ["user.read", "profile"]],
+    // ["https://graph.microsoft.com/v1.0/me", ["user.read", "profile"]],
     [environment.baseUrl, environment.scopeUri  ],
     [environment.arkFunctionUrl, environment.arkFunctionScopeUri]  
   ];  
@@ -79,14 +79,14 @@ export function MSALInstanceFactory(): IPublicClientApplication {
 
 export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
   return {
-    interactionType: InteractionType.Popup,
+    interactionType: InteractionType.Redirect,
     protectedResourceMap
   };
 }
 
 export function MSALGuardConfigFactory(): MsalGuardConfiguration {
   return { 
-    interactionType: InteractionType.Popup,
+    interactionType: InteractionType.Redirect,
   };
 }
   
@@ -135,6 +135,7 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
     HttpClient,  
     MsalUserService, 
     MsalService,
+    MsalBroadcastService,
     MsalGuard, 
     {  
       provide: HTTP_INTERCEPTORS, useClass: MsalHttpInterceptor, multi: true  

@@ -8,6 +8,9 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { MsalUserService } from './core/services/Auth/msaluser.service';
 import { environment } from 'src/environments/environment';
+import { MsalBroadcastService } from '@azure/msal-angular';
+import { filter } from 'rxjs/operators';
+import { AuthenticationResult, EventMessage, EventType } from '@azure/msal-browser';
 
 @Component({  
   selector: 'app-root',  
@@ -61,7 +64,8 @@ export class AppComponent {
     public location:Location,
     public accessService: AccessService,
     private router:Router,
-    private msalSvc: MsalUserService
+    private msalSvc: MsalUserService,
+    private msalBroadcastSvc: MsalBroadcastService
   ) {}   
 
   get getAccessibleTabs(){
@@ -93,7 +97,7 @@ export class AppComponent {
   }
 
   showUserRoles(){
-    alert(`Your role(s) : ${this.msalSvc.getCurrentUserInfo()?.idTokenClaims?.roles}`)
+    alert(`Your role(s) : ${this.msalSvc.msalSvc.instance.getActiveAccount()?.idTokenClaims?.roles}`)
   }
 
   async login(){
@@ -107,14 +111,21 @@ export class AppComponent {
     const accounts = this.msalSvc.msalSvc.instance.getAllAccounts();
     if (accounts.length === 0) {
         // No user signed in
-        this.msalSvc.msalSvc.instance.loginRedirect();
+        await this.msalSvc.msalSvc.instance.loginRedirect();
     }
 
   }
 
   ngOnInit(): void { 
+    this.msalBroadcastSvc.msalSubject$
+    .pipe(filter((msg: EventMessage) => msg.eventType === EventType.LOGIN_SUCCESS || msg.eventType === EventType.SSO_SILENT_SUCCESS))
+    .subscribe((result: EventMessage) => {
+      const payload = result.payload as AuthenticationResult;
+      this.msalSvc.msalSvc.instance.setActiveAccount(payload.account);
 
-    // this.login();
+      this.fetchTabs();
+      this.userName=this.dataService.getCurrentUserName();
+    })
 
     this.lastClickedTabRoute = this.location.path();
     this.fetchTabs();

@@ -27,7 +27,7 @@ export class MsalHttpInterceptor implements HttpInterceptor {
     const instance = this.msalSvc.instance;
     const accounts = this.msalSvc.instance.getAllAccounts()
     if(accounts.length === 0){
-      await instance.loginPopup();
+      await instance.loginRedirect();
 
       await instance.handleRedirectPromise().then(
         res => {
