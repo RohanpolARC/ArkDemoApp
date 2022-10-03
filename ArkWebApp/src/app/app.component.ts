@@ -7,6 +7,7 @@ import { AccessService } from './core/services/Auth/access.service';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { MsalUserService } from './core/services/Auth/msaluser.service';
+import { environment } from 'src/environments/environment';
 
 @Component({  
   selector: 'app-root',  
@@ -92,10 +93,28 @@ export class AppComponent {
   }
 
   showUserRoles(){
-    alert(`Your role(s) : ${this.msalSvc.getCurrentUserInfo().idToken['roles']}`)
+    alert(`Your role(s) : ${this.msalSvc.getCurrentUserInfo()?.idTokenClaims?.roles}`)
+  }
+
+  async login(){
+    await this.msalSvc.msalSvc.instance.handleRedirectPromise().then(
+      res => {
+        if(res && res.account)
+          this.msalSvc.msalSvc.instance.setActiveAccount(res.account);
+      }
+    );
+
+    const accounts = this.msalSvc.msalSvc.instance.getAllAccounts();
+    if (accounts.length === 0) {
+        // No user signed in
+        this.msalSvc.msalSvc.instance.loginRedirect();
+    }
+
   }
 
   ngOnInit(): void { 
+
+    // this.login();
 
     this.lastClickedTabRoute = this.location.path();
     this.fetchTabs();

@@ -4,7 +4,7 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';  
 import { AppComponent } from './app.component';  
 import { environment } from 'src/environments/environment';  
-import { MsalModule, MsalInterceptor } from '@azure/msal-angular';  
+import { MsalModule, MsalInterceptor, MsalGuard, MsalService, MsalGuardConfiguration, MsalInterceptorConfiguration, MSAL_INSTANCE, MSAL_GUARD_CONFIG, MSAL_INTERCEPTOR_CONFIG } from '@azure/msal-angular';  
 import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';  
 import { MsalUserService } from './core/services/Auth/msaluser.service';  
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';  
@@ -40,25 +40,63 @@ import { Platform } from '@angular/cdk/platform';
 import { InputDateAdapter } from './shared/providers/date-adapter';
 import { FilterPaneModule } from './modules/other-modules/filter-pane/filter-pane.module';
 import { MatTableModule } from '@angular/material/table';
+import { IPublicClientApplication, PublicClientApplication, BrowserCacheLocation, InteractionType, LogLevel } from '@azure/msal-browser';
+import { MsalHttpInterceptor } from './core/interceptors/msal-http.interceptor';
+// import { MsalModule, MsalInterceptor, MsalGuard, MsalGuardConfiguration, MsalService, MsalInterceptorConfiguration, MSAL_INSTANCE, MSAL_GUARD_CONFIG, MSAL_INTERCEPTOR_CONFIG, MsalBroadcastService } from '@azure/msal-angular';  
 
 export const protectedResourceMap: any =  
   [  
-    [environment.baseUrl, environment.scopeUri  
-    ]  
+    ["https://graph.microsoft.com/v1.0/me", ["user.read", "profile"]],
+    [environment.baseUrl, environment.scopeUri  ],
+    [environment.arkFunctionUrl, environment.arkFunctionScopeUri]  
   ];  
+
+export function loggerCallback(logLevel: LogLevel, message: string) {
+  console.log(message);
+}
+
+export function MSALInstanceFactory(): IPublicClientApplication {
+
+  console.log("Initialising MSAL instance")
+  return new PublicClientApplication({
+    auth: {
+      clientId: environment.uiClienId,
+      authority: 'https://login.microsoftonline.com/' + environment.tenantId,
+      redirectUri: environment.redirectUrl
+    },
+    cache: {
+      cacheLocation: BrowserCacheLocation.LocalStorage
+    },
+    system: {
+      loggerOptions: {
+        loggerCallback,
+        logLevel: LogLevel.Info,
+        piiLoggingEnabled: false
+      }
+    }
+  })
+} 
+
+export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
+  return {
+    interactionType: InteractionType.Popup,
+    protectedResourceMap
+  };
+}
+
+export function MSALGuardConfigFactory(): MsalGuardConfiguration {
+  return { 
+    interactionType: InteractionType.Popup,
+  };
+}
+  
   
 @NgModule({  
   declarations: [  
     AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent
   ],  
   imports: [  
-    MsalModule.forRoot({  
-      clientID: environment.uiClienId,  
-      authority: 'https://login.microsoftonline.com/' + environment.tenantId,  
-      //cacheLocation: 'localStorage',  
-      protectedResourceMap: protectedResourceMap,  
-      redirectUri: environment.redirectUrl  
-    }),  
+    MsalModule,
     BrowserModule,  
     AppRoutingModule,  
     HttpClientModule,
@@ -95,9 +133,23 @@ export const protectedResourceMap: any =
   ],  
   providers: [  
     HttpClient,  
-    MsalUserService,  
+    MsalUserService, 
+    MsalService,
+    MsalGuard, 
     {  
-      provide: HTTP_INTERCEPTORS, useClass: MsalInterceptor, multi: true  
+      provide: HTTP_INTERCEPTORS, useClass: MsalHttpInterceptor, multi: true  
+    },
+    {
+      provide: MSAL_INSTANCE,
+      useFactory: MSALInstanceFactory
+    },
+    {
+      provide: MSAL_GUARD_CONFIG,
+      useFactory: MSALGuardConfigFactory
+    },
+    {
+      provide: MSAL_INTERCEPTOR_CONFIG,
+      useFactory: MSALInterceptorConfigFactory
     },
     /* 
     Switched to: DD-MM-YYYY.

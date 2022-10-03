@@ -11,55 +11,38 @@ import { AssociateInvestment, CapitalActivityModel, CapitalInvestment } from '..
 })
 export class CapitalActivityService {
 
-  private CAPITAL_ACTIVITY_PUT_API: string = APIConfig.CAPITAL_ACTIVITY_PUT_API;
-  private CAPITAL_ACTIVITY_GET_API: string = APIConfig.CAPITAL_ACTIVITY_GET_API;
-  private CAPITAL_ACTIVITY_GET_REF_API: string = APIConfig.CAPITAL_ACTIVITY_GET_REF_API;
-
-  private CAPITAL_INVESTMENT_GET_API: string = APIConfig.CAPITAL_INVESTMENT_GET_API;
-  private CAPITAL_INVESTMENT_ASSOCIATE_API: string = APIConfig.CAPITAL_INVESTMENT_ASSOCIATE_API;
-
-  private CAPITAL_ACTIVITY_LOOKUP_API: string = APIConfig.CAPITAL_ACTIVITY_LOOKUP_API;
-  private CAPITAL_ACTIVITY_BULK_PUT_API: string = APIConfig.CAPITAL_ACTIVITY_BULK_PUT_API;
-
-  httpOptions = {  
-    headers: new HttpHeaders({  
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + this.msalService.GetAccessToken()  
-    })  
-  };
-
   constructor(private http:HttpClient, private msalService: MsalUserService) { }
 
   public putCapitalActivity(capitalAct: CapitalActivityModel){
 
-    return this.http.post<any>(this.CAPITAL_ACTIVITY_PUT_API, capitalAct, this.httpOptions).pipe(
+    return this.http.post<any>(APIConfig.CAPITAL_ACTIVITY_PUT_API, capitalAct).pipe(
       catchError((ex) => throwError(ex)));
   }
 
   public bulkPutCapitalActivity(bulkCapitalAct: CapitalActivityModel[]){
-    return this.http.post<any>(this.CAPITAL_ACTIVITY_BULK_PUT_API, bulkCapitalAct, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
+    return this.http.post<any>(APIConfig.CAPITAL_ACTIVITY_BULK_PUT_API, bulkCapitalAct).pipe(catchError((ex) => throwError(ex)));
   }
 
   public lookUpCapitalActivity(capitalAct: CapitalActivityModel){
-    return this.http.post<any>(this.CAPITAL_ACTIVITY_LOOKUP_API, capitalAct, this.httpOptions).pipe(
+    return this.http.post<any>(APIConfig.CAPITAL_ACTIVITY_LOOKUP_API, capitalAct).pipe(
       catchError((ex) => throwError(ex)));
   }
 
   public associateCapitalInvestments(model: AssociateInvestment){
-    return this.http.post<any>(this.CAPITAL_INVESTMENT_ASSOCIATE_API, model, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
+    return this.http.post<any>(APIConfig.CAPITAL_INVESTMENT_ASSOCIATE_API, model).pipe(catchError((ex) => throwError(ex)));
   }
 
   public getCapitalActivity(){
-    return this.http.get<any>(this.CAPITAL_ACTIVITY_GET_API, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
+    return this.http.get<any>(APIConfig.CAPITAL_ACTIVITY_GET_API).pipe(catchError((ex) => throwError(ex)));
   }
 
   public getCapitalInvestment(capitalID?: number){
     if(!capitalID)
       capitalID = -1;
-    return this.http.get<any>(`${this.CAPITAL_INVESTMENT_GET_API}/?capitalID=${capitalID}`, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
+    return this.http.get<any>(`${APIConfig.CAPITAL_INVESTMENT_GET_API}/?capitalID=${capitalID}`).pipe(catchError((ex) => throwError(ex)));
   }
 
   public getCapitalRefData(){
-    return this.http.get<any>(this.CAPITAL_ACTIVITY_GET_REF_API, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
+    return this.http.get<any>(APIConfig.CAPITAL_ACTIVITY_GET_REF_API).pipe(catchError((ex) => throwError(ex)));
   }
 }

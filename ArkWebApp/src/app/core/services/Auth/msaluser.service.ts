@@ -1,27 +1,34 @@
 import { Injectable } from '@angular/core';  
-import * as Msal from 'msal';  
+// import * as Msal from 'msal';  
 import { environment } from 'src/environments/environment';  
 import { Observable } from 'rxjs';  
+import { MsalService } from '@azure/msal-angular';
   
 @Injectable()  
 export class MsalUserService {  
-    private accessToken: any;  
-    public clientApplication: Msal.UserAgentApplication = null;  
-    constructor() {  
-        this.clientApplication = new Msal.UserAgentApplication(  
-            environment.uiClienId,   
-            'https://login.microsoftonline.com/' + environment.tenantId,  
-            this.authCallback,  
-            {  
-                storeAuthStateInCookie: true,  
-                //cacheLocation: 'localStorage' ,  
-            });  
+    public accessToken: any;  
+    // public clientApplication: Msal.UserAgentApplication = null;  
+    constructor(
+        public msalSvc: MsalService
+    ) {  
+        this.getAuthDetails();  
     }  
   
+    public getAuthDetails() {
+        // this.clientApplication = new Msal.UserAgentApplication(
+        //     environment.uiClienId,
+        //     'https://login.microsoftonline.com/' + environment.tenantId,
+        //     this.authCallback,
+        //     {
+        //         storeAuthStateInCookie: true,
+        //     });
+
+    }
+
     public GetAccessToken(): Observable<any> {  
-        if (sessionStorage.getItem('msal.idtoken') !== undefined && sessionStorage.getItem('msal.idtoken') != null) {  
-            this.accessToken = sessionStorage.getItem('msal.idtoken');  
-        }  
+        // if (sessionStorage.getItem('msal.idtoken') !== undefined && sessionStorage.getItem('msal.idtoken') != null) {  
+        //     this.accessToken = sessionStorage.getItem('msal.idtoken');  
+        // }  
         return this.accessToken;  
     }  
   
@@ -33,17 +40,15 @@ export class MsalUserService {
         }  
     }  
   
-    public getCurrentUserInfo():Msal.User  {  
-        const user = this.clientApplication.getUser();  
-        return user; 
+    public getCurrentUserInfo()  {  
+        return this.msalSvc.instance.getActiveAccount();
     }
-    
+
     public  getUserName():string {  
-        const user = this.clientApplication.getUser();  
-        return user.name;
+        return this.msalSvc.instance.getActiveAccount()?.name;
     }
 
     public logout() {  
-        this.clientApplication.logout();  
+        this.msalSvc.logout();
       }  
 }  
