@@ -1,0 +1,29 @@
+<h3>Detailed View</h3>
+
+<div class="content">
+    <ng-container *ngIf="rowData?.length > 0 && !failureMsg">
+        <ag-grid-angular
+        [gridOptions]="gridOptions"
+        [defaultColDef]="defaultColDef"
+        [modules]="agGridModules"
+        [rowData]="rowData"
+        [sideBar]="'columns'"
+        class="ag-theme-alpine ag-grid"
+        (gridReady)="onGridReady($event)"
+        >
+        </ag-grid-angular>
+    </ng-container>
+    
+    <p *ngIf="!!failureMsg" class="no-content">
+        {{ failureMsg }}
+    </p>
+    
+    <p *ngIf="rowData?.length === 0 && !failureMsg" class="no-content">
+        No detailed view
+    </p>
+
+</div>
+
+<mat-dialog-actions align="end">
+    <button type="button" mat-raised-button (click)="onClose()">Close</button>
+</mat-dialog-actions>

@@ -3,13 +3,19 @@
     font-size: 14px;
     display: flex;
     justify-content: space-between;
-    max-width: 500px;
+    height: 100%
 }
 
-.edit{
-    width: 250px;
-    margin-right: 17px;
+.input-field > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
+
+// .edit{
+//     width: 250px;
+//     margin-right: 17px;
+// }
   
 .edit .mat-form-field-wrapper{
     padding: 10px;
@@ -41,15 +47,6 @@
     padding: 5px;
 }
 
-.last-col{
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-}
-
-.main-content{
-    min-height: 325px;
-}
 .mat-option{
     font-size: 13px !important;
 }

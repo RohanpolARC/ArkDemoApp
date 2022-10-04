@@ -1,18 +1,12 @@
 import { Component } from '@angular/core';  
 import { DataService } from './core/services/data.service';  
 import { HttpClient } from '@angular/common/http';
-import {MatDialog} from '@angular/material/dialog';
-import { MatIconRegistry } from '@angular/material/icon';
-import * as moment from 'moment';
-import { FacilityDetailsFilter, FilterPane } from './shared/models/FilterPaneModel';
+import { MatDialog } from '@angular/material/dialog';
 import { Location } from '@angular/common';
-import {FormGroup, FormControl} from '@angular/forms';
-import { AsOfDateRange } from './shared/models/FilterPaneModel';
 import { AccessService } from './core/services/Auth/access.service';
 import { Router } from '@angular/router';
-import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Subscription } from 'rxjs';
-import { FacilityDetailService } from './core/services/FacilityDetails/facility-detail.service';
+import { MsalUserService } from './core/services/Auth/msaluser.service';
 
 @Component({  
   selector: 'app-root',  
@@ -21,29 +15,10 @@ import { FacilityDetailService } from './core/services/FacilityDetails/facility-
 })  
 export class AppComponent {  
   title = 'ARK';  
-
   subscriptions: Subscription[] = [];
-
   public userName:string;
   public rightSidebarOpened:boolean=false;
   public leftSIdebarOpened:boolean=false;
-
-  //Filter Pane 
-  searchDate: Date = null;
-  filterPane:FilterPane = {
-    AsOfDateRange: false,
-    Funds: false,
-    FacilityDetails: false
-  };
-
-  searchDateRange = new FormGroup({
-    start: new FormControl(),
-    end: new FormControl(),
-  });
-
-  range:AsOfDateRange = null;
-  asOfDate: string = null;
-  facilityFilter: FacilityDetailsFilter = <FacilityDetailsFilter>{};
 
   notSelectedElement = {
 
@@ -67,170 +42,189 @@ export class AppComponent {
   CashBalanceStyle: any = {};
   CapitalActivityStyle: any = {};
   FacilityDetailStyle: any = {};
+  LiquiditySummaryStyle: any = {};
+  AccessControlStyle: any = {};
+  PortfolioModellerStyle: any = {};
+  PortfolioMappingStyle: any = {};
+  UnfundedAssetsStyle: any = {};
+  ContractHistoryStyle: any = {};
+  FeeCalculationStyle: any = {}
+
+  funds
+  fundHedgings
+  entities
 
   constructor(private http: HttpClient,
     private dataService: DataService,
     public dialog: MatDialog,
-    iconRegistry:MatIconRegistry, 
     public location:Location,
     public accessService: AccessService,
     private router:Router,
-    private facilityDetailSvc: FacilityDetailService) {
+    private msalSvc: MsalUserService
+  ) {}   
 
-}   
-
-get getAccessibleTabs(){
-  return this.accessService.accessibleTabs;
-}
-
-getLastBusinessDay(){
-  let workday = moment();
-  let day = workday.day();
-  let diff = 1;  // returns yesterday
-  if (day == 0 || day == 1){  // is Sunday or Monday
-    diff = day + 2;  // returns Friday
+  get getAccessibleTabs(){
+    return this.accessService.accessibleTabs;
   }
-  return workday.subtract(diff, 'days').toDate();
-}
 
-  async fetchTabs(){
-    this.accessService.accessibleTabs = await this.accessService.getTabs();
-    this.router.navigate([this.lastClickedTabRoute]);
+  fetchTabs(){
+    if(!this.accessService.accessibleTabs){
+      this.subscriptions.push(this.accessService.getTabs().subscribe({
+        next: tabs => {
+          this.accessService.accessibleTabs = tabs;
+          this.router.navigate([this.lastClickedTabRoute]);
+        },
+        error: error => {
+          console.error("Failed to fetch accessible tabs " + error);
+        }
+      }))  
+    }    
   }
 
   lastClickedTabRoute: string = '/accessibility';
 
-  selectedFunds = [];
-  fundsDropdown = [];
-  fundDropdownSettings: IDropdownSettings = {};
+  filterApply(){
 
-  fetchFacilityFunds(){
-    this.subscriptions.push(this.facilityDetailSvc.getFacilityFunds().subscribe({
-      next: funds => {
-        this.fundsDropdown = this.selectedFunds = funds;
-
-          /**  Fetching details after getting funds*/
-        this.setFacilityFilter()
-      },
-      error: error => {
-        console.error("Failed to get funds for filtering");
-      }
-    }))
+    setTimeout(() => {
+      this.dataService.changeFilterApplyBtnState(true)
+      this.rightSidebarOpened = false
+    }, 250)
   }
 
-  filterApply(){
-    if(this.location.path() === '/facility-detail'){
-      // this.dataService.changeSearchFunds(this.selectedFunds)
-
-      this.setFacilityFilter();
-    }
-    this.rightSidebarOpened = false
+  showUserRoles(){
+    alert(`Your role(s) : ${this.msalSvc.getCurrentUserInfo().idToken['roles']}`)
   }
 
   ngOnInit(): void { 
+
     this.lastClickedTabRoute = this.location.path();
     this.fetchTabs();
     this.userName=this.dataService.getCurrentUserName();
 
-      /** On Initial Load */
+      /** On Initial Load (If screen is directly loaded from the url)*/
       /** If Cash Balance screen is directly loaded */
     if(this.location.path() === '/cash-balance'){
       this.updateSelection('Cash Balance')
     }
-      /** If GIR Editor screen is directly loaded */
     else if(this.location.path() === '/portfolio-history'){
-      this.updateSelection('Portfolio')
+      this.updateSelection('GIREditor')
     }
-      /** If Capital Activity is directly loaded */
     else if(this.location.path() === '/capital-activity'){
       this.updateSelection('Capital Activity')
     }
-      /** If Facility Details is directly loaded */
     else if(this.location.path() === '/facility-detail'){
       this.updateSelection('Facility Detail')
     }
+    else if(this.location.path() === '/liquidity-summary'){
+      this.updateSelection('Liquidity Summary')
+    }
+    else if(this.location.path() === '/access-control'){
+      this.updateSelection('Access Control')
+    }
+    else if(this.location.path() === '/irr/portfoliomodeller'){
+      this.updateSelection('Portfolio Modeller')
+    }
+    else if(this.location.path() === '/portfolio-mapping'){
+      this.updateSelection('Portfolio Mapping')
+    }
+    else if(this.location.path() === '/unfunded-assets'){
+      this.updateSelection('Unfunded Assets')
+    }
+    else if(this.location.path() === '/contract-history'){
+      this.updateSelection('Contract History')
+    }
+    else if(this.location.path() === '/fee-calculation'){
+      this.updateSelection('Fee Calculation')
+    }
     else this.updateSelection('')
-  }  
+  }
 
   logout(){  
     this.dataService.logout();  
   }  
 
-  getSearchDateRange(){
-
-    this.range.start = moment(this.searchDateRange.get('start').value).format("YYYY-MM-DD");
-    this.range.end = moment(this.searchDateRange.get('end').value).format("YYYY-MM-DD");
-
-    if(this.range.end === 'Invalid date')
-      this.range.end = this.range.start;
-
-    this.searchDateRange.setValue({
-      start: this.range.start, 
-      end: this.range.end,
-    })
-    
-    this.dataService.changeSearchDate(this.range);
-  }
-
-  setFacilityFilter(){
-    this.facilityFilter.asOfDate = moment(this.asOfDate).format('YYYY-MM-DD');
-    this.facilityFilter.funds = this.selectedFunds;
-
-    this.dataService.changeFacilityFilter(this.facilityFilter);
-  }
-
   updateSelection(screen: string): void{
 
       /** On Subsequent Load (Dynamic) */
 
-    this.filterPane.AsOfDateRange = false;
-    this.filterPane.Funds = false;
-    this.filterPane.FacilityDetails = false;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.FeeCalculationStyle = this.notSelectedElement;
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.notSelectedElement;
     this.lastClickedTabRoute = this.location.path();
 
-    if(screen === 'Portfolio'){
+    if(screen === 'GIREditor'){
       this.GIREditorStyle = this.selectedElement;
+      this.router.navigate(['/portfolio-history']);
     }
     else if(screen === 'Cash Balance'){
-      this.filterPane.AsOfDateRange = true;
-      this.range = {
-        start: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
-        end: moment(this.getLastBusinessDay()).format('YYYY-MM-DD'),
-      }
-
-      this.searchDateRange.setValue({
-        start: this.range.start,
-        end: this.range.end,
-      })
-      this.getSearchDateRange();
       this.CashBalanceStyle = this.selectedElement;
+      this.router.navigate(['/cash-balance']);
     }
     else if(screen === 'Capital Activity'){
       this.CapitalActivityStyle = this.selectedElement;
+      this.router.navigate(['/capital-activity']);
     }
     else if(screen === 'Facility Detail'){
 
-      this.filterPane.FacilityDetails = true;
-      this.filterPane.Funds = true;
       this.FacilityDetailStyle = this.selectedElement
+      this.subscriptions.push(
+        this.dataService.getUniqueValuesForField('fund').subscribe({
+          next: (data: any[]) => {
+            this.funds = data.map(item => { return { fund: item.value, id: item.id } })
+        setTimeout(() => { this.filterApply() }, 250)
+      }}))
 
-      this.asOfDate = moment(this.getLastBusinessDay()).format('YYYY-MM-DD')
+      this.router.navigate(['/facility-detail'])
+    }
+    else if(screen === 'Contract History'){
 
-      this.fetchFacilityFunds();
+      this.ContractHistoryStyle = this.selectedElement;
+      this.subscriptions.push(
+        this.dataService.getUniqueValuesForField('fund').subscribe({
+          next: (data: any[]) => {
+            this.funds = data.map(item => { return { fund: item.value, id: item.id } })
+        setTimeout(() => { this.filterApply() }, 250)
+      }}))
 
-      this.fundDropdownSettings = {
-        singleSelection: false,
-        idField: 'id',
-        textField: 'fund',
-        selectAllText: 'Select All',
-        unSelectAllText: 'Unselect All',
-        itemsShowLimit: 2,
-        allowSearchFilter: true,
-        
-      };  
+      this.router.navigate(['/contract-history'])
+    }
+    else if(screen === 'Liquidity Summary'){
+      this.LiquiditySummaryStyle = this.selectedElement;
+      this.subscriptions.push(
+        this.dataService.getUniqueValuesForField('fundHedging').subscribe({
+          next: (data: any[]) => {
+            this.fundHedgings = data.map(item => { return { fundHedging: item.value, id: item.id } })
+        setTimeout(() => { this.filterApply() }, 250)
+      }}))
+
+      this.router.navigate(['/liquidity-summary'])
+    }
+    else if(screen === 'Fee Calculation'){
+      this.FeeCalculationStyle = this.selectedElement;
+      this.subscriptions.push(
+        this.dataService.getUniqueValuesForField('Fee-Calculation-Entities').subscribe({
+          next: (data: any[]) => {
+            this.entities = data.map(item => { return { entity: item.value, id: item.id } })
+        setTimeout(() => { this.filterApply() }, 250)
+          }
+        })
+      )
+      this.router.navigate(['/fee-calculation'])
+    }
+    else if(screen === 'Portfolio Modeller'){
+      this.PortfolioModellerStyle = this.selectedElement;
+      this.router.navigate(['/irr/portfoliomodeller'])
+    }
+    else if(screen === 'Portfolio Mapping'){
+      this.PortfolioMappingStyle = this.selectedElement
+      this.router.navigate(['/portfolio-mapping'])
+    }
+    else if(screen === 'Unfunded Assets'){
+      this.UnfundedAssetsStyle = this.selectedElement
+      this.router.navigate(['/unfunded-assets'])
+    }
+    else if(screen === 'Access Control'){
+      this.AccessControlStyle = this.selectedElement;
+      this.router.navigate(['/access-control'])
     }
   }
-
-} 
+}

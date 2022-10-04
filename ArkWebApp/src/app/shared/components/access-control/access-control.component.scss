@@ -1,0 +1,21 @@
+.parent{
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+}
+
+  .title {
+    padding: 0;
+    font-size: 1.6rem;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #1e2a46;
+  }
+
+  .header {
+    padding-left: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+  }

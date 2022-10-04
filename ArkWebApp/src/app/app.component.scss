@@ -79,7 +79,7 @@ min-width: 120px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-size: 16px;
   color:#102439;
-    }
+  }
 
 
   mat-expansion-panel{
@@ -103,7 +103,7 @@ min-width: 120px;
 
 .filter-btn-row{
   position: absolute;
-  top:5px;
+  top:8px;
   right:5px
 }
 
@@ -165,9 +165,9 @@ mat-list{
   margin-left: 10%;   //Sub header indentation
 }
 
-.dropdown{
+.filter-element{
   padding: 10px;
-  width: 100%
+  width: 100%;
 }
 
 .filter-options{
@@ -178,7 +178,20 @@ mat-list{
   min-width: 100% !important;  
 }
 
+/*
+    To remove extra bottom space from mat-form-field. By default, Ng material form fields puts some margin in the bottom for "consistent spacing". In order to remove this forced margin,
+    we supply -ve margin-bottom(i.e. -1.25em).
+
+    Reference: 
+          https://github.com/angular/components/issues/7975#issuecomment-359803149
+          https://stackoverflow.com/a/56514903/17121446
+*/
+.filter-options mat-form-field{
+  margin-bottom: -1.25em;
+  width: 90%;
+}
+
 #apply-button{
-  background: #0590ca;
+  background: #0288D1;
   color: #ffffff;
 }

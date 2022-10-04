@@ -1,0 +1,13 @@
+.ag-grid{
+  height: calc(100% - 40px);
+}
+
+.action{
+  margin-right: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 1em;
+  font-size: 0.9rem;  
+}

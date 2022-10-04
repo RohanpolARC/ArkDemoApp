@@ -42,7 +42,7 @@ export class PortfolioHistoryService {
       );
   }
 
-  public putAssetGIR(assetGIRModel:AssetGIRModel){
+  public putAssetGIR(models: AssetGIRModel[]){
 
     this.httpOptions = {  
       headers: new HttpHeaders({  
@@ -52,7 +52,7 @@ export class PortfolioHistoryService {
 
   };
 
-  return  this.http.post<any>(this.PORTFOLIO_HISTORY_PUT_API,assetGIRModel,this.httpOptions).pipe(
+  return  this.http.post<any>(this.PORTFOLIO_HISTORY_PUT_API ,models, this.httpOptions).pipe(
       catchError((ex) => throwError(ex))
       );
 

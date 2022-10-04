@@ -8,15 +8,13 @@ let actualCols: string[] = [
     'Fund Currency',
     'Position Currency',
     'GIR (Pos - Fund ccy)',
-    'Amount',
+    'GIR Override',
+    'Amount (in Fund Ccy)',
     'Capital Type',
     'Capital Subtype',
-    // 'Wso Issuer ID',
-    // 'Issuer Short Name(optional)',
     'Wso Asset ID',
     'Asset (optional)',
     'Narative (optional)',
-    // 'Action'
 ]
 
 let refOptions;
@@ -25,7 +23,7 @@ let invalidMsg: string = '';
 export function validateColumns(fileColumns: string[]): {isValid: boolean, col?: string} {
 
     for(let i: number = 0; i<fileColumns.length; i+=1){
-        if(actualCols.indexOf(fileColumns[i]) !== -1 || fileColumns[i] === '_COLUMN_TITLE')
+        if(actualCols.indexOf(fileColumns[i]) !== -1 || fileColumns[i] === '_ROW_ID')
             continue;
         else 
             return {isValid: false, col: fileColumns[i]};   // Invalid col found
@@ -44,7 +42,8 @@ export function validateRowForEmptiness(row: any): void{
             'Narative (optional)', 
             // 'Wso Issuer ID', 
             'Wso Asset ID',
-            'Fund Currency'
+            'Fund Currency',
+            'GIR Override'
         ].indexOf(actualCols[i]) === -1){
             invalidMsg += (invalidMsg === '') ? `${actualCols[i]} cannot be empty` :  `, ${actualCols[i]} cannot be empty`;
         }
@@ -52,6 +51,7 @@ export function validateRowForEmptiness(row: any): void{
 }
 
 export function validateRowValueRange(row: any): void{
+
     if(Number(new Date(moment(row['Cash Flow Date']).format('YYYY-MM-DD')).getFullYear) < 2012){
         invalidMsg += (invalidMsg === '') ? '' : ','
         invalidMsg += ` Cashflow date cannot be < 2012`
@@ -59,12 +59,12 @@ export function validateRowValueRange(row: any): void{
 
     if(Number(new Date(moment(row['Call Date']).format('YYYY-MM-DD')).getFullYear) < 2012){
         invalidMsg += (invalidMsg === '') ? '' : ','
-        invalidMsg += ` Calldate cannot be < 2021`
+        invalidMsg += ` Calldate cannot be < 2012`
     }
 
-    if(Number(row['Amount']) === 0){
+    if(Number(row['Amount (in Fund Ccy)']) === 0){
         invalidMsg += (invalidMsg === '') ? '' : ','
-        invalidMsg += ` Amount cannot be 0`
+        invalidMsg += ` Amount (in Fund Ccy) cannot be 0`
     }
 
     if(Number(row['GIR (Pos - Fund ccy)']) <= 0){
@@ -72,6 +72,11 @@ export function validateRowValueRange(row: any): void{
         invalidMsg += ` GIR should be > 0`
     }
         
+    if(!['Yes', 'No'].includes(String(row['GIR Override']))){
+        invalidMsg += (invalidMsg === '') ? '' : ','
+        invalidMsg += ` GIR Override can be either Yes/No`
+    }
+
     if(!!row['Fund Hedging'] && (refOptions.fundHedgings.indexOf(String(row['Fund Hedging']).trim()) === -1)){
         invalidMsg += (invalidMsg === '') ? '' : ','
         invalidMsg += ` Fund Hedging ${String(row['Fund Hedging'])} not in range`
@@ -80,7 +85,7 @@ export function validateRowValueRange(row: any): void{
 
     if(!!row['Fund Currency'] && (refOptions.fundCcys.indexOf(String(row['Fund Currency']).trim()) === -1)){
         invalidMsg += (invalidMsg === '') ? '' : ','
-        invalidMsg += ` Fund Currnecy ${String(row['Fund Currency'])} not in range`
+        invalidMsg += ` Fund Currency ${String(row['Fund Currency'])} not in range`
     }
 
     // Set(posCcy) = Set(fundCcy)
@@ -103,22 +108,8 @@ export function validateRowValueRange(row: any): void{
     if(!!row['Wso Asset ID'] && (refOptions.wsoAssetIDs.indexOf(parseInt(row['Wso Asset ID'])) === -1)){
         invalidMsg += (invalidMsg === '') ? '' : ','
         invalidMsg += ` Wso Asset ID '${String(row['Wso Asset ID'])}' doesn't exist.`
-    }
-
-    // Subtype is 'Investment', 'Income' && WsoIssuerID is null
-    
-    // if(!row['Wso Issuer ID']){
-    //     if(['Investment', 'Income'].indexOf(String(row['Capital Subtype']).trim()) !== -1){
-    //         return {
-    //             isValid: false,
-    //             remark: `Wso Issuer ID cannot be empty for subtype '${String(row['Capital Subtype'])}'`
-    //         };  
-    //     }
-    // }
-    
+    }    
 }
-
-
 
 export function validateRow(row: any):void {
     validateRowForEmptiness(row);
@@ -141,7 +132,7 @@ export function validateExcelRows(rows: any[], ref: {capitalTypes: string[], cap
             invalidRows.push({row: rows[i], remark: invalidMsg});
     }
     
-    if(invalidRows === [])
+    if(invalidRows.length === 0)
         return {
             isValid: true
         }

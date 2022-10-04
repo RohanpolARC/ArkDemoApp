@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FacilityDetailComponent } from './facility-detail.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';  
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MatCardModule } from '@angular/material/card';
@@ -20,20 +19,26 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { InputDateAdapter } from 'src/app/shared/providers/date-adapter';
 import { Platform } from '@angular/cdk/platform';
 import { DateAdapter } from '@angular/material/core';
+import { CheckboxEditorComponent } from 'src/app/shared/components/checkbox-editor/checkbox-editor.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { FacilityDetailRoutingModule } from './facility-detail-routing.module';
 
 @NgModule({
   declarations: [
     FacilityDetailComponent,
     ActionCellRendererComponent,
-    AggridMaterialDatepickerComponent
+    AggridMaterialDatepickerComponent,
+    CheckboxEditorComponent
   ],
   imports: [    
-    BrowserAnimationsModule,
     CommonModule,
+    FacilityDetailRoutingModule,
+
     AdaptableAngularAgGridModule,
     AgGridModule.withComponents([
       ActionCellRendererComponent,
-      AggridMaterialDatepickerComponent
+      AggridMaterialDatepickerComponent,
+      CheckboxEditorComponent
     ]),
     MatCardModule,
     MatIconModule,
@@ -45,7 +50,8 @@ import { DateAdapter } from '@angular/material/core';
     MatButtonModule,
     FormsModule,
     MatTooltipModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatCheckboxModule
   ],
   providers: [
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  

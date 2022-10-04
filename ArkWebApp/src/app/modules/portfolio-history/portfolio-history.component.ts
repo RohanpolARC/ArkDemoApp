@@ -1,15 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import {
   ColDef,
-  GridApi,
   GridOptions,
   Module,
 } from '@ag-grid-community/all-modules';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
-import { HttpClient } from '@angular/common/http';
-import {Observable, Subscription} from 'rxjs';
-import * as moment from 'moment'
+import { Subscription} from 'rxjs';
 import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
 import { MenuModule } from '@ag-grid-enterprise/menu';
 import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
@@ -24,18 +21,20 @@ import {DataService} from '../../core/services/data.service'
 import {BtnCellRenderer} from './btn-cell-renderer.component'
 import {PortfolioHistoryService} from '../../core/services/PortfolioHistory/portfolio-history.service'
 
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {MatDialog } from '@angular/material/dialog';
 import {DialogDeleteComponent} from './dialog-delete/dialog-delete.component';
 
 import { ExcelExportModule } from "@ag-grid-enterprise/excel-export";
 import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
+import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 
 let adapTableApi: AdaptableApi;
 
 @Component({
   selector: 'app-portfolio-history',
   templateUrl: './portfolio-history.component.html',
-  styleUrls: ['./portfolio-history.component.scss']
+  styleUrls: ['../../shared/styles/grid-page.layout.scss', './portfolio-history.component.scss']
 })
 
 
@@ -43,7 +42,17 @@ export class PortfolioHistoryComponent implements OnInit {
 
   rowData: any[];
 
-  modules: Module[] = [ClientSideRowModelModule,RowGroupingModule,ColumnsToolPanelModule,MenuModule,SetFilterModule, ExcelExportModule];
+  modules: Module[] = [    
+    ClientSideRowModelModule,
+    RowGroupingModule,
+    SetFilterModule,
+    ColumnsToolPanelModule,
+    MenuModule,
+    ExcelExportModule,
+    FiltersToolPanelModule,
+    ClipboardModule,
+    SideBarModule,
+    RangeSelectionModule ];
 
   public gridOptions: GridOptions;
   public getRowNodeId;
@@ -55,21 +64,18 @@ export class PortfolioHistoryComponent implements OnInit {
   public frameworkComponents;
   public autoGroupColumnDef;
 
-  private gridApi;
-  private gridColumnApi;
-
   public subscriptions: Subscription[] = [];
 
-  columnDefs = [
+  columnDefs:ColDef[] = [
   { headerName:"Position Id",field: 'positionId',hide: true, type:'abColDefNumber' },
   { headerName:"Asset Id",field: 'assetId',hide: true, type:'abColDefNumber'},
   { headerName:"Issuer Short Name",field: 'issuerShortName',enableValue: true, type:'abColDefString' },
   { headerName:"Asset",field: 'asset',enableValue: true, type:'abColDefString' },
-  { headerName:"Fund",field: 'fund',  autosize:true, type:'abColDefString' },
+  { headerName:"Fund",field: 'fund', type:'abColDefString' },
   { headerName:"Fund Hedging",field: 'fundHedging', type:'abColDefString' },
   { headerName:"Fund Ccy", field: 'fundCcy', type:'abColDefString' },
   { headerName:"As Of Date", field: 'asOfDate',  valueFormatter: dateFormatter,hide: true, type:'abColDefDate' },
-  { headerName:"Trade Date",field: 'tradeDate', rowGroup: true, SortOrder: 'Desc', hide: true, valueFormatter: dateFormatter, type:'abColDefDate' },
+  { headerName:"Trade Date",field: 'tradeDate', rowGroup: true, hide: true, valueFormatter: dateFormatter, type:'abColDefDate' },
   { headerName:"Type", field: 'typeDesc', type:'abColDefString'},
   { headerName:"Settle Date",field: 'settleDate',  valueFormatter: dateFormatter, type:'abColDefDate' },
   { headerName:"Position Ccy",field: 'positionCcy', type:'abColDefString'},
@@ -88,17 +94,20 @@ export class PortfolioHistoryComponent implements OnInit {
     cellRenderer: 'btnCellRenderer',
     pinned: 'right',
     width: 40,
-    autoSize:true,
     type:'abColDefObject'
   },
   { headerName: "GIR Edited", field:'isEdited', type:'abColDefBoolean'},
+  { headerName: 'GIR Override', field: 'isOverride', type: 'abColDefBoolean' },
+  { headerName: 'GIR Source', field: 'girSource', type: 'abColDfString' },
+  { headerName: 'GIR SourceID', field: 'girSourceID', type: 'abColDefNumber' },
   { field:'uniqueID', type:'abColDefNumber'},
+  { field: 'pgh_FXRateBaseEffective', headerName: 'Par History GIR'}
 ];
 
-
-
-  constructor(private http: HttpClient,private portfolioHistoryService: PortfolioHistoryService,public dialog: MatDialog, private dataService: DataService) { 
-
+  constructor(
+    private portfolioHistoryService: PortfolioHistoryService,
+    public dialog: MatDialog, 
+    private dataSvc: DataService) {
 
     this.gridOptions = {
       enableRangeSelection: true,
@@ -115,22 +124,19 @@ export class PortfolioHistoryComponent implements OnInit {
         AdaptableToolPanel: AdaptableToolPanelAgGridComponent
       },
       columnDefs: this.columnDefs,
-      allowContextMenuWithControlKey:true
-      
-    //  rowData: this.rowData,
-     // onGridReady: this.onGridReady,
+      allowContextMenuWithControlKey: true,
+      context: {
+        adaptableApi: adapTableApi
+      }      
     };
 
     this.defaultColDef = {
-      // flex: 1,
-      // minWidth: 100,
       resizable: true,
       enableValue: true,
       enableRowGroup: true,
       enablePivot: true,
       sortable: true,
-      filter: true,
-      autosize:true
+      filter: true
     };
 
     this.autoGroupColumnDef = {
@@ -139,13 +145,9 @@ export class PortfolioHistoryComponent implements OnInit {
     };
 
     this.sideBar = 'columns';
-
-    //this.getRowNodeId = data => data.id;
-
     this.frameworkComponents = {
       btnCellRenderer: BtnCellRenderer
     }
-
     this.rowGroupPanelShow = 'always';
 
 
@@ -153,7 +155,6 @@ export class PortfolioHistoryComponent implements OnInit {
 
 
   ngOnInit(): void {
-//    localStorage.clear();
     this.subscriptions.push(this.portfolioHistoryService.getPortfolioHistory().subscribe({
       next: data => {
         this.rowData = data;
@@ -162,26 +163,29 @@ export class PortfolioHistoryComponent implements OnInit {
         console.error("Error in fetching the data: " + error);
       }
     }));
-    //this.rowData = this.portfolioHistoryService.getPortfolioHistory();
-
   }
 
   ngOnDestroy(): void{
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
+
   public adaptableOptions: AdaptableOptions = {
     primaryKey: "uniqueID",
-    userName: "TestUser",
-    adaptableId: "",
+    userName: this.dataSvc.getCurrentUserName(),
+    adaptableId: "Portfolio History",
     adaptableStateKey: `Portfolio State Key`,
 
     layoutOptions: {
       autoSaveLayouts: true,
     },
-    // userInterfaceOptions: {
-    //   showAdaptableToolPanel: true
-    // }
+
+    teamSharingOptions: {
+      enableTeamSharing: true,
+      setSharedEntities: setSharedEntities.bind(this),
+      getSharedEntities: getSharedEntities.bind(this)
+    },
+
     userInterfaceOptions:{
       actionColumns:[
         {
@@ -192,13 +196,14 @@ export class PortfolioHistoryComponent implements OnInit {
               context: ActionColumnButtonContext
             ) => {
 
-              let confirmDelete:boolean = false;
               let dialogRef = this.dialog.open(DialogDeleteComponent,{
                 data: {
                   rowData: context.rowNode?.data,
                   adapTableApi: adapTableApi
                 }});
               this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
+                if(dialogRef.componentInstance.isSuccess)
+                  this.gridOptions.api?.refreshCells({ force: true, rowNodes: [context.rowNode], columns: ['fxRateBaseEffective', 'isEdited', 'modifiedOn', 'modifiedBy'] })
               }));
             },
             icon:{
@@ -229,9 +234,13 @@ export class PortfolioHistoryComponent implements OnInit {
 
     predefinedConfig: {
       Dashboard: {
-        ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
+        ModuleButtons: ['TeamSharing','Export', 'Layout','ConditionalStyle'],
         IsCollapsed: true,
-        Tabs: [],
+        Tabs: [{
+          Name:'Layout',
+          Toolbars: ['Layout'],
+        }],
+        DashboardTitle: ' '
       },
       Filter:{
         ColumnFilters: [{
@@ -292,12 +301,10 @@ export class PortfolioHistoryComponent implements OnInit {
             ActionDelete: 'right',
           },
           RowGroupedColumns: ['tradeDate'],
-          
           ColumnWidthMap:{
             ActionDelete: 50,
           },
-          
-
+        
           ColumnSorts: [
             {
               ColumnId: 'tradeDate',
@@ -312,9 +319,6 @@ export class PortfolioHistoryComponent implements OnInit {
   }
     
   onGridReady(params) {
-    this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-
   }
 
   onAdaptableReady(
@@ -327,11 +331,8 @@ export class PortfolioHistoryComponent implements OnInit {
     }
   ) {
     adapTableApi = adaptableApi;
-    adaptableApi.eventApi.on('SelectionChanged', selection => {
-      // do stuff
-    });
-
-/* Close right sidebar toolpanel by default */
+    
+    /* Close right sidebar toolpanel by default */
     adaptableApi.toolPanelApi.closeAdapTableToolPanel();
   }
 

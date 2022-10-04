@@ -1,0 +1,73 @@
+.mat-slide-toggle-content{
+    vertical-align: top;
+    display: inline-block;
+    line-height: 24px; // this is defined in .mat-slide-toggle
+}
+
+.form-field{
+    width: 30%;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    gap: 0.8em; // Gap between two rows
+}
+
+.row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.text{
+    padding: 0 1em 0 1em;
+}
+/*
+    Removes extra default margin-bottom provided by angular by default
+*/
+mat-form-field{
+    margin-bottom: -1.25em;
+}
+
+.success-msg{
+    color: rgb(8, 204, 90);
+    padding: 5px
+}
+
+.failure-msg{
+    color: red;
+    padding: 5px;
+}
+
+.end-button{
+    display: flex;
+    justify-content: flex-start;
+}
+
+.elements-list{
+    width: 100%;
+}
+
+.action-btn{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.sub-cont{
+    width: 100%;
+    display: flex;
+    justify-content: left;
+}
+
+.sub-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-left {
+    padding-left: 2em;
+}

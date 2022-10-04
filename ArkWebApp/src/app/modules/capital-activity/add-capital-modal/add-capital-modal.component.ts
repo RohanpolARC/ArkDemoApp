@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewChild } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, Output } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CapitalActivityModel } from 'src/app/shared/models/CapitalActivityModel';
@@ -7,13 +7,14 @@ import { Subscription } from 'rxjs';
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import * as moment from 'moment';
 import { UpdateConfirmComponent } from '../update-confirm/update-confirm.component';
-import {Observable} from 'rxjs';
-import {startWith, map} from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { startWith, map, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { ColDef } from '@ag-grid-community/core';
+import { ColDef, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 
-import { dateFormatter, dateTimeFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
 import { LinkInvestorModalComponent } from '../link-investor-modal/link-investor-modal.component';
+import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 
 @Component({
   selector: 'app-add-capital-modal',
@@ -41,8 +42,8 @@ export class AddCapitalModalComponent implements OnInit{
   header: string;
   buttontext: string;
 
-  isSuccessMsgAvailable: boolean;
-  isFailureMsgAvailable: boolean;
+  isSuccess: boolean;
+  isFailure: boolean;
   updateMsg:string;
   disableSubmit: boolean = true;
   valueErrorMessage: string = null;
@@ -65,7 +66,14 @@ export class AddCapitalModalComponent implements OnInit{
   
   placeHolderGIR: string = null;
 
-  isFormPurelyNotValid: boolean = true; // To be sent to link investor component.
+  isFormPurelyNotValid: {
+    disable: boolean
+  } = {
+    disable: true
+  }; // To be sent to link investor component.
+  isAlreadyLinked: boolean = null;
+  linkStatus
+  fxRateSource: string;
 
   validateField(options: string[], control: AbstractControl, field: string): string | null{
       //  Validates individual fields and returns fetched value if it's an allowed value.
@@ -101,6 +109,9 @@ export class AddCapitalModalComponent implements OnInit{
 
     let totalAmount: number = control.get('totalAmount').value;
     let fxRate: number  = control.get('fxRate').value;
+    
+    // fxRateOverride will be always valid since it can be either true/false (checked/unchecked). So, not considering it here.
+
     let localAmount: number = control.get('localAmount').value;
 
     let CD: boolean = (callDate !== null && callDate !== 'Invalid date')
@@ -111,6 +122,10 @@ export class AddCapitalModalComponent implements OnInit{
     let CCY: boolean = (currency !== null && currency !== '')
     let TA: boolean = (totalAmount !== null) 
 
+    let ISN_AS_NR = !control.get('issuerShortName')?.errors?.['invalid']
+                  && !control.get('asset')?.errors?.['invalid']
+                  && !control.get('narrative')?.errors?.['invalid']
+
     let ISN: boolean = (issuerShortName !== null && issuerShortName !== '');
     let AS: boolean = (asset !== null && asset !== '');
     let NR: boolean = (narrative !== null && narrative !== '');
@@ -120,13 +135,13 @@ export class AddCapitalModalComponent implements OnInit{
     let LA: boolean = (localAmount !== null)
 
     if(this.data.actionType === 'LINK-ADD')
-      return ((CD && VD && FH && CT && CST && CCY && TA && ((ISN && AS)|| NR || ISN) && FX && LA)) ? { 
+      return ((CD && VD && FH && CT && CST && CCY && TA && (((ISN && AS)|| NR || ISN) && ISN_AS_NR) && FX && LA)) ? { 
         validated : true 
       }: { 
         validated : false
       };
     else if(this.data.actionType === 'ADD' || this.data.actionType === 'EDIT')
-      return (CD && VD && FH && CT && CST && CCY && TA && POSCcy && ((ISN && AS)|| NR || ISN)) ? { 
+      return (CD && VD && FH && CT && CST && CCY && TA && POSCcy && (((ISN && AS)|| NR || ISN) && ISN_AS_NR)) ? { 
         validated : true 
       }: { 
         validated : false
@@ -152,6 +167,7 @@ export class AddCapitalModalComponent implements OnInit{
 
     localAmount: new FormControl(null, Validators.required),
     fxRate: new FormControl(null, Validators.required),
+    fxRateOverride: new FormControl(null, Validators.required),
     posCcy: new FormControl(null, Validators.required),
   },{
     validators: this.capitalValidator
@@ -159,7 +175,16 @@ export class AddCapitalModalComponent implements OnInit{
   );
 
   constructor(public dialogRef: MatDialogRef<AddCapitalModalComponent>, 
-    @Inject(MAT_DIALOG_DATA) public data: any,
+    @Inject(MAT_DIALOG_DATA) public data: {
+      rowData : any,
+      adapTableApi: AdaptableApi,
+      adapTableApiInvstmnt: AdaptableApi,
+      actionType: string,
+      capitalTypes: string[],
+      capitalSubTypes: string[],
+      refData: any,
+      gridData: any
+    },
     public dialog: MatDialog,
     private capitalActivityService: CapitalActivityService, 
     private msalService: MsalUserService) { }
@@ -168,9 +193,11 @@ export class AddCapitalModalComponent implements OnInit{
     this.netISS = [];
     let seen = new Map();
     for(let i = 0; i < issuers.length; i+= 1){
-      if(seen.has(issuers[i]) === null || seen.has(issuers[i]) === false){
-        seen.set(issuers[i],true)
-        this.netISS.push([issuers[i], issuerSN[i], issuerIDs[i]])
+      if(!!issuers[i] && !!issuerSN[i] && !!issuerIDs[i]){
+        if(seen.has(issuers[i]) === null || seen.has(issuers[i]) === false){
+          seen.set(issuers[i],true)
+          this.netISS.push([issuers[i], issuerSN[i], issuerIDs[i]])
+        }  
       }
     }
   }
@@ -179,15 +206,13 @@ export class AddCapitalModalComponent implements OnInit{
     this.netAssets = [];
     let seen = new Map();
     for(let i: number = 0; i<assets.length; i+=1){
-      if(!seen.has(assets[i])){
-        seen.set(assets[i], true);
-        this.netAssets.push([assets[i], assetIDs[i]])
+      if(!!assets[i] && !!assetIDs[i]){
+        if(!seen.has(assets[i])){
+          seen.set(assets[i], true);
+          this.netAssets.push([assets[i], assetIDs[i]])
+        }  
       }
     }    
-  }
-
-  setDynamicOptions_(FH?: string, IssuerSN?: string, Asset?: string): void{
-    // if(FH)
   }
 
   setDynamicOptions(FH?: string, IssuerSN?: string, Asset?: string): void {
@@ -251,11 +276,15 @@ export class AddCapitalModalComponent implements OnInit{
          */
   
       for(let i = 0; i < this.data.refData.length; i+= 1){
-        this.issuerOptions.push(this.data.refData[i].issuer);
-        this.issuerSNOptions.push(this.data.refData[i].issuerShortName)
-        this.wsoIssuerIDOptions.push(this.data.refData[i].wsoIssuerID)
-        this.assetOptions.push(this.data.refData[i].asset);
-        this.assetIDOptions.push(<number>this.data.refData[i].wsoAssetID);
+        if(!!this.data.refData[i].issuer){
+          this.issuerOptions.push(this.data.refData[i].issuer);
+          this.issuerSNOptions.push(this.data.refData[i].issuerShortName)
+          this.wsoIssuerIDOptions.push(this.data.refData[i].wsoIssuerID)
+        }
+        if(!!this.data.refData[i].asset){
+          this.assetOptions.push(this.data.refData[i].asset);
+          this.assetIDOptions.push(<number>this.data.refData[i].wsoAssetID);  
+        }
       }
 
       // this.assetOptions = [...new Set(this.assetOptions)] 
@@ -342,24 +371,51 @@ export class AddCapitalModalComponent implements OnInit{
 
   changeListeners(): void{
 
-    /** For LINK-ADD, update Total Amount, based on changes in FX RATE, LOCAL AMOUNT */
-    if(this.data.actionType === 'LINK-ADD'){
-      this.capitalActivityForm.get('localAmount').valueChanges.subscribe(LA => {
-        this.capitalActivityForm.patchValue({
-          totalAmount: LA * this.capitalActivityForm.get('fxRate').value
-        })
-      })
+    this.subscriptions.push(this.capitalActivityForm.get('fxRate').valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(GIR => {
 
-      this.capitalActivityForm.get('fxRate').valueChanges.subscribe(GIR => {
+      if(this.data?.rowData?.fxRate === GIR && this.capitalActivityForm.get('fxRateOverride').value){      // Old GIR != new GIR and Overide
+        this.fxRateSource = this.data?.rowData?.fxRateSource      
+      }
+      else this.fxRateSource = 'CapitalActivity';
+
+      if(this.data.actionType === 'LINK-ADD'){
         this.capitalActivityForm.patchValue({
           totalAmount: GIR * this.capitalActivityForm.get('localAmount').value
         })
-      })
+      }
+    }))
+
+    this.subscriptions.push(this.capitalActivityForm.get('fxRateOverride').valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(fxRateOverride => {
+      if(fxRateOverride && this.capitalActivityForm.get('fxRate').value === this.data?.rowData?.fxRate){
+        this.fxRateSource = this.data?.rowData?.fxRateSource;
+      }
+      else if(fxRateOverride && this.capitalActivityForm.get('fxRate').value !== this.data?.rowData?.fxRate)
+        this.fxRateSource = 'CapitalActivity';
+    }))
+
+    /** For LINK-ADD, update Total Amount, based on changes in FX RATE, LOCAL AMOUNT */
+    if(this.data.actionType === 'LINK-ADD'){
+
+      this.subscriptions.push(this.dialogRef.beforeClosed().subscribe(() => {
+        this.closePopUp();
+      }))
+      
+      this.subscriptions.push(this.capitalActivityForm.get('localAmount').valueChanges.subscribe(LA => {
+        this.capitalActivityForm.patchValue({
+          totalAmount: LA * this.capitalActivityForm.get('fxRate').value
+        })
+      }))
     }
 
     /** _ since statusChanges returns INVALID form even when it is valid. Hence, using custom cross field validator: `capitalValidator` */
 
-    this.capitalActivityForm.statusChanges.subscribe(_ => {
+    this.subscriptions.push(this.capitalActivityForm.statusChanges.subscribe(_ => {
 
       if(this.data.actionType === 'LINK-ADD'){
         this.placeHolderGIR = `${this.data.rowData[0].positionCcy} -> ${this.capitalActivityForm.get('fundCcy').value}`;
@@ -371,15 +427,17 @@ export class AddCapitalModalComponent implements OnInit{
           this.placeHolderGIR = 'Pos ccy -> Fund ccy'
       }
 
-      this.isFormPurelyNotValid = !this.capitalActivityForm.errors?.['validated']
 
       if(this.capitalActivityForm.errors?.['validated'] && this.capitalActivityForm.touched)
         this.disableSubmit = false;
       else if(!this.capitalActivityForm.errors?.['validated'])
         this.disableSubmit = true;
-    })
 
+      this.isFormPurelyNotValid = {
+        disable: !this.capitalActivityForm.errors?.['validated']
+      }
 
+    }))
 
     /** Listening for changing the autocomplete options, based on search */
     
@@ -419,22 +477,46 @@ export class AddCapitalModalComponent implements OnInit{
     )
   }
 
-  linkColumnDefs: ColDef[] = [
-    {field: 'positionID', headerName: 'Position ID'},
-    {field: 'amount', headerName: 'Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell'},
-    {field: 'positionCcy', headerName: 'Position Ccy'},
-    {field: 'portfolio', headerName: 'Portfolio'},
-    {field: 'issuerShortName', headerName: 'Issuer'},
-    {field: 'asset', headerName: 'Asset'},
+  columnDefs: ColDef[] = [
+    {field: 'positionID', headerName: 'Position ID', tooltipField: 'positionID'},
+    {field: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter, tooltipField: 'cashDate'},
+    {field: 'type', headerName: 'Type', tooltipField: 'type'},
+    {field: 'amount', headerName: 'Total', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'amount'},
+    {field: 'totalBase', headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'totalBase'},
+    {field: 'linkedAmount', headerName: 'Linked Amount Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'linkedAmount'},
+    {field: 'positionCcy', headerName: 'Position Ccy', tooltipField: 'positionCcy'},
+    {field: 'portfolio', headerName: 'Portfolio', tooltipField: 'portfolio'},
+    {field: 'issuerShortName', headerName: 'Issuer', tooltipField: 'issuerShortName'},
+    {field: 'asset', headerName: 'Asset', tooltipField: 'asset'},
   ]
+
+  defaultColDef = {
+    resizable: true,
+    enableValue: true,
+    enableRowGroup: true,
+    enablePivot: false,
+    sortable: false,
+    filter: true,
+    autosize:true
+  }
+
+  gridOptions: GridOptions = {
+    enableRangeSelection: true,
+    tooltipShowDelay: 0,
+    columnDefs: this.columnDefs,
+    defaultColDef: this.defaultColDef,
+    rowGroupPanelShow: 'always'
+  }
+
+  onGridReady(params: GridReadyEvent){
+    params.columnApi.autoSizeAllColumns(false)
+  }
 
   ngOnInit(): void {
     this.setDynamicOptions();
 
-    this.isSuccessMsgAvailable = this.isFailureMsgAvailable = false;
+    this.isSuccess = this.isFailure = false;
   
-
     this.changeListeners();
 
     this.disableSubmit = true;
@@ -445,8 +527,12 @@ export class AddCapitalModalComponent implements OnInit{
     this.capitalSubTypeOptions = this.data.capitalSubTypes;
 
     for(let i = 0; i < this.data.refData.length; i+= 1){
-      this.fundHedgingOptions.push(this.data.refData[i].fundHedging);
-      this.fundCcyOptions.push(this.data.refData[i].fundCcy);
+      if(!!this.data.refData[i].fundHedging){
+        this.fundHedgingOptions.push(this.data.refData[i].fundHedging);
+      }
+      if(!!this.data.refData[i].fundCcy){
+        this.fundCcyOptions.push(this.data.refData[i].fundCcy);
+      }
     }
     this.fundHedgingOptions = [...new Set(this.fundHedgingOptions)]
     this.fundCcyOptions = [...new Set(this.fundCcyOptions)]
@@ -504,7 +590,8 @@ export class AddCapitalModalComponent implements OnInit{
 
       this.selectedIssuerID = this.data.rowData.wsoIssuerID;  // Issuer ID for the EDIT row;
       this.selectedAssetID = this.data.rowData.wsoAssetID;
-
+      this.fxRateSource = this.data.rowData.fxRateSource;
+      
       // Dynamic options for EDIT
       this.setDynamicOptions(this.data.rowData.fundHedging, this.data.rowData.issuerShortName, this.data.rowData.asset);
       this.capitalActivityForm.patchValue({
@@ -521,7 +608,8 @@ export class AddCapitalModalComponent implements OnInit{
         posCcy: this.data.rowData.posCcy,
 
         localAmount: this.data.rowData.localAmount,
-        fxRate: this.data.rowData.fxRate
+        fxRate: this.data.rowData.fxRate,
+        fxRateOverride: this.data.rowData.fxRateOverride
       })
 
         /* totalAmount wasn't getting set from the above patch statement. Hence, manually setting it up */
@@ -554,6 +642,8 @@ export class AddCapitalModalComponent implements OnInit{
 
     this.capitalAct.localAmount = this.capitalActivityForm.get('localAmount').value;
     this.capitalAct.fxRate = this.capitalActivityForm.get('fxRate').value;
+    this.capitalAct.fxRateOverride = this.capitalActivityForm.get('fxRateOverride').value;
+    this.capitalAct.fxRateSource = this.fxRateSource;
 
     this.capitalAct.posCcy = (this.data.actionType === 'LINK-ADD') 
                               ? this.data.rowData[0].positionCcy 
@@ -580,7 +670,7 @@ export class AddCapitalModalComponent implements OnInit{
   }
 
   performSubmit() {
-    this.isSuccessMsgAvailable = this.isFailureMsgAvailable = false;
+    this.isSuccess = this.isFailure = false;
     this.disableSubmit = true;
 
     this.getFormCapitalAct();
@@ -594,6 +684,8 @@ export class AddCapitalModalComponent implements OnInit{
       this.capitalAct.createdBy = this.data.rowData.createdBy;
       this.capitalAct.createdOn = this.data.rowData.createdOn;
 
+      this.capitalAct.isLinked = this.data.rowData.isLinked;
+      this.capitalAct.linkedAmount = this.data.rowData.linkedAmount;
     }
     else{
       this.capitalAct.capitalID = null;
@@ -605,8 +697,8 @@ export class AddCapitalModalComponent implements OnInit{
     this.capitalActivityForm.disable();
     this.subscriptions.push(this.capitalActivityService.putCapitalActivity(this.capitalAct).subscribe({
       next: data => {
-        this.isSuccessMsgAvailable = true;
-        this.isFailureMsgAvailable = false;
+        this.isSuccess = true;
+        this.isFailure = false;
 
         if(this.data.actionType === 'ADD'){
           if(data.data != -1)   // .data is the returned data(here, capitalID) of the newly inserted/updated row.
@@ -639,8 +731,8 @@ export class AddCapitalModalComponent implements OnInit{
         }
       },
       error: error => {
-        this.isFailureMsgAvailable = true;
-        this.isSuccessMsgAvailable = false;
+        this.isFailure = true;
+        this.isSuccess = false;
 
         if(this.data.actionType === 'ADD')
           this.updateMsg = 'Insert failed';
@@ -655,19 +747,34 @@ export class AddCapitalModalComponent implements OnInit{
   }
 
   onBlurForLink(){
-    this.childLinkComponent.searchCapitalActivities();
+    if(this.data.actionType === 'LINK-ADD')
+      this.childLinkComponent.searchCapitalActivities();
   }
 
-  closeFromLink(outcome){
+  /**
+   *  Updating `status` from `link investor` component 
+   */
+  onLinkStatus(outcome){
+    this.linkStatus = outcome
+  }
 
-    if(outcome.event === 'Linked Close'){      
-      this.data.adapTableApiInvstmnt.gridApi.deleteGridData(this.data.rowData);
-      
-      if(outcome.isNewCapital){
-        this.data.adapTableApi.gridApi.addGridData([outcome.capitalAct]);
-      }
+  /** Closing pop up during `LINK-ADD` */
+  closePopUp(source?: string){
+    let refresh: boolean = false;
+    if(this.linkStatus?.event === 'Linked Close'){      
+      this.dialogRef.close({event: 'Close with Success'});
     }
-    this.dialogRef.close({event: outcome.isNewCapital ? 'Close with Success' : 'Close'});
+    else{
+      this.dialogRef.close({event: 'Close'})
+    }
+  }
+
+  /**
+   * 
+   * @param isAlreadyLinked To hide form if the investment in `link investor` components is already linked to some investor activities.
+   */
+  onIsAlreadyLinked(isAlreadyLinked: boolean){
+    this.isAlreadyLinked = isAlreadyLinked
   }
 
   onSubmit(): void {
@@ -690,7 +797,7 @@ export class AddCapitalModalComponent implements OnInit{
   }
 
   closeDialog(data?: CapitalActivityModel): void {
-    if(this.isSuccessMsgAvailable)
+    if(this.isSuccess)
       this.dialogRef.close({event:'Close with Success', data:data});
     else
       this.dialogRef.close({event:'Close', data:null});
