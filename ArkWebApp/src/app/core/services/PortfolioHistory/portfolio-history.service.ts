@@ -5,86 +5,29 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import {AssetGIRModel} from '../../../shared/models/AssetGIRModel'
 import { MsalUserService } from '../Auth/msaluser.service';  
-import { timeout } from 'rxjs-compat/operator/timeout';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PortfolioHistoryService {
 
-  private PORTFOLIO_HISTORY_GET_API: string = APIConfig.PORTFOLIO_HISTORY_GET_API;
-  private PORTFOLIO_HISTORY_PUT_API: string = APIConfig.PORTFOLIO_HISTORY_PUT_API;
-  private PORTFOLIO_HISTORY_BULK_PUT_API: string = APIConfig.PORTFOLIO_HISTORY_BULK_PUT_API;
-  private PORTFOLIO_HISTORY_DELETE_API: string = APIConfig.PORTFOLIO_HISTORY_DELETE_API;
+  constructor(private http: HttpClient,private msalService: MsalUserService) { }
 
-  httpOptions = {  
-    headers: new HttpHeaders({  
-        'Content-Type': 'application/json'  
-    })  
-};  
-
-  constructor(private http: HttpClient,private msalService: MsalUserService) {
-
-   }
-
-   public getPortfolioHistory(){
-
-    this.httpOptions = {  
-      headers: new HttpHeaders({  
-          'Content-Type': 'application/json',  
-          'Authorization': 'Bearer ' + this.msalService.GetAccessToken()  
-      })  
-
-  };
-
-    return this.http.get<any[]>(this.PORTFOLIO_HISTORY_GET_API,this.httpOptions).pipe(
-      catchError((ex) => throwError(ex))
-      );
+  public getPortfolioHistory(){
+    return this.http.get<any[]>(APIConfig.PORTFOLIO_HISTORY_GET_API).pipe(
+      catchError((ex) => throwError(ex)));
   }
 
   public putAssetGIR(models: AssetGIRModel[]){
-
-    this.httpOptions = {  
-      headers: new HttpHeaders({  
-          'Content-Type': 'application/json',  
-          'Authorization': 'Bearer ' + this.msalService.GetAccessToken()  
-      })  
-
-  };
-
-  return  this.http.post<any>(this.PORTFOLIO_HISTORY_PUT_API ,models, this.httpOptions).pipe(
-      catchError((ex) => throwError(ex))
-      );
-
+    return this.http.post<any>(APIConfig.PORTFOLIO_HISTORY_PUT_API, models).pipe(
+      catchError((ex) => throwError(ex)));
   }
 
   public deleteAssetGIR(assetGIRModel: AssetGIRModel){
-    this.httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + this.msalService.GetAccessToken(),
-      })
-    }
-
-    return this.http.post<any>(this.PORTFOLIO_HISTORY_DELETE_API, assetGIRModel, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
+    return this.http.post<any>(APIConfig.PORTFOLIO_HISTORY_DELETE_API, assetGIRModel).pipe(catchError((ex) => throwError(ex)));
   }
 
   public putBulkAssetGIR(bulkAssetGIRModel: AssetGIRModel []){
-
-    this.httpOptions = {  
-      headers: new HttpHeaders({  
-          'Content-Type': 'application/json',  
-          'Authorization': 'Bearer ' + this.msalService.GetAccessToken()  
-      })  
-    };
-
-    return this.http.post<any>(this.PORTFOLIO_HISTORY_BULK_PUT_API, bulkAssetGIRModel, this.httpOptions).pipe(catchError((ex) => throwError(ex)));
-
+    return this.http.post<any>(APIConfig.PORTFOLIO_HISTORY_BULK_PUT_API, bulkAssetGIRModel).pipe(catchError((ex) => throwError(ex)));
   }
-
-
-
-
-
-
 }

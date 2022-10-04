@@ -2,6 +2,7 @@ import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } fro
 import { CellValueChangedEvent, ClientSideRowModelModule, ColDef, EditableCallbackParams, GridOptions, GridReadyEvent, Module, RowNode } from '@ag-grid-community/all-modules';
 import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { Component, OnInit } from '@angular/core';
+import { MsalService } from '@azure/msal-angular';
 import { Subscription } from 'rxjs';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
@@ -52,7 +53,9 @@ export class PortfolioManagerComponent implements OnInit {
     private portfolioManagerSvc: PortfolioManagerService,
     private dataSvc: DataService,
     private accessSvc: AccessService,
-    private portfolioMapDataSvc: PortfolioMappingDataService
+    private portfolioMapDataSvc: PortfolioMappingDataService,
+    private msalSvc: MsalService
+
   ) { }
 
   setAccess(){
@@ -64,7 +67,7 @@ export class PortfolioManagerComponent implements OnInit {
       editOnApproval: false,
     }
 
-    let userRoles: string[] = this.dataSvc.getCurrentUserInfo().idToken['roles'];
+    let userRoles: string[] = this.msalSvc.instance.getActiveAccount()?.idTokenClaims?.roles
 
 
       // Only Admin.Write has approv/reject access on approval grid

@@ -22,12 +22,6 @@ export class DataService {
         private msalService: MsalUserService,
         public snackBar: MatSnackBar
     ) { }  
-    
-    httpOptions = {  
-        headers: new HttpHeaders({  
-            'Content-Type': 'application/json'  
-        })  
-    };  
   
     private filterApplyBtnHit = new BehaviorSubject<boolean>(false);
     filterApplyBtnState = this.filterApplyBtnHit.asObservable();
@@ -40,9 +34,9 @@ export class DataService {
     }
     
     getCurrentUserName(){  
-        this.msalService.GetAccessToken() 
+        // this.msalService.GetAccessToken() 
         let userInfo = this.msalService.getCurrentUserInfo();  
-        return userInfo.name
+        return userInfo?.name
      }  
 
     logout(){  
@@ -50,12 +44,12 @@ export class DataService {
     }
     
     getFundHedgingsRef(){
-        return this.http.get<any[]>(`${APIConfig.REFDATA_GET_FUNDHEDGINGS_API}`, this.httpOptions).pipe(
+        return this.http.get<any[]>(`${APIConfig.REFDATA_GET_FUNDHEDGINGS_API}`).pipe(
             catchError((ex) => throwError(ex)));      
     }
 
     getWSOPortfolioRef(){
-        return this.http.get<any[]>(`${APIConfig.REFDATA_GET_WSOPORTFOLIO_API}`, this.httpOptions).pipe(
+        return this.http.get<any[]>(`${APIConfig.REFDATA_GET_WSOPORTFOLIO_API}`).pipe(
             catchError((ex) => throwError(ex)));
     }
 
@@ -65,24 +59,24 @@ export class DataService {
     }
 
     getDetailedView(model: DetailedView){
-        return this.http.post<any[]>(`${APIConfig.GET_DETAILED_VIEW}`, model, this.httpOptions).pipe(
+        return this.http.post<any[]>(`${APIConfig.GET_DETAILED_VIEW}`, model).pipe(
             catchError((ex) => throwError(ex)));      
     }
 
     saveAdaptableState(adaptableID: string, state: string){
-        return this.http.post<any[]>(`${APIConfig.SAVE_ADAPTABLE_STATE_API}`, {'adaptableID': adaptableID, 'adaptableState': state, 'username': this.getCurrentUserName()}, this.httpOptions).pipe(
+        return this.http.post<any[]>(`${APIConfig.SAVE_ADAPTABLE_STATE_API}`, {'adaptableID': adaptableID, 'adaptableState': state, 'username': this.getCurrentUserName()}).pipe(
             catchError((ex) => throwError(ex))
         );
     }
 
     getAdaptableState(adaptableID: string){
-        return this.http.get<string>(`${APIConfig.GET_ADAPTABLE_STATE_API}/?adaptableID=${adaptableID}`, this.httpOptions).pipe(
+        return this.http.get<string>(`${APIConfig.GET_ADAPTABLE_STATE_API}/?adaptableID=${adaptableID}`).pipe(
             catchError((ex) => throwError(ex))
         );
     }
 
     getGridDynamicColumns(grid: string){
-        return this.http.get<any[]>(`${APIConfig.GRID_DYNAMIC_COLUMNS_GET_API}/?grid=${grid}`, this.httpOptions).pipe(
+        return this.http.get<any[]>(`${APIConfig.GRID_DYNAMIC_COLUMNS_GET_API}/?grid=${grid}`).pipe(
             catchError((ex) => throwError(ex))
         );
     }

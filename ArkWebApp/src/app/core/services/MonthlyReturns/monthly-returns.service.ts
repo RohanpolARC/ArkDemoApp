@@ -10,13 +10,6 @@ import { MsalUserService } from '../Auth/msaluser.service';
   providedIn: 'root'
 })
 export class MonthlyReturnsService {
-
-  private httpOptions = {  
-    headers: new HttpHeaders({  
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + this.msalService.GetAccessToken()  
-    })
-  };
   
   constructor(
     private http: HttpClient,
@@ -24,7 +17,7 @@ export class MonthlyReturnsService {
 
   public getMonthlyReturns(params: MonthlyReturnsCalcParams){
 
-    return this.http.post<any>(APIConfig.MONTHLY_RETURNS_CALC_API, params, this.httpOptions).pipe(
+    return this.http.post<any>(APIConfig.MONTHLY_RETURNS_CALC_API, params).pipe(
       catchError((ex) => throwError(ex))
     )
   } 

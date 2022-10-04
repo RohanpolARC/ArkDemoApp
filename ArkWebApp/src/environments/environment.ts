@@ -11,6 +11,7 @@ export const environment = {
   uiClienId: '9a06035c-d10f-4b52-817d-8cc7583721a1',  
   redirectUrl: 'http://localhost:4200',
   
+  arkFunctionScopeUri: ['api://1ade3513-1077-49b7-838d-681c7ea8f3a3/arc-irr-func'],
   arkFunctionUrl: 'https://irrcalcfunuatnew.azurewebsites.net',
   // arkFunctionUrl: 'http://localhost:7071'
 };

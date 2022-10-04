@@ -5,7 +5,6 @@ import { Inject } from '@angular/core';
 import {AssetGIRModel} from '../../../shared/models/AssetGIRModel'
 import {DataService} from '../../../core/services/data.service'
 import { PortfolioHistoryService } from 'src/app/core/services/PortfolioHistory/portfolio-history.service';
-import { AdaptableApi } from '@adaptabletools/adaptable/types';
 
 @Component({
     templateUrl:'./delete-confirm.html',
@@ -55,9 +54,12 @@ export class DialogDeleteComponent{
               this.isFailure = false;
               this.updateMsg = "GIR successfully deleted";
               
-              this.data.rowData.isEdited = false;
+              this.data.rowData.isEdited = 'No';
+              this.data.rowData.isOverride = 'No';
 
-              this.data.rowData.fxRateBaseEffective = this.data.rowData?.['pgh_FXRateBaseEffective'];
+              this.data.rowData.girSource = null;
+              this.data.rowData.girSourceID = null;
+              this.data.rowData.fxRateBaseEffective = 0;
               this.data.rowData.modifiedBy = ' ';
               this.data.rowData.modifiedOn = null;
             },
@@ -72,7 +74,7 @@ export class DialogDeleteComponent{
     }
   
     ngOnInit(): void{
-      this.isDeletable = this.data.rowData.isEdited;  
+      this.isDeletable = this.data.rowData.isEdited === 'Yes';  
 
       this.isSuccess = false;
       this.isFailure = false;

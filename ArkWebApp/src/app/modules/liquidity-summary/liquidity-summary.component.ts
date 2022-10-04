@@ -355,7 +355,7 @@ export class LiquiditySummaryComponent implements OnInit {
   fetchLiquiditySummary(){
 
     this.setSelectedRowID(null);
-    if(this.asOfDate !== null){
+    if(this.asOfDate !== null && this.fundHedgings !== null && this.days !== null){
 
       this.gridOptions.api?.showLoadingOverlay();
       this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryPivoted(this.asOfDate, this.fundHedgings, this.days).subscribe({
