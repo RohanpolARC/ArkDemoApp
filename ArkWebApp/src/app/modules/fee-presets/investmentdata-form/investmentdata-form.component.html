@@ -1,0 +1,48 @@
+<!-- Using bootstrap in-built classes for containerization (row, col) -->
+
+<form [formGroup] = "form" autocomplete="off">
+
+    <div class="row">
+        <mat-form-field class="col-3" appearance="outline">
+            <mat-label>Fund Name</mat-label>
+            <input matInput type="text" formControlName="fundName" 
+            [readonly]="true"
+            [style.color]="'grey'"
+            autocomplete="off">
+        </mat-form-field>
+        <mat-form-field class="col-3" appearance="outline">
+            <mat-label>Cash Yield Percent</mat-label>
+            <input matInput type="number" formControlName="cashYield"
+            autocomplete="off">
+        </mat-form-field>
+        <mat-form-field class="col-3" appearance="outline">
+            <mat-label>Total Yield Percent</mat-label>
+            <input matInput type="number" formControlName="totalYield"
+            autocomplete="off">
+        </mat-form-field>
+    <!-- </div>
+    <div class="row"> -->
+        <mat-form-field class="col-3" appearance="outline">
+            <mat-label>Financing Rate Percent</mat-label>
+            <input matInput type="number" formControlName="financingRate"
+            autocomplete="off">
+        </mat-form-field>
+        <mat-form-field class="col-3" appearance="outline">
+            <mat-label>Investment Period (Months)</mat-label>
+            <input matInput type="number" formControlName="investmentPeriod"
+            autocomplete="off">
+        </mat-form-field>
+        <mat-form-field class="col-3" appearance="outline">
+            <mat-label>Financing Ratio</mat-label>
+            <input matInput type="number" formControlName="financingRatio"
+            autocomplete="off">
+        </mat-form-field>
+    </div>
+
+    <!-- <div class="row justify-content-end">
+        <div class="col-4">
+            <button mat-raised-button color="primary" (click)="onSubmit()">Submit</button>
+        </div>
+    </div> -->
+
+</form>

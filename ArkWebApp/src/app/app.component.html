@@ -83,8 +83,11 @@
       </mat-expansion-panel-header>
 
       <mat-list>
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Fee Calculation')" [ngStyle]="FeeCalculationStyle">
-          <div class="list-item-text">Fee Calculation</div>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Fee Presets')" [ngStyle]="FeePresetStyle">
+          <div class="list-item-text">Fee Presets</div>
+        </mat-list-item> 
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Performance Fees')" [ngStyle]="PerformanceFeesStyle">
+          <div class="list-item-text">Performance Fees</div>
         </mat-list-item>          
       </mat-list>
     </mat-expansion-panel>
