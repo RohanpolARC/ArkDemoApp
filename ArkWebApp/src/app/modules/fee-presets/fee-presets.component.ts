@@ -5,6 +5,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { DataService } from 'src/app/core/services/data.service';
 import { FeePresetsService } from 'src/app/core/services/FeePresets/fee-presets.service';
 import { amountFormatter, dateFormatter, dateTimeFormatter, formatDate } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
@@ -38,7 +39,8 @@ export class FeePresetsComponent implements OnInit {
 
   constructor(
     private feePresetsSvc: FeePresetsService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private dataSvc: DataService
     ) { }
 
   ngOnInit(): void {
