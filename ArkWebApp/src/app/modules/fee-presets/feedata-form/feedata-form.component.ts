@@ -106,17 +106,17 @@ export class FeedataFormComponent implements OnInit {
         // entity: new FormControl(''),        
       }),
       financing: new FormGroup({
-        financingMaxCapitalDeploymentPerMonth: new FormControl(0),
-        financingEndDate: new FormControl(''),
-        financingStartDate: new FormControl(''),
-        financingCommitment: new FormControl(0)             
+        financingMaxCapitalDeploymentPerMonth: new FormControl(0, Validators.required),
+        financingEndDate: new FormControl('', Validators.required),
+        financingStartDate: new FormControl('', Validators.required),
+        financingCommitment: new FormControl(0, Validators.required)             
       }),
       financingAdvanced: new FormGroup({
-        financingStage1Ratio: new FormControl(0),
-        financingStage2Ratio: new FormControl(0),
-        financingStage3Ratio: new FormControl(0),
-        financingStage1EndDate: new FormControl(''),
-        financingStage2EndDate: new FormControl('')        
+        financingStage1Ratio: new FormControl(0, Validators.required),
+        financingStage2Ratio: new FormControl(0, Validators.required),
+        financingStage3Ratio: new FormControl(0, Validators.required),
+        financingStage1EndDate: new FormControl('', Validators.required),
+        financingStage2EndDate: new FormControl('', Validators.required)        
       }),
       capitalDeployment: new FormGroup({
         holdback: new FormControl('', Validators.required),
@@ -141,9 +141,9 @@ export class FeedataFormComponent implements OnInit {
         undrawnCommitFeesRate: new FormControl('', Validators.required)        
       }),
       other: new FormGroup({
-        overrideExpected: new FormControl('No'),
-        useFXHedgingCashflows: new FormControl('No'),
-        otherExpensesFixed: new FormControl(0)
+        overrideExpected: new FormControl('No', Validators.required),
+        useFXHedgingCashflows: new FormControl('No', Validators.required),
+        otherExpensesFixed: new FormControl(0, Validators.required)
       })
     })  
 

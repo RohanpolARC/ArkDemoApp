@@ -119,13 +119,19 @@ export class AppComponent {
 
   ngOnInit(): void { 
     this.subscriptions.push(this.msalBroadcastSvc.msalSubject$
-    .pipe(filter((msg: EventMessage) => msg.eventType === EventType.LOGIN_SUCCESS || msg.eventType === EventType.SSO_SILENT_SUCCESS))
+    // .pipe(filter((msg: EventMessage) => msg.eventType === EventType.LOGIN_SUCCESS || msg.eventType === EventType.SSO_SILENT_SUCCESS))
     .subscribe((result: EventMessage) => {
-      const payload = result.payload as AuthenticationResult;
-      this.msalSvc.msalSvc.instance.setActiveAccount(payload.account);
+      if(result.eventType === EventType.LOGIN_SUCCESS || result.eventType === EventType.SSO_SILENT_SUCCESS){
 
-      this.fetchTabs();
-      this.userName=this.dataService.getCurrentUserName();
+        const payload = result.payload as AuthenticationResult;
+        this.msalSvc.msalSvc.instance.setActiveAccount(payload.account);
+  
+        this.fetchTabs();
+        this.userName=this.dataService.getCurrentUserName();  
+      }
+      else if(result.eventType === EventType.ACQUIRE_TOKEN_FAILURE || result.eventType === EventType.ACQUIRE_TOKEN_BY_CODE_FAILURE){
+        this.msalSvc.logout();
+      }
     }))
 
     this.lastClickedTabRoute = this.location.path();

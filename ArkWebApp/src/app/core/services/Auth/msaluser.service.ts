@@ -50,5 +50,6 @@ export class MsalUserService {
 
     public logout() {  
         this.msalSvc.logout();
-      }  
+        this.msalSvc.instance.loginRedirect();
+    }  
 }  

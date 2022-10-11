@@ -244,7 +244,6 @@ export class FeePresetsComponent implements OnInit {
   }
 
   openDialog(action: 'ADD' | 'EDIT' = 'ADD', fundFee = [], fundInvestment = []) { 
-    console.log(this.adaptableApi)
     const dialogRef = this.dialog.open(PresetsFormComponent, {
       data: { 
         action: action,

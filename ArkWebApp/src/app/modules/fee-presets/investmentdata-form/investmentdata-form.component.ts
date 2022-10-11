@@ -25,11 +25,8 @@ export class InvestmentdataFormComponent implements OnInit {
       this.form.patchValue({
         fundName: this.fundName
       })
-      console.log("update investment fund name called", this.fundName)
-
     }
     if(changes?.feeInvestment?.currentValue){
-      console.log(this.feeInvestment)
 
       this.form.patchValue({
         fundName: this.feeInvestment.fundName,

@@ -57,7 +57,6 @@ export function loggerCallback(logLevel: LogLevel, message: string) {
 
 export function MSALInstanceFactory(): IPublicClientApplication {
 
-  console.log("Initialising MSAL instance")
   return new PublicClientApplication({
     auth: {
       clientId: environment.uiClienId,
