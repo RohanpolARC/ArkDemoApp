@@ -42,6 +42,7 @@ import { FilterPaneModule } from './modules/other-modules/filter-pane/filter-pan
 import { MatTableModule } from '@angular/material/table';
 import { IPublicClientApplication, PublicClientApplication, BrowserCacheLocation, InteractionType, LogLevel } from '@azure/msal-browser';
 import { MsalHttpInterceptor } from './core/interceptors/msal-http.interceptor';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 // import { MsalModule, MsalInterceptor, MsalGuard, MsalGuardConfiguration, MsalService, MsalInterceptorConfiguration, MSAL_INSTANCE, MSAL_GUARD_CONFIG, MSAL_INTERCEPTOR_CONFIG, MsalBroadcastService } from '@azure/msal-angular';  
 
 export const protectedResourceMap: any =  
@@ -126,7 +127,7 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
     MatCheckboxModule,
     MatSelectModule,
     MatTableModule,
-
+    MatProgressSpinnerModule,
     FilterPaneModule,
 
   ],  

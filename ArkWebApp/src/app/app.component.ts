@@ -130,7 +130,7 @@ export class AppComponent {
         this.userName=this.dataService.getCurrentUserName();  
       }
       else if(result.eventType === EventType.ACQUIRE_TOKEN_FAILURE || result.eventType === EventType.ACQUIRE_TOKEN_BY_CODE_FAILURE){
-        this.msalSvc.logout();
+        this.msalSvc.msalSvc.loginRedirect();
       }
     }))
 

@@ -1,8 +1,11 @@
 <div class="main">
-    <mat-icon class="icon">
+    <mat-spinner [diameter] = "60" *ngIf="!accessSvc.accessibleTabs"></mat-spinner>
+    <mat-icon class="icon" *ngIf="accessSvc.accessibleTabs">
         lock
     </mat-icon>
+    <br>
     <div style="display: block;">
-        Unauthorized access
+        <div *ngIf="!accessSvc.accessibleTabs">Please wait while we check your access</div>
+        <div *ngIf="accessSvc.accessibleTabs">Sorry, you do not have access for this tab</div>
     </div>
 </div>

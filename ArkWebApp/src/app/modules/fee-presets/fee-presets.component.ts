@@ -5,6 +5,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { FeePresetsService } from 'src/app/core/services/FeePresets/fee-presets.service';
 import { amountFormatter, dateFormatter, dateTimeFormatter, formatDate } from 'src/app/shared/functions/formatter';
@@ -36,14 +37,24 @@ export class FeePresetsComponent implements OnInit {
     SideBarModule,
     RangeSelectionModule
   ];
+  isWriteAccess: boolean = false;
 
   constructor(
     private feePresetsSvc: FeePresetsService,
     public dialog: MatDialog,
-    private dataSvc: DataService
+    private dataSvc: DataService,
+    private accessSvc: AccessService
     ) { }
 
   ngOnInit(): void {
+
+    this.isWriteAccess = false;
+    for(let i: number = 0; i < this.accessSvc.accessibleTabs.length; i+= 1){
+      if(this.accessSvc.accessibleTabs[i].tab === 'Fee Presets' && this.accessSvc.accessibleTabs[i].isWrite){
+        this.isWriteAccess = true;
+        break;
+      }        
+    }
 
     this.columnDefs = [
         { field: 'fundName' },
@@ -137,8 +148,13 @@ export class FeePresetsComponent implements OnInit {
                 button: AdaptableButton<ActionColumnButtonContext>,
                 context: ActionColumnButtonContext
               ) => {
-                let rowData = context.rowNode.data;
 
+                if(!this.isWriteAccess){
+                  this.dataSvc.setWarningMsg('No Access', 'Dismiss', 'ark-theme-snackbar-warning')
+                  return;
+                }
+
+                let rowData = context.rowNode.data;
                 let fundName: string = rowData?.['fundName'];
 
                 // To open dialog after successfull fetch
@@ -246,6 +262,12 @@ export class FeePresetsComponent implements OnInit {
   }
 
   openDialog(action: 'ADD' | 'EDIT' = 'ADD', fundFee = [], fundInvestment = []) { 
+    
+    if(!this.isWriteAccess){
+      this.dataSvc.setWarningMsg('No Access', 'Dismiss', 'ark-theme-snackbar-warning')
+      return
+    }
+
     const dialogRef = this.dialog.open(PresetsFormComponent, {
       data: { 
         action: action,
