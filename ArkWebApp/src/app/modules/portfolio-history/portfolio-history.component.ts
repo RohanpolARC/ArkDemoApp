@@ -208,8 +208,10 @@ export class PortfolioHistoryComponent implements OnInit {
               }));
             },
             icon:{
-              src:
-              '../assets/img/trash.svg',
+              src: '../assets/img/trash.svg',
+              style: {
+                height: 25, width: 25
+              }
             }
           },
         },

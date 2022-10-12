@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AccessService } from 'src/app/core/services/Auth/access.service';
 
 @Component({
   selector: 'app-unauthorized',
@@ -7,7 +8,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class UnauthorizedComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    public accessSvc: AccessService
+  ) { }
 
   ngOnInit(): void {
   }

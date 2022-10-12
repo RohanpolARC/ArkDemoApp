@@ -52,7 +52,8 @@ export class AppComponent {
   PortfolioMappingStyle: any = {};
   UnfundedAssetsStyle: any = {};
   ContractHistoryStyle: any = {};
-  FeeCalculationStyle: any = {}
+  PerformanceFeesStyle: any = {}
+  FeePresetStyle: any = {}
 
   funds
   fundHedgings
@@ -117,15 +118,21 @@ export class AppComponent {
   }
 
   ngOnInit(): void { 
-    this.msalBroadcastSvc.msalSubject$
-    .pipe(filter((msg: EventMessage) => msg.eventType === EventType.LOGIN_SUCCESS || msg.eventType === EventType.SSO_SILENT_SUCCESS))
+    this.subscriptions.push(this.msalBroadcastSvc.msalSubject$
+    // .pipe(filter((msg: EventMessage) => msg.eventType === EventType.LOGIN_SUCCESS || msg.eventType === EventType.SSO_SILENT_SUCCESS))
     .subscribe((result: EventMessage) => {
-      const payload = result.payload as AuthenticationResult;
-      this.msalSvc.msalSvc.instance.setActiveAccount(payload.account);
+      if(result.eventType === EventType.LOGIN_SUCCESS || result.eventType === EventType.SSO_SILENT_SUCCESS){
 
-      this.fetchTabs();
-      this.userName=this.dataService.getCurrentUserName();
-    })
+        const payload = result.payload as AuthenticationResult;
+        this.msalSvc.msalSvc.instance.setActiveAccount(payload.account);
+  
+        this.fetchTabs();
+        this.userName=this.dataService.getCurrentUserName();  
+      }
+      else if(result.eventType === EventType.ACQUIRE_TOKEN_FAILURE || result.eventType === EventType.ACQUIRE_TOKEN_BY_CODE_FAILURE){
+        this.msalSvc.msalSvc.loginRedirect();
+      }
+    }))
 
     this.lastClickedTabRoute = this.location.path();
     this.fetchTabs();
@@ -164,9 +171,13 @@ export class AppComponent {
       this.updateSelection('Contract History')
     }
     else if(this.location.path() === '/fee-calculation'){
-      this.updateSelection('Fee Calculation')
+      this.updateSelection('Performance Fees')
     }
     else this.updateSelection('')
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());  
   }
 
   logout(){  
@@ -177,7 +188,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.FeeCalculationStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.notSelectedElement;
 
     this.lastClickedTabRoute = this.location.path();
 
@@ -228,8 +239,8 @@ export class AppComponent {
 
       this.router.navigate(['/liquidity-summary'])
     }
-    else if(screen === 'Fee Calculation'){
-      this.FeeCalculationStyle = this.selectedElement;
+    else if(screen === 'Performance Fees'){
+      this.PerformanceFeesStyle = this.selectedElement;
       this.subscriptions.push(
         this.dataService.getUniqueValuesForField('Fee-Calculation-Entities').subscribe({
           next: (data: any[]) => {
@@ -255,6 +266,10 @@ export class AppComponent {
     else if(screen === 'Access Control'){
       this.AccessControlStyle = this.selectedElement;
       this.router.navigate(['/access-control'])
+    }
+    else if(screen === 'Fee Presets'){
+      this.FeePresetStyle = this.selectedElement;
+      this.router.navigate(['/fee-presets'])
     }
   }
 }

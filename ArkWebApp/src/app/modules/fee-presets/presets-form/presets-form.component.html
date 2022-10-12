@@ -1,0 +1,36 @@
+<div>
+    <div *ngIf="isSuccess || isFailure"
+    [class.success-msg]="isSuccess"
+    [class.failure-msg]="isFailure"
+    >
+        {{ updateMsg }}
+    </div>
+</div>
+
+<mat-vertical-stepper linear #stepper>
+    <mat-step [stepControl]="feeForm?.form">
+        <ng-template matStepLabel>Fee Data</ng-template>
+        <app-feedata-form
+            [action] = "action"
+            [feeData] = "feeData"
+            (fundNameEmitter)="updateFundName($event)"
+        ></app-feedata-form>
+    </mat-step>
+    <mat-step [stepControl]="investmentForm?.form">
+        <ng-template matStepLabel>Fee Investments</ng-template>
+        <app-investmentdata-form
+            [action] = "action"
+            [feeInvestment] = "feeInvestment"
+            [fundName] = "fundName"
+        ></app-investmentdata-form>
+    </mat-step>
+</mat-vertical-stepper>
+
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" 
+        [disabled] = "!(!isSuccess && 
+        (feeForm?.form?.status === 'VALID') && (investmentForm?.form?.status === 'VALID') &&
+        (feeForm?.form?.dirty || investmentForm?.form?.dirty)) 
+        || isSuccess" (click)="onSubmit()">Submit</button>
+    <button mat-raised-button (click)="onCancel()">Cancel</button>
+</mat-dialog-actions>

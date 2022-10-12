@@ -1,0 +1,29 @@
+<div class="parent">
+    <div class="header">
+        <div class="title">
+            Fee Presets
+        </div>
+        <div class="action">
+            <button mat-icon-button
+            matTooltip="Add fee presets"
+            (click)="openDialog()">
+                <mat-icon class="material-icons-outlined">add_circle_outline</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <div class="content">
+        <mat-card class="mat-content">
+
+            <ag-grid-angular
+            [gridOptions] = "gridOptions"
+            [adaptableOptions] = "adaptableOptions"
+            [modules] = "agGridModules"
+            [rowData] = "rowData | async"
+            (adaptableReady) = "onAdaptableReady($event)"
+            class="ag-theme-alpine ag-grid">                
+            </ag-grid-angular>
+
+        </mat-card>
+    </div>
+</div>

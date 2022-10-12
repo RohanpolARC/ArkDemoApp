@@ -68,4 +68,9 @@ export class APIConfig {
 
     public static FEE_RUN_CALCS_API: string = APIConfig.ARK_FUNCTION_BASEURL + "/api/FeeCalculatorFunction_HttpTrigger";
     public static MONTHLY_RETURNS_CALC_API: string = APIConfig.BASEURL + "/api/MonthlyReturns/GetMonthlyReturn";
+
+    public static FEE_PRESET_INVESTMENT_GET_API: string = APIConfig.BASEURL + "/api/FeePresets/GetFundInvestmentData";
+    public static FEE_PRESET_DATA_GET_API: string = APIConfig.BASEURL + "/api/FeePresets/GetFundFeeData";
+    public static FEE_PRESET_INVESTMENT_PUT_API: string = APIConfig.BASEURL + "/api/FeePresets/PutFundInvestmentData";
+    public static FEE_PRESET_DATA_PUT_API: string = APIConfig.BASEURL + "/api/FeePresets/PutFundFeeData";
 }

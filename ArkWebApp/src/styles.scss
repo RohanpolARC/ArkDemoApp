@@ -116,3 +116,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     color: black;
     }
 }
+
+// Mat Progress spinner (Used in unauthorized component)
+.mat-progress-spinner circle, .mat-spinner circle {
+  stroke: #0590ca;
+}

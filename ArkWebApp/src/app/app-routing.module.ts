@@ -58,6 +58,8 @@ const routes: Routes = [
   },
   { path: 'fee-calculation', 
     loadChildren: () => import('./modules/fee-calculation/fee-calculation.module').then(m => m.FeeCalculationModule) },
+  { path: 'fee-presets',
+    loadChildren: () => import('./modules/fee-presets/fee-presets.module').then(m => m.FeePresetsModule) }
 ];
 
 @NgModule({  
