@@ -1,0 +1,74 @@
+<h2>
+    Fixing Details
+</h2>
+<form [formGroup]="form">
+        <div class="row" >
+            <mat-form-field class="col-4" appearance="outline">
+                <mat-label>As Of Date</mat-label>
+                <input matInput [matDatepicker]="asOfDatePicker" formControlName="asOfDate"
+                autocomplete="off">
+                <mat-datepicker-toggle matSuffix [for]="asOfDatePicker"></mat-datepicker-toggle>
+                <mat-datepicker #asOfDatePicker></mat-datepicker>
+            </mat-form-field>
+            <!-- <mat-form-field class="col" appearance="outline">
+                <mat-label>Attribute Name</mat-label>
+                <input matInput type="text" formControlName="attributeName"
+                autocomplete="off">
+            </mat-form-field> -->
+            
+            <mat-form-field class="col-4" appearance="outline">
+                <mat-label>Attribute Name</mat-label>
+                <mat-select formControlName="attributeName">
+                    <mat-option *ngFor="let attr of attrNames" [value]="attr" >{{ attr}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field class="col-4" appearance="outline">
+                <mat-label>Attribute Type</mat-label>
+                <mat-select formControlName="attributeType">
+                    <mat-option *ngFor="let type of attrDataTypes" [value]="type" >{{ type}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="row">
+            <mat-form-field class="col-4" appearance="outline">
+                <mat-label>Attribute Level</mat-label>
+                <mat-select formControlName="attributeLevel">
+                    <mat-option [value]="'Fund'" >Fund</mat-option>
+                    <mat-option [value]="'FundHedging'" >Fund Hedging</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field class="col-4" appearance="outline">
+                <mat-label>Attribute Level Value</mat-label>
+                <mat-select formControlName="attributeLevelValue">
+                    <mat-option *ngFor="let value of levelValues" [value]="value" >{{ value}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="col-4" appearance="outline"  *ngIf="attributeType=='String' || attributeType=='Integer' || attributeType=='Decimal'">
+                <mat-label>Attribute Value</mat-label>
+                <input matInput type="text" formControlName="attributeValue"
+                autocomplete="off">
+            </mat-form-field>
+
+            <mat-form-field class="col-4" appearance="outline"  *ngIf="attributeType=='Boolean'">
+                <mat-label>Attribute Value</mat-label>
+                <mat-select formControlName="attributeValue" >
+                    <mat-option [value]="'TRUE'" >Yes</mat-option>
+                    <mat-option [value]="'FALSE'" >No</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="col-4" appearance="outline" *ngIf="attributeType=='Date'">
+                <mat-label>Attribute Value</mat-label>
+                <input matInput [matDatepicker]="customDatePicker" formControlName="attributeValue"
+                autocomplete="off">
+                <mat-datepicker-toggle matSuffix [for]="customDatePicker"></mat-datepicker-toggle>
+                <mat-datepicker #customDatePicker></mat-datepicker>
+            </mat-form-field>
+        </div>
+</form>
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" 
+        (click)="onSubmit()">Submit</button>
+    <button mat-raised-button (click)="onCancel()">Cancel</button>
+</mat-dialog-actions>

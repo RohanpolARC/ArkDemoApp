@@ -52,8 +52,9 @@ export class AppComponent {
   PortfolioMappingStyle: any = {};
   UnfundedAssetsStyle: any = {};
   ContractHistoryStyle: any = {};
-  PerformanceFeesStyle: any = {}
-  FeePresetStyle: any = {}
+  PerformanceFeesStyle: any = {};
+  FeePresetStyle: any = {};
+  AttributesFixingStyle:any = {}
 
   funds
   fundHedgings
@@ -188,7 +189,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.AttributesFixingStyle = this.notSelectedElement;
 
     this.lastClickedTabRoute = this.location.path();
 
@@ -271,5 +272,10 @@ export class AppComponent {
       this.FeePresetStyle = this.selectedElement;
       this.router.navigate(['/fee-presets'])
     }
+    else if(screen === 'Attributes Fixing'){
+      this.AttributesFixingStyle = this.selectedElement;
+      this.router.navigate(['/attributes-fixing'])
+    }
+
   }
 }
