@@ -4,6 +4,7 @@ import { MatDialogRef,MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { Form, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DataService } from 'src/app/core/services/data.service';
+import { forkJoin } from 'rxjs';
 
 
 type ACTION_TYPE = 'ADD' | 'EDIT';
@@ -45,17 +46,34 @@ export class FixingDetailsFormComponent implements OnInit {
     //   console.log(data.
     // }
     // )
-    this.dataSvc.getUniqueValuesForField('fund').subscribe(data=>{
-      //console.log(data)
-      this.fundValues = data.map(r=>r.value)
-      console.log(this.fundValues)
+    // this.dataSvc.getUniqueValuesForField('fund').subscribe(data=>{
+    //   //console.log(data)
+    //   this.fundValues = data.map(r=>r.value)
+    //   console.log(this.fundValues)
+    // })
+    // this.dataSvc.getUniqueValuesForField('fundHedging').subscribe(data=>{
+    //   //console.log(data)
+    //   this.fundHedgingValues = data.map(r=>r.value)
+    //   console.log(this.fundHedgingValues)
+    // })
+
+    forkJoin([
+      this.dataSvc.getUniqueValuesForField('fund'),
+      this.dataSvc.getUniqueValuesForField('fundHedging')
+    ]).subscribe({
+      next: (result) => {
+        console.log(result)
+        this.fundValues =  result[0].map(r=>r.value)
+        this.fundHedgingValues = result[1].map(r=>r.value)
+
+        this.initForm();
+      },
+      error: (error) => {
+
+      }
     })
-    this.dataSvc.getUniqueValuesForField('fundHedging').subscribe(data=>{
-      //console.log(data)
-      this.fundHedgingValues = data.map(r=>r.value)
-      console.log(this.fundHedgingValues)
-    })
-    this.initForm();
+
+    // this.initForm();
 
   }
 
@@ -73,6 +91,8 @@ export class FixingDetailsFormComponent implements OnInit {
       attributeType: new FormControl(this.data.fixingDetails.attributeType,Validators.required),
       attributeValue: new FormControl(this.data.fixingDetails.attributeValue,Validators.required)
     })
+    console.log(this.data.fixingDetails.attributeLevelValue)
+    console.log(this.levelValues)
     this.form.get("attributeLevel").valueChanges.subscribe(level=>{
       if(level=="Fund"){
         this.levelValues = this.fundValues

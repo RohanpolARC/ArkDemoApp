@@ -133,11 +133,15 @@ export class AttributesFixingComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 2,
+          Revision: 3,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
-            Columns: [ ...this.columnDefs.map(colDef => colDef.field), 'ActionEdit'],
+            Columns: [ ...this.columnDefs.map(colDef => colDef.field).filter(r => !['fixingID'
+            ,'attributeId'
+            ,'attributeType'
+            ,'createdBy'
+            ,'createdOn'].includes(r)), 'ActionEdit'],
             PinnedColumnsMap: { 
               ActionEdit: 'right' 
             },
