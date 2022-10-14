@@ -18,5 +18,9 @@ export class AttributesFixingService {
   public getFixingTypes(){
     return this.http.get(`${APIConfig.FIXING_TYPES_GET_API}`)
   }
+
+  public putFixingDetails(model){
+    return this.http.post(`${APIConfig.FIXING_TYPES_PUT_API}`, model);
+  }
 }
 

@@ -14,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatOptionModule } from '@angular/material/core';
 import {MatSelectModule} from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
 
 
 @NgModule({
@@ -35,7 +36,8 @@ import {MatSelectModule} from '@angular/material/select';
     MatButtonModule,
     MatDialogModule,
     MatOptionModule,
-    MatSelectModule
+    MatSelectModule,
+    MatIconModule
   ]
 })
 export class AttributesFixingModule { }

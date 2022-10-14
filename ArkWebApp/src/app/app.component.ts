@@ -174,6 +174,12 @@ export class AppComponent {
     else if(this.location.path() === '/fee-calculation'){
       this.updateSelection('Performance Fees')
     }
+    else if(this.location.path() === '/fee-presets'){
+      this.updateSelection('Fee Presets')
+    }
+    else if(this.location.path() === '/attributes-fixing'){
+      this.updateSelection('Attributes Fixing')
+    }
     else this.updateSelection('')
   }
 

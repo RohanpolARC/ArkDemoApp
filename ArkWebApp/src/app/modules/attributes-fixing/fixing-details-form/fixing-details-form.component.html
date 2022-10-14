@@ -1,17 +1,31 @@
 <h3>{{ data.action }}</h3>
+<div>
+    <div *ngIf="isSuccess || isFailure"
+    [class.success-msg]="isSuccess"
+    [class.failure-msg]="isFailure"
+    >
+        {{ updateMsg }}
+    </div>
+</div>
+
 <form [formGroup]="form" *ngIf="form">
         <div class="row" >
             <mat-form-field class="col-6" appearance="outline">
                 <mat-label>As Of Date</mat-label>
                 <input matInput [matDatepicker]="asOfDatePicker" formControlName="asOfDate"
-                autocomplete="off">
+                autocomplete="off" 
+                [disabled]="readOnly"
+                [style.color]="readOnly ? 'grey' : null">
                 <mat-datepicker-toggle matSuffix [for]="asOfDatePicker"></mat-datepicker-toggle>
                 <mat-datepicker #asOfDatePicker></mat-datepicker>
             </mat-form-field>
             
             <mat-form-field class="col-6" appearance="outline">
-                <mat-label>Attribute Level Value</mat-label>
-                <mat-select formControlName="attributeLevelValue" disableOptionCentering>
+                <mat-label>{{ form.get('attributeLevel').value || 'Attribute Level' }}</mat-label>
+                <mat-select formControlName="attributeLevelValue" disableOptionCentering                
+                [disabled]="readOnly"
+                [style.color]="readOnly ? 'grey' : null">
+
                     <mat-option *ngFor="let value of levelValues" [value]="value" >{{ value}}</mat-option>
                 </mat-select>
             </mat-form-field>
@@ -33,16 +47,25 @@
 
             <mat-form-field class="col-6" appearance="outline">
                 <mat-label>Attribute Name</mat-label>
-                <mat-select formControlName="attributeName" disableOptionCentering>
+                <mat-select formControlName="attributeName" disableOptionCentering                
+                [disabled]="readOnly"
+                [style.color]="readOnly ? 'pink' : null">
                     <mat-option *ngFor="let attr of attrNames" [value]="attr" >{{ attr}}</mat-option>
                 </mat-select>
             </mat-form-field>
 
-            <mat-form-field class="col-6" appearance="outline"  *ngIf="attributeType=='String' || attributeType=='Integer' || attributeType=='Decimal'">
+            <mat-form-field class="col-6" appearance="outline"  *ngIf="attributeType=='String'">
                 <mat-label>Attribute Value</mat-label>
                 <input matInput type="text" formControlName="attributeValue"
-                autocomplete="off">
+                autocomplete="off">  
             </mat-form-field>
+
+            <mat-form-field class="col-6" appearance="outline" *ngIf="attributeType=='Integer' || attributeType=='Decimal'">
+                <mat-label>Attribute Value</mat-label>
+                <input matInput type="number" formControlName="attributeValue"
+                autocomplete="off">                
+            </mat-form-field>
+
 
             <mat-form-field class="col-6" appearance="outline"  *ngIf="attributeType=='Boolean'">
                 <mat-label>Attribute Value</mat-label>
@@ -63,6 +86,7 @@
 </form>
 <mat-dialog-actions align="end">
     <button mat-raised-button color="primary" 
-        (click)="onSubmit()">Submit</button>
+        (click)="onSubmit()"
+        [disabled]="isSuccess ? true : (!(this.form?.status === 'VALID') || !this.form?.dirty)">Submit</button>
     <button mat-raised-button (click)="onCancel()">Cancel</button>
 </mat-dialog-actions>

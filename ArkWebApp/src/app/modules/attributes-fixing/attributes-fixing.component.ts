@@ -52,7 +52,7 @@ export class AttributesFixingComponent implements OnInit {
 
     this.columnDefs = [
       { field: 'fixingID' },
-      { field: 'asOfDate',valueFormatter:dateFormatter },
+      { field: 'asOfDate',valueFormatter:dateFormatter, type: 'abColDefDate' },
       { field: 'attributeName'},
       { field: 'attributeId'},
       { field: 'attributeType'},
@@ -63,7 +63,8 @@ export class AttributesFixingComponent implements OnInit {
           if(params.data?.['attributeType'] === 'Date')
             return formatDate(params.value);
           return params.value;
-      }},
+      }
+      },
       { field: 'modifiedBy' },
       { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
       { field: 'createdBy' },
@@ -165,6 +166,17 @@ export class AttributesFixingComponent implements OnInit {
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
     this.fetchFixingDetails();
+  }
+
+  onAdaptableReady({
+    adaptableApi,
+    vendorGrid
+  }: {
+    adaptableApi: AdaptableApi;
+    vendorGrid: GridOptions;
+  }){
+    this.adaptableApi = adaptableApi
+    this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
   }
 
   fetchFixingDetails(){
