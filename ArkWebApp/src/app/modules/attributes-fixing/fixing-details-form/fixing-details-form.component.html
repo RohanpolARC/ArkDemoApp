@@ -1,7 +1,5 @@
-<h2>
-    Fixing Details
-</h2>
-<form [formGroup]="form">
+<h3>{{ data.action }}</h3>
+<form [formGroup]="form" *ngIf="form">
         <div class="row" >
             <mat-form-field class="col-6" appearance="outline">
                 <mat-label>As Of Date</mat-label>
@@ -10,15 +8,10 @@
                 <mat-datepicker-toggle matSuffix [for]="asOfDatePicker"></mat-datepicker-toggle>
                 <mat-datepicker #asOfDatePicker></mat-datepicker>
             </mat-form-field>
-            <!-- <mat-form-field class="col" appearance="outline">
-                <mat-label>Attribute Name</mat-label>
-                <input matInput type="text" formControlName="attributeName"
-                autocomplete="off">
-            </mat-form-field> -->
             
             <mat-form-field class="col-6" appearance="outline">
                 <mat-label>Attribute Level Value</mat-label>
-                <mat-select formControlName="attributeLevelValue">
+                <mat-select formControlName="attributeLevelValue" disableOptionCentering>
                     <mat-option *ngFor="let value of levelValues" [value]="value" >{{ value}}</mat-option>
                 </mat-select>
             </mat-form-field>
@@ -40,7 +33,7 @@
 
             <mat-form-field class="col-6" appearance="outline">
                 <mat-label>Attribute Name</mat-label>
-                <mat-select formControlName="attributeName">
+                <mat-select formControlName="attributeName" disableOptionCentering>
                     <mat-option *ngFor="let attr of attrNames" [value]="attr" >{{ attr}}</mat-option>
                 </mat-select>
             </mat-form-field>
@@ -54,8 +47,8 @@
             <mat-form-field class="col-6" appearance="outline"  *ngIf="attributeType=='Boolean'">
                 <mat-label>Attribute Value</mat-label>
                 <mat-select formControlName="attributeValue" >
-                    <mat-option [value]="'TRUE'" >Yes</mat-option>
-                    <mat-option [value]="'FALSE'" >No</mat-option>
+                    <mat-option [value]="'Yes'" >Yes</mat-option>
+                    <mat-option [value]="'No'" >No</mat-option>
                 </mat-select>
             </mat-form-field>
 

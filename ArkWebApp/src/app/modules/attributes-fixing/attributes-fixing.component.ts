@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { ClientSideRowModelModule, ColDef, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/all-modules';
+import { ClientSideRowModelModule, ColDef, GridApi, GridOptions, GridReadyEvent, Module, ValueFormatterParams } from '@ag-grid-community/all-modules';
 import { ActionColumnButtonContext, AdaptableApi, AdaptableButton, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
 import { Observable, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { dateTimeFormatter,dateFormatter } from 'src/app/shared/functions/formatter';
+import { dateTimeFormatter,dateFormatter, formatDate } from 'src/app/shared/functions/formatter';
 import { AttributesFixingService } from 'src/app/core/services/AttributesFixing/attributes-fixing.service';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { DataService } from 'src/app/core/services/data.service';
 import { ClipboardModule, ColumnsToolPanelModule, ExcelExportModule, FiltersToolPanelModule, MenuModule, RangeSelectionModule, SetFilterModule, SideBarModule } from '@ag-grid-enterprise/all-modules';
 import { FixingDetailsFormComponent } from './fixing-details-form/fixing-details-form.component';
+import { map } from 'rxjs/operators';
 
 
 @Component({
@@ -55,8 +56,14 @@ export class AttributesFixingComponent implements OnInit {
       { field: 'attributeName'},
       { field: 'attributeId'},
       { field: 'attributeType'},
+      { field: 'attributeLevel' },
       { field: 'attributeLevelValue'},
-      { field: 'attributeValue'},
+      { field: 'attributeValue', 
+        valueFormatter: (params: ValueFormatterParams) => {
+          if(params.data?.['attributeType'] === 'Date')
+            return formatDate(params.value);
+          return params.value;
+      }},
       { field: 'modifiedBy' },
       { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
       { field: 'createdBy' },
@@ -157,13 +164,20 @@ export class AttributesFixingComponent implements OnInit {
 
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
-    this.fetchFundFeeData();
+    this.fetchFixingDetails();
   }
 
-  fetchFundFeeData(){
-    this.rowData = this.attributeFixingSvc.getFixingDetails()
-
+  fetchFixingDetails(){
+    this.rowData = this.attributeFixingSvc.getFixingDetails().pipe(
+      map((fixingData: any[]) => fixingData.map(row => {
+        if(row['attributeType'] === 'Boolean'){
+          row['attributeValue'] = row['attributeValue'] ? 'Yes' : 'No';
+        }
+        return row;
+      }))
+    )
   }
+
   openDialog(action: 'ADD' | 'EDIT' = 'ADD', fixingDetails = []) { 
     
     if(!this.isWriteAccess){

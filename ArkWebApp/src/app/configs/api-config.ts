@@ -75,5 +75,5 @@ export class APIConfig {
     public static FEE_PRESET_DATA_PUT_API: string = APIConfig.BASEURL + "/api/FeePresets/PutFundFeeData";
 
     public static FIXING_DETAILS_GET_API: string = APIConfig.BASEURL + "/api/FixingAttributes/GetFixingDetails";
-
+    public static FIXING_TYPES_GET_API: string = APIConfig.BASEURL + "/api/GetRef/GetFixingTypes";
 }

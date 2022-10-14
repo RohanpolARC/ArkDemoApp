@@ -22,14 +22,14 @@ interface UniqueValues{
 export class FixingDetailsFormComponent implements OnInit {
 
   form: FormGroup
-  attrNames: string[] = ['a','b']
+  fixingRef: any;
+  attrNames: string[]
   attrDataTypes: string[] = ['Boolean','Decimal','Integer','Date','String']
   fundValues: string[] = []
   fundHedgingValues: string[] = []
   levelValues: string[];
   adaptableApi: AdaptableApi
   attributeType: any;
-
   constructor(
     private attributesFixingSvc: AttributesFixingService,
     private dataSvc: DataService,
@@ -57,14 +57,19 @@ export class FixingDetailsFormComponent implements OnInit {
     //   console.log(this.fundHedgingValues)
     // })
 
+    console.log(this.data)
     forkJoin([
       this.dataSvc.getUniqueValuesForField('fund'),
-      this.dataSvc.getUniqueValuesForField('fundHedging')
+      this.dataSvc.getUniqueValuesForField('fundHedging'),
+      this.attributesFixingSvc.getFixingTypes()
     ]).subscribe({
       next: (result) => {
         console.log(result)
         this.fundValues =  result[0].map(r=>r.value)
         this.fundHedgingValues = result[1].map(r=>r.value)
+        console.log(result[2])
+        this.fixingRef = result[2]
+        this.setAttributeNames();
 
         this.initForm();
       },
@@ -77,22 +82,36 @@ export class FixingDetailsFormComponent implements OnInit {
 
   }
 
-  setAttributeNames(attributeLevel:string){
+  setAttributeNames(){
+    this.attrNames = this.fixingRef.map(r => r?.['attributeName'])
+  }
+
+  updateForm(){
+    this.form.patchValue({
+      asOfDate: this.data.fixingDetails.asOfDate,
+      attributeName: this.data.fixingDetails.attributeName,
+      attributeLevel: this.data.fixingDetails.attributeLevel,
+      attributeLevelValue: this.data.fixingDetails.attributeLevelValue,
+      attributeType: this.data.fixingDetails.attributeType,
+      attributeValue: this.data.fixingDetails.attributeValue
+    })
   }
 
   initForm(){
     this.attributeType= this.data.fixingDetails.attributeType
-    this.setAttributeNames(this.data.fixingDetails.attributeLevel)
     this.form = new FormGroup({
-      asOfDate:new FormControl(this.data.fixingDetails.asOfDate,Validators.required),
-      attributeName: new FormControl(this.data.fixingDetails.attributeName,Validators.required),
-      attributeLevel: new FormControl(this.data.fixingDetails.attributeLevel,Validators.required),
-      attributeLevelValue: new FormControl(this.data.fixingDetails.attributeLevelValue,Validators.required),
-      attributeType: new FormControl(this.data.fixingDetails.attributeType,Validators.required),
-      attributeValue: new FormControl(this.data.fixingDetails.attributeValue,Validators.required)
+      asOfDate:new FormControl(null, Validators.required),
+      attributeName: new FormControl(null, Validators.required),
+      attributeLevel: new FormControl(null, Validators.required),
+      attributeLevelValue: new FormControl(null, Validators.required),
+      attributeType: new FormControl(null, Validators.required),
+      attributeValue: new FormControl(null, Validators.required)
     })
-    console.log(this.data.fixingDetails.attributeLevelValue)
-    console.log(this.levelValues)
+    this.changeListeners();
+    this.updateForm();
+  }
+
+  changeListeners(){
     this.form.get("attributeLevel").valueChanges.subscribe(level=>{
       if(level=="Fund"){
         this.levelValues = this.fundValues
@@ -100,9 +119,22 @@ export class FixingDetailsFormComponent implements OnInit {
         this.levelValues = this.fundHedgingValues
       }
     })
-    this.form.get("attributeType").valueChanges.subscribe(newAttributeType=>{
-      this.attributeType = newAttributeType
+
+    this.form.get('attributeName').valueChanges.subscribe(attributeName => {
+      let r = this.fixingRef.filter(r => r?.['attributeName'] === attributeName)[0];
+      this.attributeType = r?.['attributeType']
+      
+      if(attributeName === this.data.fixingDetails.attributeName){
+        this.form.patchValue({ attributeValue: this.data.fixingDetails.attributeValue})
+      }
+      else this.form.get('attributeValue').reset();
+      
+      // alert(this.attributeType)
     })
+
+    // this.form.get("attributeType").valueChanges.subscribe(newAttributeType=>{
+    //   this.attributeType = newAttributeType
+    // })
   }
 
   onSubmit(){
