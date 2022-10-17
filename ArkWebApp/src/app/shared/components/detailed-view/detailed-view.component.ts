@@ -71,7 +71,7 @@ export class DetailedViewComponent implements OnInit {
 
     if(!!this.rowData){
 
-      this.columnDefs = createColumnDefs(this.rowData[0].columnValues, ['account', 'accountid', 'account id', 'issuer', 'id', 'positionid', 'position id', 'issuerid', 'issuer id', 'asset id', 'assetid', 'extract id','attributevalue']);
+      this.columnDefs = createColumnDefs(this.rowData[0].columnValues);
       this.rowData = parseFetchedData(this.rowData);  
       params.api.setColumnDefs(this.columnDefs);
 
