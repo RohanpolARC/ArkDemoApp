@@ -11,10 +11,7 @@ import { getMomentDate } from 'src/app/shared/functions/utilities';
 
 type ACTION_TYPE = 'ADD' | 'EDIT';
 
-interface UniqueValues{
-  id:number,
-  value:string
-} 
+
 
 @Component({
   selector: 'app-fixing-details-form',

@@ -8,8 +8,8 @@ const routes: Routes =
 [
     { 
         path: '', component: AttributesFixingComponent, 
-        //canActivate: [MsalGuard, RoleGuard], 
-        //data: { tab: 'Fee Presets' } 
+        canActivate: [MsalGuard, RoleGuard], 
+        data: { tab: 'Attributes Fixing' } 
     }
 ];
 

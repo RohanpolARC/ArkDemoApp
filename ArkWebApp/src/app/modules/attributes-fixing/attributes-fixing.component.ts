@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ClientSideRowModelModule, ColDef, GridApi, GridOptions, GridReadyEvent, Module, ValueFormatterParams } from '@ag-grid-community/all-modules';
+import { ClientSideRowModelModule, ColDef, GridApi, GridOptions, GridReadyEvent, Module, RowNode, ValueFormatterParams } from '@ag-grid-community/all-modules';
 import { ActionColumnButtonContext, AdaptableApi, AdaptableButton, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
 import { Observable, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -10,6 +10,9 @@ import { DataService } from 'src/app/core/services/data.service';
 import { ClipboardModule, ColumnsToolPanelModule, ExcelExportModule, FiltersToolPanelModule, MenuModule, RangeSelectionModule, SetFilterModule, SideBarModule } from '@ag-grid-enterprise/all-modules';
 import { FixingDetailsFormComponent } from './fixing-details-form/fixing-details-form.component';
 import { map } from 'rxjs/operators';
+import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
+import { AccessService } from 'src/app/core/services/Auth/access.service';
+import { MsalService } from '@azure/msal-angular';
 
 
 @Component({
@@ -26,7 +29,7 @@ export class AttributesFixingComponent implements OnInit {
   gridApi: GridApi
   adaptableApi : AdaptableApi
   rowData: Observable<any>
-  isWriteAccess: boolean = true;
+  isWriteAccess: boolean = false;
 
   agGridModules: Module[] = [
     ClientSideRowModelModule,
@@ -39,16 +42,27 @@ export class AttributesFixingComponent implements OnInit {
     SideBarModule,
     RangeSelectionModule
   ];
+  deleteFixingDetailID: number;
 
   
 
   constructor(
     private attributeFixingSvc: AttributesFixingService,
     private dataSvc: DataService,
+    private accessSvc: AccessService,
+    private msalSvc: MsalService,
     public dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
+
+    this.isWriteAccess = false;
+    for(let i: number = 0; i < this.accessSvc.accessibleTabs?.length; i+= 1){
+      if(this.accessSvc.accessibleTabs[i].tab === 'Attributes Fixing' && this.accessSvc.accessibleTabs[i].isWrite){
+        this.isWriteAccess = true;
+        break;
+      }        
+    }
 
     this.columnDefs = [
       { field: 'fixingID' },
@@ -116,13 +130,44 @@ export class AttributesFixingComponent implements OnInit {
                   }
   
                   let rowData = context.rowNode.data;
-                  let fundName: string = rowData?.['fundName'];
   
                   // To open dialog after successfull fetch
                   this.openDialog('EDIT', rowData); 
               },
               icon: {
                 src: '../assets/img/edit.svg',
+                style: {height: 25, width: 25}
+              }
+            }
+          },
+          {
+            columnId: 'ActionDelete',
+            actionColumnButton: {
+              onClick: (
+                button: AdaptableButton<ActionColumnButtonContext>,
+                context: ActionColumnButtonContext
+              ) => {
+
+                let isDeleteAccess: boolean = false;
+
+                let userRoles: string[] = this.msalSvc.instance.getActiveAccount()?.idTokenClaims?.roles
+                // Only Admin.Write has approv/reject access on approval grid
+                if(userRoles.map(role => role.toLowerCase()).includes('admin.write')){
+                  isDeleteAccess = true;
+                }
+                // TO open the dialog
+                if(!isDeleteAccess){
+                  this.dataSvc.setWarningMsg('Only admin has delete access', 'Dismiss', 'ark-theme-snackbar-warning')
+                  return;
+                }
+
+                let rowData = context.rowNode.data;
+
+                // To open dialog after successfull fetch
+                this.openDialog('DELETE', rowData); 
+              },
+              icon: {
+                src: '../assets/img/trash.svg',
                 style: {height: 25, width: 25}
               }
             }
@@ -141,7 +186,7 @@ export class AttributesFixingComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 3,
+          Revision: 10,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -149,12 +194,14 @@ export class AttributesFixingComponent implements OnInit {
             ,'attributeId'
             ,'attributeType'
             ,'createdBy'
-            ,'createdOn'].includes(r)), 'ActionEdit'],
+            ,'createdOn'].includes(r)), 'ActionEdit','ActionDelete'],
             PinnedColumnsMap: { 
-              ActionEdit: 'right' 
+              ActionEdit: 'right',
+              ActionDelete:'right' 
             },
             ColumnWidthMap: {
-              ActionEdit: 15
+              ActionEdit: 8,
+              ActionDelete:8
             }
           }]
         }
@@ -190,24 +237,52 @@ export class AttributesFixingComponent implements OnInit {
     )
   }
 
-  openDialog(action: 'ADD' | 'EDIT' = 'ADD', fixingDetails = []) { 
+  deleteFixingDetail(fixingID){
+    this.subscriptions.push(this.attributeFixingSvc.deleteFixingDetails(fixingID).subscribe((result:any)=>{
+      if(result.isSuccess===true){
+        const rowNode:RowNode = this.adaptableApi.gridApi.getRowNodeForPrimaryKey(fixingID)
+        this.adaptableApi.gridApi.deleteGridData([rowNode.data])
+        this.dataSvc.setWarningMsg('The Attribute deleted successfully','Dismiss','ark-theme-snackbar-success')
+      }else{
+        this.dataSvc.setWarningMsg('The Attribute could not be deleted','Dismiss','ark-theme-snackbar-error')
+      }
+    }))
+  }
+
+  openDialog(action: 'ADD' | 'EDIT' | 'DELETE' = 'ADD', fixingDetails:any = []) { 
     
     if(!this.isWriteAccess){
       this.dataSvc.setWarningMsg('No Access', 'Dismiss', 'ark-theme-snackbar-warning')
       return
     }
 
-    const dialogRef = this.dialog.open(FixingDetailsFormComponent, {
-      data: { 
-        action: action,
-        fixingDetails: fixingDetails,
-        adaptableApi: this.adaptableApi
-      },
-      maxHeight: '95vh'
-      //minHeight: '60vh'
-    })
+    if(action === 'DELETE'){
+      this.deleteFixingDetailID = fixingDetails.fixingID
+      let confirmTextString = 'Are you sure you want to delete this attribute ?'
+      const dialogRef = this.dialog.open(ConfirmationPopupComponent, { 
+        data:{confirmText:confirmTextString},
+        maxHeight: '95vh'
+      })
+      this.subscriptions.push(dialogRef.afterClosed().subscribe((value)=>{
+        if(value.action==='Confirm'){
+          this.deleteFixingDetail(this.deleteFixingDetailID)
+        }
+      }))
+    }else{
+      const dialogRef = this.dialog.open(FixingDetailsFormComponent, {
+        data: { 
+          action: action,
+          fixingDetails: fixingDetails,
+          adaptableApi: this.adaptableApi
+        },
+        maxHeight: '95vh'
+        //minHeight: '60vh'
+      })
+      this.subscriptions.push(dialogRef.afterClosed().subscribe())
+    }
 
-    this.subscriptions.push(dialogRef.afterClosed().subscribe())
+
+    
   }
 
 }
