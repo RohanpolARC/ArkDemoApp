@@ -30,6 +30,7 @@ export class AttributesFixingComponent implements OnInit {
   adaptableApi : AdaptableApi
   rowData: Observable<any>
   isWriteAccess: boolean = false;
+  isDeleteAccess: boolean = false;
 
   agGridModules: Module[] = [
     ClientSideRowModelModule,
@@ -62,6 +63,12 @@ export class AttributesFixingComponent implements OnInit {
         this.isWriteAccess = true;
         break;
       }        
+    }
+
+    // Only admin.write has delete access.
+    let userRoles: string[] = this.msalSvc.instance.getActiveAccount()?.idTokenClaims?.roles
+    if(userRoles.map(role => role.toLowerCase()).includes('admin.write')){
+      this.isDeleteAccess = true;
     }
 
     this.columnDefs = [
@@ -148,15 +155,8 @@ export class AttributesFixingComponent implements OnInit {
                 context: ActionColumnButtonContext
               ) => {
 
-                let isDeleteAccess: boolean = false;
-
-                let userRoles: string[] = this.msalSvc.instance.getActiveAccount()?.idTokenClaims?.roles
-                // Only Admin.Write has approv/reject access on approval grid
-                if(userRoles.map(role => role.toLowerCase()).includes('admin.write')){
-                  isDeleteAccess = true;
-                }
                 // TO open the dialog
-                if(!isDeleteAccess){
+                if(!this.isDeleteAccess){
                   this.dataSvc.setWarningMsg('Only admin has delete access', 'Dismiss', 'ark-theme-snackbar-warning')
                   return;
                 }
@@ -186,7 +186,7 @@ export class AttributesFixingComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 10,
+          Revision: 12,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -200,8 +200,8 @@ export class AttributesFixingComponent implements OnInit {
               ActionDelete:'right' 
             },
             ColumnWidthMap: {
-              ActionEdit: 8,
-              ActionDelete:8
+              ActionEdit: 18,
+              ActionDelete: 18
             }
           }]
         }
@@ -275,7 +275,8 @@ export class AttributesFixingComponent implements OnInit {
           fixingDetails: fixingDetails,
           adaptableApi: this.adaptableApi
         },
-        maxHeight: '95vh'
+        maxHeight: '95vh',
+        // minWidth: '500px'
         //minHeight: '60vh'
       })
       this.subscriptions.push(dialogRef.afterClosed().subscribe())

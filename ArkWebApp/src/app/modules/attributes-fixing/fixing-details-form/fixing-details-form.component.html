@@ -10,7 +10,9 @@
 
 <form [formGroup]="form" *ngIf="form">
         <div class="row" >
-            <mat-form-field class="col-6" appearance="outline">
+            <mat-form-field appearance="outline"
+            [class.col-6]="attributeType"
+            [class.col]="!attributeType">
                 <mat-label>As Of Date</mat-label>
                 <input matInput [matDatepicker]="asOfDatePicker" formControlName="asOfDate"
                 autocomplete="off" 
@@ -20,32 +22,21 @@
                 <mat-datepicker #asOfDatePicker></mat-datepicker>
             </mat-form-field>
             
-            <mat-form-field class="col-6" appearance="outline">
-                <mat-label>{{ form.get('attributeLevel').value || 'Attribute Level' }}</mat-label>
-                <mat-select formControlName="attributeLevelValue" disableOptionCentering                
-                [disabled]="readOnly"
-                [style.color]="readOnly ? 'grey' : null">
-
-                    <mat-option *ngFor="let value of levelValues" [value]="value" >{{ value}}</mat-option>
-                </mat-select>
-            </mat-form-field>
-            <!-- <mat-form-field class="col-6" appearance="outline">
-                <mat-label>Attribute Type</mat-label>
-                <mat-select formControlName="attributeType">
-                    <mat-option *ngFor="let type of attrDataTypes" [value]="type" >{{ type}}</mat-option>
-                </mat-select>
-            </mat-form-field> -->
+            <ng-container *ngIf="!!attributeType">
+                <mat-form-field class="col-6" appearance="outline">
+                    <mat-label>{{ form.get('attributeLevel').value || 'Attribute Level' }}</mat-label>
+                    <mat-select formControlName="attributeLevelValue" disableOptionCentering
+                    [disabled]="readOnly"
+                    [style.color]="readOnly ? 'grey' : null">
+                        <mat-option *ngFor="let value of levelValues" [value]="value" >{{ value}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </ng-container>
         </div>
         <div class="row">
-            <!-- <mat-form-field class="col-6" appearance="outline">
-                <mat-label>Attribute Level</mat-label>
-                <mat-select formControlName="attributeLevel">
-                    <mat-option [value]="'Fund'" >Fund</mat-option>
-                    <mat-option [value]="'FundHedging'" >Fund Hedging</mat-option>
-                </mat-select>
-            </mat-form-field> -->
-
-            <mat-form-field class="col-6" appearance="outline">
+            <mat-form-field appearance="outline"
+            [class.col-6]="attributeType"
+            [class.col]="!attributeType">
                 <mat-label>Attribute Name</mat-label>
                 <mat-select formControlName="attributeName" disableOptionCentering                
                 [disabled]="readOnly"

@@ -68,6 +68,8 @@ export class FixingDetailsFormComponent implements OnInit {
         this.initForm();
       },
       error: (error) => {
+        this.dataSvc.setWarningMsg(`Failed to get fixing attribute reference information`, `Dismiss`, `ark-theme-snackbar-error`);
+        console.error(error)
       }
     })
   }
