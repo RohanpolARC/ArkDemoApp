@@ -90,7 +90,6 @@ export function createColumnDefs(
       else if(!isNaN(parseFloat(row[i].value))){
         colDef.valueFormatter = amountFormatter
       }
-      console.log(colDef)
       columnDefs.push(colDef);
     }
     return columnDefs;
