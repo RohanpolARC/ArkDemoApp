@@ -60,7 +60,7 @@ const routes: Routes = [
     loadChildren: () => import('./modules/fee-calculation/fee-calculation.module').then(m => m.FeeCalculationModule) },
   { path: 'fee-presets',
     loadChildren: () => import('./modules/fee-presets/fee-presets.module').then(m => m.FeePresetsModule) },
-  { path: 'attributes-fixing',
+  { path: 'fixing-attributes',
     loadChildren: () => import('./modules/attributes-fixing/attributes-fixing.module').then(m => m.AttributesFixingModule) }
 ];
 

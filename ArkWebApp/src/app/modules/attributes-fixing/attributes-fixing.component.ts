@@ -58,7 +58,7 @@ export class AttributesFixingComponent implements OnInit {
 
     this.isWriteAccess = false;
     for(let i: number = 0; i < this.accessSvc.accessibleTabs?.length; i+= 1){
-      if(this.accessSvc.accessibleTabs[i].tab === 'Attributes Fixing' && this.accessSvc.accessibleTabs[i].isWrite){
+      if(this.accessSvc.accessibleTabs[i].tab === 'Fixing Attributes' && this.accessSvc.accessibleTabs[i].isWrite){
         this.isWriteAccess = true;
         break;
       }        

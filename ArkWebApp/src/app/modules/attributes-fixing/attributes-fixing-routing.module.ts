@@ -9,7 +9,7 @@ const routes: Routes =
     { 
         path: '', component: AttributesFixingComponent, 
         canActivate: [MsalGuard, RoleGuard], 
-        data: { tab: 'Attributes Fixing' } 
+        data: { tab: 'Fixing Attributes' } 
     }
 ];
 
