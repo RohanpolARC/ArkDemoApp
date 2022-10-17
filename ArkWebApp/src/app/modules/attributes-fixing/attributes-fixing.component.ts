@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ClientSideRowModelModule, ColDef, GridApi, GridOptions, GridReadyEvent, Module, RowNode, ValueFormatterParams } from '@ag-grid-community/all-modules';
+import { CellClickedEvent, ClientSideRowModelModule, ColDef, GridApi, GridOptions, GridReadyEvent, Module, RowNode, ValueFormatterParams } from '@ag-grid-community/all-modules';
 import { ActionColumnButtonContext, AdaptableApi, AdaptableButton, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
 import { Observable, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,6 +13,8 @@ import { map } from 'rxjs/operators';
 import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { MsalService } from '@azure/msal-angular';
+import { DetailedView } from 'src/app/shared/models/GeneralModel';
+import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
 
 
 @Component({
@@ -74,7 +76,13 @@ export class AttributesFixingComponent implements OnInit {
     this.columnDefs = [
       { field: 'fixingID' },
       { field: 'asOfDate',valueFormatter:dateFormatter, type: 'abColDefDate' },
-      { field: 'attributeName'},
+      { 
+        field: 'attributeName',
+        cellStyle: {
+          color: '#0590ca'
+        },
+        onCellClicked: this.onAttributeCellClicked.bind(this),
+      },
       { field: 'attributeId'},
       { field: 'attributeType'},
       { field: 'attributeLevel' },
@@ -208,6 +216,27 @@ export class AttributesFixingComponent implements OnInit {
       }
 
     }
+  }
+
+  onAttributeCellClicked(event: CellClickedEvent){
+      console.log('in event')
+      let model: DetailedView = <DetailedView>{};
+
+      model.screen = 'Fixing Attributes';
+      model.param1 = String(event.data.attributeId);           //attribute name
+      model.param2 = String(event.data.attributeLevelValue);
+      model.param3 = formatDate(event.data.asOfDate,true);
+      model.param4 = ''
+      model.param5 = ''
+      console.log(model)
+
+      const dialogRef = this.dialog.open(DetailedViewComponent,{
+        data: {
+          detailedViewRequest: model
+        },
+        width: '90vw',
+        height: '80vh'
+      })
   }
 
   onGridReady(params: GridReadyEvent) {
