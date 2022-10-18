@@ -15,6 +15,7 @@ import { ColDef, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 import { dateFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
 import { LinkInvestorModalComponent } from '../link-investor-modal/link-investor-modal.component';
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
+import { DataService } from 'src/app/core/services/data.service';
 
 @Component({
   selector: 'app-add-capital-modal',
@@ -38,6 +39,7 @@ export class AddCapitalModalComponent implements OnInit{
   assetOptions = [];
   assetIDOptions = [];
   fundCcyOptions = [];
+  positionCcyOptions = [];
 
   header: string;
   buttontext: string;
@@ -105,7 +107,7 @@ export class AddCapitalModalComponent implements OnInit{
     let capitalType: string = this.validateField(this.capitalTypeOptions, control, 'capitalType');
     let capitalSubType: string = this.validateField(this.capitalSubTypeOptions, control, 'capitalSubType');
     let currency: string = this.validateField(this.fundCcyOptions, control, 'fundCcy');
-    let posCcy: string = this.validateField(this.fundCcyOptions, control, 'posCcy');
+    let posCcy: string = this.validateField(this.positionCcyOptions, control, 'posCcy');
 
     let totalAmount: number = control.get('totalAmount').value;
     let fxRate: number  = control.get('fxRate').value;
@@ -187,7 +189,8 @@ export class AddCapitalModalComponent implements OnInit{
     },
     public dialog: MatDialog,
     private capitalActivityService: CapitalActivityService, 
-    private msalService: MsalUserService) { }
+    private msalService: MsalUserService,
+    private dataSvc: DataService) { }
 
   createNetISS(issuers: string[], issuerSN: string[], issuerIDs: number[]){
     this.netISS = [];
@@ -295,13 +298,30 @@ export class AddCapitalModalComponent implements OnInit{
     }
   }   
 
-  setCcy(FH: string): void{
-    this.data.refData.forEach(row => {
-      if(row.fundHedging === FH)
+  setFundCcy(FH: string): void{
+    for(let i: number = 0; i < this.data.refData.length; i+= 1){
+      let row = this.data.refData[i];
+      if(row.fundHedging === FH){
         this.capitalActivityForm.patchValue({
           fundCcy: row.fundCcy
         })
-    });
+        break;
+      }        
+    }
+  }
+
+  setPositionCcy(FH: string, ISN: string, AS: string): void{
+    if(FH && ISN && AS){
+      for(let i: number = 0; i < this.data.refData.length; i+= 1){
+        let row = this.data.refData[i];
+        if(row.fundHedging === FH && row.issuerShortName === ISN && row.asset === AS){
+          this.capitalActivityForm.patchValue({
+            posCcy: row.positionCcy
+          })
+          break;
+        }
+      }
+    }
   }
 
   _filterIS(value?: string): [string, string, number][]{
@@ -366,7 +386,14 @@ export class AddCapitalModalComponent implements OnInit{
     this.setDynamicOptions(FH, null, null);
     this.capitalActivityForm.get('issuerShortName').reset();
     this.capitalActivityForm.get('asset').reset();
-    this.setCcy(FH);
+    this.setFundCcy(FH);
+  }
+
+  assetSelect(event: MatAutocompleteSelectedEvent){
+    let AS: string = event.option.value;
+    let FH: string = this.capitalActivityForm.get('fundHedging').value;
+    let ISN: string = this.capitalActivityForm.get('issuerShortName').value;
+    this.setPositionCcy(FH, ISN, AS)
   }
 
   changeListeners(): void{
@@ -392,6 +419,7 @@ export class AddCapitalModalComponent implements OnInit{
       debounceTime(300),
       distinctUntilChanged()
     ).subscribe(fxRateOverride => {
+
       if(fxRateOverride && this.capitalActivityForm.get('fxRate').value === this.data?.rowData?.fxRate){
         this.fxRateSource = this.data?.rowData?.fxRateSource;
       }
@@ -465,7 +493,7 @@ export class AddCapitalModalComponent implements OnInit{
       
     this.posCcyFilteredOptions = this.capitalActivityForm.get('posCcy').valueChanges.pipe(
       startWith(''),
-      map(value => this._filter(this.fundCcyOptions, value))
+      map(value => this._filter(this.positionCcyOptions, value))
     )
 
     this.capitalTypeFilteredOptions = this.capitalActivityForm.get('capitalType').valueChanges.pipe( startWith(''), 
@@ -533,9 +561,13 @@ export class AddCapitalModalComponent implements OnInit{
       if(!!this.data.refData[i].fundCcy){
         this.fundCcyOptions.push(this.data.refData[i].fundCcy);
       }
+      if(!!this.data.refData[i].positionCcy){
+        this.positionCcyOptions.push(this.data.refData[i].positionCcy);
+      }
     }
     this.fundHedgingOptions = [...new Set(this.fundHedgingOptions)]
     this.fundCcyOptions = [...new Set(this.fundCcyOptions)]
+    this.positionCcyOptions = [ ...new Set(this.positionCcyOptions)]
 
     if(this.data.actionType === 'LINK-ADD'){
       this.header = 'Link Investment';
