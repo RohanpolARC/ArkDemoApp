@@ -43,7 +43,6 @@ import { MatTableModule } from '@angular/material/table';
 import { IPublicClientApplication, PublicClientApplication, BrowserCacheLocation, InteractionType, LogLevel } from '@azure/msal-browser';
 import { MsalHttpInterceptor } from './core/interceptors/msal-http.interceptor';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-// import { MsalModule, MsalInterceptor, MsalGuard, MsalGuardConfiguration, MsalService, MsalInterceptorConfiguration, MSAL_INSTANCE, MSAL_GUARD_CONFIG, MSAL_INTERCEPTOR_CONFIG, MsalBroadcastService } from '@azure/msal-angular';  
 
 export const protectedResourceMap: any =  
   [  
@@ -53,7 +52,8 @@ export const protectedResourceMap: any =
   ];  
 
 export function loggerCallback(logLevel: LogLevel, message: string) {
-  console.log(message);
+  if(LogLevel.Error === logLevel || LogLevel.Warning === logLevel)
+    console.log(message);
 }
 
 export function MSALInstanceFactory(): IPublicClientApplication {
@@ -70,7 +70,7 @@ export function MSALInstanceFactory(): IPublicClientApplication {
     system: {
       loggerOptions: {
         loggerCallback,
-        logLevel: LogLevel.Info,
+        logLevel: LogLevel.Error,
         piiLoggingEnabled: false
       }
     }

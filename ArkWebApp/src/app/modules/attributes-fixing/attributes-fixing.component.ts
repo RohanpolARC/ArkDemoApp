@@ -133,6 +133,7 @@ export class AttributesFixingComponent implements OnInit {
         actionColumns: [
           {
             columnId: 'ActionEdit',
+            friendlyName: 'Edit',
             actionColumnButton: {
               onClick: (
                 button: AdaptableButton<ActionColumnButtonContext>,
@@ -157,6 +158,7 @@ export class AttributesFixingComponent implements OnInit {
           },
           {
             columnId: 'ActionDelete',
+            friendlyName: 'Delete',
             actionColumnButton: {
               onClick: (
                 button: AdaptableButton<ActionColumnButtonContext>,
@@ -253,6 +255,7 @@ export class AttributesFixingComponent implements OnInit {
   }){
     this.adaptableApi = adaptableApi
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
+    this.adaptableApi.columnApi.autosizeAllColumns()
   }
 
   fetchFixingDetails(){
