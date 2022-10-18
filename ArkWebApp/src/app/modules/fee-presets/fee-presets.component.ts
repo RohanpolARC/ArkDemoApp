@@ -182,7 +182,7 @@ export class FeePresetsComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 11,
+          Revision: 7,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -191,7 +191,7 @@ export class FeePresetsComponent implements OnInit {
               ActionEdit: 'right' 
             },
             ColumnWidthMap: {
-              ActionEdit: 2
+              ActionEdit: 18
             }
           }]
         }
