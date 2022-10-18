@@ -221,7 +221,6 @@ export class AttributesFixingComponent implements OnInit {
   }
 
   onAttributeCellClicked(event: CellClickedEvent){
-      console.log('in event')
       let model: DetailedView = <DetailedView>{};
 
       model.screen = 'Fixing Attributes';
@@ -230,7 +229,6 @@ export class AttributesFixingComponent implements OnInit {
       model.param3 = formatDate(event.data.asOfDate,true);
       model.param4 = ''
       model.param5 = ''
-      console.log(model)
 
       const dialogRef = this.dialog.open(DetailedViewComponent,{
         data: {
