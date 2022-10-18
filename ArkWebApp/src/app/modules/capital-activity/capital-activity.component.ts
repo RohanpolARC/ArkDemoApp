@@ -96,7 +96,7 @@ export class CapitalActivityComponent implements OnInit {
   columnDefsInvstmnt: ColDef[] = [
     { field: 'unqiueID', tooltipField: 'unqiueID', type: 'abColDefNumber'},
     { field: 'positionID', tooltipField: 'positionID', headerName: 'Position ID', type: 'abColDefNumber'},
-    { field: 'cashDate', tooltipField: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter},
+    { field: 'cashDate', tooltipField: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter, type: 'abColDefDate'},
     { field: 'fund', tooltipField: 'fund', headerName: 'Fund', type: 'abColDefString'},
     { field: 'fundHedging', tooltipField: 'fundHedging', headerName: 'Fund Hedging', type: 'abColDefString'},
     { field: 'portfolio', tooltipField: 'portfolio', headerName: 'Portfolio', type: 'abColDefString'},
@@ -250,7 +250,12 @@ export class CapitalActivityComponent implements OnInit {
       userName: this.dataSvc.getCurrentUserName(),
       adaptableId: 'Capital Activity - Investor Cashflows',
       adaptableStateKey: `Capital Activity Key`,
-      
+
+      exportOptions: {
+        exportDateFormat: 'dd/MM/yyyy',
+        exportFormatType: 'formattedValue'
+      },
+
       teamSharingOptions: {
         enableTeamSharing: true,
         setSharedEntities: setSharedEntities.bind(this),
@@ -352,6 +357,11 @@ export class CapitalActivityComponent implements OnInit {
       adaptableId: 'Capital Activity - Investment Cashflows',
       adaptableStateKey: `Investment CashFlow Key`,
       
+      exportOptions: {
+        exportDateFormat: 'dd/MM/yyyy',
+        exportFormatType: 'formattedValue'
+      },
+
       toolPanelOptions: {
         toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
       },
