@@ -1,4 +1,4 @@
-<h3>Detailed View</h3>
+<h3>{{header}}</h3>
 
 <div class="content">
     <ng-container *ngIf="rowData?.length > 0 && !failureMsg">
@@ -19,7 +19,7 @@
     </p>
     
     <p *ngIf="rowData?.length === 0 && !failureMsg" class="no-content">
-        No detailed view
+        {{ noDataMessage }}
     </p>
 
 </div>

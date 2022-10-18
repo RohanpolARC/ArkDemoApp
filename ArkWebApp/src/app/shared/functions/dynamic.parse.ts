@@ -3,7 +3,9 @@ import { ColDef, ValueFormatterParams } from "@ag-grid-community/all-modules";
 import { amountFormatter, dateFormatter, dateTimeFormatter } from "./formatter";
 
 const GENERAL_FORMATTING_EXCEPTIONS = ['account', 'accountid', 'account id', 'issuer', 'id', 'positionid', 'position id', 'issuerid', 'issuer id', 'asset id', 'assetid', 'extract id', 'loanxid', 
-'issuershortname', 'asset', 'fund', 'fundhedging', 'issuer', 'issuer short name'];
+'issuershortname', 'asset', 'fund', 'fundhedging', 'issuer', 'issuer short name',
+'AttributeValue'    //Added for Fixing Details - Attribute name detailed view
+];
 
 const GENERAL_DATETIME_FORMATTING_COLUMNS = ['createdon','created on','modified on', 'modifiedon']
 
@@ -88,7 +90,6 @@ export function createColumnDefs(
       else if(!isNaN(parseFloat(row[i].value))){
         colDef.valueFormatter = amountFormatter
       }
-
       columnDefs.push(colDef);
     }
     return columnDefs;

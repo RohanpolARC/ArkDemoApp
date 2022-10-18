@@ -52,8 +52,9 @@ export class AppComponent {
   PortfolioMappingStyle: any = {};
   UnfundedAssetsStyle: any = {};
   ContractHistoryStyle: any = {};
-  PerformanceFeesStyle: any = {}
-  FeePresetStyle: any = {}
+  PerformanceFeesStyle: any = {};
+  FeePresetStyle: any = {};
+  FixingAttributesStyle:any = {}
 
   funds
   fundHedgings
@@ -173,6 +174,12 @@ export class AppComponent {
     else if(this.location.path() === '/fee-calculation'){
       this.updateSelection('Performance Fees')
     }
+    else if(this.location.path() === '/fee-presets'){
+      this.updateSelection('Fee Presets')
+    }
+    else if(this.location.path() === '/fixing-attributes'){
+      this.updateSelection('Fixing Attributes')
+    }
     else this.updateSelection('')
   }
 
@@ -188,7 +195,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.notSelectedElement;
 
     this.lastClickedTabRoute = this.location.path();
 
@@ -271,5 +278,10 @@ export class AppComponent {
       this.FeePresetStyle = this.selectedElement;
       this.router.navigate(['/fee-presets'])
     }
+    else if(screen === 'Fixing Attributes'){
+      this.FixingAttributesStyle = this.selectedElement;
+      this.router.navigate(['/fixing-attributes'])
+    }
+
   }
 }

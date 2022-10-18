@@ -23,10 +23,17 @@ export class DetailedViewComponent implements OnInit {
   agGridModules: Module[] = [ClientSideRowModelModule,RowGroupingModule,SetFilterModule,ColumnsToolPanelModule,MenuModule, ClipboardModule,ExcelExportModule];
 
   failureMsg: string = null;
+  header: string = 'Detailed View'
+  noDataMessage: string = 'No detailed view'
 
   constructor(
     public dialogRef: MatDialogRef<DetailedViewComponent>,
-    @Inject(MAT_DIALOG_DATA) public data,
+    @Inject(MAT_DIALOG_DATA) public data: {
+      detailedViewRequest: any,
+      failureMsg: string,
+      header: string,
+      noDataMessage: string
+    },
     private dataSvc: DataService
   ) { }
 
@@ -43,9 +50,15 @@ export class DetailedViewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.request = this.data?.['detailedViewRequest'];
-    this.failureMsg = this.data?.['failureMsg'];
-
+    if(this.data.detailedViewRequest)
+      this.request = this.data?.['detailedViewRequest'];
+    if(this.data.failureMsg)   
+      this.failureMsg = this.data?.['failureMsg'];
+    if(this.data.header)
+      this.header = this.data?.['header'];
+    if(this.data.noDataMessage)
+      this.noDataMessage = this.data?.['noDataMessage'];
+    
     // If failureMsg is not null, then component displays the failure message directly.
     if(!this.failureMsg){
 
@@ -71,7 +84,7 @@ export class DetailedViewComponent implements OnInit {
 
     if(!!this.rowData){
 
-      this.columnDefs = createColumnDefs(this.rowData[0].columnValues, ['account', 'accountid', 'account id', 'issuer', 'id', 'positionid', 'position id', 'issuerid', 'issuer id', 'asset id', 'assetid', 'extract id']);
+      this.columnDefs = createColumnDefs(this.rowData[0].columnValues);
       this.rowData = parseFetchedData(this.rowData);  
       params.api.setColumnDefs(this.columnDefs);
 

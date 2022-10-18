@@ -73,4 +73,10 @@ export class APIConfig {
     public static FEE_PRESET_DATA_GET_API: string = APIConfig.BASEURL + "/api/FeePresets/GetFundFeeData";
     public static FEE_PRESET_INVESTMENT_PUT_API: string = APIConfig.BASEURL + "/api/FeePresets/PutFundInvestmentData";
     public static FEE_PRESET_DATA_PUT_API: string = APIConfig.BASEURL + "/api/FeePresets/PutFundFeeData";
+
+    public static FIXING_DETAILS_GET_API: string = APIConfig.BASEURL + "/api/FixingAttributes/GetFixingDetails";
+    public static FIXING_TYPES_GET_API: string = APIConfig.BASEURL + "/api/GetRef/GetFixingTypes";
+    public static FIXING_TYPES_PUT_API: string = APIConfig.BASEURL + "/api/FixingAttributes/PutFixingDetails";
+    public static FIXING_TYPES_DELETE_API: string = APIConfig.BASEURL + "/api/FixingAttributes/DeleteFixingDetails";
+
 }
