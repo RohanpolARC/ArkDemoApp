@@ -117,8 +117,8 @@
             Fund Currency
           </mat-label>
   
-          <input type="text" matInput required formControlName="fundCcy" [matAutocomplete]="autoFundCcy" matAutocompletePosition="below">
-          <mat-error *ngIf="capitalActivityForm.get('fundCcy').invalid">Please select currency from the list</mat-error>
+          <input type="text" matInput required formControlName="fundCcy" [matAutocomplete]="autoFundCcy" matAutocompletePosition="below" [readonly]="true">
+          <mat-error *ngIf="capitalActivityForm.get('fundCcy').invalid">Please select fund hedging</mat-error>
           <mat-autocomplete autoActiveFirstOption #autoFundCcy="matAutocomplete" panelWidth="auto">
             <mat-option
               *ngFor="let ccy of fundCcyFilteredOptions | async"
@@ -137,7 +137,7 @@
           <input type="text" matInput formControlName="asset" [matAutocomplete]="autoAsset" matAutocompletePosition="below">
           <mat-error *ngIf="capitalActivityForm.get('asset').invalid">Please select asset from the list</mat-error>
   
-          <mat-autocomplete autoActiveFirstOption #autoAsset="matAutocomplete" class="capital-autocomplete-panel" classList="capital-autocomplete-panel"  panelWidth="auto">
+          <mat-autocomplete autoActiveFirstOption #autoAsset="matAutocomplete" (optionSelected)='assetSelect($event)' class="capital-autocomplete-panel" classList="capital-autocomplete-panel"  panelWidth="auto">
             <mat-option
               *ngFor="let asset of assetFilteredOptions | async"
               [value]="asset[0]"
@@ -173,8 +173,8 @@
               Position Currency
             </mat-label>
   
-            <input type="text" matInput required formControlName="posCcy" [matAutocomplete]="autoPosCcy" matAutocompletePosition="below">
-            <mat-error *ngIf="capitalActivityForm.get('posCcy').invalid">Please select currency from the list</mat-error>
+            <input type="text" matInput required formControlName="posCcy" [matAutocomplete]="autoPosCcy" matAutocompletePosition="below" [readonly]="true">
+            <mat-error *ngIf="capitalActivityForm.get('posCcy').invalid">Please select fund hedging, issuer and asset</mat-error>
             <mat-autocomplete autoActiveFirstOption #autoPosCcy="matAutocomplete" panelWidth="auto">
               <mat-option
                 *ngFor="let ccy of posCcyFilteredOptions | async"
