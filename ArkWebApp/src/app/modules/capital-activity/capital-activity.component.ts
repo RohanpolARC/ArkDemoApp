@@ -36,6 +36,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { DetailedView } from 'src/app/shared/models/GeneralModel';
 import { FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { CommonConfig } from 'src/app/configs/common-config';
 
 @Component({
   selector: 'app-capital-activity',
@@ -96,7 +97,7 @@ export class CapitalActivityComponent implements OnInit {
   columnDefsInvstmnt: ColDef[] = [
     { field: 'unqiueID', tooltipField: 'unqiueID', type: 'abColDefNumber'},
     { field: 'positionID', tooltipField: 'positionID', headerName: 'Position ID', type: 'abColDefNumber'},
-    { field: 'cashDate', tooltipField: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter},
+    { field: 'cashDate', tooltipField: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter, type: 'abColDefDate'},
     { field: 'fund', tooltipField: 'fund', headerName: 'Fund', type: 'abColDefString'},
     { field: 'fundHedging', tooltipField: 'fundHedging', headerName: 'Fund Hedging', type: 'abColDefString'},
     { field: 'portfolio', tooltipField: 'portfolio', headerName: 'Portfolio', type: 'abColDefString'},
@@ -115,7 +116,7 @@ export class CapitalActivityComponent implements OnInit {
         return null;
       }, type: 'abColDefNumber'},
     { field: 'totalEur', headerName: 'Total Eur', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-    { field: 'type'}
+    { field: 'type', type: 'abColDefString'}
   ]
 
   columnDefs: ColDef[] = [
@@ -144,7 +145,6 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'createdBy', tooltipField: 'createdBy', headerName: 'Created By', type:'abColDefString'},
     { field: 'modifiedOn', tooltipField: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
     { field: 'modifiedBy', tooltipField: 'modifiedBy', headerName: 'Modified By', type:'abColDefString'},
-
   ]
 
   defaultColDef = {
@@ -250,7 +250,9 @@ export class CapitalActivityComponent implements OnInit {
       userName: this.dataSvc.getCurrentUserName(),
       adaptableId: 'Capital Activity - Investor Cashflows',
       adaptableStateKey: `Capital Activity Key`,
-      
+
+      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
+
       teamSharingOptions: {
         enableTeamSharing: true,
         setSharedEntities: setSharedEntities.bind(this),
@@ -352,6 +354,9 @@ export class CapitalActivityComponent implements OnInit {
       adaptableId: 'Capital Activity - Investment Cashflows',
       adaptableStateKey: `Investment CashFlow Key`,
       
+      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
+
+
       toolPanelOptions: {
         toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
       },

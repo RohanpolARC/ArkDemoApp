@@ -27,6 +27,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { CheckboxEditorComponent } from 'src/app/shared/components/checkbox-editor/checkbox-editor.component';
 import { FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/utilities';
+import { CommonConfig } from 'src/app/configs/common-config';
 
 @Component({
   selector: 'app-facility-detail',
@@ -364,6 +365,8 @@ export class FacilityDetailComponent implements OnInit {
       userName: this.dataSvc.getCurrentUserName(),
       adaptableId: "Facility Detail ID",
       adaptableStateKey: 'Facility Detail Key',
+
+      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
       teamSharingOptions: {
         enableTeamSharing: true,

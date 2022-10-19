@@ -79,16 +79,19 @@ export function createColumnDefs(
         }
       }
       if(col.toLowerCase().includes('date')){
-        colDef.valueFormatter = dateFormatter
+        colDef.valueFormatter = dateFormatter;
+        colDef.type = 'abColDefDate'
       }
       else if(dateTimeColumns.includes(col.toLowerCase())){
-        colDef.valueFormatter = dateTimeFormatter
+        colDef.valueFormatter = dateTimeFormatter;
+        colDef.type = 'abColDefDate'
       }
       else if(exceptions.includes(col.toLowerCase())){
         colDef.valueFormatter = null;
       }
       else if(!isNaN(parseFloat(row[i].value))){
-        colDef.valueFormatter = amountFormatter
+        colDef.valueFormatter = amountFormatter;
+        colDef.type = 'abColDefNumber'
       }
       columnDefs.push(colDef);
     }

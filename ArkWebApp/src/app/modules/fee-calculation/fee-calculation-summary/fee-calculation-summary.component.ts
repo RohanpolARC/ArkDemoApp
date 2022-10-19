@@ -3,6 +3,7 @@ import { ClientSideRowModelModule, ColDef, GridApi, GridOptions, GridReadyEvent,
 import { SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { Component, Input, OnInit, SimpleChange, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { amountFormatter, dateFormatter, nonAmountNumberFormatter2Dec } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
@@ -188,6 +189,8 @@ export class FeeCalculationSummaryComponent implements OnInit {
         setSharedEntities: setSharedEntities.bind(this),
         getSharedEntities: getSharedEntities.bind(this)
       },
+      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
+
       predefinedConfig: {
         Dashboard: {
           Revision: 2,

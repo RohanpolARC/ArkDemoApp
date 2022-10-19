@@ -28,6 +28,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import * as moment from 'moment';
 import { FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
+import { CommonConfig } from 'src/app/configs/common-config';
 
 @Component({
   selector: 'app-bulk-upload',
@@ -204,7 +205,8 @@ export class BulkUploadComponent implements OnInit {
      toolPanelOptions: {
        toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
      },
-     
+     exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
+
      teamSharingOptions: {
       enableTeamSharing: true,
       setSharedEntities: setSharedEntities.bind(this),

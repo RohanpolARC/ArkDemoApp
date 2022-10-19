@@ -3,6 +3,7 @@ import { ColDef, GridOptions, Module, ClientSideRowModelModule, GridReadyEvent, 
 import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { Component, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { PortfolioManagerService } from 'src/app/core/services/PortfolioManager/portfolio-manager.service';
 import { PortfolioMappingDataService } from 'src/app/core/services/PortfolioManager/portfolio-mapping-data.service';
@@ -385,6 +386,8 @@ export class ApprovalComponent implements OnInit {
       userName: this.dataSvc.getCurrentUserName(),
       adaptableId: 'Portfolio Mapping Approval ID',
       adaptableStateKey: 'Portfolio Mapping Approval Key',
+
+      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
       layoutOptions: {
         includeExpandedRowGroups: true

@@ -76,6 +76,7 @@ export class AddCapitalModalComponent implements OnInit{
   isAlreadyLinked: boolean = null;
   linkStatus
   fxRateSource: string;
+  posCcyChangeMsg: string = 'Rate will flow to Asset GIR only if position currency matches that on investment side'
 
   validateField(options: string[], control: AbstractControl, field: string): string | null{
       //  Validates individual fields and returns fetched value if it's an allowed value.
@@ -396,6 +397,12 @@ export class AddCapitalModalComponent implements OnInit{
     this.setPositionCcy(FH, ISN, AS)
   }
 
+  positionCcySelect(event: MatAutocompleteSelectedEvent){
+    if(this.capitalActivityForm.get('fxRateOverride').value){
+      this.dataSvc.setWarningMsg(this.posCcyChangeMsg, 'Dismiss', 'ark-theme-snackbar-warning')
+    }
+  }
+
   changeListeners(): void{
 
     this.subscriptions.push(this.capitalActivityForm.get('fxRate').valueChanges.pipe(
@@ -419,6 +426,10 @@ export class AddCapitalModalComponent implements OnInit{
       debounceTime(300),
       distinctUntilChanged()
     ).subscribe(fxRateOverride => {
+
+      if(fxRateOverride){
+        this.dataSvc.setWarningMsg(this.posCcyChangeMsg, `Dismiss`, 'ark-theme-snackbar-warning')
+      }
 
       if(fxRateOverride && this.capitalActivityForm.get('fxRate').value === this.data?.rowData?.fxRate){
         this.fxRateSource = this.data?.rowData?.fxRateSource;

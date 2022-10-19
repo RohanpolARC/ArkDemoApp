@@ -4,6 +4,7 @@ import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule,
 import { Component, OnInit } from '@angular/core';
 import { MsalService } from '@azure/msal-angular';
 import { Subscription } from 'rxjs';
+import { CommonConfig } from 'src/app/configs/common-config';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { PortfolioManagerService } from 'src/app/core/services/PortfolioManager/portfolio-manager.service';
@@ -260,6 +261,8 @@ export class PortfolioManagerComponent implements OnInit {
       userName: this.dataSvc.getCurrentUserName(),
       adaptableId: 'Portfolio Manager ID',
       adaptableStateKey: 'Portfolio Manager Key',
+
+      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
       toolPanelOptions: {
         toolPanelOrder: ['columns', 'AdaptableToolPanel']

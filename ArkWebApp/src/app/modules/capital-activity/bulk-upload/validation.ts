@@ -17,6 +17,7 @@ let actualCols: string[] = [
     'Narative (optional)',
 ]
 
+let refData;
 let refOptions;
 let invalidMsg: string = '';
 
@@ -42,7 +43,7 @@ export function validateRowForEmptiness(row: any): void{
             'Narative (optional)', 
             // 'Wso Issuer ID', 
             'Wso Asset ID',
-            'Fund Currency',
+            // 'Fund Currency',
             'GIR Override'
         ].indexOf(actualCols[i]) === -1){
             invalidMsg += (invalidMsg === '') ? `${actualCols[i]} cannot be empty` :  `, ${actualCols[i]} cannot be empty`;
@@ -88,8 +89,6 @@ export function validateRowValueRange(row: any): void{
         invalidMsg += ` Fund Currency ${String(row['Fund Currency'])} not in range`
     }
 
-    // Set(posCcy) = Set(fundCcy)
-
     if(!!row['Position Currency'] && (refOptions.fundCcys.indexOf(String(row['Position Currency']).trim()) === -1)){
         invalidMsg += (invalidMsg === '') ? '' : ','
         invalidMsg += ` Position Currency ${String(row['Position Currency'])} not in range`
@@ -111,13 +110,32 @@ export function validateRowValueRange(row: any): void{
     }    
 }
 
+export function validateRowValueMappings(row:any):void{
+    
+    if(row['Wso Asset ID']){
+        let filteredAssetData = refData.filter((rdata) => {
+            return (Number(rdata['wsoAssetID']) ===  Number(row['Wso Asset ID'])) && 
+                (rdata['fundHedging'] === row['Fund Hedging']) && 
+                (rdata['fundCcy']===row['Fund Currency']) && 
+                (rdata['positionCcy'] === row['Position Currency'])
+        })
+    
+        if(filteredAssetData.length === 0){
+            invalidMsg += (invalidMsg === '') ? '' : ','
+            invalidMsg += `WSO Asset ID ${String(row['Wso Asset ID'])} doesn't exist for fund hedging ${String(row['Fund Hedging'])} and fund currency ${String(row['Fund Currency'])} and position currency ${String(row['Position Currency'])}`
+        }    
+    }
+}
+
 export function validateRow(row: any):void {
     validateRowForEmptiness(row);
     validateRowValueRange(row);
+    validateRowValueMappings(row);
 }
 
 export function validateExcelRows(rows: any[], ref: {capitalTypes: string[], capitalSubTypes: string[], refData: any}): {isValid: boolean, invalidRows?: {row: any, remark: string}[]} {
 
+    refData = ref.refData
     refOptions = getUniqueOptions(ref);
     
     let invalidRows: any[] = [];

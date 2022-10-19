@@ -21,6 +21,7 @@ import { dateFormatter, amountFormatter } from 'src/app/shared/functions/formatt
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
+import { CommonConfig } from 'src/app/configs/common-config';
 
 @Component({
   selector: 'app-cash-balance',
@@ -106,6 +107,9 @@ export class CashBalanceComponent implements OnInit {
       adaptableId: "Cash Balance",
       adaptableStateKey: `Cash Balance Key`,
       
+      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
+
+
       toolPanelOptions: {
         toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
       },
