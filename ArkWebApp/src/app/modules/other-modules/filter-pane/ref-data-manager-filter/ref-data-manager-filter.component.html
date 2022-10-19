@@ -1,0 +1,11 @@
+<div class="element">
+    Reference Data
+    <app-multi-select
+        [placeholder] = "'Select Filter'"
+        [settings] = "refDataFilterSettings"
+        [dropdownData] = "refDataFilter"
+        [selectedDropdownData] = "preSelectedRefDataFilter"
+        (onNgModelChangeCallback) = "onRefDataFilterChange($event)"
+        >
+    </app-multi-select>
+</div>

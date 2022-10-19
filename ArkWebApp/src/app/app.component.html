@@ -131,6 +131,10 @@
           <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Access Control')" [ngStyle]="AccessControlStyle">
             <div class="list-item-text">Access Control</div>
           </mat-list-item>
+
+          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Ref Data Manager')" [ngStyle]="RefDataManagerStyle">
+            <div class="list-item-text">Ref Data Manager</div>
+          </mat-list-item>
         </mat-list>
   
       </mat-expansion-panel>
@@ -171,6 +175,10 @@
 
     <div *ngIf="location.path() === '/fee-calculation'" class="filter-element">
       <app-fee-calculation-filter [entities] = "entities"></app-fee-calculation-filter>
+    </div>
+
+    <div *ngIf="location.path() === '/ref-data-manager'" class="filter-element">
+      <app-ref-data-manager-filter [refDataFilter] = "refDataFilter"></app-ref-data-manager-filter>
     </div>
 
   </mat-sidenav>

@@ -54,11 +54,13 @@ export class AppComponent {
   ContractHistoryStyle: any = {};
   PerformanceFeesStyle: any = {};
   FeePresetStyle: any = {};
-  FixingAttributesStyle:any = {}
+  FixingAttributesStyle:any = {};
+  RefDataManagerStyle:any = {};
 
   funds
   fundHedgings
   entities
+  refDataFilter: string[];
 
   constructor(private http: HttpClient,
     private dataService: DataService,
@@ -180,6 +182,9 @@ export class AppComponent {
     else if(this.location.path() === '/fixing-attributes'){
       this.updateSelection('Fixing Attributes')
     }
+    else if(this.location.path() === '/ref-data-manager'){
+      this.updateSelection('Ref Data Manager')
+    }
     else this.updateSelection('')
   }
 
@@ -195,7 +200,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.RefDataManagerStyle = this.notSelectedElement;
 
     this.lastClickedTabRoute = this.location.path();
 
@@ -281,6 +286,11 @@ export class AppComponent {
     else if(screen === 'Fixing Attributes'){
       this.FixingAttributesStyle = this.selectedElement;
       this.router.navigate(['/fixing-attributes'])
+    }
+    else if(screen === 'Ref Data Manager'){
+      this.RefDataManagerStyle = this.selectedElement;
+      this.refDataFilter = ['Attribute Fixing']
+      this.router.navigate(['/ref-data-manager'])      
     }
 
   }

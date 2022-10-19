@@ -1,0 +1,43 @@
+<h3>{{ data.action }}</h3>
+<div>
+    <div *ngIf="isSuccess || isFailure"
+    [class.success-msg]="isSuccess"
+    [class.failure-msg]="isFailure"
+    >
+        {{ updateMsg }}
+    </div>
+</div>
+
+<form [formGroup]="form" *ngIf="form">
+    <div class="row">
+        <mat-form-field appearance="outline">
+            <mat-label>Attribute Name</mat-label>
+            <input matInput type="text" formControlName="attributeName"
+            autocomplete="off">  
+        </mat-form-field>
+    </div>
+   <div class="row" >
+        <mat-form-field class="col" appearance="outline">
+            <mat-label>Attribute Level</mat-label>
+            <mat-select formControlName="attributeLevel" disableOptionCentering>
+                <mat-option value="Fund">Fund</mat-option>
+                <mat-option value="Fund Hedging">Fund Hedging</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div class="row" >
+        <mat-form-field appearance="outline">
+            <mat-label>Attribute Type</mat-label>
+            <mat-select formControlName="attributeType" disableOptionCentering>
+                <mat-option *ngFor="let type of types" [value]="type" >{{ type}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div> 
+
+</form>
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" 
+        (click)="onSubmit()"
+        [disabled]="isSuccess ? true : (!(this.form?.status === 'VALID') || !this.form?.dirty)">Submit</button>
+    <button mat-raised-button (click)="onCancel()">Cancel</button>
+</mat-dialog-actions>

@@ -9,3 +9,11 @@ export interface AttributeFixingModel {
     attributeLevelValue:string,
     modifiedBy:string
 }
+
+export interface AttributeFixingTypeModel {
+    filterValue:string,
+    attributeName:string,
+    attributeType:string,
+    attributeLevel:string,
+    modifiedBy:string
+}
