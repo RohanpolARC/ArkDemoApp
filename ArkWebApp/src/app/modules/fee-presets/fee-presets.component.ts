@@ -5,6 +5,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { CommonConfig } from 'src/app/configs/common-config';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { FeePresetsService } from 'src/app/core/services/FeePresets/fee-presets.service';
@@ -134,6 +135,8 @@ export class FeePresetsComponent implements OnInit {
       toolPanelOptions: {
         toolPanelOrder: ['columns', 'AdaptableToolPanel']
       },
+      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
+
       teamSharingOptions: {
         enableTeamSharing: true,
         setSharedEntities: setSharedEntities.bind(this),

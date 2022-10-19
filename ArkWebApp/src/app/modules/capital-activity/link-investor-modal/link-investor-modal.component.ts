@@ -22,6 +22,7 @@ import { Subscription } from 'rxjs';
 import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
 import { ExcelExportModule, MenuModule, RowGroupingModule, SetFilterModule } from '@ag-grid-enterprise/all-modules';
 import * as moment from 'moment';
+import { CommonConfig } from 'src/app/configs/common-config';
 
 @Component({
   selector: 'app-link-investor-modal',
@@ -118,6 +119,8 @@ export class LinkInvestorModalComponent implements OnInit {
     userName: this.msalService.getUserName(),
     adaptableId: 'Linking',
     adaptableStateKey: 'Linking Key',
+
+    exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
     toolPanelOptions: {
       toolPanelOrder: ['columns', 'AdaptableToolPanel']

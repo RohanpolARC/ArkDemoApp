@@ -29,6 +29,7 @@ import { dateFormatter, dateTimeFormatter, amountFormatter, nonAmountNumberForma
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { map } from 'rxjs/operators';
+import { CommonConfig } from 'src/app/configs/common-config';
 
 let adapTableApi: AdaptableApi;
 
@@ -102,7 +103,7 @@ export class PortfolioHistoryComponent implements OnInit {
   { headerName: 'GIR Source', field: 'girSource', type: 'abColDfString' },
   { headerName: 'GIR SourceID', field: 'girSourceID', type: 'abColDefNumber', valueFormatter: nonAmountNumberFormatter },
   { field:'uniqueID', type:'abColDefNumber'},
-  { field: 'pgh_FXRateBaseEffective', headerName: 'Effective Going In Rate', valueFormatter: nonAmountNumberFormatter, cellClass: 'ag-right-aligned-cell'}
+  { field: 'pgh_FXRateBaseEffective', headerName: 'Effective Going In Rate', valueFormatter: nonAmountNumberFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'}
 ];
 
   constructor(
@@ -176,6 +177,9 @@ export class PortfolioHistoryComponent implements OnInit {
     userName: this.dataSvc.getCurrentUserName(),
     adaptableId: "Portfolio History",
     adaptableStateKey: `Portfolio State Key`,
+
+    exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
+
 
     layoutOptions: {
       autoSaveLayouts: true,

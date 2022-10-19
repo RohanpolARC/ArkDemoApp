@@ -3,6 +3,7 @@ import { ClientSideRowModelModule, ClipboardModule, ColDef, ColumnsToolPanelModu
 import { Component, OnInit } from '@angular/core';
 import { forkJoin, Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
+import { CommonConfig } from 'src/app/configs/common-config';
 import { ContractHistoryService } from 'src/app/core/services/ContractHistory/contract-history.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { createColumnDefs, GENERAL_FORMATTING_EXCEPTIONS, parseFetchedData, saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
@@ -65,6 +66,9 @@ export class ContractHistoryComponent implements OnInit {
     adaptableId: 'Contracts history ID',
     adaptableStateKey: 'Contracts history state key',
 
+    exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
+
+    
     toolPanelOptions: {
       toolPanelOrder: ['columns', 'AdaptableToolPanel']
     },

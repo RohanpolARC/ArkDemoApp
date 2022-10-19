@@ -15,6 +15,7 @@ import { EventEmitter } from '@angular/core';
 import { AggridMaterialDatepickerComponent } from '../../facility-detail/aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/portfolio-save-run-model.component';
 import { getLastBusinessDay, getMomentDate, getMomentDateStr, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { CommonConfig } from 'src/app/configs/common-config';
 
 @Component({
   selector: 'app-portfolio-modeller',
@@ -287,6 +288,7 @@ export class PortfolioModellerComponent implements OnInit {
       adaptableId: 'IRR Calc - positions',
       adaptableStateKey: 'IRR Calc key',
       
+      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
       teamSharingOptions: {
         enableTeamSharing: true,

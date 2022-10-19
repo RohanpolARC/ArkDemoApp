@@ -4,6 +4,7 @@ import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule,
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
+import { CommonConfig } from 'src/app/configs/common-config';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
@@ -101,6 +102,8 @@ export class UnfundedAssetsComponent implements OnInit {
       userName: this.dataSvc.getCurrentUserName(),
       adaptableId: 'Unfunded Asset ID',
       adaptableStateKey: 'Unfunded Asset Key',
+
+      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
       toolPanelOptions: {
         toolPanelOrder: ['columns', 'AdaptableToolPanel']

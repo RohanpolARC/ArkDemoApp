@@ -15,6 +15,7 @@ import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { MsalService } from '@azure/msal-angular';
 import { DetailedView } from 'src/app/shared/models/GeneralModel';
 import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
+import { CommonConfig } from 'src/app/configs/common-config';
 
 
 @Component({
@@ -74,7 +75,7 @@ export class AttributesFixingComponent implements OnInit {
     }
 
     this.columnDefs = [
-      { field: 'fixingID' },
+      { field: 'fixingID', type: 'abColDefNumber' },
       { field: 'asOfDate',valueFormatter:dateFormatter, type: 'abColDefDate' },
       { 
         field: 'attributeName',
@@ -82,11 +83,12 @@ export class AttributesFixingComponent implements OnInit {
           color: '#0590ca'
         },
         onCellClicked: this.onAttributeCellClicked.bind(this),
+        type: 'abColDefString'
       },
-      { field: 'attributeId'},
-      { field: 'attributeType'},
-      { field: 'attributeLevel' },
-      { field: 'attributeLevelValue'},
+      { field: 'attributeId', type: 'abColDefNumber'},
+      { field: 'attributeType', type: 'abColDefString'},
+      { field: 'attributeLevel', type: 'abColDefString' },
+      { field: 'attributeLevelValue',type: 'abColDefString'},
       { field: 'attributeValue', 
         valueFormatter: (params: ValueFormatterParams) => {
           if(params.data?.['attributeType'] === 'Date')
@@ -94,10 +96,10 @@ export class AttributesFixingComponent implements OnInit {
           return params.value;
       }
       },
-      { field: 'modifiedBy' },
-      { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
-      { field: 'createdBy' },
-      { field: 'createdOn', valueFormatter: dateTimeFormatter },
+      { field: 'modifiedBy', type: 'abColDefString' },
+      { field: 'modifiedOn', valueFormatter: dateTimeFormatter, type: 'abColDefDate' },
+      { field: 'createdBy', type: 'abColDefString' },
+      { field: 'createdOn', valueFormatter: dateTimeFormatter, type: 'abColDefDate' },
     ]
 
     this.gridOptions = {
@@ -124,6 +126,7 @@ export class AttributesFixingComponent implements OnInit {
       toolPanelOptions: {
         toolPanelOrder: ['columns', 'AdaptableToolPanel']
       },
+      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
       teamSharingOptions: {
         enableTeamSharing: true,
         setSharedEntities: setSharedEntities.bind(this),
