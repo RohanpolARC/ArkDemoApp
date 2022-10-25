@@ -61,7 +61,8 @@ const routes: Routes = [
   { path: 'fee-presets',
     loadChildren: () => import('./modules/fee-presets/fee-presets.module').then(m => m.FeePresetsModule) },
   { path: 'fixing-attributes',
-    loadChildren: () => import('./modules/attributes-fixing/attributes-fixing.module').then(m => m.AttributesFixingModule) }
+    loadChildren: () => import('./modules/attributes-fixing/attributes-fixing.module').then(m => m.AttributesFixingModule) },
+  { path: 'management-fee', loadChildren: () => import('./modules/management-fee/management-fee.module').then(m => m.ManagementFeeModule) }
 ];
 
 @NgModule({  
@@ -71,6 +72,5 @@ const routes: Routes = [
   exports: [RouterModule],
 })
 export class AppRoutingModule {
-  constructor(){
-  }
+  constructor(){ }
 }

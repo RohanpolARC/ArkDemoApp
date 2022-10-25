@@ -79,4 +79,5 @@ export class APIConfig {
     public static FIXING_TYPES_PUT_API: string = APIConfig.BASEURL + "/api/FixingAttributes/PutFixingDetails";
     public static FIXING_TYPES_DELETE_API: string = APIConfig.BASEURL + "/api/FixingAttributes/DeleteFixingDetails";
 
+    public static MANAGEMENT_FEE_GET_API: string = APIConfig.BASEURL + "/api/ManagementFee/GetManagementFee";
 }

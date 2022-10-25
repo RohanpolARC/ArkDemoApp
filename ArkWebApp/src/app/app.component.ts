@@ -55,6 +55,7 @@ export class AppComponent {
   PerformanceFeesStyle: any = {};
   FeePresetStyle: any = {};
   FixingAttributesStyle:any = {}
+  ManagementFeeStyle: any = {}
 
   funds
   fundHedgings
@@ -180,6 +181,9 @@ export class AppComponent {
     else if(this.location.path() === '/fixing-attributes'){
       this.updateSelection('Fixing Attributes')
     }
+    else if(this.location.path() === '/management-fee'){
+      this.updateSelection('Management Fee')
+    }
     else this.updateSelection('')
   }
 
@@ -195,7 +199,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.notSelectedElement;
 
     this.lastClickedTabRoute = this.location.path();
 
@@ -282,6 +286,9 @@ export class AppComponent {
       this.FixingAttributesStyle = this.selectedElement;
       this.router.navigate(['/fixing-attributes'])
     }
-
+    else if(screen === 'Management Fee'){
+      this.ManagementFeeStyle = this.selectedElement;
+      this.router.navigate(['/management-fee'])
+    }
   }
 }

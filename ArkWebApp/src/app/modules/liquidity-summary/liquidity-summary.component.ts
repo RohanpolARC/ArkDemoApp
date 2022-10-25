@@ -119,7 +119,8 @@ export class LiquiditySummaryComponent implements OnInit {
     for(let i:number = 0; i < summary.length; i+= 1){
       let row = {};
       row['attr'] = summary[i]['attr'];
-      row['date'] = summary[i]['date'];
+      console.log(summary[i]['date'], typeof summary[i]['attr'])
+      row['date'] = String(summary[i]['date']).substring(0, 10);
       row['attrType'] = summary[i]['attrType'];
       row['subAttr'] = summary[i]['subAttr'];
       row['isManual'] = summary[i]['isManual']

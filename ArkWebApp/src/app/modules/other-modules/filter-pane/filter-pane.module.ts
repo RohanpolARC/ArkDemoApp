@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { LiquiditySummaryFilterComponent } from './liquidity-summary-filter/liquidity-summary-filter.component';
 import { IrrCalculationFilterComponent } from './irr-calculation-filter/irr-calculation-filter.component';
 import { FeeCalculationFilterComponent } from './fee-calculation-filter/fee-calculation-filter.component';
+import { ManagementFeeFilterComponent } from './management-fee-filter/management-fee-filter.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { FeeCalculationFilterComponent } from './fee-calculation-filter/fee-calc
     FacilityDetailFilterComponent,
     LiquiditySummaryFilterComponent,
     IrrCalculationFilterComponent,
-    FeeCalculationFilterComponent
+    FeeCalculationFilterComponent,
+    ManagementFeeFilterComponent
   ],
   imports: [
     CommonModule,
@@ -40,7 +42,8 @@ import { FeeCalculationFilterComponent } from './fee-calculation-filter/fee-calc
     FacilityDetailFilterComponent,
     LiquiditySummaryFilterComponent,
     IrrCalculationFilterComponent,
-    FeeCalculationFilterComponent
+    FeeCalculationFilterComponent,
+    ManagementFeeFilterComponent
   ]
 })
 export class FilterPaneModule { }
