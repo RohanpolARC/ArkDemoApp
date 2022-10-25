@@ -233,9 +233,7 @@ export class RefDataManagerComponent implements OnInit {
                 'AttributeLevel',
                 'AttributeType',
                 'CreatedOn',
-                'CreatedBy',
-                'ModifiedOn',
-                'ModifiedBy','ActionDelete'],
+                'CreatedBy','ActionDelete'],
               PinnedColumnsMap: { 
                 ActionDelete:'right' 
               },
@@ -249,7 +247,6 @@ export class RefDataManagerComponent implements OnInit {
             Layout: this.layout
           })
           this.gridApi?.setRowData(this.rowRefData)
-          console.log(this.adaptableOptions,this.adaptableApi.layoutApi.getCurrentLayout(),this.adaptableApi.userInterfaceApi.getAllActionColumn())
         },
         error:error=>{
           console.log(error)
@@ -327,7 +324,12 @@ export class RefDataManagerComponent implements OnInit {
       if(result.isSuccess===true){
         const rowNode:RowNode = this.adaptableApi.gridApi.getRowNodeForPrimaryKey(deleteRefDataID)
         this.adaptableApi.gridApi.deleteGridData([rowNode.data])
-        this.dataSvc.setWarningMsg('The Attribute deleted successfully','Dismiss','ark-theme-snackbar-success')
+        //this.dataSvc.setWarningMsg('Deleting the Attribute','Dismiss','ark-theme-snackbar-warning')
+        if(this.adaptableApi.gridApi.getRowNodeForPrimaryKey(deleteRefDataID) === undefined)
+          this.dataSvc.setWarningMsg('The Attribute deleted successfully','Dismiss','ark-theme-snackbar-success')
+        else
+          this.dataSvc.setWarningMsg('Some Error occured please try refreshing the Window','Dismiss','ark-theme-snackbar-error')
+
       }else{
         this.dataSvc.setWarningMsg('The Attribute could not be deleted','Dismiss','ark-theme-snackbar-error')
       }
