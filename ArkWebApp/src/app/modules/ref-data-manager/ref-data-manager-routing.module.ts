@@ -7,8 +7,8 @@ import { RefDataManagerComponent } from './ref-data-manager.component';
 const routes: Routes = [
   {
     path: '', component: RefDataManagerComponent, 
-    // canActivate: [MsalGuard, RoleGuard], 
-    // data: { tab: 'Ref Data Manager' } 
+    canActivate: [MsalGuard, RoleGuard], 
+    data: { tab: 'Ref Data Manager' }
   }
 ];
 

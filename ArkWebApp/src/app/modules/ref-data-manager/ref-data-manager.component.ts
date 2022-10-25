@@ -26,7 +26,7 @@ export class RefDataManagerComponent implements OnInit {
 
   subscriptions: Subscription[] = []
 
-  isWriteAccess: boolean 
+  isWriteAccess: boolean = false;
   columnDefs: ColDef[] =[]
   userInterfaceOptions: UserInterfaceOptions ={}
   gridApi: GridApi
@@ -152,7 +152,7 @@ export class RefDataManagerComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.isWriteAccess = true;
+    this.isWriteAccess = false;
     for(let i: number = 0; i < this.accessSvc.accessibleTabs?.length; i+= 1){
       if(this.accessSvc.accessibleTabs[i].tab === 'Ref Data Manager' && this.accessSvc.accessibleTabs[i].isWrite){
         this.isWriteAccess = true;
