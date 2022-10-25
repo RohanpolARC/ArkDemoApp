@@ -313,7 +313,7 @@ export class RefDataManagerComponent implements OnInit {
   }
   deleteRefData(deleteRefDataID: any) {
     let refDataProcParams:RefDataProc = {
-      filterValue : this.filterValue[0],
+      filterValue : 'Attribute Fixing',//this.filterValue[0],
       param1 :String(deleteRefDataID),
       param2 :'',
       param3 : '',
