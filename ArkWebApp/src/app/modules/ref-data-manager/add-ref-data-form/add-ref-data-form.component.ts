@@ -27,8 +27,9 @@ export class AddRefDataFormComponent implements OnInit {
     public dialogRef: MatDialogRef<AddRefDataFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       action: ACTION_TYPE,
-      fixingType: any,
-      adaptableApi: AdaptableApi
+      refData: any,
+      adaptableApi: AdaptableApi,
+      filterValue: string
     }
   ) { }
 
@@ -45,58 +46,64 @@ export class AddRefDataFormComponent implements OnInit {
   }
 
   initForm(){
-    this.form = new FormGroup({
-      attributeName: new FormControl(null, Validators.required),
-      attributeLevel: new FormControl(null, Validators.required),
-      attributeType: new FormControl(null, Validators.required)
-    })
+    if(this.data.filterValue === 'Attribute Fixing'){
+      this.form = new FormGroup({
+        attributeName: new FormControl(null, Validators.required),
+        attributeLevel: new FormControl(null, Validators.required),
+        attributeType: new FormControl(null, Validators.required)
+      })
+    }
+
   }
 
 
   onSubmit(){
     let model = <AttributeFixingTypeModel>{}
-    
-    model.attributeName = this.form.value.attributeName;
-    model.attributeLevel = this.form.value.attributeLevel;
-    model.attributeType = this.form.value.attributeType;
-    model.modifiedBy = this.dataSvc.getCurrentUserName();
-
-    this.refDataManagerSvc.putRefDataFixingTypes(model).subscribe({
-      next: (result: any) => {
-        if(result.isSuccess){
-          this.isSuccess = true;
-          this.isFailure = false;
-          this.updateMsg = 'Successfully updated fixing types';
-
-          let r = { ...this.data.fixingType }
-          r.attributeName = this.form.value.attributeName;
-          r.attributeLevel = this.form.value.attributeLevel;
-          r.attributeType = this.form.value.attributeType;
-          r.modifiedBy = this.dataSvc.getCurrentUserName();
-          r.modifiedOn = new Date();
-
-          if(this.data.action === 'EDIT'){
-            this.adaptableApi.gridApi.updateGridData([r])
+    if(this.data.filterValue === 'Attribute Fixing'){
+      model.attributeName = this.form.value.attributeName;
+      model.attributeLevel = this.form.value.attributeLevel;
+      model.attributeType = this.form.value.attributeType;
+      model.modifiedBy = this.dataSvc.getCurrentUserName();
+  
+      this.refDataManagerSvc.putRefData(model).subscribe({
+        next: (result: any) => {
+          if(result.isSuccess){
+            this.isSuccess = true;
+            this.isFailure = false;
+            this.updateMsg = 'Successfully updated fixing types';
+  
+            let r = { ...this.data.refData }
+            r.AttributeName = this.form.value.attributeName;
+            r.AttributeLevel = this.form.value.attributeLevel;
+            r.AttributeType = this.form.value.attributeType;
+            r.ModifiedBy = this.dataSvc.getCurrentUserName();
+            r.ModifiedOn = new Date();
+  
+            if(this.data.action === 'EDIT'){
+              this.adaptableApi.gridApi.updateGridData([r])
+            }
+            else if(this.data.action === 'ADD'){
+              r.AttributeId = Number(result.data)
+              r.CreatedBy = r.ModifiedBy
+              r.CreatedOn = r.ModifiedOn
+              this.adaptableApi.gridApi.addGridData([r])
+              
+            }
           }
-          else if(this.data.action === 'ADD'){
-            r.attributeId = result.data
-            r.createdBy = r.modifiedBy
-            r.createdOn = r.modifiedOn
-            this.adaptableApi.gridApi.addGridData([r])
+          else{
+              this.isFailure = true;
+              this.isSuccess = false;
+              this.updateMsg = 'Failed to update fixing details'
           }
+        },
+        error: (error) => {
+          this.isSuccess = false;
+          this.isFailure = true;
+          this.updateMsg = 'Failed to update fixing details';
         }
-        else{
-            this.isFailure = true;
-            this.isSuccess = false;
-            this.updateMsg = 'Failed to update fixing details'
-        }
-      },
-      error: (error) => {
-        this.isSuccess = false;
-        this.isFailure = true;
-        this.updateMsg = 'Failed to update fixing details';
-      }
-    })
+      })
+    }
+
   }
 
   onCancel(){

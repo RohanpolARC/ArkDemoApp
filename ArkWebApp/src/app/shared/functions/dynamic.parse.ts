@@ -24,6 +24,7 @@ export function saveAndSetLayout(columnDefs: ColDef[], adaptableApi: AdaptableAp
   if(existingLayout != null){
     layout = existingLayout     // Will have Uuid and other dynamically added properties.
     layout.Columns = columnDefs.map(col => col.field)
+
   }
   else{
     layout = {
@@ -78,7 +79,7 @@ export function createColumnDefs(
           return String(params.value)
         }
       }
-      if(col.toLowerCase().includes('date')){
+      if(col.toLowerCase().includes('date') || col.toLowerCase()==='createdon'|| col.toLowerCase()==='modifiedon'){
         colDef.valueFormatter = dateFormatter;
         colDef.type = 'abColDefDate'
       }
