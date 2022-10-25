@@ -80,7 +80,6 @@ export class ManagementFeeComponent implements OnInit {
       return c
     })
 
-    console.log(this.columnDefs)
     let aggFuncs = {
       'Max': (params: IAggFuncParams) => {
         if(params.column.getColId() === 'fixingDate'){
