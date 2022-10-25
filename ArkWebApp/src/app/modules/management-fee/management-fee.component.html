@@ -1,0 +1,24 @@
+<div class="parent">
+    <div class="header">
+        <div class="title">
+            Management Fees
+        </div>
+        <div class="action">
+        </div>
+    </div>
+
+    <div class="content">
+        <mat-card class="mat-content">
+
+            <ag-grid-angular
+            [adaptableOptions]="adaptableOptions"
+            [gridOptions]="gridOptions"
+            [modules]="agGridModules"
+            [rowData]="rowData"
+            (adaptableReady)="onAdaptableReady($event)"
+            class="ag-theme-alpine ag-grid"
+            >
+            </ag-grid-angular>
+        </mat-card>
+    </div>
+</div>

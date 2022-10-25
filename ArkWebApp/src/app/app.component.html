@@ -89,6 +89,9 @@
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Performance Fees')" [ngStyle]="PerformanceFeesStyle">
           <div class="list-item-text">Performance Fees</div>
         </mat-list-item>          
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Management Fee')" [ngStyle]="ManagementFeeStyle">
+          <div class="list-item-text">Management Fees</div>
+        </mat-list-item>
       </mat-list>
     </mat-expansion-panel>
   </mat-accordion>
@@ -148,7 +151,7 @@
       <span>Filter Pane</span>
       <button mat-raised-button id="apply-button"  
         *ngIf="[
-        '/facility-detail', '/liquidity-summary', '/fee-calculation',
+        '/facility-detail', '/liquidity-summary', '/fee-calculation', '/management-fee',
         '/irr/portfoliomodeller', '/contract-history', '/cash-balance'].includes(location.path())" 
         (click)="filterApply()">Apply</button>
     </div>
@@ -179,6 +182,9 @@
 
     <div *ngIf="location.path() === '/ref-data-manager'" class="filter-element">
       <app-ref-data-manager-filter [refDataFilter] = "refDataFilter"></app-ref-data-manager-filter>
+      
+    <div *ngIf="location.path() === '/management-fee'" class="filter-element">
+      <app-management-fee-filter></app-management-fee-filter>
     </div>
 
   </mat-sidenav>

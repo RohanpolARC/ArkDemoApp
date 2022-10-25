@@ -82,4 +82,5 @@ export class APIConfig {
     public static REF_DATA_FIXING_TYPES_PUT_API: string = APIConfig.BASEURL + "/api/GetRef/PutFixingTypes";
 
 
+    public static MANAGEMENT_FEE_GET_API: string = APIConfig.BASEURL + "/api/ManagementFee/GetManagementFee";
 }
