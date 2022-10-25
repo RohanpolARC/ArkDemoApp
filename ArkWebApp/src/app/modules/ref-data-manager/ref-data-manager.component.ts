@@ -303,7 +303,7 @@ export class RefDataManagerComponent implements OnInit {
           action: action,
           refData:rowData,
           adaptableApi: this.adaptableApi,
-          filterValue: this.filterValue[0]
+          filterValue: 'Attribute Fixing'//this.filterValue[0]
         },
         maxHeight: '95vh'
       })
