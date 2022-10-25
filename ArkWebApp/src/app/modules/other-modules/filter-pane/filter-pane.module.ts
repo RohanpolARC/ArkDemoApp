@@ -14,6 +14,7 @@ import { LiquiditySummaryFilterComponent } from './liquidity-summary-filter/liqu
 import { IrrCalculationFilterComponent } from './irr-calculation-filter/irr-calculation-filter.component';
 import { FeeCalculationFilterComponent } from './fee-calculation-filter/fee-calculation-filter.component';
 import { RefDataManagerFilterComponent } from './ref-data-manager-filter/ref-data-manager-filter.component';
+import { ManagementFeeFilterComponent } from './management-fee-filter/management-fee-filter.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { RefDataManagerFilterComponent } from './ref-data-manager-filter/ref-dat
     LiquiditySummaryFilterComponent,
     IrrCalculationFilterComponent,
     FeeCalculationFilterComponent,
-    RefDataManagerFilterComponent
+    RefDataManagerFilterComponent,
+    ManagementFeeFilterComponent
   ],
   imports: [
     CommonModule,
@@ -43,7 +45,8 @@ import { RefDataManagerFilterComponent } from './ref-data-manager-filter/ref-dat
     LiquiditySummaryFilterComponent,
     IrrCalculationFilterComponent,
     FeeCalculationFilterComponent,
-    RefDataManagerFilterComponent
+    RefDataManagerFilterComponent,
+    ManagementFeeFilterComponent
   ]
 })
 export class FilterPaneModule { }

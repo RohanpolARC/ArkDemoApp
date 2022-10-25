@@ -83,4 +83,5 @@ export class APIConfig {
     public static REF_DATA_DELETE_API: string = APIConfig.BASEURL + "/api/GetRef/DeleteRefData";
 
 
+    public static MANAGEMENT_FEE_GET_API: string = APIConfig.BASEURL + "/api/ManagementFee/GetManagementFee";
 }
