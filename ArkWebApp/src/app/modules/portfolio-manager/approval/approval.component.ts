@@ -335,9 +335,9 @@ export class ApprovalComponent implements OnInit {
       },
       { field: "action", cellRenderer: 'actionCellRenderer'},
       { field: 'modifiedBy', headerName: 'Requested By',  type: 'abColDefString' },
-      { field: 'modifiedOn', headerName: 'Requested On', valueFormatter: dateTimeFormatter, type: 'abColDefDate', },
+      { field: 'modifiedOn', headerName: 'Requested On', valueFormatter: dateTimeFormatter, type: 'abColDefDate', cellClass: 'dateUK'},
       { field: 'reviewedBy', type: 'abColDefString'},
-      { field: 'reviewedOn', valueFormatter: dateTimeFormatter, type: 'abColDefDate' },
+      { field: 'reviewedOn', valueFormatter: dateTimeFormatter, type: 'abColDefDate', cellClass: 'dateUK' },
       { field: 'remark', type: 'abColDefString' }
     ]
 
@@ -364,7 +364,8 @@ export class ApprovalComponent implements OnInit {
       },
       singleClickEdit: true,
       rowGroupPanelShow: 'always',
-      onCellValueChanged: this.onCellValueChanged.bind(this)
+      onCellValueChanged: this.onCellValueChanged.bind(this),
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     }
 
     this.adaptableOptions = {

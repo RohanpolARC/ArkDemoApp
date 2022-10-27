@@ -65,19 +65,18 @@ export class PortfolioModellerComponent implements OnInit {
 
   columnDefs: ColDef[] = [    
   {field: 'positionID', width:100, tooltipField: 'positionID', type:'abColDefNumber'},
-  {field: 'fundHedging', width:150, tooltipField: 'fundHedging', rowGroup: true, pinned: 'left'}, 
-  {field: 'issuerShortName', width: 170, tooltipField: 'issuerShortName', rowGroup: true, pinned: 'left'},
-  {field: 'asset', width: 240, tooltipField: 'asset'},
+  {field: 'fundHedging', width:150, tooltipField: 'fundHedging', rowGroup: true, pinned: 'left', type: 'abColDefString'}, 
+  {field: 'issuerShortName', width: 170, tooltipField: 'issuerShortName', rowGroup: true, pinned: 'left', type: 'abColDefString'},
+  {field: 'asset', width: 240, tooltipField: 'asset', type: 'abColDefString'},
   {field: 'assetID', width: 103, type:'abColDefNumber'},
-  {field: 'assetTypeName', width: 153},
-  {field: 'fund', width: 150, tooltipField: 'fund'},
+  {field: 'assetTypeName', width: 153, type: 'abColDefString'},
+  {field: 'fund', width: 150, tooltipField: 'fund', type: 'abColDefString'},
   {field: 'ccy', width: 80},
   {field: 'faceValueIssue',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 150, type:'abColDefNumber'},
   {field: 'costPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 110, type:'abColDefNumber'},
   {field: 'mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 86, type:'abColDefNumber'},
-  {field: 'maturityDate',
-   width: 135},
-  {field: 'benchMarkIndex', width: 161},
+  {field: 'maturityDate', type: 'abColDefDate', width: 135, cellClass: 'dateUK'},
+  {field: 'benchMarkIndex', width: 161, type: 'abColDefString'},
   { 
     field: 'spread', width: 94, cellClass: 'ag-right-aligned-cell', valueFormatter: removeDecimalFormatter, type:'abColDefNumber'
   },
@@ -94,7 +93,8 @@ export class PortfolioModellerComponent implements OnInit {
     editable: (params: EditableCallbackParams) => {
       return this.isLocal.value
     },
-    cellStyle: this.editableCellStyle.bind(this)
+    cellStyle: this.editableCellStyle.bind(this),
+    cellClass: 'dateUK'
   },
   { field: 'expectedPrice', width: 140, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber', enableCellChangeFlash: true,
     editable: (params: EditableCallbackParams) => {
@@ -276,7 +276,8 @@ export class PortfolioModellerComponent implements OnInit {
       suppressAggFuncInHeader: true,
       enableGroupEdit: true,
       autoGroupColumnDef: this.autoGroupColumnDef,
-      frameworkComponents: frameworkComponents
+      frameworkComponents: frameworkComponents,
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     }
 
     this.adaptableOptions = {

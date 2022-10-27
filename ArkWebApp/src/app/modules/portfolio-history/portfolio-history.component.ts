@@ -60,10 +60,10 @@ export class PortfolioHistoryComponent implements OnInit {
   { headerName: "Fund",field : 'fund', type:'abColDefString' },
   { headerName: "Fund Hedging", field: 'fundHedging', type:'abColDefString' },
   { headerName: "Fund Ccy",  field: 'fundCcy', type:'abColDefString' },
-  { headerName: "As Of Date ", field: 'asOfDate',  valueFormatter: dateFormatter,hide: true, type:'abColDefDate' },
-  { headerName: "Trade Date", field: 'tradeDate', rowGroup: true, hide: true, valueFormatter: dateFormatter, type:'abColDefDate' },
+  { headerName: "As Of Date ", field: 'asOfDate',  valueFormatter: dateFormatter, cellClass: 'dateUK' ,hide: true, type:'abColDefDate' },
+  { headerName: "Trade Date", field: 'tradeDate', rowGroup: true, hide: true, valueFormatter: dateFormatter, cellClass: 'dateUK' , type:'abColDefDate' },
   { headerName: "Type", field : 'typeDesc', type:'abColDefString'},
-  { headerName: "Settle Date", field: 'settleDate',  valueFormatter: dateFormatter, type:'abColDefDate' },
+  { headerName: "Settle Date", field: 'settleDate',  valueFormatter: dateFormatter, cellClass: 'dateUK' , type:'abColDefDate' },
   { headerName: "Position Ccy", field: 'positionCcy', type:'abColDefString'},
   { headerName: "Amount",field : 'amount',enableValue: true ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
   { headerName: "Par Amount", field: 'parAmount' ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
@@ -73,7 +73,7 @@ export class PortfolioHistoryComponent implements OnInit {
   { headerName: "FundedCostAmountLocal",field : 'fundedCostAmountLocal',  valueFormatter: amountFormatter , type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
   { headerName: "Edited Going In Rate",field: 'fxRateBaseEffective',editable:true , type:'abColDefNumber', cellClass: 'ag-right-aligned-cell', valueFormatter: nonAmountNumberFormatter},
   { headerName: "Modified By",  field: 'modifiedBy', type:'abColDefString'},
-  { headerName: "Modified On",  field: "modifiedOn", valueFormatter: dateTimeFormatter, type:'abColDefDate'},
+  { headerName: "Modified On",  field: "modifiedOn", valueFormatter: dateTimeFormatter, type:'abColDefDate', cellClass: 'dateUK'},
   {
     headerName:"",
     field: 'actionNew',
@@ -106,14 +106,12 @@ export class PortfolioHistoryComponent implements OnInit {
           { statusPanel: 'agFilteredRowCountComponent' },
         ],
       },
-      // components: {
-      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      // },
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey: true,
       context: {
         adaptableApi: adapTableApi
-      }      
+      },
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     };
 
     this.defaultColDef = {

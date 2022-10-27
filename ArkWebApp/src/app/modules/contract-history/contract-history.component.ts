@@ -46,7 +46,8 @@ export class ContractHistoryComponent implements OnInit {
       filter: true
     },
     rowData: this.rowData,
-    sideBar: true
+    sideBar: true,
+    excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
   }
 
   adaptableOptions: AdaptableOptions = {

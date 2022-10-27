@@ -183,7 +183,7 @@ export class FacilityDetailComponent implements OnInit {
       {field: 'costPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 110, type: 'abColDefNumber'},
       {field: 'mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 86, type: 'abColDefNumber'},
       {field: 'maturityDate', //valueFormatter: dateFormatter,
-       width: 135},
+       width: 135, cellClass: 'dateUK'},
       {field: 'benchMarkIndex', width: 161, type: 'abColDefString'},
       { 
         field: 'spread', 
@@ -211,7 +211,8 @@ export class FacilityDetailComponent implements OnInit {
   
         editable: this.isEditable,
         cellEditor: 'agGridMaterialDatepicker',
-        cellStyle: this.editableCellStyle
+        cellStyle: this.editableCellStyle,
+        cellClass: 'dateUK'
       },
       { field: 'expectedPrice', 
         width: 140,
@@ -263,7 +264,7 @@ export class FacilityDetailComponent implements OnInit {
       { field: 'securedUnsecured', width: 145, type: 'abColDefString' },
       { field: 'seniority', width: 145, type: 'abColDefString' },
       { field: 'modifiedBy', width: 145, type: 'abColDefString' },
-      { field: 'modifiedOn', width: 150, valueFormatter: dateTimeFormatter }
+      { field: 'modifiedOn', width: 150, valueFormatter: dateTimeFormatter, cellClass: 'dateUK' }
     ]
     /** Making this component available to child components in Ag-grid */
     
@@ -330,7 +331,8 @@ export class FacilityDetailComponent implements OnInit {
       // },
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:true, 
-      onCellValueChanged: this.onCellValueChanged.bind(this)
+      onCellValueChanged: this.onCellValueChanged.bind(this),
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     }
 
     this.adaptableOptions = {

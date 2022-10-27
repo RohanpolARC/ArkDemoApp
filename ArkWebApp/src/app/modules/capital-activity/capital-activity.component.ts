@@ -84,7 +84,7 @@ export class CapitalActivityComponent implements OnInit {
   columnDefsInvstmnt: ColDef[] = [
     { field: 'unqiueID', tooltipField: 'unqiueID', type: 'abColDefNumber'},
     { field: 'positionID', tooltipField: 'positionID', headerName: 'Position ID', type: 'abColDefNumber'},
-    { field: 'cashDate', tooltipField: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter, type: 'abColDefDate'},
+    { field: 'cashDate', tooltipField: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter, type: 'abColDefDate', cellClass: 'dateUK'},
     { field: 'fund', tooltipField: 'fund', headerName: 'Fund', type: 'abColDefString'},
     { field: 'fundHedging', tooltipField: 'fundHedging', headerName: 'Fund Hedging', type: 'abColDefString'},
     { field: 'portfolio', tooltipField: 'portfolio', headerName: 'Portfolio', type: 'abColDefString'},
@@ -108,8 +108,8 @@ export class CapitalActivityComponent implements OnInit {
 
   columnDefs: ColDef[] = [
     { field: 'capitalID', tooltipField: 'capitalID', headerName: 'Capital ID', type: 'abColDefNumber'},
-    { field: 'callDate', tooltipField: 'callDate', headerName: 'Call Date', type: 'abColDefDate', valueFormatter: dateFormatter },
-    { field: 'valueDate', tooltipField: 'valueDate', headerName: 'Value Date', type: 'abColDefDate', valueFormatter: dateFormatter},
+    { field: 'callDate', tooltipField: 'callDate', headerName: 'Call Date', type: 'abColDefDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
+    { field: 'valueDate', tooltipField: 'valueDate', headerName: 'Value Date', type: 'abColDefDate', valueFormatter: dateFormatter, cellClass: 'dateUK'},
     { field: 'capitalType', tooltipField: 'capitalType', headerName: 'Capital Type', type:'abColDefString'},
     { field: 'capitalSubType', tooltipField: 'capitalSubType', headerName: 'Capital Subtype', type:'abColDefString'},
     { field: 'fundHedging', tooltipField: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
@@ -128,9 +128,9 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'sourceID', tooltipField: 'sourceID', headerName: 'Source ID', type:'abColDefNumber', valueFormatter: nullOrZeroFormatter},
     { field: 'isLinked', tooltipField: 'isLinked', headerName: 'Is Linked', type:'abColDefBoolean'},
     { field: 'linkedAmount', tooltipField: 'linkedAmount', headerName: 'Linked Total Base', type:'abColDefNumber', valueFormatter: amountFormatter},
-    { field: 'createdOn', tooltipField: 'createdOn', headerName: 'Created On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
+    { field: 'createdOn', tooltipField: 'createdOn', headerName: 'Created On', type:'abColDefDate', valueFormatter: dateTimeFormatter, cellClass: 'dateUK'},
     { field: 'createdBy', tooltipField: 'createdBy', headerName: 'Created By', type:'abColDefString'},
-    { field: 'modifiedOn', tooltipField: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', valueFormatter: dateTimeFormatter},
+    { field: 'modifiedOn', tooltipField: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', valueFormatter: dateTimeFormatter, cellClass: 'dateUK'},
     { field: 'modifiedBy', tooltipField: 'modifiedBy', headerName: 'Modified By', type:'abColDefString'},
   ]
 
@@ -221,7 +221,8 @@ export class CapitalActivityComponent implements OnInit {
       // },
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:false,
-      suppressScrollOnNewData: true
+      suppressScrollOnNewData: true,
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     }
 
     this.gridOptionsInvstmnt = JSON.parse(JSON.stringify(this.gridOptions));

@@ -50,24 +50,24 @@ export class FeePresetsComponent implements OnInit {
         { field: 'fundName' },
         { field: 'commitment', valueFormatter: amountFormatter },
         { field: 'currentCapitalCalled', valueFormatter: amountFormatter },
-        { field: 'startDate', valueFormatter: dateFormatter },
+        { field: 'startDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
         { field: 'curveCurrency' },
         { field: 'curveName' },
         { field: 'entity' },
         
         { field: 'financingCommitment' },
-        { field: 'financingEndDate', valueFormatter: dateFormatter },
+        { field: 'financingEndDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
         { field: 'financingMaxCapitalDeploymentPerMonth' },
-        { field: 'financingStartDate', valueFormatter: dateFormatter },
+        { field: 'financingStartDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
         
         { field: 'financingStage1Ratio' },
         { field: 'financingStage2Ratio' },
         { field: 'financingStage3Ratio' },
-        { field: 'financingStage1EndDate', valueFormatter: dateFormatter },
-        { field: 'financingStage2EndDate', valueFormatter: dateFormatter },
+        { field: 'financingStage1EndDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
+        { field: 'financingStage2EndDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
 
         { field: 'holdback' },
-        { field: 'holdingDate', valueFormatter: dateFormatter },
+        { field: 'holdingDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
         { field: 'maxCapitalDeploymentPerMonth' },
         { field: 'reinvestInterest' },
 
@@ -77,7 +77,7 @@ export class FeePresetsComponent implements OnInit {
         { field: 'hurdleRate' },
         { field: 'includeMgmtFee' },
         { field: 'includeOtherExpense' },
-        { field: 'investmentDate', valueFormatter: dateFormatter },
+        { field: 'investmentDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
         { field: 'isMgmtFeesPaidAtEnd' },
         { field: 'isPerfFeesPaidAtEnd' },
         { field: 'isQuarterEndMgmtFees' },
@@ -92,7 +92,7 @@ export class FeePresetsComponent implements OnInit {
 
         // { field: 'isParallel' },
         { field: 'modifiedBy' },
-        { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
+        { field: 'modifiedOn', valueFormatter: dateTimeFormatter, cellClass: 'dateUK' },
         { field: 'createdBy' },
         { field: 'createdOn', valueFormatter: dateTimeFormatter },
     ].map(col => { 
@@ -114,7 +114,8 @@ export class FeePresetsComponent implements OnInit {
         filter: true,
         enableValue: true,
         enableRowGroup: true  
-      }
+      },
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     }
 
     this.adaptableOptions = {

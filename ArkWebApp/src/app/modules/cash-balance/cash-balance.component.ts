@@ -27,7 +27,7 @@ export class CashBalanceComponent implements OnInit {
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
 
   columnDefs: ColDef[] = [
-    { field: 'asofDate', headerName: 'As of Date', type: 'abColDefDate', valueFormatter: dateFormatter },
+    { field: 'asofDate', headerName: 'As of Date', type: 'abColDefDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
     { field: 'pbName', headerName: 'Fund Accounting', type: 'abColDefString' },
     { field: 'mapName', headerName: 'Map', type: 'abColDefString' },
     { field: 'account', headerName: 'Account', type:'abColDefNumber' },
@@ -73,7 +73,8 @@ export class CashBalanceComponent implements OnInit {
       //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
       // },
       columnDefs: this.columnDefs,
-      allowContextMenuWithControlKey:true
+      allowContextMenuWithControlKey:true,
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     }
 
     this.adaptableOptions = {

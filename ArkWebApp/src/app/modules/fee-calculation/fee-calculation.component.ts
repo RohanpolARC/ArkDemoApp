@@ -123,13 +123,13 @@ export class FeeCalculationComponent implements OnInit {
     }
 
     this.columnDefsCFs = [
-      { field: 'Date', tooltipField:  'Date', valueFormatter: dateFormatter, minWidth: 122, type: 'abColDefDate' },
+      { field: 'Date', tooltipField:  'Date', valueFormatter: dateFormatter, cellClass: 'dateUK', minWidth: 122, type: 'abColDefDate' },
       { field: 'NumberDays', tooltipField:  'NumberDays', type: 'abColDefNumber' },
       { field: 'Fund', tooltipField:  'Fund', type: 'abColDefString' },
       { field: 'CashType', tooltipField:  'CashType', type:'abColDefString' },
       { field: 'TotalType', tooltipField:  'TotalType', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-      { field: 'LocalLastMgmtFeeDate', tooltipField:  'LocalLastMgmtFeeDate', valueFormatter: dateFormatter, minWidth: 122, type: 'abColDefDate' },
-      { field: 'LocalLastHurdleCompoundDate', tooltipField:  'LocalLastHurdleCompoundDate', valueFormatter: dateFormatter, minWidth: 122, type: 'abColDefDate' },
+      { field: 'LocalLastMgmtFeeDate', tooltipField:  'LocalLastMgmtFeeDate', valueFormatter: dateFormatter, cellClass: 'dateUK', minWidth: 122, type: 'abColDefDate' },
+      { field: 'LocalLastHurdleCompoundDate', tooltipField:  'LocalLastHurdleCompoundDate', valueFormatter: dateFormatter, cellClass: 'dateUK', minWidth: 122, type: 'abColDefDate' },
       { field: 'LocalHurdleCompoundingAdjustment', tooltipField:  'LocalHurdleCompoundingAdjustment', valueFormatter: amountFormatter, type: 'abColDefNumber' },
       { field: 'Total', tooltipField:  'Total', valueFormatter: amountFormatter, type: 'abColDefNumber' },
       { field: 'TotalAfterOtherExpenses', tooltipField:  'TotalAfterOtherExpenses', valueFormatter: amountFormatter, type: 'abColDefNumber' },
@@ -196,9 +196,7 @@ export class FeeCalculationComponent implements OnInit {
       defaultColDef: defaultColDef,
       onGridReady: this.onGridCFsReady.bind(this),
       sideBar: true,
-      // components: {
-      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      // }
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     }
 
     this.adaptableOptionsCFs = {

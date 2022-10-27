@@ -56,7 +56,7 @@ export class FeeCalculationSummaryComponent implements OnInit {
     this.columnDefs = [
     { field: 'FundName' },
     { field: 'ScenarioType' },
-    { field: 'AsofDate', valueFormatter: dateFormatter },
+    { field: 'AsofDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
     { field: 'FXHedgeCost', valueFormatter: amountFormatter },
     { field: 'FXHedgeCostActual', valueFormatter: amountFormatter },
     { field: 'MgmtFees', valueFormatter: amountFormatter },
@@ -120,14 +120,14 @@ export class FeeCalculationSummaryComponent implements OnInit {
     { field: 'MOMAfterFXHedgeCost', valueFormatter: nonAmountNumberFormatter2Dec },
     { field: 'MOMAfterMgmtFees', valueFormatter: nonAmountNumberFormatter2Dec },
     { field: 'MOMAfterPerfFees', valueFormatter: nonAmountNumberFormatter2Dec },
-    { field: 'FinancingStartDate', valueFormatter: dateFormatter },
-    { field: 'FinancingEndDate', valueFormatter: dateFormatter },
+    { field: 'FinancingStartDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
+    { field: 'FinancingEndDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
     { field: 'CashYield', valueFormatter: this.percentFormatter },
     { field: 'TotalYield', valueFormatter: this.percentFormatter },
     { field: 'FinancingRate', valueFormatter: this.percentFormatter },
     { field: 'InvestmentPeriod', valueFormatter: nonAmountNumberFormatter2Dec },
-    { field: 'FirstCashFlowDate', valueFormatter: dateFormatter },
-    { field: 'LastCashFlowDate', valueFormatter: dateFormatter },
+    { field: 'FirstCashFlowDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
+    { field: 'LastCashFlowDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
     { field: 'ProjCapDeployed', valueFormatter: amountFormatter },
     { field: 'ProjCapDeployedRepayement', valueFormatter: amountFormatter },
     { field: 'ProjCapDeployedInterest', valueFormatter: amountFormatter },
@@ -164,7 +164,8 @@ export class FeeCalculationSummaryComponent implements OnInit {
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel();
         this.gridApi = params.api;        
-      }
+      },
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     }
 
     this.adaptableOptions = {

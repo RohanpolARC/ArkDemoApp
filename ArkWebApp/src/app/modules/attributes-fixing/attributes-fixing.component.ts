@@ -65,7 +65,7 @@ export class AttributesFixingComponent implements OnInit {
 
     this.columnDefs = [
       { field: 'fixingID', type: 'abColDefNumber' },
-      { field: 'asOfDate',valueFormatter:dateFormatter, type: 'abColDefDate' },
+      { field: 'asOfDate',valueFormatter:dateFormatter, type: 'abColDefDate', cellClass: 'dateUK' },
       { 
         field: 'attributeName',
         cellStyle: {
@@ -86,9 +86,9 @@ export class AttributesFixingComponent implements OnInit {
       }
       },
       { field: 'modifiedBy', type: 'abColDefString' },
-      { field: 'modifiedOn', valueFormatter: dateTimeFormatter, type: 'abColDefDate' },
+      { field: 'modifiedOn', valueFormatter: dateTimeFormatter, type: 'abColDefDate', cellClass: 'dateUK' },
       { field: 'createdBy', type: 'abColDefString' },
-      { field: 'createdOn', valueFormatter: dateTimeFormatter, type: 'abColDefDate' },
+      { field: 'createdOn', valueFormatter: dateTimeFormatter, type: 'abColDefDate', cellClass: 'dateUK' },
     ]
 
     this.gridOptions = {
@@ -102,7 +102,8 @@ export class AttributesFixingComponent implements OnInit {
         filter: true,
         enableValue: true,
         enableRowGroup: true  
-      }
+      },
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     }
 
     this.adaptableOptions= {

@@ -59,11 +59,11 @@ export class UnfundedAssetsComponent implements OnInit {
       { field: 'fundedAmount', type: 'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
       { field: 'unfundedAmount', type: 'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
       { field: 'tobefundedAmount', headerName: 'To be funded', type: 'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
-      { field: 'fundingDate', type: 'abColDefDate', valueFormatter: dateFormatter },
+      { field: 'fundingDate', type: 'abColDefDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
       { field: 'createdBy', type: 'abColDefString' },
-      { field: 'createdOn', type: 'abColDefDate', valueFormatter: dateTimeFormatter },
+      { field: 'createdOn', type: 'abColDefDate', valueFormatter: dateTimeFormatter, cellClass: 'dateUK' },
       { field: 'modifiedBy', type: 'abColDefString' },
-      { field: 'modifiedOn', type: 'abColDefDate', valueFormatter: dateTimeFormatter }
+      { field: 'modifiedOn', type: 'abColDefDate', valueFormatter: dateTimeFormatter, cellClass: 'dateUK' }
     ]
 
     this.gridOptions = {
@@ -82,7 +82,8 @@ export class UnfundedAssetsComponent implements OnInit {
         enableValue: true,
         enableRowGroup: true  
       },
-      onGridReady: this.onGridReady.bind(this)
+      onGridReady: this.onGridReady.bind(this),
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     }
 
     this.adaptableOptions = {

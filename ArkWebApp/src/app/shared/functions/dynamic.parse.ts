@@ -82,10 +82,12 @@ export function createColumnDefs(
       if(col.toLowerCase().includes('date') || col.toLowerCase()==='createdon'|| col.toLowerCase()==='modifiedon'){
         colDef.valueFormatter = dateFormatter;
         colDef.type = 'abColDefDate'
+        colDef.cellClass = 'dateUK'
       }
       else if(dateTimeColumns.includes(col.toLowerCase())){
         colDef.valueFormatter = dateTimeFormatter;
         colDef.type = 'abColDefDate'
+        colDef.cellClass = 'dateUK'
       }
       else if(exceptions.includes(col.toLowerCase())){
         colDef.valueFormatter = null;

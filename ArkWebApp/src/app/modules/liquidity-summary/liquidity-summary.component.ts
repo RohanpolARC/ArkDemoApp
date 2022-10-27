@@ -194,7 +194,7 @@ export class LiquiditySummaryComponent implements OnInit {
         width: 115,
         pinned: 'left',
         sortable: true,
-      
+        cellClass: 'dateUK'
       },
       
       {
@@ -534,7 +534,7 @@ export class LiquiditySummaryComponent implements OnInit {
       columnDefs: this.columnDefs,
       defaultColDef: this.defaultColDef,
       aggFuncs: this.aggFuncs,
-      
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
 
             // Expand groups
       isGroupOpenByDefault: (params: IsGroupOpenByDefaultParams) => {
