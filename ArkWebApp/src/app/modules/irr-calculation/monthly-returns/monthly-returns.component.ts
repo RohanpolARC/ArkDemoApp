@@ -1,4 +1,4 @@
-import { ColDef, GridOptions, GridReadyEvent, IAggFuncParams, ValueFormatterParams } from '@ag-grid-community/all-modules';
+import { ColDef, GridOptions, GridReadyEvent, IAggFuncParams, ValueFormatterParams } from '@ag-grid-community/core';
 import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';

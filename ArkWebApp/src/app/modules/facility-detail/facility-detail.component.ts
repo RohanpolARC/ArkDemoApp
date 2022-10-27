@@ -1,33 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, ICellRendererParams } from '@ag-grid-community/all-modules';
-import {
-  GridOptions,
-  Module,
-} from '@ag-grid-community/all-modules';
-import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
-import { MenuModule } from '@ag-grid-enterprise/menu';
-import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
-import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
-import { ExcelExportModule } from '@ag-grid-enterprise/excel-export';
-import {
-  AdaptableOptions,
-  AdaptableApi,
-} from '@adaptabletools/adaptable/types';
-import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
+import { AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable/types';
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from 'src/app/core/services/FacilityDetails/facility-detail.service';
-
 import { amountFormatter, removeDecimalFormatter, formatDate, dateTimeFormatter } from 'src/app/shared/functions/formatter';
 import { ActionCellRendererComponent } from './action-cell-renderer.component';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { AggridMaterialDatepickerComponent } from './aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { DataService } from 'src/app/core/services/data.service';
 import { CheckboxEditorComponent } from 'src/app/shared/components/checkbox-editor/checkbox-editor.component';
-import { FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
+import { CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, GridOptions, ICellRendererParams, Module } from '@ag-grid-community/core';
 
 @Component({
   selector: 'app-facility-detail',
@@ -39,13 +22,8 @@ export class FacilityDetailComponent implements OnInit {
   @ViewChild(ActionCellRendererComponent) actionCell!: ActionCellRendererComponent;
 
   subscriptions: Subscription[] = [];
-
-  agGridModules: Module[] = [
-    ClientSideRowModelModule, RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule
-  ];
-
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   columnDefs: ColDef[]
-    
   defaultColDef = {
     resizable: true,
     enableValue: true,
@@ -55,26 +33,21 @@ export class FacilityDetailComponent implements OnInit {
     filter: true,
     autosize:true,
   };  
-
   gridOptions: GridOptions;
-
+  adaptableOptions: AdaptableOptions;
+  adapTableApi: AdaptableApi;
+  context
+  gridApi: GridApi
+  gridColumnApi
+  params
+  actionClickedRowID: number = null;
+  isWriteAccess: boolean = false;
   rowData: any[] = [];
+
   constructor(private facilityDetailsService: FacilityDetailService,
     private accessService: AccessService,
     private dataSvc: DataService) { }
 
-  adaptableOptions: AdaptableOptions;
-  adapTableApi: AdaptableApi;
-
-  context
-
-  gridApi: GridApi
-  gridColumnApi
-  params
-
-  actionClickedRowID: number = null;
-  
-  isWriteAccess: boolean = false;
 
   editableCellStyle = (params) => {
     return (params.rowIndex === this.actionClickedRowID) ? 
@@ -275,7 +248,7 @@ export class FacilityDetailComponent implements OnInit {
         },
         width: 130
       },
-      { headerName: 'Action', 
+      { headerName: 'Edit', 
         field: 'Action',
         width: 130,
         pinned: 'right',
@@ -352,15 +325,16 @@ export class FacilityDetailComponent implements OnInit {
       suppressMenuHide: true,
       singleClickEdit: true,
       undoRedoCellEditing: false,
-      components: {
-        AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      },
+      // components: {
+      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+      // },
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:true, 
       onCellValueChanged: this.onCellValueChanged.bind(this)
     }
 
     this.adaptableOptions = {
+      licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'assetID',
       userName: this.dataSvc.getCurrentUserName(),
       adaptableId: "Facility Detail ID",
@@ -376,10 +350,10 @@ export class FacilityDetailComponent implements OnInit {
 
       predefinedConfig: {
         Dashboard: {
-          ModuleButtons: ['TeamSharing', 'Export', 'Layout', 'ConditionalStyle', 'Filter'],
+          ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           Tabs: [],
           DashboardTitle: ' ',
-          Revision: 2
+          Revision: 3
         },
         Layout:{
           Revision: 2,
@@ -428,22 +402,8 @@ export class FacilityDetailComponent implements OnInit {
     }
    }
 
-  onAdaptableReady(
-    {
-      adaptableApi,
-      vendorGrid,
-    }: {
-      adaptableApi: AdaptableApi;
-      vendorGrid: GridOptions;
-    }
-  ) {
+   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApi = adaptableApi;
-
-    adaptableApi.eventApi.on('SelectionChanged', selection => {
-      // do stuff
-    });
-
-/* Closes right sidebar on start */
-    adaptableApi.toolPanelApi.closeAdapTableToolPanel();
-  }
+    this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
+  };
 }

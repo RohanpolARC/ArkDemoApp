@@ -32,7 +32,7 @@ import { LiquiditySummaryRoutingModule } from './liquidity-summary-routing.modul
     LiquiditySummaryRoutingModule,
     
     MatDialogModule,
-    AgGridModule.withComponents([UpdateCellRendererComponent, AttributeGroupRendererComponent]),
+    AgGridModule,
     MatCardModule,
     MatIconModule,
     MatButtonModule,

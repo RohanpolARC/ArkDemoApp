@@ -25,7 +25,7 @@ import { PortfolioHistoryRoutingModule } from './portfolio-history-routing.modul
 
     MatIconModule,
     MatCardModule,
-    AgGridModule.withComponents([BtnCellRenderer]),
+    AgGridModule,
     AdaptableAngularAgGridModule,
     MatDialogModule,
     MatFormFieldModule,

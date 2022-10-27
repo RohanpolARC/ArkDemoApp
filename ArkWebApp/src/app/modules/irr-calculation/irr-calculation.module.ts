@@ -37,7 +37,7 @@ import { MonthlyReturnsComponent } from './monthly-returns/monthly-returns.compo
     IrrCalculationRoutingModule,
 
     AdaptableAngularAgGridModule,
-    AgGridModule.withComponents([]),
+    AgGridModule,
     MatCardModule,
     MatButtonModule,
     MatSlideToggleModule,

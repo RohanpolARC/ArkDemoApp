@@ -1,5 +1,5 @@
-import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
-import { ClientSideRowModelModule, ClipboardModule, ColDef, ColumnsToolPanelModule, ExcelExportModule, FiltersToolPanelModule, GridApi, GridOptions, GridReadyEvent, MenuModule, Module, RangeSelectionModule, SetFilterModule, SideBarModule } from '@ag-grid-enterprise/all-modules';
+import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColDef, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { forkJoin, Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
@@ -18,17 +18,7 @@ import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/u
 export class ContractHistoryComponent implements OnInit {
 
   subscriptions: Subscription[] = []
-  agGridModules: Module[] = [
-    ClientSideRowModelModule,
-    SetFilterModule,
-    ColumnsToolPanelModule,
-    MenuModule,
-    ExcelExportModule,
-    FiltersToolPanelModule,
-    ClipboardModule,
-    SideBarModule,
-    RangeSelectionModule
-  ];
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   
   columnDefs: ColDef[] = []
   gridApi: GridApi;
@@ -44,9 +34,9 @@ export class ContractHistoryComponent implements OnInit {
     enableRangeSelection: true,
     columnDefs: this.columnDefs,
     tooltipShowDelay: 0,
-    components: {
-      AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-    },
+    // components: {
+    //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+    // },
     onGridReady: this.onGridReady.bind(this),
     defaultColDef: {
       flex: 1,
@@ -60,6 +50,7 @@ export class ContractHistoryComponent implements OnInit {
   }
 
   adaptableOptions: AdaptableOptions = {
+    licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
     primaryKey: '',
     userName: this.dataSvc.getCurrentUserName(),
     autogeneratePrimaryKey: true,
@@ -69,9 +60,9 @@ export class ContractHistoryComponent implements OnInit {
     exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
     
-    toolPanelOptions: {
-      toolPanelOrder: ['columns', 'AdaptableToolPanel']
-    },
+    // toolPanelOptions: {
+    //   toolPanelOrder: ['columns', 'AdaptableToolPanel']
+    // },
 
     teamSharingOptions: {
       enableTeamSharing: true,
@@ -86,8 +77,8 @@ export class ContractHistoryComponent implements OnInit {
 
     predefinedConfig: {
       Dashboard: {
-        Revision: 1,
-        ModuleButtons: ['TeamSharing', 'Export', 'Layout', 'ConditionalStyle', 'Filter'],
+        Revision: 2,
+        ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
         IsCollapsed: true,
         Tabs: [{
           Name: 'Layout',
@@ -184,16 +175,8 @@ export class ContractHistoryComponent implements OnInit {
     this.refreshGrid();
     params.api.closeToolPanel()
   }
-
-  onAdaptableReady(
-    {
-      adaptableApi,
-      vendorGrid,
-    }: {
-      adaptableApi: AdaptableApi;
-      vendorGrid: GridOptions;
-    }
-  ) {
+  
+  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
   }

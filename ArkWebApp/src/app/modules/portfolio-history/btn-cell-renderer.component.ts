@@ -2,9 +2,9 @@ import { Component, OnDestroy } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import {UpdateGirModalComponent} from './update-gir-modal/update-gir-modal.component'
-import { ICellRendererParams } from '@ag-grid-community/all-modules';
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { Subscription } from 'rxjs';
+import { ICellRendererParams } from '@ag-grid-community/core';
 
 @Component({
   selector: 'btn-cell-renderer',

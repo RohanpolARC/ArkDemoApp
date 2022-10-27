@@ -1,5 +1,5 @@
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
-import { GridApi } from '@ag-grid-community/all-modules';
+import { GridApi } from '@ag-grid-community/core';
 import { Injectable } from '@angular/core';
 
 @Injectable({

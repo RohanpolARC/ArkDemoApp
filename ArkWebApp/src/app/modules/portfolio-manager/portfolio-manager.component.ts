@@ -1,6 +1,5 @@
-import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
-import { CellValueChangedEvent, ClientSideRowModelModule, ColDef, EditableCallbackParams, GridOptions, GridReadyEvent, Module, RowNode } from '@ag-grid-community/all-modules';
-import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
+import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
+import { CellValueChangedEvent, ColDef, EditableCallbackParams, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { MsalService } from '@azure/msal-angular';
 import { Subscription } from 'rxjs';
@@ -34,18 +33,7 @@ export class PortfolioManagerComponent implements OnInit {
   gridOptions: GridOptions
   adaptableOptions: AdaptableOptions
   subscriptions: Subscription[] = []
-  agGridModules: Module[] = [
-    ClientSideRowModelModule,
-    RowGroupingModule,
-    SetFilterModule,
-    ColumnsToolPanelModule,
-    MenuModule,
-    ExcelExportModule,
-    FiltersToolPanelModule,
-    ClipboardModule,
-    SideBarModule,
-    RangeSelectionModule
-  ];
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   actionClickedRowID: number = null;
   context: any;
   adapTableApi: AdaptableApi;
@@ -244,9 +232,9 @@ export class PortfolioManagerComponent implements OnInit {
       columnDefs: this.columnDefs,
       defaultColDef: this.defaultColDef,
       sideBar: true,
-      components: {
-        AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      },
+      // components: {
+      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+      // },
       frameworkComponents: {
         updateCellRenderer: UpdateCellRendererComponent,
         autocompleteCellEditor: MatAutocompleteEditorComponent
@@ -257,6 +245,7 @@ export class PortfolioManagerComponent implements OnInit {
     }
 
     this.adaptableOptions = {
+      licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'mappingID',
       userName: this.dataSvc.getCurrentUserName(),
       adaptableId: 'Portfolio Manager ID',
@@ -264,9 +253,9 @@ export class PortfolioManagerComponent implements OnInit {
 
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
-      toolPanelOptions: {
-        toolPanelOrder: ['columns', 'AdaptableToolPanel']
-      },
+      // toolPanelOptions: {
+      //   toolPanelOrder: ['columns', 'AdaptableToolPanel']
+      // },
 
       teamSharingOptions: {
         enableTeamSharing: true,
@@ -277,8 +266,8 @@ export class PortfolioManagerComponent implements OnInit {
 
       predefinedConfig: {
         Dashboard: {
-          Revision: 4,
-          ModuleButtons: ['TeamSharing', 'Export', 'Layout', 'ConditionalStyle', 'Filter'],
+          Revision: 5,
+          ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
             Name: 'Layout',
@@ -375,20 +364,11 @@ export class PortfolioManagerComponent implements OnInit {
     this.validateAndUpdate(params)
   }
 
-  onAdaptableReady(
-    {
-      adaptableApi,
-      vendorGrid,
-    }: {
-      adaptableApi: AdaptableApi;
-      vendorGrid: GridOptions;
-    }
-  ) {
+  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApi = adaptableApi;
-    this.adapTableApi.toolPanelApi.closeAdapTableToolPanel()
+    this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
 
     this.portfolioMapDataSvc.mappingsAdaptableApi = adaptableApi
-
   }
 
   onGridReady(params: GridReadyEvent){

@@ -1,7 +1,6 @@
-import { ColumnFilter, AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent, CheckboxColumnClickedInfo } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColumnFilter, AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { FiltersToolPanelModule } from '@ag-grid-enterprise/filter-tool-panel';
-import { ClientSideRowModelModule, ColDef, EditableCallbackParams, GridOptions, RowSelectedEvent, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi } from '@ag-grid-community/all-modules';
-import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, Module,ExcelExportModule, ClipboardModule, RangeSelectionModule, SideBarModule } from '@ag-grid-enterprise/all-modules';
+import { ColDef, EditableCallbackParams, GridOptions, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi, Module } from '@ag-grid-community/core';
 import { Component, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -14,7 +13,7 @@ import { IRRCalcParams, MonthlyReturnsCalcParams, VPortfolioLocalOverrideModel }
 import { EventEmitter } from '@angular/core';
 import { AggridMaterialDatepickerComponent } from '../../facility-detail/aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/portfolio-save-run-model.component';
-import { getLastBusinessDay, getMomentDate, getMomentDateStr, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { getLastBusinessDay, getMomentDateStr, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
 
 @Component({
@@ -53,9 +52,7 @@ export class PortfolioModellerComponent implements OnInit {
   selectedPositionIDs: number[] = []
   localOverrides
 
-  agGridModules: Module[] = [
-    ClientSideRowModelModule, RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule
-  ];
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
 
   editableCellStyle = (params) => {
     return (this.isLocal.value && !params.node.group) ? 
@@ -268,9 +265,9 @@ export class PortfolioModellerComponent implements OnInit {
         sortable: true,
         filter: true
       },
-      components: {
-        AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      },
+      // components: {
+      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+      // },
       rowGroupPanelShow: 'always',
       rowSelection: 'multiple',
       groupSelectsFiltered: true,
@@ -283,6 +280,7 @@ export class PortfolioModellerComponent implements OnInit {
     }
 
     this.adaptableOptions = {
+      licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'positionID',
       userName: this.dataSvc.getCurrentUserName(),
       adaptableId: 'IRR Calc - positions',
@@ -306,8 +304,8 @@ export class PortfolioModellerComponent implements OnInit {
 
       predefinedConfig: {  
         Dashboard: {
-          Revision: 2,
-          ModuleButtons: ['TeamSharing', 'Export', 'Layout', 'ConditionalStyle'],
+          Revision: 3,
+          ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
             Name:'Layout',
@@ -618,7 +616,7 @@ export class PortfolioModellerComponent implements OnInit {
     /** Here, we clear all filters applied on the grid, overrides, toggles etc.*/
 
     if(this.adapTableApi){
-      this.adapTableApi.filterApi.clearAllColumnFilter();
+      this.adapTableApi.filterApi.clearColumnFilters();
       this.gridApi.deselectAll();
       if(userAction)
         this.updateGridOverrides('Clear');
@@ -714,7 +712,7 @@ export class PortfolioModellerComponent implements OnInit {
   onPortfolioModelSelect(event){
     this.selectedModelID = event.modelID
 
-    this.adapTableApi.filterApi.clearAllColumnFilter();
+    this.adapTableApi.filterApi.clearColumnFilters();
     this.selectedPositionIDs = []
 
     if(this.modelMap[this.selectedModelID].rules){
@@ -756,19 +754,10 @@ export class PortfolioModellerComponent implements OnInit {
     }))
   }
 
-  onAdaptableReady(
-    {
-      adaptableApi,
-      vendorGrid,
-    }: {
-      adaptableApi: AdaptableApi;
-      vendorGrid: GridOptions;
-    }
-  ) {
+  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApi = adaptableApi;
-    this.adapTableApi.toolPanelApi.closeAdapTableToolPanel()
-
-    this.adapTableApi.filterApi.clearAllColumnFilter();
+    this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
+    this.adapTableApi.filterApi.clearColumnFilters();
   }
 
   onGridReady(params: GridReadyEvent){

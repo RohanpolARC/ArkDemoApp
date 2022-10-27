@@ -1,6 +1,5 @@
-import { AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
-import { ClientSideRowModelModule, ColDef, GridApi, GridOptions, GridReadyEvent, Module, ExcelStyle } from '@ag-grid-community/all-modules';
-import { ClipboardModule, ColumnsToolPanelModule, ExcelExportModule, FiltersToolPanelModule, MenuModule, RangeSelectionModule, SetFilterModule, SideBarModule } from '@ag-grid-enterprise/all-modules';
+import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColDef, GridApi, GridOptions, GridReadyEvent, Module, ExcelStyle } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { Subject, Subscription, timer } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
@@ -27,17 +26,7 @@ export class FeeCalculationComponent implements OnInit {
   rowDataSmy: any[] = []    // Output summary
   gridApiCFs: GridApi
 
-  agGridModules: Module[] = [
-    ClientSideRowModelModule,
-    SetFilterModule,
-    ColumnsToolPanelModule,
-    MenuModule,
-    ExcelExportModule,
-    FiltersToolPanelModule,
-    ClipboardModule,
-    SideBarModule,
-    RangeSelectionModule
-  ];
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
 
   isFirstCallMade: boolean = false
   asOfDate: string; //'YYYY-MM-DD'
@@ -207,12 +196,13 @@ export class FeeCalculationComponent implements OnInit {
       defaultColDef: defaultColDef,
       onGridReady: this.onGridCFsReady.bind(this),
       sideBar: true,
-      components: {
-        AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      }
+      // components: {
+      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+      // }
     }
 
     this.adaptableOptionsCFs = {
+      licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       autogeneratePrimaryKey: true,
       primaryKey: '',
       userName: this.dataSvc.getCurrentUserName(),
@@ -228,8 +218,8 @@ export class FeeCalculationComponent implements OnInit {
 
       predefinedConfig: {
         Dashboard: {
-          Revision: 1,
-          ModuleButtons: ['TeamSharing', 'Export', 'Layout', 'ConditionalStyle', 'Filter'],
+          Revision: 2,
+          ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
             Name: 'Layout',

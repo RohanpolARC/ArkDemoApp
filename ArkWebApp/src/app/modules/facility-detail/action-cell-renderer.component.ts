@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
-import { ICellRendererParams } from '@ag-grid-community/all-modules';
 import { FacilityDetailComponent } from './facility-detail.component';
 import { FacilityDetailModel } from 'src/app/shared/models/FacilityDetailModel';
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from 'src/app/core/services/FacilityDetails/facility-detail.service';
-import {MsalUserService} from '../../core/services/Auth/msaluser.service'
+import { MsalUserService } from '../../core/services/Auth/msaluser.service'
 import { DataService } from 'src/app/core/services/data.service';
+import { ICellRendererParams } from '@ag-grid-community/core';
 
 @Component({
   selector: 'app-action-cell-renderer',

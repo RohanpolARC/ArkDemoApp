@@ -1,5 +1,5 @@
-import { ICellEditorParams, ICellRendererParams } from '@ag-grid-community/all-modules';
-import { ICellEditorAngularComp, ICellRendererAngularComp } from '@ag-grid-community/angular';
+import { ICellRendererAngularComp } from '@ag-grid-community/angular';
+import { ICellRendererParams } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -44,7 +44,5 @@ export class CheckboxEditorComponent implements ICellRendererAngularComp, OnInit
     }
   }
 
-  ngOnInit(): void {
-  }
-
+  ngOnInit(): void { }
 }

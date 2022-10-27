@@ -1,7 +1,7 @@
-import { ActionColumnButtonContext } from "@adaptabletools/adaptable/types";
-import { RowNode } from '@ag-grid-community/all-modules';
+import { ActionColumnContext } from "@adaptabletools/adaptable-angular-aggrid";
+import { RowNode } from "@ag-grid-community/core";
 
-export function validateLinkSelect(context: ActionColumnButtonContext){
+export function validateLinkSelect(context: ActionColumnContext){
 
     let children = getNodes(context.rowNode);
 

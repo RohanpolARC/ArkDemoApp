@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
-import { ICellRendererParams } from '@ag-grid-community/all-modules';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { LiquiditySummaryComponent } from '../liquidity-summary.component';
 import { LiquiditySummaryUpdateModel } from 'src/app/shared/models/LiquiditySummaryModel';
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/liquidity-summary.service';
+import { ICellRendererParams } from '@ag-grid-community/core';
 
 @Component({
   selector: 'app-update-cell-renderer',

@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ICellEditorAngularComp } from '@ag-grid-community/angular';
-import { ICellEditorParams } from '@ag-grid-community/all-modules';
 import { FacilityDetailComponent } from '../facility-detail.component';
 import { formatDate } from 'src/app/shared/functions/formatter';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { MatDatepicker } from '@angular/material/datepicker';
+import { ICellEditorParams } from '@ag-grid-community/core';
 
 @Component({
   selector: 'app-aggrid-material-datepicker',

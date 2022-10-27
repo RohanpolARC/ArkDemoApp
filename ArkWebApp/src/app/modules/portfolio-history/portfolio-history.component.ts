@@ -1,9 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import {
-  ColDef,
-  GridOptions,
-  Module,
-} from '@ag-grid-community/all-modules';
+import { Component, OnInit } from '@angular/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { Observable, Subscription} from 'rxjs';
@@ -14,9 +9,7 @@ import {
   AdaptableOptions,
   AdaptableApi,
   AdaptableButton,
-  ActionColumnButtonContext,
 } from '@adaptabletools/adaptable/types';
-import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 import {DataService} from '../../core/services/data.service'
 import {BtnCellRenderer} from './btn-cell-renderer.component'
 import {PortfolioHistoryService} from '../../core/services/PortfolioHistory/portfolio-history.service'
@@ -27,9 +20,10 @@ import {DialogDeleteComponent} from './dialog-delete/dialog-delete.component';
 import { ExcelExportModule } from "@ag-grid-enterprise/excel-export";
 import { dateFormatter, dateTimeFormatter, amountFormatter, nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
-import { FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { map } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
+import { ColDef, GridOptions, Module } from '@ag-grid-community/core';
+import { ActionColumnContext } from '@adaptabletools/adaptable-angular-aggrid';
 
 let adapTableApi: AdaptableApi;
 
@@ -44,17 +38,7 @@ export class PortfolioHistoryComponent implements OnInit {
 
   rowData: Observable<any[]>;
 
-  modules: Module[] = [    
-    ClientSideRowModelModule,
-    RowGroupingModule,
-    SetFilterModule,
-    ColumnsToolPanelModule,
-    MenuModule,
-    ExcelExportModule,
-    FiltersToolPanelModule,
-    ClipboardModule,
-    SideBarModule,
-    RangeSelectionModule ];
+  modules: Module[] = CommonConfig.AG_GRID_MODULES
 
   public gridOptions: GridOptions;
   public getRowNodeId;
@@ -122,9 +106,9 @@ export class PortfolioHistoryComponent implements OnInit {
           { statusPanel: 'agFilteredRowCountComponent' },
         ],
       },
-      components: {
-        AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      },
+      // components: {
+      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+      // },
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey: true,
       context: {
@@ -173,6 +157,7 @@ export class PortfolioHistoryComponent implements OnInit {
 
 
   public adaptableOptions: AdaptableOptions = {
+    licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
     primaryKey: "uniqueID",
     userName: this.dataSvc.getCurrentUserName(),
     adaptableId: "Portfolio History",
@@ -191,14 +176,15 @@ export class PortfolioHistoryComponent implements OnInit {
       getSharedEntities: getSharedEntities.bind(this)
     },
 
-    userInterfaceOptions:{
+    actionOptions:{
       actionColumns:[
         {
           columnId: 'ActionDelete',
+          friendlyName: 'Delete',
           actionColumnButton: {
             onClick: (
-              button: AdaptableButton<ActionColumnButtonContext>,
-              context: ActionColumnButtonContext
+              button: AdaptableButton<ActionColumnContext>,
+              context: ActionColumnContext
             ) => {
 
               let dialogRef = this.dialog.open(DialogDeleteComponent,{
@@ -222,51 +208,36 @@ export class PortfolioHistoryComponent implements OnInit {
       ]
     },
     generalOptions: {
-      // autoSortGroupedColumns: true,
 
       /* Adaptable calls this on grid init */
       /* Custom comparator for descending order */  
-      columnSortComparers:[{
-        columnId: 'tradeDate',
-        comparer: (valueA: Date, valueB: Date) => {
-          if(valueA > valueB)
-            return -1;
-          else if(valueA < valueB)
-            return 1;
-          else
-            return 0; 
+      customSortComparers: [
+        {
+          scope: {
+            ColumnIds: ['tradeDate']
+          },
+          comparer: (valueA: Date, valueB: Date) => {
+            if(valueA > valueB)
+              return 1;
+            else if(valueA < valueB)
+              return -1;
+            else
+              return 0; 
+          }
         }
-      }]
+      ]
     },
 
     predefinedConfig: {
       Dashboard: {
-        ModuleButtons: ['TeamSharing','Export', 'Layout','ConditionalStyle'],
+        Revision: 1,
+        ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
         IsCollapsed: true,
         Tabs: [{
           Name:'Layout',
           Toolbars: ['Layout'],
         }],
         DashboardTitle: ' '
-      },
-      Filter:{
-        ColumnFilters: [{
-          ColumnId: 'typeDesc',
-          Predicate: {
-            PredicateId: 'Values',
-            Inputs: ['Borrowing', 'Buy Trade']
-          }
-        }]
-      },
-      FormatColumn:{
-        FormatColumns: [
-          {
-            Scope: {
-              ColumnIds: ['ActionDelete'],
-            },
-            HeaderName: " ",
-          }
-        ]
       },
       QuickSearch: {
         QuickSearchText: '',
@@ -317,7 +288,13 @@ export class PortfolioHistoryComponent implements OnInit {
           ColumnWidthMap:{
             ActionDelete: 50,
           },
-        
+          ColumnFilters: [{
+            ColumnId: 'typeDesc',
+            Predicate: {
+              PredicateId: 'Values',
+              Inputs: ['Borrowing', 'Buy Trade']
+            }
+          }],        
           ColumnSorts: [
             {
               ColumnId: 'tradeDate',
@@ -325,24 +302,14 @@ export class PortfolioHistoryComponent implements OnInit {
             },
           ],
         }]
-      }
-    
+      }  
     }
-  
   }
 
-  onAdaptableReady(
-    {
-      adaptableApi,
-      vendorGrid,
-    }: {
-      adaptableApi: AdaptableApi;
-      vendorGrid: GridOptions;
-    }
-  ) {
+  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     adapTableApi = adaptableApi;
-    
-    /* Close right sidebar toolpanel by default */
     adaptableApi.toolPanelApi.closeAdapTableToolPanel();
-  }
+    // use AdaptableApi for runtime access to Adaptable
+  };
+
 }

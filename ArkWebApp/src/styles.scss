@@ -11,10 +11,14 @@
 
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
-@import "../node_modules/@ag-grid-community/all-modules/dist/styles/ag-grid.css";
-@import "../node_modules/@ag-grid-community/all-modules/dist/styles/ag-theme-alpine.css";
+// @import "../node_modules/@ag-grid-community/all-modules/dist/styles/ag-grid.css";
+// @import "../node_modules/@ag-grid-community/all-modules/dist/styles/ag-theme-alpine.css";
 
-@import "../node_modules/@ag-grid-community/all-modules/dist/styles/ag-theme-alpine-dark.css";
+// @import "../node_modules/@ag-grid-community/all-modules/dist/styles/ag-theme-alpine-dark.css";
+
+@import url(../../ArkWebApp/node_modules/@ag-grid-community/styles/ag-grid.css);
+@import "../node_modules/@ag-grid-community/styles/ag-grid.css";
+@import "../node_modules/@ag-grid-community/styles/ag-theme-alpine.css";
 
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker

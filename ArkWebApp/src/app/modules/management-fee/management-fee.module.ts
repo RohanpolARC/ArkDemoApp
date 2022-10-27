@@ -7,7 +7,6 @@ import { AgGridModule } from '@ag-grid-community/angular';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
 import { MatCardModule } from '@angular/material/card';
 
-
 @NgModule({
   declarations: [
     ManagementFeeComponent

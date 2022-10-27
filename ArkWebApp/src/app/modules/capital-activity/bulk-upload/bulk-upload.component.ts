@@ -7,11 +7,10 @@ import { amountFormatter } from 'src/app/shared/functions/formatter';
 import { dateFormatter } from '../utilities/utility';
 import { CapitalActivityModel } from 'src/app/shared/models/CapitalActivityModel';
 import { Subscription } from 'rxjs';
-import { getColumnTitle } from '../utilities/utility';
 import {
   GridOptions,
   Module,
-} from '@ag-grid-community/all-modules';
+} from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { MenuModule } from '@ag-grid-enterprise/menu';
@@ -22,12 +21,10 @@ import {
   AdaptableOptions,
   AdaptableApi
 } from '@adaptabletools/adaptable/types';
-import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 import { validateColumns, validateExcelRows } from './validation';
 import { DataService } from 'src/app/core/services/data.service';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import * as moment from 'moment';
-import { FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { CommonConfig } from 'src/app/configs/common-config';
 
 @Component({
@@ -46,8 +43,7 @@ export class BulkUploadComponent implements OnInit {
   gridApi;
   gridColumnApi;
 
-  agGridModules: Module[] = [  ClientSideRowModelModule, RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule
-];
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
 
   validationErrorMsg: string = null;
   isValid: boolean = false;
@@ -181,9 +177,9 @@ export class BulkUploadComponent implements OnInit {
       sideBar: true,
       suppressMenuHide: true,
       singleClickEdit: false,
-      components: {
-        AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      },
+      // components: {
+      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+      // },
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:true,
       rowGroupPanelShow: 'always',
@@ -196,15 +192,16 @@ export class BulkUploadComponent implements OnInit {
   }
 
   public adaptableOptions: AdaptableOptions = {
+    licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
     autogeneratePrimaryKey: true,
      primaryKey:'',
      userName: this.dataSvc.getCurrentUserName(),
      adaptableId: "Capital Activity - Bulk Upload",
      adaptableStateKey: `Bulk Upload Key`,
  
-     toolPanelOptions: {
-       toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
-     },
+    //  toolPanelOptions: {
+    //    toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
+    //  },
      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
      teamSharingOptions: {
@@ -216,7 +213,7 @@ export class BulkUploadComponent implements OnInit {
      predefinedConfig: {
        Dashboard: {
          Revision: 1,
-         ModuleButtons: ['TeamSharing', 'Export', 'Layout','ConditionalStyle', 'Filter'],
+         ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
          IsCollapsed: true,
          Tabs: [],
          DashboardTitle: ' '
@@ -300,18 +297,9 @@ export class BulkUploadComponent implements OnInit {
     this.gridColumnApi = params.columnApi;
   }
 
-  onAdaptableReady(
-    {
-      adaptableApi,
-      vendorGrid,
-    }: {
-      adaptableApi: AdaptableApi;
-      vendorGrid: GridOptions;
-    }
-  ) { 
+  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApi = adaptableApi;
-/* Closes right sidebar on start */
-   
+
     if(this.invalidRowData.length > 0){
       this.adapTableApi.gridApi.loadGridData(this.invalidRowData)
       this.adapTableApi.layoutApi.setLayout('Invalid Excel Grid')

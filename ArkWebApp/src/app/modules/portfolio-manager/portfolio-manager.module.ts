@@ -34,9 +34,7 @@ import { PortfolioMappingRoutingModule } from './portfolio-mapping-routing.modul
     PortfolioMappingRoutingModule,
     
     AdaptableAngularAgGridModule,
-    AgGridModule.withComponents([
-      UpdateCellRendererComponent, MatAutocompleteEditorComponent, ApprovalActionCellRendererComponent
-    ]),
+    AgGridModule,
 
     ReactiveFormsModule,
 

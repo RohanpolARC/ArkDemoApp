@@ -103,7 +103,7 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
 
 
     AdaptableAngularAgGridModule, 
-    AgGridModule.withComponents([]),
+    AgGridModule,
     MatToolbarModule,
     MatIconModule,
     BrowserAnimationsModule,

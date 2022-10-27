@@ -1,17 +1,14 @@
-import { ActionColumn, ActionColumnButtonContext, AdaptableApi, AdaptableButton, AdaptableOptions, AdaptableToolPanelAgGridComponent, DashboardState, LayoutState, UserInterfaceOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ClientSideRowModelModule, ColDef, GridApi, GridOptions, GridReadyEvent, Module, RowNode } from '@ag-grid-community/all-modules';
-import { SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
+import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableOptions, DashboardState, LayoutState, UserInterfaceOptions } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColDef, GridApi, GridOptions, GridReadyEvent, Module, RowNode } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { forkJoin, Observable, Subscription } from 'rxjs';
-import { first } from 'rxjs/operators';
-import { AttributesFixingService } from 'src/app/core/services/AttributesFixing/attributes-fixing.service';
+import { CommonConfig } from 'src/app/configs/common-config';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { RefDataManagerService } from 'src/app/core/services/RefDataManager/ref-data-manager.service';
 import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 import { createColumnDefs, GENERAL_FORMATTING_EXCEPTIONS, parseFetchedData, saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
-import { dateTimeFormatter,dateFormatter, formatDate } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { RefDataProc } from 'src/app/shared/models/GeneralModel';
 import { AddRefDataFormComponent } from './add-ref-data-form/add-ref-data-form.component';
@@ -34,20 +31,9 @@ export class RefDataManagerComponent implements OnInit {
   rowData: Observable<any>
   filterValue: string
 
-  agGridModules: Module[] = [
-    ClientSideRowModelModule,
-    SetFilterModule,
-    ColumnsToolPanelModule,
-    MenuModule,
-    ExcelExportModule,
-    FiltersToolPanelModule,
-    ClipboardModule,
-    SideBarModule,
-    RangeSelectionModule
-  ];
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   preSelectedColumns: any[] = [];
   rowRefData = []
-
 
 
   gridOptions:GridOptions = {
@@ -55,9 +41,6 @@ export class RefDataManagerComponent implements OnInit {
     columnDefs: this.columnDefs,
     sideBar: true,
     onGridReady: this.onGridReady.bind(this),
-    components: {
-      AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-    },
     defaultColDef: {
       resizable: true,
       sortable: true,
@@ -72,7 +55,8 @@ export class RefDataManagerComponent implements OnInit {
   }
 
   dashBoard: DashboardState = {
-    ModuleButtons: ['TeamSharing', 'Export', 'Layout', 'ConditionalStyle', 'Filter'],
+    Revision: 5,
+    ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
     IsCollapsed: true,
     Tabs: [{
       Name: 'Layout',
@@ -85,28 +69,25 @@ export class RefDataManagerComponent implements OnInit {
   primaryKey: string = 'AttributeId';
 
   adaptableOptions:AdaptableOptions =  {
+    licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
     primaryKey: this.primaryKey,
     userName: this.dataSvc.getCurrentUserName(),
-    //autogeneratePrimaryKey:true,
     adaptableId: 'Ref Data ID',
     adaptableStateKey: 'RefData State Key',
-    toolPanelOptions: {
-      toolPanelOrder: ['columns', 'AdaptableToolPanel']
-    },
     teamSharingOptions: {
       enableTeamSharing: true,
       setSharedEntities: setSharedEntities.bind(this),
       getSharedEntities: getSharedEntities.bind(this)
     },
-    userInterfaceOptions: {
+    actionOptions: {
       actionColumns: [
         {
           columnId: 'ActionDelete',
           friendlyName: 'Delete',
           actionColumnButton: {
             onClick: (
-              button: AdaptableButton<ActionColumnButtonContext>,
-              context: ActionColumnButtonContext
+              button: AdaptableButton<ActionColumnContext>,
+              context: ActionColumnContext
             ) => {
 
 
@@ -264,17 +245,10 @@ export class RefDataManagerComponent implements OnInit {
     params.api.closeToolPanel()
   }
 
-  onAdaptableReady({
-    adaptableApi,
-    vendorGrid
-  }: {
-    adaptableApi: AdaptableApi;
-    vendorGrid: GridOptions;
-  }){
-    this.adaptableApi = adaptableApi
+  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
+    this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
   }
-
   openDialog(action: 'ADD' | 'EDIT' | 'DELETE' = 'ADD',rowData:any=[]) { 
     
     if(!this.isWriteAccess){

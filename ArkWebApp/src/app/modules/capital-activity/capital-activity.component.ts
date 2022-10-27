@@ -8,7 +8,7 @@ import {
   Module,
   ColDef,
   CellClickedEvent
-} from '@ag-grid-community/all-modules';
+} from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { MenuModule } from '@ag-grid-enterprise/menu';
@@ -19,9 +19,8 @@ import {
   AdaptableOptions,
   AdaptableApi,
   AdaptableButton,
-  ActionColumnButtonContext,
+  ActionColumnContext,
 } from '@adaptabletools/adaptable/types';
-import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/CapitalActivityModel';
 
 import { Subscription } from 'rxjs';
@@ -34,7 +33,6 @@ import { DetailedViewComponent } from '../../shared/components/detailed-view/det
 import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
 import { DataService } from 'src/app/core/services/data.service';
 import { DetailedView } from 'src/app/shared/models/GeneralModel';
-import { FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
 
@@ -52,18 +50,7 @@ export class CapitalActivityComponent implements OnInit {
   rowDataInvstmnt: CapitalInvestment[];
   rowGroupPanelShow:string = 'always';
 
-  agGridModules: Module[] = [
-    ClientSideRowModelModule,
-    RowGroupingModule,
-    SetFilterModule,
-    ColumnsToolPanelModule,
-    MenuModule,
-    ExcelExportModule,
-    FiltersToolPanelModule,
-    ClipboardModule,
-    SideBarModule,
-    RangeSelectionModule
-  ];
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
 
   onTotalBaseClick(event: CellClickedEvent){
     if(event.node.group){
@@ -172,7 +159,6 @@ export class CapitalActivityComponent implements OnInit {
 
   capitalTypeOptions: string[] = [];
   capitalSubTypeOptions: string[] = [];
-
   refData = [];
 
   invstmntPanelOpenState = false;
@@ -230,9 +216,9 @@ export class CapitalActivityComponent implements OnInit {
       sideBar: true,
       suppressMenuHide: true,
       singleClickEdit: false,
-      components: {
-        AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      },
+      // components: {
+      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+      // },
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:false,
       suppressScrollOnNewData: true
@@ -241,11 +227,12 @@ export class CapitalActivityComponent implements OnInit {
     this.gridOptionsInvstmnt = JSON.parse(JSON.stringify(this.gridOptions));
     this.gridOptionsInvstmnt.columnDefs = this.columnDefsInvstmnt;
 
-    this.gridOptionsInvstmnt.components = {
-      AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-    },
+    // this.gridOptionsInvstmnt.components = {
+    //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+    // },
 
     this.adaptableOptions = {
+      licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'capitalID',
       userName: this.dataSvc.getCurrentUserName(),
       adaptableId: 'Capital Activity - Investor Cashflows',
@@ -260,18 +247,18 @@ export class CapitalActivityComponent implements OnInit {
   
       },
   
-      toolPanelOptions: {
-        toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
-      },
+      // toolPanelOptions: {
+      //   toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
+      // },
   
-      userInterfaceOptions: {
+      actionOptions: {
         actionColumns: [
           {
             columnId: 'ActionEdit',
             actionColumnButton: {
               onClick: (
-                button: AdaptableButton<ActionColumnButtonContext>,
-                context: ActionColumnButtonContext
+                button: AdaptableButton<ActionColumnContext>,
+                context: ActionColumnContext
               ) => {
   
                 let rowData =  context.rowNode?.data;
@@ -299,8 +286,8 @@ export class CapitalActivityComponent implements OnInit {
   
       predefinedConfig: {
         Dashboard: {
-          Revision: 2,
-          ModuleButtons: ['TeamSharing','Export', 'Layout','ConditionalStyle', 'Filter'],
+          Revision: 3,
+          ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
             Name:'Layout',
@@ -349,6 +336,7 @@ export class CapitalActivityComponent implements OnInit {
     }
 
     this.adaptableOptionsInvstmnt = {
+      licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'uniqueID',
       userName: this.dataSvc.getCurrentUserName(),
       adaptableId: 'Capital Activity - Investment Cashflows',
@@ -357,9 +345,9 @@ export class CapitalActivityComponent implements OnInit {
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
 
-      toolPanelOptions: {
-        toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
-      },
+      // toolPanelOptions: {
+      //   toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
+      // },
 
       teamSharingOptions: {
         enableTeamSharing: true,
@@ -368,15 +356,15 @@ export class CapitalActivityComponent implements OnInit {
   
       },
   
-      userInterfaceOptions: {
+      actionOptions: {
         actionColumns: [
           {
             columnId: 'ActionLink',
             includeGroupedRows: true,
             actionColumnButton: {
               onClick: (
-                button: AdaptableButton<ActionColumnButtonContext>,
-                context: ActionColumnButtonContext
+                button: AdaptableButton<ActionColumnContext>,
+                context: ActionColumnContext
               ) => {
 
                 let error: string = validateLinkSelect(context);
@@ -406,8 +394,8 @@ export class CapitalActivityComponent implements OnInit {
   
       predefinedConfig: {
         Dashboard: {
-          Revision: 2,
-          ModuleButtons: ['TeamSharing', 'Export', 'Layout','ConditionalStyle', 'Filter'],
+          Revision: 3,
+          ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
             Name:'Layout',
@@ -510,39 +498,16 @@ export class CapitalActivityComponent implements OnInit {
     }))
   }
 
-  onAdaptableReady(
-    {
-      adaptableApi,
-      vendorGrid,
-    }: {
-      adaptableApi: AdaptableApi;
-      vendorGrid: GridOptions;
-    }
-  ) {
+  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApi = adaptableApi;
-    adaptableApi.eventApi.on('SelectionChanged', selection => {
-      // do stuff
-    });
+    this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
+    // use AdaptableApi for runtime access to Adaptable
+  };
 
-/* Closes right sidebar on start */
-    adaptableApi.toolPanelApi.closeAdapTableToolPanel();
-  }
+  onAdaptableInvstmntReady = ({ adaptableApi, gridOptions }) => {
+    this.adapTableApiInvstmnt = adaptableApi;
+    this.adapTableApiInvstmnt.toolPanelApi.closeAdapTableToolPanel();
+    // use AdaptableApi for runtime access to Adaptable
+  };
 
-  onAdaptableInvstmntReady(
-    {
-      adaptableApi,
-      vendorGrid,
-    }: {
-      adaptableApi: AdaptableApi;
-      vendorGrid: GridOptions;
-    }
-  ) {
-    this.adapTableApiInvstmnt  = adaptableApi;
-    adaptableApi.eventApi.on('SelectionChanged', selection => {
-      // do stuff
-    });
-
-/* Closes right sidebar on start */
-    adaptableApi.toolPanelApi.closeAdapTableToolPanel();
-  }
 }

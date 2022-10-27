@@ -1,6 +1,5 @@
-import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
-import { ClientSideRowModelModule, ColDef, ColGroupDef, GridOptions, Module, ValueFormatterParams } from '@ag-grid-community/all-modules';
-import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule } from '@ag-grid-enterprise/all-modules';
+import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColDef, ColGroupDef, GridOptions, Module, ValueFormatterParams } from '@ag-grid-community/core';
 import { Component, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
 import { Subject, Subscription, timer } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
@@ -30,14 +29,7 @@ export class IrrResultComponent implements OnInit {
   adaptableOptions: AdaptableOptions
   gridOptions: GridOptions
   defaultColDef
-  agGridModules: Module[] = [
-    ClientSideRowModelModule,
-    RowGroupingModule,
-    SetFilterModule,
-    ColumnsToolPanelModule,
-    MenuModule,
-    ExcelExportModule
-  ];
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   calcs // Calchelper
   cashFlows // cfList
   modelName: string;
@@ -137,14 +129,15 @@ export class IrrResultComponent implements OnInit {
       sideBar: true,
       columnDefs: this.columnDefs,
       defaultColDef: this.defaultColDef,
-      components: {
-        AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      },
+      // components: {
+      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+      // },
       suppressAggFuncInHeader: true,
       rowGroupPanelShow: 'always'
     }
     
     this.adaptableOptions = {
+      licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: '',
       autogeneratePrimaryKey: true,
       userName: this.dataSvc.getCurrentUserName(),
@@ -169,8 +162,8 @@ export class IrrResultComponent implements OnInit {
 
       predefinedConfig: {  
         Dashboard: {
-          Revision: 2,
-          ModuleButtons: ['TeamSharing', 'Export', 'Layout', 'ConditionalStyle'],
+          Revision: 3,
+          ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
             Name:'Layout',
@@ -329,19 +322,8 @@ export class IrrResultComponent implements OnInit {
     })
   }
 
-  onAdaptableReady(
-    {
-      adaptableApi,
-      vendorGrid,
-    }: {
-      adaptableApi: AdaptableApi;
-      vendorGrid: GridOptions;
-    }
-  ) {
+  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApi = adaptableApi;
-    adaptableApi.toolPanelApi.closeAdapTableToolPanel()
-    adaptableApi.eventApi.on('SelectionChanged', selection => {
-      // do stuff
-    });
+    this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
   }
 }

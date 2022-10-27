@@ -1,4 +1,4 @@
-import { ICellEditorParams } from '@ag-grid-community/all-modules';
+import { ICellEditorParams } from '@ag-grid-community/core';
 import { ICellEditorAngularComp } from '@ag-grid-community/angular';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';

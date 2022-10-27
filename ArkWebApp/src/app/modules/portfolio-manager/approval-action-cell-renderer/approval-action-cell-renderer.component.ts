@@ -1,4 +1,4 @@
-import { ICellRendererParams } from '@ag-grid-community/all-modules';
+import { ICellRendererParams } from '@ag-grid-community/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';

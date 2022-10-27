@@ -1,6 +1,5 @@
-import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridOptions, Module, ClientSideRowModelModule, GridReadyEvent, RowNode, EditableCallbackParams, ICellRendererParams, CellValueChangedEvent } from '@ag-grid-community/all-modules';
-import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
+import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColDef, GridOptions, Module, GridReadyEvent, RowNode, EditableCallbackParams, ICellRendererParams, CellValueChangedEvent } from '@ag-grid-community/core';
 import { Component, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -38,19 +37,7 @@ export class ApprovalComponent implements OnInit {
   gridOptions: GridOptions
   adaptableOptions: AdaptableOptions
   subscriptions: Subscription[] = []
-  agGridModules: Module[] = [
-    ClientSideRowModelModule,
-    RowGroupingModule,
-    SetFilterModule,
-    ColumnsToolPanelModule,
-    MenuModule,
-    ExcelExportModule,
-    FiltersToolPanelModule,
-    ClipboardModule,
-    SideBarModule,
-    RangeSelectionModule
-  ];
-
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES;
   actionClickedRowID: number = null;
   adaptableApi: AdaptableApi;
   context: any;
@@ -368,9 +355,9 @@ export class ApprovalComponent implements OnInit {
       columnDefs: this.columnDefs,
       defaultColDef: this.defaultColDef,
       sideBar: true,
-      components: {
-        AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      },
+      // components: {
+      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+      // },
       frameworkComponents: {
         actionCellRenderer: ApprovalActionCellRendererComponent,
         autocompleteCellEditor: MatAutocompleteEditorComponent
@@ -381,6 +368,7 @@ export class ApprovalComponent implements OnInit {
     }
 
     this.adaptableOptions = {
+      licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'uniqueRowID',
 
       userName: this.dataSvc.getCurrentUserName(),
@@ -393,9 +381,9 @@ export class ApprovalComponent implements OnInit {
         includeExpandedRowGroups: true
       },
 
-      toolPanelOptions: {
-        toolPanelOrder: ['columns', 'AdaptableToolPanel']
-      },
+      // toolPanelOptions: {
+      //   toolPanelOrder: ['columns', 'AdaptableToolPanel']
+      // },
 
       teamSharingOptions: {
         enableTeamSharing: true,
@@ -406,8 +394,8 @@ export class ApprovalComponent implements OnInit {
 
       predefinedConfig: {
         Dashboard: {
-          Revision: 1,
-          ModuleButtons: ['TeamSharing', 'Export', 'Layout', 'ConditionalStyle', 'Filter'],
+          Revision: 2,
+          ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
             Name: 'Layout',
@@ -417,19 +405,8 @@ export class ApprovalComponent implements OnInit {
           DashboardTitle: ' '
         },
         
-        Filter:{
-          Revision: 3,
-          ColumnFilters: [{
-            ColumnId: 'status',
-            Predicate: {
-              PredicateId: 'Values',
-              Inputs: ['Pending', 'Rejected']
-            }
-          }]
-        },  
-
         Layout: {
-          Revision: 18,
+          Revision: 19,
           CurrentLayout: 'Default Approval Layout',
           Layouts: [{
             Name: 'Default Approval Layout',
@@ -469,8 +446,14 @@ export class ApprovalComponent implements OnInit {
             ColumnWidthMap:{
               action: 170,
             },
-            RowGroupedColumns: ['actionType', 'status', 'portfolioName']            
-
+            RowGroupedColumns: ['actionType', 'status', 'portfolioName'],            
+            ColumnFilters: [{
+              ColumnId: 'status',
+              Predicate: {
+                PredicateId: 'Values',
+                Inputs: ['Pending', 'Rejected']
+              }
+            }]  
           }]
         }
       }
@@ -483,15 +466,7 @@ export class ApprovalComponent implements OnInit {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  onAdaptableReady(
-    {
-      adaptableApi,
-      vendorGrid,
-    }: {
-      adaptableApi: AdaptableApi;
-      vendorGrid: GridOptions;
-    }
-  ) {
+  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel()
 

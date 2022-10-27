@@ -1,6 +1,5 @@
-import { ActionColumnButtonContext, AdaptableApi, AdaptableButton, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
-import { ClientSideRowModelModule, ColDef, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/all-modules';
-import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
+import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColDef, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
@@ -28,18 +27,7 @@ export class UnfundedAssetsComponent implements OnInit {
   gridOptions: GridOptions
   adaptableOptions: AdaptableOptions
 
-  agGridModules: Module[] = [
-    ClientSideRowModelModule,
-    RowGroupingModule,
-    SetFilterModule,
-    ColumnsToolPanelModule,
-    MenuModule,
-    ExcelExportModule,
-    FiltersToolPanelModule,
-    ClipboardModule,
-    SideBarModule,
-    RangeSelectionModule
-  ];
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   adaptableApi: AdaptableApi;
 
   constructor(
@@ -83,9 +71,9 @@ export class UnfundedAssetsComponent implements OnInit {
       columnDefs: this.columnDefs,
       rowData: this.rowData,
       sideBar: true,
-      components: {
-        AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      },
+      // components: {
+      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+      // },
       rowGroupPanelShow: 'always',
       defaultColDef: {
         resizable: true,
@@ -98,6 +86,7 @@ export class UnfundedAssetsComponent implements OnInit {
     }
 
     this.adaptableOptions = {
+      licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'rowID',
       userName: this.dataSvc.getCurrentUserName(),
       adaptableId: 'Unfunded Asset ID',
@@ -105,9 +94,9 @@ export class UnfundedAssetsComponent implements OnInit {
 
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
-      toolPanelOptions: {
-        toolPanelOrder: ['columns', 'AdaptableToolPanel']
-      },
+      // toolPanelOptions: {
+      //   toolPanelOrder: ['columns', 'AdaptableToolPanel']
+      // },
 
       teamSharingOptions: {
         enableTeamSharing: true,
@@ -116,15 +105,15 @@ export class UnfundedAssetsComponent implements OnInit {
   
       },
 
-      userInterfaceOptions: {
+      actionOptions: {
         actionColumns: [
           {            
             columnId: 'actionEdit',
-            friendlyName: "actionEdit",
+            friendlyName: "Edit",
             actionColumnButton: {
               onClick: (
-                button: AdaptableButton<ActionColumnButtonContext>,
-                context: ActionColumnButtonContext
+                button: AdaptableButton<ActionColumnContext>,
+                context: ActionColumnContext
               ) => {
 
                 let rowData = context.rowNode.data
@@ -143,8 +132,8 @@ export class UnfundedAssetsComponent implements OnInit {
 
       predefinedConfig: {
         Dashboard: {
-          Revision: 1,
-          ModuleButtons: ['TeamSharing', 'Export', 'Layout', 'ConditionalStyle', 'Filter'],
+          Revision: 2,
+          ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
             Name: 'Layout',
@@ -207,18 +196,10 @@ export class UnfundedAssetsComponent implements OnInit {
     })
   }
 
-  onAdaptableReady(
-    {
-      adaptableApi,
-      vendorGrid,
-    }: {
-      adaptableApi: AdaptableApi;
-      vendorGrid: GridOptions;
-    }
-  ) {
+  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
-  }
+  };
 
   onGridReady(params: GridReadyEvent){
 

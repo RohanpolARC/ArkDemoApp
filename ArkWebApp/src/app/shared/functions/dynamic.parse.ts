@@ -1,5 +1,5 @@
 import { AdaptableApi, Layout } from "@adaptabletools/adaptable-angular-aggrid";
-import { ColDef, ValueFormatterParams } from "@ag-grid-community/all-modules";
+import { ColDef, ValueFormatterParams } from "@ag-grid-community/core";
 import { amountFormatter, dateFormatter, dateTimeFormatter } from "./formatter";
 
 const GENERAL_FORMATTING_EXCEPTIONS = ['account', 'accountid', 'account id', 'issuer', 'id', 'positionid', 'position id', 'issuerid', 'issuer id', 'asset id', 'assetid', 'extract id', 'loanxid', 

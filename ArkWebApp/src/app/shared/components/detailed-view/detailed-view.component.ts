@@ -1,8 +1,9 @@
-import { ClientSideRowModelModule, ColDef, GridOptions, GridReadyEvent, Module, ValueFormatterParams } from '@ag-grid-community/all-modules';
-import { RowGroupingModule, SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, ClipboardModule } from '@ag-grid-enterprise/all-modules';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
+import { ColDef, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
+import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { createColumnDefs, parseFetchedData } from '../../functions/dynamic.parse';
 import { DetailedView } from '../../models/GeneralModel';
@@ -20,7 +21,7 @@ export class DetailedViewComponent implements OnInit {
   columnDefs: ColDef[] = [];
   gridOptions: GridOptions;
   defaultColDef: ColDef;
-  agGridModules: Module[] = [ClientSideRowModelModule,RowGroupingModule,SetFilterModule,ColumnsToolPanelModule,MenuModule, ClipboardModule,ExcelExportModule];
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES;
 
   failureMsg: string = null;
   header: string = 'Detailed View'

@@ -1,14 +1,14 @@
-import { AdaptableApi, AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridApi, GridOptions, GridReadyEvent, IAggFuncParams, Module } from '@ag-grid-enterprise/all-modules';
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { ManagementFeeService } from 'src/app/core/services/ManagementFee/management-fee.service';
-import { amountFormatter, dateFormatter, formatDate } from 'src/app/shared/functions/formatter';
+import { amountFormatter, dateFormatter, formatDate, noDecimalAmountFormatter } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { getNodes } from '../capital-activity/utilities/functions';
+import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
+import { GridApi, GridOptions, Module, ColDef, IAggFuncParams, GridReadyEvent } from '@ag-grid-community/core';
 
 @Component({
   selector: 'app-management-fee',
@@ -32,7 +32,7 @@ export class ManagementFeeComponent implements OnInit {
     private dataSvc: DataService
   ) { }
 
-  ngOnInit(): void {
+  fetchManagementFee(){
 
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if(isHit){
@@ -55,6 +55,10 @@ export class ManagementFeeComponent implements OnInit {
       }
     }))
 
+  }
+  ngOnInit(): void {
+
+
     this.subscriptions.push(this.managementFeeSvc.currentSearchDate.subscribe(asOfDate => {
       this.asOfDate = asOfDate
     }))
@@ -63,20 +67,24 @@ export class ManagementFeeComponent implements OnInit {
     
     let allowedAggFunc = ['sum', 'max', 'min', 'first', 'last', 'count']
     this.columnDefs = [
+      { field: 'positionID', type: 'abColDefNumber' },
       { field: 'fundHedging', type: 'abColDefString' },
-      { field: 'aumBase', type: 'abColDefNumber', valueFormatter: amountFormatter, aggFunc: 'sum' },
-      { field: 'feeRate', type: 'abColDefNumber', valueFormatter: amountFormatter, aggFunc: 'max'  },
-      { field: 'calculatedITDFee', type: 'abColDefNumber', valueFormatter: amountFormatter, aggFunc: 'sum'  },
-      { field: 'fixingDate', type: 'abColDefDate', valueFormatter: dateFormatter, aggFunc: 'Max', allowedAggFuncs: ['Max'] },
-      { field: 'fixing', type: 'abColDefNumber', valueFormatter: amountFormatter, aggFunc: 'max'  },
-      { field: 'adjustment', type: 'abColDefNumber', valueFormatter: amountFormatter, aggFunc: 'sum',   },
-      { field: 'instrumentType', type: 'abColDefString' },
-      { field: 'investment', type: 'abColDefString' },
-      { field: 'adjustedITDFee', type: 'abColDefNumber', valueFormatter: amountFormatter, allowedAggFuncs: ['Sum'], aggFunc: 'Sum' },
-      { field: 'aggregatedAdjustment', type: 'abColDefNumber', valueFormatter: amountFormatter }
+      { field: 'issuerShortName', type: 'abColDefString' },
+      { field: 'issuer', type: 'abColDefString' },
+      { field: 'asset', type: 'abColDefString' },
+      { field: 'managementDate', type: 'abColDefDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
+      { field: 'aumBase', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, aggFunc: 'sum' },
+      { field: 'feeRate', type: 'abColDefNumber', valueFormatter: amountFormatter, aggFunc: 'max', headerName: 'Fee Rate Percent'  },
+      { field: 'calculatedITDFee', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, aggFunc: 'sum'  },
+      { field: 'fixingDate', type: 'abColDefDate', valueFormatter: dateFormatter, aggFunc: 'Max', allowedAggFuncs: ['Max'], cellClass: 'dateUK' },
+      { field: 'fixing', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, aggFunc: 'max'  },
+      { field: 'adjustment', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, aggFunc: 'sum',   },
+      { field: 'adjustedITDFee', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, allowedAggFuncs: ['Sum'], aggFunc: 'Sum' },
+      { field: 'aggregatedAdjustment', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter }
     ].map(c => {
       if(c.allowedAggFuncs == null)
         c.allowedAggFuncs = allowedAggFunc
+      c['tooltipField'] = c.field;
       return c
     })
 
@@ -118,9 +126,9 @@ export class ManagementFeeComponent implements OnInit {
       columnDefs: this.columnDefs,
       sideBar: true,
       rowGroupPanelShow: 'always',
-      components: {
-        AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      },
+      // components: {
+      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+      // },
       defaultColDef: {
         resizable: true,
         sortable: true,
@@ -130,17 +138,16 @@ export class ManagementFeeComponent implements OnInit {
       },
       suppressAggFuncInHeader: true,
       onGridReady: this.onGridReady.bind(this),
-      aggFuncs: aggFuncs
+      aggFuncs: aggFuncs,
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     }
 
     this.adaptableOptions = {
+      licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: '',
       autogeneratePrimaryKey: true,
       adaptableId: 'Management Fee ID',
       adaptableStateKey: 'Management Fee State key',
-      toolPanelOptions: {
-        toolPanelOrder: ['columns', 'AdaptableToolPanel']
-      },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
       teamSharingOptions: {
         enableTeamSharing: true,
@@ -149,7 +156,8 @@ export class ManagementFeeComponent implements OnInit {
       },
       predefinedConfig: {
         Dashboard: {
-          ModuleButtons: ['TeamSharing', 'Export', 'Layout', 'ConditionalStyle', 'Filter'],
+          Revision: 2,
+          ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
             Name: 'Layout',
@@ -159,7 +167,7 @@ export class ManagementFeeComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 9,
+          Revision: 11,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -188,19 +196,14 @@ export class ManagementFeeComponent implements OnInit {
   }
   onGridReady(params: GridReadyEvent){
     this.gridApi = params.api;
+    
+    this.fetchManagementFee();
   }
 
-  onAdaptableReady({
-    adaptableApi,
-    vendorGrid
-  }: {
-    adaptableApi: AdaptableApi;
-    vendorGrid: GridOptions;
-  }){
-    this.adaptableApi = adaptableApi
+  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
+    this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
-
-
-  }
+    // use AdaptableApi for runtime access to Adaptable
+  };
 
 }

@@ -1,5 +1,5 @@
 import { AdaptableApi } from "@adaptabletools/adaptable-angular-aggrid";
-import { CellValueChangedEvent, GridApi } from "@ag-grid-community/all-modules";
+import { CellValueChangedEvent, GridApi } from "@ag-grid-community/core";
 import { PortfolioMappingDataService } from "src/app/core/services/PortfolioManager/portfolio-mapping-data.service";
 
 const MANDATORY_FIELDS: string[] = ['wsoPortfolioID', 'fund', 'fundLegalEntity', 'fundHedging', 'fundStrategy', 'fundSMA', 'fundInvestor', 'fundCcy', 'fundAdmin', 'portfolioAUMMethod', 'isCoinvestment', 'excludeFxExposure']

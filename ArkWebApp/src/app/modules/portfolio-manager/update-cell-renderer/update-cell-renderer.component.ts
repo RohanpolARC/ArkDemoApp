@@ -1,4 +1,4 @@
-import { ICellRendererParams, RowNode } from '@ag-grid-community/all-modules';
+import { ICellRendererParams, RowNode } from '@ag-grid-community/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';

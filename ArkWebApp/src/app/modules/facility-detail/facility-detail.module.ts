@@ -35,11 +35,7 @@ import { FacilityDetailRoutingModule } from './facility-detail-routing.module';
     FacilityDetailRoutingModule,
 
     AdaptableAngularAgGridModule,
-    AgGridModule.withComponents([
-      ActionCellRendererComponent,
-      AggridMaterialDatepickerComponent,
-      CheckboxEditorComponent
-    ]),
+    AgGridModule,
     MatCardModule,
     MatIconModule,
     MatSnackBarModule,

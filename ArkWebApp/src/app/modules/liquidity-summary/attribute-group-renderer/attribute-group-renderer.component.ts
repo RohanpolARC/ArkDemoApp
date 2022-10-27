@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
-import { ICellRendererParams } from '@ag-grid-community/all-modules';
+import { ICellRendererParams } from '@ag-grid-community/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { LiquiditySummaryComponent } from '../liquidity-summary.component';

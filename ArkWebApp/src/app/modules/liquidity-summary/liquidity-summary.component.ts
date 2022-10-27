@@ -4,20 +4,12 @@ import {
   CellClickedEvent,
   ColDef,
   EditableCallbackParams,
-  GridApi,
   GridOptions,
   IAggFuncParams,
   IsGroupOpenByDefaultParams,
   ITooltipParams,
   Module
-} from '@ag-grid-community/all-modules';
-import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
-import { MenuModule } from '@ag-grid-enterprise/menu';
-import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
-import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
-import { ExcelExportModule } from '@ag-grid-enterprise/excel-export';
-
+} from '@ag-grid-community/core';
 import { dateFormatter, noDecimalAmountFormatter } from 'src/app/shared/functions/formatter';
 import { Subscription } from 'rxjs';
 import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/liquidity-summary.service';
@@ -31,9 +23,9 @@ import { DetailedView } from 'src/app/shared/models/GeneralModel';
 import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
 import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
 import { getMomentDateStr } from 'src/app/shared/functions/utilities';
-import { ClipboardModule, FiltersToolPanelModule, RangeSelectionModule, SideBarModule } from '@ag-grid-enterprise/all-modules';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
 import { UnfundedAssetsEditorComponent } from '../unfunded-assets/unfunded-assets-editor/unfunded-assets-editor.component';
+import { CommonConfig } from 'src/app/configs/common-config';
 
 @Component({
   selector: 'app-liquidity-summary',
@@ -52,23 +44,9 @@ export class LiquiditySummaryComponent implements OnInit {
               private warningMsgPopUp: MatSnackBar,
               public dialog: MatDialog) { }
 
-  agGridModules: Module[] = [    
-    ClientSideRowModelModule,
-    RowGroupingModule,
-    SetFilterModule,
-    ColumnsToolPanelModule,
-    MenuModule,
-    ExcelExportModule,
-    FiltersToolPanelModule,
-    ClipboardModule,
-    SideBarModule,
-    RangeSelectionModule
-];
-
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   gridOptions: GridOptions;
 
-   
-  
   /** Filter Pane fields */
   asOfDate: string = null;
   fundHedgings: string[] = null;
@@ -147,7 +125,7 @@ export class LiquiditySummaryComponent implements OnInit {
   
           if (params.rowNode.key === 'Current Cash') {
   
-            this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+            this.gridOptions.api.forEachNode((rowNode, index) => {
               if(rowNode.data?.['attrType'] === 'Current Cash'){
                 sum += Number(rowNode.data?.[colName]);
               }
@@ -155,7 +133,7 @@ export class LiquiditySummaryComponent implements OnInit {
           }
           else if(params.rowNode.key === 'Net Cash') {
   
-            this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+            this.gridOptions.api.forEachNode((rowNode, index) => {
               if(['Current Cash', 'Net Cash'].includes(rowNode.data?.['attrType'])){
                 sum += Number(rowNode.data?.[colName]);
               }
@@ -163,7 +141,7 @@ export class LiquiditySummaryComponent implements OnInit {
           }
           else if(params.rowNode.key === 'Liquidity'){
   
-            this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+            this.gridOptions.api.forEachNode((rowNode, index) => {
               if(['Current Cash', 'Net Cash', 'Liquidity'].includes(rowNode.data?.['attrType'])){
                 sum += Number(rowNode.data?.[colName]);
               }
@@ -171,7 +149,7 @@ export class LiquiditySummaryComponent implements OnInit {
           }
           else if(params.rowNode.key === 'Known Outflows Unsettled'){
   
-            this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+            this.gridOptions.api.forEachNode((rowNode, index) => {
               if(['Known Outflows Unsettled'].includes(rowNode.data?.['attrType'])){
                 sum += Number(rowNode.data?.[colName]);
               }
@@ -179,7 +157,7 @@ export class LiquiditySummaryComponent implements OnInit {
           }
           else if(params.rowNode.key === 'Known Outflows Pipeline'){
   
-            this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+            this.gridOptions.api.forEachNode((rowNode, index) => {
               if(['Known Outflows Pipeline'].includes(rowNode.data?.['attrType'])){
                 sum += Number(rowNode.data?.[colName]);
               }
@@ -187,7 +165,7 @@ export class LiquiditySummaryComponent implements OnInit {
           }
           else if(params.rowNode.key === 'Known Outflows Funding'){
   
-            this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+            this.gridOptions.api.forEachNode((rowNode, index) => {
               if(['Known Outflows Funding'].includes(rowNode.data?.['attrType'])){
                 sum += Number(rowNode.data?.[colName]);
               }
@@ -195,7 +173,7 @@ export class LiquiditySummaryComponent implements OnInit {
           }
           else if(params.rowNode.key === 'Cash Post Known Outflows'){
   
-            this.gridOptions.api.forEachNodeAfterFilter((rowNode, index) => {
+            this.gridOptions.api.forEachNode((rowNode, index) => {
               if(['Current Cash', 'Net Cash', 'Liquidity','Known Outflows Unsettled', 'Known Outflows Funding','Known Outflows Pipeline'].includes(rowNode.data?.['attrType'])){
                 sum += Number(rowNode.data?.[colName]);
               }

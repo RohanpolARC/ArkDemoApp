@@ -4,9 +4,8 @@ import {
   GridOptions,
   Module,
   ColDef,
-  ClientSideRowModelModule,
   SelectionChangedEvent
-} from '@ag-grid-community/all-modules';
+} from '@ag-grid-community/core';
 import { dateFormatter, amountFormatter, nonAmountNumberFormatter, formatDate } from 'src/app/shared/functions/formatter';
 
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
@@ -14,14 +13,11 @@ import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import {
   AdaptableOptions,
   AdaptableApi,
-  ActionColumnButtonContext
+  ActionColumnContext
 } from '@adaptabletools/adaptable/types';
-import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 import { AssociateInvestment, CapitalActivityModel } from 'src/app/shared/models/CapitalActivityModel';
 import { Subscription } from 'rxjs';
 import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
-import { ExcelExportModule, MenuModule, RowGroupingModule, SetFilterModule } from '@ag-grid-enterprise/all-modules';
-import * as moment from 'moment';
 import { CommonConfig } from 'src/app/configs/common-config';
 
 @Component({
@@ -59,9 +55,8 @@ export class LinkInvestorModalComponent implements OnInit {
   isCreateNew: boolean = false;
   newCapitalAct: CapitalActivityModel = null;
 
-  agGridModules: Module[] = [ClientSideRowModelModule, RowGroupingModule,SetFilterModule,ColumnsToolPanelModule,MenuModule, ExcelExportModule];
-
-  rowContext: ActionColumnButtonContext = null;
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
+  rowContext: ActionColumnContext = null;
   columnDefs: ColDef[] = [
     {field: 'capitalID', headerName: 'Capital ID', type: 'abColDefNumber'},
     { field: 'callDate', headerName: 'Call Date', type: 'abColDefDate', valueFormatter: dateFormatter },
@@ -105,9 +100,9 @@ export class LinkInvestorModalComponent implements OnInit {
     singleClickEdit: false,
     rowGroupPanelShow: 'always',
     enableGroupEdit: false,
-    components: {
-      AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-    },
+    // components: {
+    //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+    // },
     columnDefs: this.columnDefs,
     allowContextMenuWithControlKey:true,
     onSelectionChanged: this.onSelectionChanged.bind(this)
@@ -115,6 +110,7 @@ export class LinkInvestorModalComponent implements OnInit {
   };
   adapTableApi: AdaptableApi;
   adaptableOptions: AdaptableOptions = {
+    licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
     primaryKey: 'capitalID',
     userName: this.msalService.getUserName(),
     adaptableId: 'Linking',
@@ -122,9 +118,9 @@ export class LinkInvestorModalComponent implements OnInit {
 
     exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
-    toolPanelOptions: {
-      toolPanelOrder: ['columns', 'AdaptableToolPanel']
-    },
+    // toolPanelOptions: {
+    //   toolPanelOrder: ['columns', 'AdaptableToolPanel']
+    // },
     predefinedConfig: {
       Dashboard: {
         Revision: 1,
@@ -324,18 +320,12 @@ export class LinkInvestorModalComponent implements OnInit {
   }
 
 
-  onAdaptableReady(
-    {
-      adaptableApi,
-      vendorGrid,
-    }: {
-      adaptableApi: AdaptableApi;
-      vendorGrid: GridOptions;
-    }
-  ) {
+  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApi = adaptableApi;
-    adaptableApi.columnApi.autosizeAllColumns()
-  }
+    this.adapTableApi.columnApi.autosizeAllColumns();
+    // this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
+    // use AdaptableApi for runtime access to Adaptable
+  };
 
   onSelectionChanged(params: SelectionChangedEvent){
     this.checkedCapitalIDs =  params.api.getSelectedNodes()?.map(node => node.data.capitalID)
@@ -355,7 +345,7 @@ export class LinkInvestorModalComponent implements OnInit {
 ) { }
 
   clearFilter(): void{
-    this.adapTableApi.filterApi.clearAllColumnFilter();
+    this.adapTableApi.filterApi.clearColumnFilters();
   }
 
   searchCapitalActivities(){

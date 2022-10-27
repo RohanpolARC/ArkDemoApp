@@ -4,13 +4,9 @@ import { Inject } from '@angular/core';
 import {AssetGIRModel} from '../../../shared/models/AssetGIRModel'
 import {DataService} from '../../../core/services/data.service'
 import { PortfolioHistoryService } from 'src/app/core/services/PortfolioHistory/portfolio-history.service';
-
-import { ColDef } from '@ag-grid-community/core';
-
-import * as moment from 'moment';
+import { ColDef, GridApi, RowNode } from '@ag-grid-community/core';
 import { Subscription } from 'rxjs';
 import { dateFormatter } from 'src/app/shared/functions/formatter';
-import { GridApi, RowNode } from '@ag-grid-enterprise/all-modules';
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { getNodes } from '../../capital-activity/utilities/functions';
 

@@ -1,6 +1,5 @@
-import { AdaptableOptions, AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable-angular-aggrid';
-import { ClientSideRowModelModule, ColDef, GridApi, GridOptions, GridReadyEvent, Module, ValueFormatterParams } from '@ag-grid-community/all-modules';
-import { SetFilterModule, ColumnsToolPanelModule, MenuModule, ExcelExportModule, FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
+import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColDef, GridApi, GridOptions, GridReadyEvent, Module, ValueFormatterParams } from '@ag-grid-community/core';
 import { Component, Input, OnInit, SimpleChange, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -17,17 +16,7 @@ export class FeeCalculationSummaryComponent implements OnInit {
 
   @Input() feeSmy;
   
-  agGridModules: Module[] =[
-    ClientSideRowModelModule,
-    SetFilterModule,
-    ColumnsToolPanelModule,
-    MenuModule,
-    ExcelExportModule,
-    FiltersToolPanelModule,
-    ClipboardModule,
-    SideBarModule,
-    RangeSelectionModule
-  ]
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   subscriptions: Subscription[] = []
   gridOptions: GridOptions
   adaptableOptions: AdaptableOptions
@@ -179,6 +168,7 @@ export class FeeCalculationSummaryComponent implements OnInit {
     }
 
     this.adaptableOptions = {
+      licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       autogeneratePrimaryKey: true,
       primaryKey: '',
       userName: this.dataSvc.getCurrentUserName(),
@@ -193,8 +183,8 @@ export class FeeCalculationSummaryComponent implements OnInit {
 
       predefinedConfig: {
         Dashboard: {
-          Revision: 2,
-          ModuleButtons: ['TeamSharing', 'Export', 'Layout', 'ConditionalStyle', 'Filter'],
+          Revision: 3,
+          ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
             Name: 'Layout',

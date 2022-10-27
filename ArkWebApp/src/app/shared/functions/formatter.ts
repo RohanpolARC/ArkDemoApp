@@ -1,4 +1,4 @@
-import { ValueFormatterParams } from '@ag-grid-community/all-modules';
+import { ValueFormatterParams } from '@ag-grid-community/core';
 import * as moment from 'moment';
 
 export function dateFormatter(params) {

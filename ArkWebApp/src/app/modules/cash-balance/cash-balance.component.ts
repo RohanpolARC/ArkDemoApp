@@ -2,26 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CashBalanceService } from 'src/app/core/services/CashBalance/cash-balance.service';
 import { DataService } from 'src/app/core/services/data.service';
-import {
-  ColDef,
-  ColumnApi,
-  GridApi,
-  GridOptions,
-  Module,
-} from '@ag-grid-community/all-modules';
-import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
-import { MenuModule } from '@ag-grid-enterprise/menu';
-import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
-import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
-import { ExcelExportModule } from '@ag-grid-enterprise/excel-export';
-import { AdaptableToolPanelAgGridComponent } from '@adaptabletools/adaptable/src/AdaptableComponents';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { dateFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
-import { FiltersToolPanelModule, ClipboardModule, SideBarModule, RangeSelectionModule } from '@ag-grid-enterprise/all-modules';
 import { CommonConfig } from 'src/app/configs/common-config';
+import { ColDef, ColumnApi, GridApi, GridOptions, Module } from '@ag-grid-community/core';
 
 @Component({
   selector: 'app-cash-balance',
@@ -38,17 +24,7 @@ export class CashBalanceComponent implements OnInit {
   subscriptions: Subscription[] = [];
   gridApi: GridApi;
   gridColumnApi: ColumnApi;
-  agGridModules: Module[] = [
-    ClientSideRowModelModule,
-    RowGroupingModule,
-    SetFilterModule,
-    ColumnsToolPanelModule,
-    MenuModule,
-    ExcelExportModule,
-    FiltersToolPanelModule,
-    ClipboardModule,
-    SideBarModule,
-    RangeSelectionModule ];
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
 
   columnDefs: ColDef[] = [
     { field: 'asofDate', headerName: 'As of Date', type: 'abColDefDate', valueFormatter: dateFormatter },
@@ -93,14 +69,15 @@ export class CashBalanceComponent implements OnInit {
       sideBar: true,
       suppressMenuHide: true,
       singleClickEdit: false,
-      components: {
-        AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      },
+      // components: {
+      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
+      // },
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:true
     }
 
     this.adaptableOptions = {
+      licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       autogeneratePrimaryKey: true,
       primaryKey:'',
       userName: this.dataSvc.getCurrentUserName(),
@@ -110,9 +87,9 @@ export class CashBalanceComponent implements OnInit {
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
 
-      toolPanelOptions: {
-        toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
-      },
+      // toolPanelOptions: {
+      //   toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
+      // },
   
       teamSharingOptions: {
         enableTeamSharing: true,
@@ -122,7 +99,8 @@ export class CashBalanceComponent implements OnInit {
   
       predefinedConfig: {
         Dashboard: {
-          ModuleButtons: ['TeamSharing','Export', 'Layout','ConditionalStyle'],
+          Revision: 1,
+          ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
             Name:'Layout',
@@ -195,16 +173,7 @@ export class CashBalanceComponent implements OnInit {
     this.gridColumnApi = params.columnApi;
   }
 
-  onAdaptableReady(
-    {
-      adaptableApi,
-      vendorGrid,
-    }: {
-      adaptableApi: AdaptableApi;
-      vendorGrid: GridOptions;
-    }
-  ) {
-/* Closes right sidebar on start */
+  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     adaptableApi.toolPanelApi.closeAdapTableToolPanel();
-  }
+  };
 }

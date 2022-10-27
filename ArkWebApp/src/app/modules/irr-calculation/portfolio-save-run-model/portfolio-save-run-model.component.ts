@@ -103,7 +103,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     }
 
     if(this.isAutomatic){
-      this.rules = JSON.parse(JSON.stringify(this.adaptableApi.filterApi.getAllColumnFilter()))
+      this.rules = JSON.parse(JSON.stringify(this.adaptableApi.filterApi.getActiveColumnFilters()))
       this.recursiveRemoveKey(this.rules, 'Uuid')
       this.recursiveRemoveKey(this.rules, 'Source')  
     }
