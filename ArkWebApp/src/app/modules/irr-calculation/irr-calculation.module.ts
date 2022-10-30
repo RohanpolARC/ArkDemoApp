@@ -23,6 +23,7 @@ import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 import { InputDateAdapter } from 'src/app/shared/providers/date-adapter';
 import { Platform } from '@angular/cdk/platform';
 import { MonthlyReturnsComponent } from './monthly-returns/monthly-returns.component';
+import { FeeCalculationModule } from '../fee-calculation/fee-calculation.module';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,8 @@ import { MonthlyReturnsComponent } from './monthly-returns/monthly-returns.compo
     CommonModule,
     IrrCalculationRoutingModule,
 
+    FeeCalculationModule,
+    
     AdaptableAngularAgGridModule,
     AgGridModule,
     MatCardModule,

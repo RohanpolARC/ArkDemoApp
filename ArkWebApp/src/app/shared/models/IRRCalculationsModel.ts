@@ -36,3 +36,13 @@ export interface MonthlyReturnsCalcParams {
     modelName?: string,
     asOfDate?: string
 }
+
+export interface PerfFeesCalcParams {
+    positionIDs: number[],
+    feePreset: string,
+    feePresetID: number,
+
+    modelID?: number,
+    modelName?: string,
+    asOfDate?: string
+}

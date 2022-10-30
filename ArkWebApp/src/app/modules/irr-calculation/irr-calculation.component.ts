@@ -3,8 +3,7 @@ import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
-import { IRRCalcParams, MonthlyReturnsCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
-import { IrrResultComponent } from './irr-result/irr-result.component';
+import { IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 
 @Component({
   selector: 'app-irr-calculation',
@@ -63,6 +62,25 @@ export class IrrCalculationComponent implements OnInit {
     }
   }
 
+  /**
+   * 
+   * @param tabType ${Model Name} / Monthly Returns / IRR 
+   * @param params IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesParams
+   */
+  calcParamsReceived(p: {tabName: string, tabType: string, calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams}){
+
+    let cnt: number = this.tabs.filter(tab => tab.actualName === p.tabName).length;
+    let newTab = {
+      displayName: (cnt !== 0) ? `${p.tabName} ${cnt + 1}`: `${p.tabName}`,
+      actualName: p.tabName,
+      status: 'Loading',
+      resultType: p.tabType
+    }
+    this.tabs.push(newTab);    
+    this.selected.setValue(this.tabs.indexOf(newTab))
+    this.calcParamsMap[newTab.displayName] = p.calcParams;
+  }
+
   irrCalcParamsReceived(params: IRRCalcParams){
     /** 
      * Calc params received from Portfolio Modeller. Now, creating a new tab for these params with IRR-result inside it.
@@ -83,10 +101,11 @@ export class IrrCalculationComponent implements OnInit {
   returnsParamsReceived(params: MonthlyReturnsCalcParams){
     /** Return params received from Portfolio Modeller. Now creating a new tab for these params with Monthly Returns inside it */
 
-    let cnt: number = this.tabs.filter(tab => tab.actualName === 'Monthly Returns').length;
+    let tabName: string = `Monthly Returns`
+    let cnt: number = this.tabs.filter(tab => tab.actualName === tabName).length;
     let newTab = {
-      displayName: (cnt !== 0) ? `Monthly Returns ${cnt + 1}`: `Monthly Returns`,
-      actualName: `Monthly Returns`,
+      displayName: (cnt !== 0) ? `${tabName} ${cnt + 1}`: `${tabName}`,
+      actualName: tabName,
       status: 'Loading',
       resultType: 'MonthlyReturns'
     }
@@ -94,6 +113,23 @@ export class IrrCalculationComponent implements OnInit {
     this.selected.setValue(this.tabs.indexOf(newTab))
     this.calcParamsMap[newTab.displayName] = params;
 
+  }
+
+  /**
+   * Originally: 
+   * MonthlyReturns, IRR  
+   */
+  createNewTab(tabName: string, params: PerfFeesCalcParams | MonthlyReturnsCalcParams | IRRCalcParams){
+    let cnt: number = this.tabs.filter(tab => tab.actualName === tabName).length;
+    let newTab = {
+      displayName: (cnt !== 0) ? `${tabName} ${cnt + 1}`: `${tabName}`,
+      actualName: tabName,
+      status: 'Loading',
+      resultType: tabName
+    }
+    this.tabs.push(newTab);    
+    this.selected.setValue(this.tabs.indexOf(newTab))
+    this.calcParamsMap[newTab.displayName] = params;
   }
 
   reRun(index: number){

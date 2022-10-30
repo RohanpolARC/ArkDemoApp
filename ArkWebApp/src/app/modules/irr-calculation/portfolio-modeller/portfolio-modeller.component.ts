@@ -9,12 +9,19 @@ import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { amountFormatter, removeDecimalFormatter, formatDate } from 'src/app/shared/functions/formatter';
-import { IRRCalcParams, MonthlyReturnsCalcParams, VPortfolioLocalOverrideModel } from 'src/app/shared/models/IRRCalculationsModel';
+import { IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams, VPortfolioLocalOverrideModel } from 'src/app/shared/models/IRRCalculationsModel';
 import { EventEmitter } from '@angular/core';
 import { AggridMaterialDatepickerComponent } from '../../facility-detail/aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/portfolio-save-run-model.component';
 import { getLastBusinessDay, getMomentDateStr, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
+
+type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`
+type EmitParams = {
+  tabName: string,
+  tabType: TabType,
+  calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams
+}
 
 @Component({
   selector: 'app-portfolio-modeller',
@@ -29,8 +36,7 @@ export class PortfolioModellerComponent implements OnInit {
     public dialog: MatDialog
   ) { }
 
-  @Output() calcParamsEmitter = new EventEmitter<IRRCalcParams>();
-  @Output() returnsParamsEmitter = new EventEmitter<MonthlyReturnsCalcParams>();
+  @Output() calcParamsEmitter = new EventEmitter<EmitParams>();
 
   multiSelectPlaceHolder: string = null;
   dropdownSettings: IDropdownSettings = null;
@@ -189,7 +195,8 @@ export class PortfolioModellerComponent implements OnInit {
   }
 
   fetchPortfolioModels(modelID?: number, context: string = 'SaveRunIRR', contextData: {
-    baseMeasure: string
+    baseMeasure?: string,
+    feePreset?: string
   } = null){
     this.subscriptions.push(this.irrCalcService.getPortfolioModels(this.dataSvc.getCurrentUserName()).subscribe({
       next: data => {
@@ -197,10 +204,17 @@ export class PortfolioModellerComponent implements OnInit {
         this.InitModelMap()
         this.setSelectedModel(modelID)
         if(!!modelID && context === 'SaveRunIRR'){
-            this.calcIRR();
+          // this.calcIRR();
+          this.calculationStaging({ type: 'IRR' })
         }
         else if(!!modelID && context === 'SaveRunMReturns'){
-          this.calcReturns(contextData?.baseMeasure);
+          this.calculationStaging({ type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
+          // this.calcReturns(contextData?.baseMeasure);
+
+        }
+        else if(!!modelID && context === 'SaveRunPFees'){
+          this.calculationStaging({ type: 'Performance Fees', feePreset: contextData?.feePreset })
+          // this.calcPerfFees(contextData?.feePreset);
         }
       },
       error: error => {
@@ -562,6 +576,8 @@ export class PortfolioModellerComponent implements OnInit {
             this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context);
           if(res?.context === 'SaveRunMReturns')
             this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context, { baseMeasure: res?.['baseMeasure']});
+          if(res?.context === 'SaveRunPFees')
+            this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context, { feePreset: res?.['feePreset'] });
 
           this.updateLocalFields()
         }
@@ -569,44 +585,101 @@ export class PortfolioModellerComponent implements OnInit {
     }))
   }
 
-  /** 
-   * Opening new tab for Monthly Return in IRR Calculation and sending MonthlyReturnCalcParams as `@Input` to `<app-monthly-returns>` component.
-   *  Portfolio Modeller -> IRR Calculation -> Monthly Returns
-  */
-  calcReturns(baseMeasure: string){
+  calculationStaging(p: {
+    type: TabType,
+    baseMeasure?: string,
+    feePreset?: string
+  }){
 
-    let calcParams: MonthlyReturnsCalcParams = <MonthlyReturnsCalcParams> {};
-    calcParams.baseMeasure = baseMeasure;
+    let calcParams
+    let tabName: string, tabType: TabType
+    if(p.type === 'IRR'){
+      let cp = <IRRCalcParams> {};
+      cp.positionIDs = this.selectedPositionIDs;
+      cp.irrAggrType = this.modelMap[this.selectedModelID]?.irrAggrType;
 
-    let positionIDsSTR: string = ''
-    this.selectedPositionIDs.forEach(posID => {
-      positionIDsSTR += String(posID) + ','
-    })
-    positionIDsSTR = positionIDsSTR.slice(0, -1) // Remove last delimeter
+      calcParams = cp as IRRCalcParams
+    }
+    else if(p.type === 'Monthly Returns'){
+      let cp = <MonthlyReturnsCalcParams> {};
+      cp.baseMeasure = p.baseMeasure;
+      let positionIDsSTR: string = ''
+      this.selectedPositionIDs.forEach(posID => {
+        positionIDsSTR += String(posID) + ','
+      })
+      positionIDsSTR = positionIDsSTR.slice(0, -1) // Remove last delimeter
 
-    calcParams.positionIDs = positionIDsSTR;
-    calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
-    calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
-    calcParams.asOfDate = this.asOfDate
+      cp.positionIDs = positionIDsSTR
+      calcParams = cp as MonthlyReturnsCalcParams
+    }
+    else if(p.type === 'Performance Fees'){
+      let cp = <PerfFeesCalcParams> {};
+      cp.positionIDs = this.selectedPositionIDs;
+      cp.feePreset = p.feePreset;
 
-    this.returnsParamsEmitter.emit(calcParams)
-  }
+      calcParams = cp as PerfFeesCalcParams
+    }
 
-  /** 
-   * Opening new tab for IRR Result in IRR Calculation and sending IRRCalcParams as `@Input` to `<app-irr-result>` component.
-   *  Portfolio Modeller -> IRR Calculation -> IRR Result 
-  */
-  calcIRR(){
-
-    let calcParams: IRRCalcParams = <IRRCalcParams>{};
     calcParams.asOfDate = this.asOfDate;
-    calcParams.positionIDs = this.selectedPositionIDs;
     calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
     calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
-    calcParams.irrAggrType = this.modelMap[this.selectedModelID]?.irrAggrType;
 
-    this.calcParamsEmitter.emit(calcParams);
+    tabName = (p.type !== 'IRR') ? p.type : calcParams.modelName;
+    tabType = p.type;
+    this.calcParamsEmitter.emit({calcParams: calcParams, tabName: tabName, tabType: tabType});
   }
+
+  // /** 
+  //  * Opening new tab for Monthly Return in IRR Calculation and sending MonthlyReturnCalcParams as `@Input` to `<app-monthly-returns>` component.
+  //  *  Portfolio Modeller -> IRR Calculation -> Monthly Returns
+  // */
+  // calcReturns(baseMeasure: string){
+
+  //   let calcParams: MonthlyReturnsCalcParams = <MonthlyReturnsCalcParams> {};
+  //   calcParams.baseMeasure = baseMeasure;
+
+  //   let positionIDsSTR: string = ''
+  //   this.selectedPositionIDs.forEach(posID => {
+  //     positionIDsSTR += String(posID) + ','
+  //   })
+  //   positionIDsSTR = positionIDsSTR.slice(0, -1) // Remove last delimeter
+
+  //   calcParams.positionIDs = positionIDsSTR;
+  //   calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
+  //   calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
+  //   calcParams.asOfDate = this.asOfDate
+
+  //   this.calcParamsEmitter.emit()
+  // }
+
+  // calcPerfFees(feePreset: string){
+  //   let calcParams: PerfFeesCalcParams = <PerfFeesCalcParams> {};
+  //   calcParams.feePreset = feePreset;
+  //   calcParams.asOfDate = this.asOfDate;
+  //   calcParams.positionIDs = this.selectedPositionIDs;
+  //   calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
+  //   calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
+
+  //   let e: EmitParams;
+  //   e.calcParams = calcParams
+  //   this.calcParamsEmitter.emit(e);
+  // }
+
+  // /** 
+  //  * Opening new tab for IRR Result in IRR Calculation and sending IRRCalcParams as `@Input` to `<app-irr-result>` component.
+  //  *  Portfolio Modeller -> IRR Calculation -> IRR Result 
+  // */
+  // calcIRR(){
+
+  //   let calcParams: IRRCalcParams = <IRRCalcParams>{};
+  //   calcParams.asOfDate = this.asOfDate;
+  //   calcParams.positionIDs = this.selectedPositionIDs;
+  //   calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
+  //   calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
+  //   calcParams.irrAggrType = this.modelMap[this.selectedModelID]?.irrAggrType;
+
+  //   // this.calcParamsEmitter.emit(calcParams);
+  // }
 
   runIRRCalc(){
     this.onSavePortfolio('SaveRunIRR');
