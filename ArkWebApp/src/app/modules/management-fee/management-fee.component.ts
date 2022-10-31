@@ -72,7 +72,7 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'issuerShortName', type: 'abColDefString' },
       { field: 'issuer', type: 'abColDefString' },
       { field: 'asset', type: 'abColDefString' },
-      { field: 'managementDate', type: 'abColDefDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
+      { field: 'managementDate', type: 'abColDefDate', valueFormatter: dateFormatter, cellClass: 'dateUK', headerName: 'Trade Date' },
       { field: 'aumBase', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, aggFunc: 'sum' },
       { field: 'feeRate', type: 'abColDefNumber', valueFormatter: amountFormatter, aggFunc: 'max', headerName: 'Fee Rate Percent'  },
       { field: 'calculatedITDFee', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, aggFunc: 'sum'  },
@@ -88,7 +88,6 @@ export class ManagementFeeComponent implements OnInit {
       return c
     })
 
-    console.log(this.columnDefs)
     let aggFuncs = {
       'Max': (params: IAggFuncParams) => {
         if(params.column.getColId() === 'fixingDate'){

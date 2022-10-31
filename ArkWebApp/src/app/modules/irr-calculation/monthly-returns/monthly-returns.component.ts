@@ -2,6 +2,7 @@ import { ColDef, GridOptions, GridReadyEvent, IAggFuncParams, ValueFormatterPara
 import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { CommonConfig } from 'src/app/configs/common-config';
 import { MonthlyReturnsService } from 'src/app/core/services/MonthlyReturns/monthly-returns.service';
 import { amountFormatter } from 'src/app/shared/functions/formatter';
 import { MonthlyReturnsCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
@@ -95,7 +96,7 @@ export class MonthlyReturnsComponent implements OnInit {
   ngOnInit(): void {
 
     this.columnDefsMonthlyRets = [
-      { field: 'asofDate', valueFormatter: this.dateFormatter.bind(this), headerName: 'As Of Date', rowGroup: true, allowedAggFuncs: [] },
+      { field: 'asofDate', valueFormatter: this.dateFormatter.bind(this), headerName: 'As Of Date', rowGroup: true, allowedAggFuncs: [], cellClass: 'dateUK' },
       { field: 'issuerShortName', allowedAggFuncs: [] },
       { field: 'monthlyPnL', valueFormatter: amountFormatter, headerName: 'Monthly P&L', aggFunc: 'Sum', allowedAggFuncs: ['Sum'] },
       { field: 'baseMeasure', valueFormatter: amountFormatter, aggFunc: 'Sum', allowedAggFuncs: ['Sum'] },
@@ -114,6 +115,7 @@ export class MonthlyReturnsComponent implements OnInit {
       autoGroupColumnDef: {
         sort: 'desc'
       },
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
       aggFuncs: this.aggFuncs,
       defaultColDef: {
         resizable: true,
