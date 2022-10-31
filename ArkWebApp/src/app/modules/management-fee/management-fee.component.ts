@@ -87,6 +87,7 @@ export class ManagementFeeComponent implements OnInit {
       c['tooltipField'] = c.field;
       return c
     })
+    
 
     let aggFuncs = {
       'Max': (params: IAggFuncParams) => {
