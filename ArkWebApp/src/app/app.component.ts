@@ -261,7 +261,7 @@ export class AppComponent {
         this.dataService.getUniqueValuesForField('Fee-Calculation-Entities').subscribe({
           next: (data: any[]) => {
             this.entities = data.map(item => { return { entity: item.value, id: item.id } })
-        setTimeout(() => { this.filterApply() }, 250)
+        // setTimeout(() => { this.filterApply() }, 250)
           }
         })
       )

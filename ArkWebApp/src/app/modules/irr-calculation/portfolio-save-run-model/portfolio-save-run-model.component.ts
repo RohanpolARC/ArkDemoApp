@@ -67,7 +67,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     this.subscriptions.push(
       forkJoin([
         this.dataService.getUniqueValuesForField('Returns-Base-Measures'),
-        this.dataService.getUniqueValuesForField('Fee-Calculation-Entities')
+        this.dataService.getUniqueValuesForField('PortfolioModeller-Fee-Calculation-Entities')
       ]).subscribe({
         next: (d: any[]) => {
           let bm = d[0]

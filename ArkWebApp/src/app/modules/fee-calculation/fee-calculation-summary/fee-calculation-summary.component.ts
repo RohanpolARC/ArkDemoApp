@@ -15,6 +15,7 @@ import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/u
 export class FeeCalculationSummaryComponent implements OnInit {
 
   @Input() feeSmy;
+  @Input() status: 'Loading' | 'Loaded' | 'Failed';
   
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   subscriptions: Subscription[] = []
@@ -42,6 +43,12 @@ export class FeeCalculationSummaryComponent implements OnInit {
       else if(changes['feeSmy'].currentValue != null){
         this.gridApi?.hideOverlay();
       }
+    }
+    else if(changes?.['status'].currentValue){
+      if(this.status === 'Loading')
+        this.gridApi.showLoadingOverlay();
+      else 
+        this.gridApi.hideOverlay();
     }
   }
 

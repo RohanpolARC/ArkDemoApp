@@ -24,6 +24,10 @@ import { InputDateAdapter } from 'src/app/shared/providers/date-adapter';
 import { Platform } from '@angular/cdk/platform';
 import { MonthlyReturnsComponent } from './monthly-returns/monthly-returns.component';
 import { FeeCalculationModule } from '../fee-calculation/fee-calculation.module';
+import { PerformanceFeeComponent } from './performance-fee/performance-fee.component';
+import { FeeCalculationService } from 'src/app/core/services/FeeCalculation/fee-calculation.service';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { FeePresetsGridComponent } from './fee-presets-grid/fee-presets-grid.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +35,9 @@ import { FeeCalculationModule } from '../fee-calculation/fee-calculation.module'
     PortfolioSaveRunModelComponent,
     IrrResultComponent,
     PortfolioModellerComponent,
-    MonthlyReturnsComponent
+    MonthlyReturnsComponent,
+    PerformanceFeeComponent,
+    FeePresetsGridComponent
   ],
   imports: [
     CommonModule,
@@ -54,9 +60,11 @@ import { FeeCalculationModule } from '../fee-calculation/fee-calculation.module'
     MatTooltipModule,
     MatTabsModule,
     MatProgressSpinnerModule,
-    MatSelectModule
+    MatSelectModule,
+    MatExpansionModule
   ],
   providers: [
+    FeeCalculationService,
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  
     {provide: DateAdapter, useClass: InputDateAdapter, deps: [MAT_DATE_LOCALE, Platform]},
     DatePipe

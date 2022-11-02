@@ -81,56 +81,56 @@ export class IrrCalculationComponent implements OnInit {
     this.calcParamsMap[newTab.displayName] = p.calcParams;
   }
 
-  irrCalcParamsReceived(params: IRRCalcParams){
-    /** 
-     * Calc params received from Portfolio Modeller. Now, creating a new tab for these params with IRR-result inside it.
-    */
+  // irrCalcParamsReceived(params: IRRCalcParams){
+  //   /** 
+  //    * Calc params received from Portfolio Modeller. Now, creating a new tab for these params with IRR-result inside it.
+  //   */
 
-    let cnt: number = this.tabs.filter(tab => tab.actualName === params.modelName).length;
-    let newTab = {
-      displayName: (cnt !== 0) ? `${params.modelName} ${cnt + 1}`: `${params.modelName}`,
-      actualName: `${params.modelName}`,
-      status: 'Loading',
-      resultType: 'IRR'
-    }
-    this.tabs.push(newTab);    
-    this.selected.setValue(this.tabs.indexOf(newTab))
-    this.calcParamsMap[newTab.displayName] = params;
-  }
+  //   let cnt: number = this.tabs.filter(tab => tab.actualName === params.modelName).length;
+  //   let newTab = {
+  //     displayName: (cnt !== 0) ? `${params.modelName} ${cnt + 1}`: `${params.modelName}`,
+  //     actualName: `${params.modelName}`,
+  //     status: 'Loading',
+  //     resultType: 'IRR'
+  //   }
+  //   this.tabs.push(newTab);    
+  //   this.selected.setValue(this.tabs.indexOf(newTab))
+  //   this.calcParamsMap[newTab.displayName] = params;
+  // }
 
-  returnsParamsReceived(params: MonthlyReturnsCalcParams){
-    /** Return params received from Portfolio Modeller. Now creating a new tab for these params with Monthly Returns inside it */
+  // returnsParamsReceived(params: MonthlyReturnsCalcParams){
+  //   /** Return params received from Portfolio Modeller. Now creating a new tab for these params with Monthly Returns inside it */
 
-    let tabName: string = `Monthly Returns`
-    let cnt: number = this.tabs.filter(tab => tab.actualName === tabName).length;
-    let newTab = {
-      displayName: (cnt !== 0) ? `${tabName} ${cnt + 1}`: `${tabName}`,
-      actualName: tabName,
-      status: 'Loading',
-      resultType: 'MonthlyReturns'
-    }
-    this.tabs.push(newTab);    
-    this.selected.setValue(this.tabs.indexOf(newTab))
-    this.calcParamsMap[newTab.displayName] = params;
+  //   let tabName: string = `Monthly Returns`
+  //   let cnt: number = this.tabs.filter(tab => tab.actualName === tabName).length;
+  //   let newTab = {
+  //     displayName: (cnt !== 0) ? `${tabName} ${cnt + 1}`: `${tabName}`,
+  //     actualName: tabName,
+  //     status: 'Loading',
+  //     resultType: 'MonthlyReturns'
+  //   }
+  //   this.tabs.push(newTab);    
+  //   this.selected.setValue(this.tabs.indexOf(newTab))
+  //   this.calcParamsMap[newTab.displayName] = params;
 
-  }
+  // }
 
-  /**
-   * Originally: 
-   * MonthlyReturns, IRR  
-   */
-  createNewTab(tabName: string, params: PerfFeesCalcParams | MonthlyReturnsCalcParams | IRRCalcParams){
-    let cnt: number = this.tabs.filter(tab => tab.actualName === tabName).length;
-    let newTab = {
-      displayName: (cnt !== 0) ? `${tabName} ${cnt + 1}`: `${tabName}`,
-      actualName: tabName,
-      status: 'Loading',
-      resultType: tabName
-    }
-    this.tabs.push(newTab);    
-    this.selected.setValue(this.tabs.indexOf(newTab))
-    this.calcParamsMap[newTab.displayName] = params;
-  }
+  // /**
+  //  * Originally: 
+  //  * MonthlyReturns, IRR  
+  //  */
+  // createNewTab(tabName: string, params: PerfFeesCalcParams | MonthlyReturnsCalcParams | IRRCalcParams){
+  //   let cnt: number = this.tabs.filter(tab => tab.actualName === tabName).length;
+  //   let newTab = {
+  //     displayName: (cnt !== 0) ? `${tabName} ${cnt + 1}`: `${tabName}`,
+  //     actualName: tabName,
+  //     status: 'Loading',
+  //     resultType: tabName
+  //   }
+  //   this.tabs.push(newTab);    
+  //   this.selected.setValue(this.tabs.indexOf(newTab))
+  //   this.calcParamsMap[newTab.displayName] = params;
+  // }
 
   reRun(index: number){
     if(index >= 1){

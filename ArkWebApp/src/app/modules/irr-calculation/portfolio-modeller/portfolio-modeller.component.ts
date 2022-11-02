@@ -1,4 +1,4 @@
-import { ColumnFilter, AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColumnFilter, AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { FiltersToolPanelModule } from '@ag-grid-enterprise/filter-tool-panel';
 import { ColDef, EditableCallbackParams, GridOptions, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi, Module } from '@ag-grid-community/core';
 import { Component, OnInit, Output } from '@angular/core';
@@ -22,6 +22,8 @@ type EmitParams = {
   tabType: TabType,
   calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams
 }
+
+let adaptable_Api: AdaptableApi
 
 @Component({
   selector: 'app-portfolio-modeller',
@@ -143,6 +145,16 @@ export class PortfolioModellerComponent implements OnInit {
   adapTableApi: AdaptableApi;
   adaptableOptions: AdaptableOptions;
 
+  setDateFields(row: any, fields: string[]){
+    for(let i = 0; i < fields.length; i+= 1){
+      row[fields[i]] = formatDate(row[fields[i]]);
+      if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(row[fields[i]]))
+        row[fields[i]] = null;
+    }
+
+    return row;
+  }
+
   fetchIRRPostions() {
     if(this.asOfDate !== null){
       this.gridOptions?.api?.showLoadingOverlay();
@@ -150,31 +162,17 @@ export class PortfolioModellerComponent implements OnInit {
         next: data => {
           this.gridOptions?.api?.hideOverlay();
           for(let i: number = 0; i < data?.length; i+= 1){
-            data[i].expectedDate = formatDate(data[i]?.expectedDate)
-            if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].expectedDate)){
-              data[i].expectedDate = null;
-            }
-            data[i].localExpectedDate = formatDate(data[i]?.localExpectedDate)
-            if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].localExpectedDate)){
-              data[i].localExpectedDate = null;
-            }
-            data[i].globalExpectedDate = formatDate(data[i]?.globalExpectedDate)
-            if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].globalExpectedDate)){
-              data[i].globalExpectedDate = null;
-            }  
-            data[i].maturityDate = formatDate(data[i]?.maturityDate)
-            if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].maturityDate)){
-              data[i].maturityDate = null;
-            }
+            data[i] = this.setDateFields(data[i], ['expectedDate', 'localExpectedDate', 'globalExpectedDate', 'maturityDate'])
           }  
 
-          this.gridApi.setRowData(data)
+          console.log(adaptable_Api)
+          adaptable_Api.gridApi.setGridData(data)
           if(this.selectedModelID){
             if(this.modelMap[this.selectedModelID].positionIDs){
 
               this.gridApi.deselectAll();
               this.modelMap[this.selectedModelID].positionIDs?.forEach(posID => {
-                let node: RowNode = this.adapTableApi.gridApi.getRowNodeForPrimaryKey(posID)
+                let node: RowNode = adaptable_Api.gridApi.getRowNodeForPrimaryKey(posID)
                 node.setSelected(true);
                 this.selectedPositionIDs = this.modelMap[this.selectedModelID].positionIDs
               })
@@ -405,8 +403,6 @@ export class PortfolioModellerComponent implements OnInit {
       }
 
     }
-
-    this.changeListeners()
   }
 
   rows: number[]
@@ -492,10 +488,10 @@ export class PortfolioModellerComponent implements OnInit {
       return;
 
     let positionIDs = this.modelMap[modelID]?.positionIDs
-    this.adapTableApi?.gridApi?.deselectAll();
+    adaptable_Api?.gridApi?.deselectAll();
     if(positionIDs != null || positionIDs?.length != 0){
       positionIDs.forEachLeafNode(posID => {
-        let node: RowNode = this.adapTableApi?.gridApi?.getRowNodeForPrimaryKey(posID);
+        let node: RowNode = adaptable_Api?.gridApi?.getRowNodeForPrimaryKey(posID);
         node.setSelected(posID)
       })
       this.selectedPositionIDs = positionIDs;
@@ -543,7 +539,7 @@ export class PortfolioModellerComponent implements OnInit {
     }
     const dialogRef = this.dialog.open(PortfolioSaveRunModelComponent, {
       data: {
-        adaptableApi: this.adapTableApi, 
+        adaptableApi: adaptable_Api, 
         model: this.modelMap[this.selectedModelID], 
         asOfDate: this.asOfDate, 
         isAutomatic: this.isAutomatic.value, 
@@ -689,12 +685,9 @@ export class PortfolioModellerComponent implements OnInit {
   onReset(userAction: boolean = false){
     /** Here, we clear all filters applied on the grid, overrides, toggles etc.*/
 
-    if(this.adapTableApi){
-      this.adapTableApi.filterApi.clearColumnFilters();
-      this.gridApi.deselectAll();
-      if(userAction)
-        this.updateGridOverrides('Clear');
-    }
+    console.log(adaptable_Api?.filterApi.getActiveColumnFilters());
+    
+
     this.selectedDropdownData = [];
     this.selectedPositionIDs = [];
 
@@ -706,6 +699,15 @@ export class PortfolioModellerComponent implements OnInit {
     this.isAutomatic.setValue(false)
     this.localOverrides = null
     this.selectedModelID = null
+
+    if(adaptable_Api){
+      adaptable_Api.filterApi.clearColumnFilters();
+      this.gridApi.deselectAll();
+      if(userAction)
+        this.updateGridOverrides('Clear');
+    }
+
+    console.log(adaptable_Api?.filterApi.getActiveColumnFilters());
   }
 
   updateGridWithOverrides(overrideInfo: any){
@@ -715,7 +717,7 @@ export class PortfolioModellerComponent implements OnInit {
             colName: string = overrideInfo[i].key,
             val: string = overrideInfo[i].value
 
-      let node: RowNode = this.adapTableApi.gridApi.getRowNodeForPrimaryKey(posID)
+      let node: RowNode = adaptable_Api.gridApi.getRowNodeForPrimaryKey(posID)
       if(colName === 'expectedDate'){
         node.setDataValue('expectedDate', val)
       }
@@ -786,12 +788,8 @@ export class PortfolioModellerComponent implements OnInit {
   onPortfolioModelSelect(event){
     this.selectedModelID = event.modelID
 
-    this.adapTableApi.filterApi.clearColumnFilters();
+    adaptable_Api.filterApi.clearColumnFilters();
     this.selectedPositionIDs = []
-
-    if(this.modelMap[this.selectedModelID].rules){
-      this.adapTableApi.filterApi.setColumnFilter(this.modelMap[this.selectedModelID].rules)
-    }
 
     /** On model selection, data will be refetched with overrides, hence we do not want to programmatically set it again, hence emitEvent: false */
     this.isLocal.setValue(this.modelMap[this.selectedModelID].isLocal, {emitEvent: false})
@@ -799,16 +797,20 @@ export class PortfolioModellerComponent implements OnInit {
     //emitEvent: true (Default) since we want to switch layouts programmatically. 
     this.isAutomatic.setValue(!this.modelMap[this.selectedModelID].isManual)
 
+    if(this.modelMap[this.selectedModelID].rules){
+      adaptable_Api.filterApi.setColumnFilter(this.modelMap[this.selectedModelID].rules)
+    }
+
     this.fetchIRRPostions()
  }
 
   changeListeners(){
     this.subscriptions.push(this.isAutomatic.valueChanges.subscribe( isAuto => {
       if(isAuto){
-        this.adapTableApi.layoutApi.setLayout('Automatic')
+        adaptable_Api.layoutApi.setLayout('Automatic')
       }
       else {
-        this.adapTableApi.layoutApi.setLayout('Manual')
+        adaptable_Api.layoutApi.setLayout('Manual')
       }
     }))
 
@@ -829,13 +831,11 @@ export class PortfolioModellerComponent implements OnInit {
   }
 
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
-    this.adapTableApi = adaptableApi;
-    this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
-    this.adapTableApi.filterApi.clearColumnFilters();
-  }
+    adaptable_Api = adaptableApi;
+    adaptable_Api.toolPanelApi.closeAdapTableToolPanel();
+    adaptable_Api.filterApi.clearColumnFilters();
 
-  onGridReady(params: GridReadyEvent){
-    this.gridApi = params.api;
+    console.log(adaptable_Api)
 
     this.subscriptions.push(this.irrCalcService.currentSearchDate.subscribe(asOfDate => {
       this.asOfDate = asOfDate;
@@ -847,6 +847,14 @@ export class PortfolioModellerComponent implements OnInit {
         this.fetchIRRPostions();
       }
     }))  
+
+    this.changeListeners()
+  }
+
+  onGridReady(params: GridReadyEvent){
+    this.gridApi = params.api;
+
+    console.log(adaptable_Api)
   }
   
   parseFetchedModels(data){

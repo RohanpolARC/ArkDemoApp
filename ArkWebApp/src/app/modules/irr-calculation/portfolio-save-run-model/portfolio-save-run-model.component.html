@@ -16,7 +16,7 @@
             -->
     
         <form [formGroup]="modelForm" autocomplete="off">
-            <div class="row">
+            <div class="row gy-3 d-flex align-items-center">
                     <div class="col-3">
                         <div>
                             <div class="mat-slide-toggle-content">
@@ -139,6 +139,11 @@
                     </ng-container>
 
                 </div>    
+            </div>
+
+            <br>Fee Presets
+            <div class="row">
+                <app-fee-presets-grid [feePreset] = "modelForm.get('feePreset').value"></app-fee-presets-grid>
             </div>
 
         </form>

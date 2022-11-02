@@ -1,4 +1,5 @@
 export interface FeeCalcParams {
     asOfDate: string, // 'YYYY-MM-DD'
-    entity: string
+    entity: string,
+    positionIDs ?: number[]
 }

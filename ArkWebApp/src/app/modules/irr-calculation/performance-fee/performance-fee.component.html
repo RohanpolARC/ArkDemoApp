@@ -11,10 +11,13 @@
     <div class="content">
         <mat-card class="mat-content">
 
-                        <app-fee-calculation-summary [feeSmy] = "feeSmy" [status] = "status"
+                        <app-fee-calculation-summary [feeSmy] = "feeSmy"
                         ></app-fee-calculation-summary>                        
-                        
-            <mat-accordion>
+
+                        <app-fee-cashflows [feeCashflows] = "feeCashflows" class="ag-grid">
+                        </app-fee-cashflows>
+    
+            <!-- <mat-accordion>
                 <mat-expansion-panel>
                     <mat-expansion-panel-header>
                         <mat-panel-title>
@@ -22,22 +25,12 @@
                         </mat-panel-title>
                     </mat-expansion-panel-header>
 
-                    <app-fee-cashflows [feeCashflows] = "feeCashflows"
-                    [status] = "status"
-                    class="ag-grid">
+                    <app-fee-cashflows [feeCashflows] = "feeCalcSvc.rowDataCFs" class="ag-grid">
                     </app-fee-cashflows>
 
-                    <!-- <ag-grid-angular
-                        [modules] = "agGridModules"
-                        [gridOptions] = "gridOptionsCFs"
-                        [adaptableOptions] = "adaptableOptionsCFs"
-                        [rowData] = "rowDataCFs"
-                        class="ag-theme-alpine ag-grid"
-                    >
-                    </ag-grid-angular> -->
             
                 </mat-expansion-panel>
-            </mat-accordion>
+            </mat-accordion> -->
 
         </mat-card>
     </div>
