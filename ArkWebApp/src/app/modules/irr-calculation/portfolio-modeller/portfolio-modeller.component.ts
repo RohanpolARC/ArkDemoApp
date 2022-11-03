@@ -192,7 +192,7 @@ export class PortfolioModellerComponent implements OnInit {
     }
   }
 
-  fetchPortfolioModels(modelID?: number, context: string = 'SaveRunIRR', contextData: {
+  fetchPortfolioModels(modelID?: number, context: string[] = ['SaveRunIRR'], contextData: {  //changes context type from string to string[]
     baseMeasure?: string,
     feePreset?: string
   } = null){
@@ -201,16 +201,16 @@ export class PortfolioModellerComponent implements OnInit {
         this.parseFetchedModels(data);
         this.InitModelMap()
         this.setSelectedModel(modelID)
-        if(!!modelID && context === 'SaveRunIRR'){
+        if(!!modelID && context.includes('SaveRunIRR')){
           // this.calcIRR();
           this.calculationStaging({ type: 'IRR' })
         }
-        else if(!!modelID && context === 'SaveRunMReturns'){
+        if(!!modelID && context.includes('SaveRunMReturns')){
           this.calculationStaging({ type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
           // this.calcReturns(contextData?.baseMeasure);
 
         }
-        else if(!!modelID && context === 'SaveRunPFees'){
+        if(!!modelID && context.includes('SaveRunPFees')){
           this.calculationStaging({ type: 'Performance Fees', feePreset: contextData?.feePreset })
           // this.calcPerfFees(contextData?.feePreset);
         }
@@ -568,12 +568,21 @@ export class PortfolioModellerComponent implements OnInit {
         if(res?.isSuccess){
           this.selectedModelID = dialogRef.componentInstance.modelID
 
-          if(res?.context === 'SaveRunIRR')
-            this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context);
-          if(res?.context === 'SaveRunMReturns')
-            this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context, { baseMeasure: res?.['baseMeasure']});
-          if(res?.context === 'SaveRunPFees')
-            this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context, { feePreset: res?.['feePreset'] });
+          this.fetchPortfolioModels(
+            dialogRef.componentInstance.modelID,
+            res.context,
+            {
+              baseMeasure: res?.['baseMeasure'],
+              feePreset: res?.['feePreset']
+            }
+          )
+
+          // if(res?.context === 'SaveRunIRR')
+          //   this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context);
+          // if(res?.context === 'SaveRunMReturns')
+          //   this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context, { baseMeasure: res?.['baseMeasure']});
+          // if(res?.context === 'SaveRunPFees')
+          //   this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context, { feePreset: res?.['feePreset'] });
 
           this.updateLocalFields()
         }

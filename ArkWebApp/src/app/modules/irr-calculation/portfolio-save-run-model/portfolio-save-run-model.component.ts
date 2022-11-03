@@ -8,7 +8,9 @@ import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { VPortfolioModel } from 'src/app/shared/models/IRRCalculationsModel';
 
-type Proceed = "Save" | "SaveRunIRR" | "SaveRunMReturns" | "SaveRunPFees"
+//type Proceed = "Save" | "SaveRunIRR" | "SaveRunMReturns" | "SaveRunPFees"
+type Proceed = "Save" | "SaveRun"
+
 
 @Component({
   selector: 'app-portfolio-save-run-model',
@@ -47,7 +49,11 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   }[] = []
   baseMeasures: { baseMeasure: string, id: number }[]
   feePresets: { feePreset: string, id: number }[]
+  calculationTypes: string[]= ['IRR','Monthly Returns','Fee Model']
   readMore: boolean = false;
+  isIRRDisabled: boolean = true;
+  isFeePresetDisabled: boolean = true;
+  isMonthlyReturnsDisabled: boolean = true;
 
   constructor(
     public dialogRef: MatDialogRef<PortfolioSaveRunModelComponent>,
@@ -63,6 +69,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   }
   
   ngOnInit(): void {
+
 
     this.subscriptions.push(
       forkJoin([
@@ -132,7 +139,9 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       isShared: new FormControl(!!this.data.isShared, Validators.required),
       aggregationType: new FormControl(this.data.aggregationType, Validators.required),
       baseMeasure: new FormControl(this.baseMeasures[0]?.baseMeasure, Validators.required),
-      feePreset: new FormControl(this.feePresets[0]?.feePreset, Validators.required)
+      feePreset: new FormControl(this.feePresets[0]?.feePreset, Validators.required),
+      calculationType: new FormControl(this.calculationTypes[0], Validators.required)
+
     })
 
     this.aggregationTypes = [
@@ -159,6 +168,18 @@ export class PortfolioSaveRunModelComponent implements OnInit {
         this.modelForm.get('modelDesc').reset()
         this.modelForm.get('aggregationType').reset()
       }
+    }))
+
+    this.subscriptions.push(this.modelForm.get('calculationType').valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(calculationType =>{
+      //['IRR','Fee Model','Monthly Returns']
+      this.isIRRDisabled = !calculationType.includes('IRR')
+      this.isFeePresetDisabled = !calculationType.includes('Fee Model')
+      this.isMonthlyReturnsDisabled = !calculationType.includes('Monthly Returns')
+
+      
     }))
 
     this.subscriptions.push(this.modelForm.get('modelName').valueChanges.pipe(
@@ -232,26 +253,35 @@ export class PortfolioSaveRunModelComponent implements OnInit {
             this.modelID = result.data[0].value;
           }
 
-          if(context === 'SaveRunIRR'){
-            this.dialogRef.close({ 
-              context: 'SaveRunIRR',
-              isSuccess: true
-             });
-          }
-          else if(context === 'SaveRunMReturns'){
-            this.dialogRef.close({ 
-              context: 'SaveRunMReturns',
-              isSuccess: true,
-              baseMeasure: this.modelForm.get('baseMeasure').value
-            });  
-          }
-          else if(context === 'SaveRunPFees'){
+          if(context === 'SaveRun'){
             this.dialogRef.close({
-              context: 'SaveRunPFees',
-              isSuccess: true,
-              feePreset: this.modelForm.get('feePreset').value
+              context: this.mapCalTypeToContext(this.modelForm.get('calculationType').value),
+              isSuccess:true,
+              baseMeasure: this.isMonthlyReturnsDisabled? null: this.modelForm.get('baseMeasure').value,
+              feePreset: this.isFeePresetDisabled? null:  this.modelForm.get('feePreset').value
             })
           }
+
+          // if(context === 'SaveRunIRR'){
+          //   this.dialogRef.close({ 
+          //     context: 'SaveRunIRR',
+          //     isSuccess: true
+          //    });
+          // }
+          // else if(context === 'SaveRunMReturns'){
+          //   this.dialogRef.close({ 
+          //     context: 'SaveRunMReturns',
+          //     isSuccess: true,
+          //     baseMeasure: this.modelForm.get('baseMeasure').value
+          //   });  
+          // }
+          // else if(context === 'SaveRunPFees'){
+          //   this.dialogRef.close({
+          //     context: 'SaveRunPFees',
+          //     isSuccess: true,
+          //     feePreset: this.modelForm.get('feePreset').value
+          //   })
+          // }
         }
         else{
           this.isSuccess = false
@@ -266,6 +296,21 @@ export class PortfolioSaveRunModelComponent implements OnInit {
         this.updateMsg = 'Failed to update model';
       }
     }))
+  }
+  mapCalTypeToContext(calulationTypes:string[]):string[] {
+    //['IRR','Fee Model','Monthly Returns']
+    //type Proceed = "Save" | "SaveRunIRR" | "SaveRunMReturns" | "SaveRunPFees"
+    let mappedContext = []
+    if(calulationTypes.includes('IRR')){
+      mappedContext.push('SaveRunIRR')
+    }
+    if(calulationTypes.includes('Fee Model')){
+      mappedContext.push('SaveRunPFees')
+    }
+    if(calulationTypes.includes('Monthly Returns')){
+      mappedContext.push('SaveRunMReturns')
+    }
+    return mappedContext
   }
 
   recursiveRemoveKey = (object, deleteKey) => {
