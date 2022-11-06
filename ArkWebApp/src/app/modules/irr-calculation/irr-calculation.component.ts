@@ -5,6 +5,13 @@ import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 
+type tabset = {
+  displayName: string,
+  status: string,    // Loaded, Loading, Failed
+  resultType: string,    //'IRR' | 'MonthlyReturn' | 'PortfolioModeller'
+  calcParams?: any//IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams
+}[]
+
 @Component({
   selector: 'app-irr-calculation',
   templateUrl: './irr-calculation.component.html',
@@ -19,24 +26,37 @@ export class IrrCalculationComponent implements OnInit {
   ) { }
 
   subscriptions: Subscription[] = []
-  tabs : {
-    actualName: string, 
-    displayName: string,
-    status: string,    // Loaded, Loading, Failed
-    resultType: string    //'IRR' | 'MonthlyReturn' | 'PortfolioModeller'
-  }[] = [{
-    actualName: 'Portfolio Modeller',
+  parenttabs : {
+    parentDisplayName: string,
+    parentActualName:string,
+    status:string,
+    tabset:tabset
+  }[]= [{
+    parentDisplayName: 'Portfolio Modeller',
+    parentActualName: 'Portfolio Modeller',
+    status: 'Loaded',
+    tabset: [{
     displayName: 'Portfolio Modeller',
     status: 'Loaded',
     resultType: 'PortfolioModeller'
+  }]
   }];
+
+
 
   selected = new FormControl(0);
 
   calcParamsMap = {} //<model name, IRRCalcParams>
 
-  removeTab(index: number) {
-    this.tabs.splice(index, 1);
+  removeTab(params:{index?: number,pDisplayName:string}) {
+    if(params.index){
+      this.parenttabs.splice(params.index, 1);
+    }else{
+      let index = this.parenttabs.findIndex(parenttab=>params.pDisplayName==parenttab.parentDisplayName)
+      this.parenttabs.splice(index, 1);
+    }
+    delete this.calcParamsMap[params.pDisplayName]
+
   }
 
   ngOnInit(): void {
@@ -46,11 +66,15 @@ export class IrrCalculationComponent implements OnInit {
 
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if(isHit){
-        this.tabs = [{
-          actualName: 'Portfolio Modeller',
+        this.parenttabs = [{
+          parentDisplayName: 'Portfolio Modeller',
+          parentActualName: 'Portfolio Modeller',
+          status: 'Loaded',
+          tabset: [{
           displayName: 'Portfolio Modeller',
           status: 'Loaded',
           resultType: 'PortfolioModeller'
+        }]
         }]
       }
     }))
@@ -58,7 +82,7 @@ export class IrrCalculationComponent implements OnInit {
   }
   statusReceived(status: string, index: number){
     if(index >= 1){
-      this.tabs[index].status = status
+      this.parenttabs[index].status = status 
     }
   }
 
@@ -67,18 +91,58 @@ export class IrrCalculationComponent implements OnInit {
    * @param tabType ${Model Name} / Monthly Returns / IRR 
    * @param params IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesParams
    */
-  calcParamsReceived(p: {tabName: string, tabType: string, calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams}){
-
-    let cnt: number = this.tabs.filter(tab => tab.actualName === p.tabName).length;
-    let newTab = {
-      displayName: (cnt !== 0) ? `${p.tabName} ${cnt + 1}`: `${p.tabName}`,
-      actualName: p.tabName,
-      status: 'Loading',
-      resultType: p.tabType
+  calcParamsReceived(
+    params: {
+      parentDisplayName: string,
+      tabs: {tabName: string, tabType: string, calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams}[]
     }
-    this.tabs.push(newTab);    
-    this.selected.setValue(this.tabs.indexOf(newTab))
-    this.calcParamsMap[newTab.displayName] = p.calcParams;
+    ){
+      let p = params.tabs
+
+    //let calcParamsArray = {}
+    let newTabSet:tabset =[]
+    p.forEach((tabData)=>{
+      // let cnt:number = 0
+      // this.parenttabs.forEach(
+      //   (parenttab)=>{
+      //     cnt+=parenttab.tabset.filter(tab =>tab.actualName === tabData.tabName).length
+      //   }
+      // )
+      // let displayName = (cnt !== 0) ? `${tabData.tabName} ${cnt + 1}`: `${tabData.tabName}`
+      newTabSet.push({
+        displayName: tabData.tabName,
+        status: 'Loading',
+        resultType: tabData.tabType,
+        calcParams: tabData.calcParams
+      })
+
+      //calcParamsArray[tabData.tabName] = tabData.calcParams;
+
+    })
+
+    let cnt = this.parenttabs.filter(pt=>pt.parentActualName===params.parentDisplayName).length
+   
+
+    let parentDisplayName = (cnt !== 0) ? `${params.parentDisplayName} ${cnt + 1}`: `${params.parentDisplayName}`
+    //this.calcParamsMap[parentDisplayName]  = calcParamsArray
+
+    let newParentTab = {
+      parentDisplayName:parentDisplayName ,
+      parentActualName:params.parentDisplayName,
+      status : 'Loading',
+      tabset:newTabSet}
+    this.parenttabs.push(newParentTab);    
+    this.selected.setValue(this.parenttabs.indexOf(newParentTab))
+   
+
+    //let cnt: number = this.tabs.filter(tab => tab.actualName === p.tabName).length;
+    // let newTab = {
+    //   displayName: (cnt !== 0) ? `${p.tabName} ${cnt + 1}`: `${p.tabName}`,
+    //   actualName: p.tabName,
+    //   status: 'Loading',
+    //   resultType: p.tabType
+    // }
+
   }
 
   // irrCalcParamsReceived(params: IRRCalcParams){
@@ -134,7 +198,7 @@ export class IrrCalculationComponent implements OnInit {
 
   reRun(index: number){
     if(index >= 1){
-      let displayName: string = this.tabs[index].displayName
+      let displayName: string = this.parenttabs[index][0].displayName 
       let params = this.calcParamsMap[displayName]
       this.calcParamsMap[displayName] = null;
       this.calcParamsMap[displayName] = params

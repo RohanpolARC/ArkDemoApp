@@ -17,10 +17,18 @@ import { getLastBusinessDay, getMomentDateStr, getSharedEntities, setSharedEntit
 import { CommonConfig } from 'src/app/configs/common-config';
 
 type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`
+// type EmitParams = {
+//   tabName: string,
+//   tabType: TabType,
+//   calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams
+// }
 type EmitParams = {
-  tabName: string,
-  tabType: TabType,
-  calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams
+  parentDisplayName: string,
+  tabs:{
+    tabName: string,
+    tabType: TabType,
+    calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams
+  }[]
 }
 
 let adaptable_Api: AdaptableApi
@@ -201,25 +209,37 @@ export class PortfolioModellerComponent implements OnInit {
         this.parseFetchedModels(data);
         this.InitModelMap()
         this.setSelectedModel(modelID)
-        if(!!modelID && context.includes('SaveRunIRR')){
-          // this.calcIRR();
-          this.calculationStaging({ type: 'IRR' })
+        if(!!modelID){
+          let calcParamsData = []
+          if(context.includes('SaveRunIRR'))
+            calcParamsData.push({ type: 'IRR' })
+          if(context.includes('SaveRunMReturns'))
+            calcParamsData.push({ type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
+          if(context.includes('SaveRunPFees'))
+            calcParamsData.push({ type: 'Performance Fees', feePreset: contextData?.feePreset })
+          console.log(modelID)
+          this.multCalculationStaging(this.modelMap[this.selectedModelID]?.modelName,calcParamsData)
         }
-        if(!!modelID && context.includes('SaveRunMReturns')){
-          this.calculationStaging({ type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
-          // this.calcReturns(contextData?.baseMeasure);
+        // if(!!modelID && context.includes('SaveRunIRR')){
+        //   // this.calcIRR();
+        //   this.calculationStaging({ type: 'IRR' })
+        // }
+        // if(!!modelID && context.includes('SaveRunMReturns')){
+        //   this.calculationStaging({ type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
+        //   // this.calcReturns(contextData?.baseMeasure);
 
-        }
-        if(!!modelID && context.includes('SaveRunPFees')){
-          this.calculationStaging({ type: 'Performance Fees', feePreset: contextData?.feePreset })
-          // this.calcPerfFees(contextData?.feePreset);
-        }
+        // }
+        // if(!!modelID && context.includes('SaveRunPFees')){
+        //   this.calculationStaging({ type: 'Performance Fees', feePreset: contextData?.feePreset })
+        //   // this.calcPerfFees(contextData?.feePreset);
+        // }
       },
       error: error => {
         console.error(`Failed to fetch Portfolio Rules: ${error}`)
       }
     }))
   }
+
 
   InitModelMap(){
     this.modelMap = {};
@@ -590,6 +610,20 @@ export class PortfolioModellerComponent implements OnInit {
     }))
   }
 
+  multCalculationStaging(parentDisplayName,calcStagingData: {
+    type: TabType,
+    baseMeasure?: string,
+    feePreset?: string
+  }[]) {
+    let calcParamsEmitterData = []
+    calcStagingData.forEach((stagingData)=>{
+      let _ = this.calculationStaging(stagingData)
+      calcParamsEmitterData.push(_)
+    })
+    //this.calcParamsEmitter.emit({calcParams: calcParams, tabName: tabName, tabType: tabType});
+    this.calcParamsEmitter.emit({parentDisplayName:parentDisplayName,tabs:calcParamsEmitterData})
+  }
+
   calculationStaging(p: {
     type: TabType,
     baseMeasure?: string,
@@ -629,9 +663,13 @@ export class PortfolioModellerComponent implements OnInit {
     calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
     calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
 
-    tabName = (p.type !== 'IRR') ? p.type : calcParams.modelName;
+    tabName = p.type
+    //tabName = (p.type !== 'IRR') ? p.type : calcParams.modelName;
     tabType = p.type;
-    this.calcParamsEmitter.emit({calcParams: calcParams, tabName: tabName, tabType: tabType});
+    let tabData = {calcParams: calcParams, tabName: tabName, tabType: tabType}
+    return tabData
+    //this.calcParamsEmitter.emit({calcParams: calcParams, tabName: tabName, tabType: tabType});
+
   }
 
   // /** 

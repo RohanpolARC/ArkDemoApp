@@ -63,13 +63,15 @@
                     <div class="col-6">
                         <div class="flex-row d-flex justify-content-between">
                                 <button mat-raised-button 
-                                [disabled]="modelForm?.invalid ? true : isSuccess" type="button" class="col-2"
+                                [disabled]="modelForm?.invalid ? true : isSuccess" type="button" class="w-10"
                                 color="primary" (click)="onProceed('Save')">Save</button>
 
                                 <button mat-raised-button [disabled]="(modelForm?.invalid || (isFeePresetDisabled && isMonthlyReturnsDisabled && isIRRDisabled))? true : isSuccess " type="button"
-                                color="primary" (click)="onProceed('SaveRun')" class="col-2">Save & Run</button>
+                                color="primary" (click)="onProceed('SaveRun')" class="w-18">Save & Run</button>
 
-                                <button mat-raised-button (click)="onClose()" type="button" class="col-2">Cancel</button>
+                                <div class="w-10"></div>
+
+                                <button mat-raised-button (click)="onClose()" type="button" class="w-10">Cancel</button>
                         </div>
                     </div>
 

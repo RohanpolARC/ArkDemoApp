@@ -1,0 +1,52 @@
+<div class="parent">
+
+    <mat-tab-group [selectedIndex]="selected.value" >
+        <mat-tab *ngFor="let subtab of subtabs; let index = index" [label]="subtab.displayName"  class="mat-tab-label">
+
+            <!-- status implementation pending -->
+            <ng-template mat-tab-label  >
+                        
+                <ng-container *ngIf="subtabs[index].status === 'Loading'">
+                    <mat-spinner [diameter] = "20"></mat-spinner>
+                </ng-container>
+
+                <ng-container *ngIf="subtabs[index].status === 'Failed'">
+                    <mat-icon class="failed-refresh" (click)="reRun(index)">error</mat-icon>
+                    
+                </ng-container>
+
+                &nbsp;
+
+                {{ subtab.displayName }}
+                <br>
+
+                <mat-icon (click)="removeTab(index)">close</mat-icon>
+
+
+            </ng-template>
+
+            <app-irr-result 
+                *ngIf="subtab.resultType === 'IRR'" 
+                style="display: block; height: calc(100vh -245px);"
+                (status)="statusReceived($event, index)"
+                [calcParams] = "subtab.calcParams"
+            ></app-irr-result>
+
+            <app-monthly-returns
+                *ngIf="subtab.resultType === 'Monthly Returns'"
+                style="display: block; height: calc(100vh -205px);"
+                (status)="statusReceived($event, index)"
+                [calcParams] = "subtab.calcParams"
+            ></app-monthly-returns>
+
+
+            <app-performance-fee
+                *ngIf="subtab.resultType === 'Performance Fees'"
+                style="display: block; height: calc(100vh -245px);"
+                (status)="statusReceived($event, index)"
+                [calcParams] = "subtab.calcParams"
+            ></app-performance-fee>
+       </mat-tab>
+    </mat-tab-group>
+
+</div>
