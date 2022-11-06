@@ -1,27 +1,27 @@
 <div class="parent">
 
             <mat-tab-group [selectedIndex]="selected.value" 
-               (selectedIndexChange)="selected.setValue($event)" style="margin-right: 32px;">
-                <mat-tab *ngFor="let tab of tabs; let index = index" [label]="tab.displayName">
+               (selectedIndexChange)="selected.setValue($event)" style="margin-right: 32px; width: 100vw;" [backgroundColor]="">
+                <mat-tab *ngFor="let parenttab of parenttabs; let index = index" [label]="parenttab.parentDisplayName">
                     <ng-template mat-tab-label>
                         
-                        <ng-container *ngIf="index !== 0 && tabs[index].status === 'Loading'">
+                        <ng-container *ngIf="index !== 0 && parenttabs[index].tabset[0].status === 'Loading'">
                             <mat-spinner [diameter] = "20"></mat-spinner>
                         </ng-container>
 
-                        <ng-container *ngIf="index !== 0 && tabs[index].status === 'Failed'">
+                        <ng-container *ngIf="index !== 0 && parenttabs[index].tabset[0].status === 'Failed'">
                             <mat-icon class="failed-refresh" (click)="reRun(index)" *ngIf="index !== 0">error</mat-icon>
                             
                         </ng-container>
 
                         &nbsp;
 
-                        {{ tab.displayName }}
+                        {{ parenttab.parentDisplayName }}
                         <br>
 
                         ({{ asOfDate | date:"dd/MM/yyyy" }}) 
 
-                        <mat-icon (click)="removeTab(index)" *ngIf="index !== 0">close</mat-icon>
+                        <mat-icon (click)="removeTab({index:index,pDisplayName:parenttab.parentDisplayName})" *ngIf="index !== 0">close</mat-icon>
 
 
                     </ng-template>
@@ -32,26 +32,42 @@
                         (calcParamsEmitter) = "calcParamsReceived($event)"
                     ></app-portfolio-modeller>
 
-                    <app-irr-result 
+
+                    <app-tab-group-wrapper
+                        *ngIf = "index !== 0" 
+                        [parentTab] = "parenttab"
+                        style = "display: block; height: calc(100vh - 64px - 50px); width: 100%;"
+                        (noSubTabs) = "removeTab($event)"
+                        (status) = "statusReceived($event,index)"
+                    ></app-tab-group-wrapper>
+
+                    <!-- <app-irr-result 
                         *ngIf="index !== 0 && tab.resultType === 'IRR'" 
                         style="display: block; height: calc(100vh - 64px - 50px);"
                         (status)="statusReceived($event, index)"
                         [calcParams] = "calcParamsMap[tab.displayName]"
-                    ></app-irr-result>
+                    ></app-irr-result> -->
 
-                    <app-monthly-returns
+                    <!-- <app-monthly-returns
                         *ngIf="index !== 0 && tab.resultType === 'Monthly Returns'"
                         style="display: block; height: calc(100vh - 64px - 50px);"
                         (status)="statusReceived($event, index)"
                         [calcParams] = "calcParamsMap[tab.displayName]"
-                    ></app-monthly-returns>
+                    ></app-monthly-returns> -->
 
-                    <app-performance-fee
+                    <!-- <app-fee-calculation
                         *ngIf="index !== 0 && tab.resultType === 'Performance Fees'"
                         style="display: block; height: calc(100vh - 64px - 50px);"
                         (status)="statusReceived($event, index)"
                         [calcParams] = "calcParamsMap[tab.displayName]"
-                    ></app-performance-fee>
+                    ></app-fee-calculation> -->
+
+                    <!-- <app-performance-fee
+                        *ngIf="index !== 0 && tab.resultType === 'Performance Fees'"
+                        style="display: block; height: calc(100vh - 64px - 50px);"
+                        (status)="statusReceived($event, index)"
+                        [calcParams] = "calcParamsMap[tab.displayName]"
+                    ></app-performance-fee> -->
                </mat-tab>
             </mat-tab-group>
 

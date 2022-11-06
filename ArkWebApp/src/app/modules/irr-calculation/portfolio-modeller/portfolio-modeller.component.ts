@@ -19,10 +19,18 @@ import cryptoRandomString from 'crypto-random-string';
 import { first, switchMap, takeUntil } from 'rxjs/operators';
 
 type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`
+// type EmitParams = {
+//   tabName: string,
+//   tabType: TabType,
+//   calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams
+// }
 type EmitParams = {
-  tabName: string,
-  tabType: TabType,
-  calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams
+  parentDisplayName: string,
+  tabs:{
+    tabName: string,
+    tabType: TabType,
+    calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams
+  }[]
 }
 export type LoadStatusType = `Loading` | `Loaded` | `Failed`;
 let adaptable_Api: AdaptableApi
@@ -204,23 +212,33 @@ export class PortfolioModellerComponent implements OnInit {
     if(!modelID)
       console.error(`Model ID not received`)
       
-    // Set calculation param configs and open all the tabs first
-    context.forEach(e => {
-        switch (e) {
+    let calcParamsData = []
+    if(context.includes('SaveRunIRR'))
+      calcParamsData.push({ runID: runID, type: 'IRR' })
+    if(context.includes('SaveRunMReturns'))
+      calcParamsData.push({ runID: runID, type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
+    if(context.includes('SaveRunPFees'))
+      calcParamsData.push({ runID: runID, type: 'Performance Fees', feePreset: contextData?.feePreset })
+    console.log(modelID)
+    this.multiCalculationStaging(this.modelMap[this.selectedModelID]?.modelName,calcParamsData)
 
-          case 'SaveRunPFees':
-            this.calculationStaging({ runID: runID, type: 'Performance Fees', feePreset: contextData?.feePreset })
-            break;
-          case 'SaveRunMReturns':
-            this.calculationStaging({ runID: runID, type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
-            break;  
-          case 'SaveRunIRR':
-            this.calculationStaging({ runID: runID, type: 'IRR'})
-            break;
-          default:
-            break;
-        }
-    });
+    // Set calculation param configs and open all the tabs first
+    // context.forEach(e => {
+    //     switch (e) {
+
+    //       case 'SaveRunPFees':
+    //         this.calculationStaging({ runID: runID, type: 'Performance Fees', feePreset: contextData?.feePreset })
+    //         break;
+    //       case 'SaveRunMReturns':
+    //         this.calculationStaging({ runID: runID, type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
+    //         break;  
+    //       case 'SaveRunIRR':
+    //         this.calculationStaging({ runID: runID, type: 'IRR'})
+    //         break;
+    //       default:
+    //         break;
+    //     }
+    // });
 
     // Create params for generating cashflows and trigger the virtual model cashflow generator
     let m = <IRRCalcParams> {};
@@ -302,12 +320,26 @@ export class PortfolioModellerComponent implements OnInit {
         if(modelID)
         this.saveModelCashflowsAndOpenTabs(modelID, context, runID, contextData);
 
+        // if(!!modelID && context.includes('SaveRunIRR')){
+        //   // this.calcIRR();
+        //   this.calculationStaging({ type: 'IRR' })
+        // }
+        // if(!!modelID && context.includes('SaveRunMReturns')){
+        //   this.calculationStaging({ type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
+        //   // this.calcReturns(contextData?.baseMeasure);
+
+        // }
+        // if(!!modelID && context.includes('SaveRunPFees')){
+        //   this.calculationStaging({ type: 'Performance Fees', feePreset: contextData?.feePreset })
+        //   // this.calcPerfFees(contextData?.feePreset);
+        // }
       },
       error: error => {
         console.error(`Failed to fetch Portfolio Rules: ${error}`)
       }
     }))
   }
+
 
   InitModelMap(){
     this.modelMap = {};
@@ -682,6 +714,24 @@ export class PortfolioModellerComponent implements OnInit {
     }))
   }
 
+  multiCalculationStaging(parentDisplayName,calcStagingData: {
+    runID: string,
+    type: TabType,
+    baseMeasure?: string,
+    feePreset?: string
+  }[]) {
+    let calcParamsEmitterData = []
+    calcStagingData.forEach((stagingData)=>{
+      let _ = this.calculationStaging(stagingData)
+      calcParamsEmitterData.push(_)
+    })
+    //this.calcParamsEmitter.emit({calcParams: calcParams, tabName: tabName, tabType: tabType});
+    this.calcParamsEmitter.emit({
+      parentDisplayName: parentDisplayName,
+      tabs:calcParamsEmitterData
+    })
+  }
+
   calculationStaging(p: {
     runID: string,
     type: TabType,
@@ -727,12 +777,13 @@ export class PortfolioModellerComponent implements OnInit {
     calcParams.asOfDate = this.asOfDate;
     calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
 
-    tabName = (p.type !== 'IRR') ? p.type : calcParams.modelName;
+    tabName = p.type
+    //tabName = (p.type !== 'IRR') ? p.type : calcParams.modelName;
     tabType = p.type;
+    let tabData = {calcParams: calcParams, tabName: tabName, tabType: tabType}
+    return tabData
+    //this.calcParamsEmitter.emit({calcParams: calcParams, tabName: tabName, tabType: tabType});
 
-    setTimeout(() => {
-      this.calcParamsEmitter.emit({calcParams: calcParams, tabName: tabName, tabType: tabType});
-    }, 5000)
   }
 
   // /** 
