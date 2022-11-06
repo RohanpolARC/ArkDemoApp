@@ -49,7 +49,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   }[] = []
   baseMeasures: { baseMeasure: string, id: number }[]
   feePresets: { feePreset: string, id: number }[]
-  calculationTypes: string[]= ['IRR','Monthly Returns','Fee Model']
+  calculationTypes: string[]= ['Monthly Returns','Fee Model','IRR']
   readMore: boolean = false;
   isIRRDisabled: boolean = true;
   isFeePresetDisabled: boolean = true;

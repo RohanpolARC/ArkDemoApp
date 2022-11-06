@@ -1,4 +1,4 @@
-import { ColDef, GridOptions, GridReadyEvent, IAggFuncParams, ValueFormatterParams } from '@ag-grid-community/core';
+import { ColDef, GridOptions, GridReadyEvent, IAggFuncParams, Module, ValueFormatterParams } from '@ag-grid-community/core';
 import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
@@ -24,6 +24,7 @@ export class MonthlyReturnsComponent implements OnInit {
   gridOptionsMonthlyRets: GridOptions
   monthlyReturns
 
+  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   modelName: string
   baseMeasure: string
   asOfDate: string

@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
+import { LoadStatusType } from './portfolio-modeller/portfolio-modeller.component';
 
 @Component({
   selector: 'app-irr-calculation',
@@ -32,8 +33,8 @@ export class IrrCalculationComponent implements OnInit {
   }];
 
   selected = new FormControl(0);
-
   calcParamsMap = {} //<model name, IRRCalcParams>
+  cashflowLoadStatus: LoadStatusType = 'Loading';
 
   removeTab(index: number) {
     this.tabs.splice(index, 1);
@@ -79,6 +80,10 @@ export class IrrCalculationComponent implements OnInit {
     this.tabs.push(newTab);    
     this.selected.setValue(this.tabs.indexOf(newTab))
     this.calcParamsMap[newTab.displayName] = p.calcParams;
+  }
+
+  cashflowLoadStatusReceived(status: LoadStatusType){
+    this.cashflowLoadStatus = status;
   }
 
   // irrCalcParamsReceived(params: IRRCalcParams){

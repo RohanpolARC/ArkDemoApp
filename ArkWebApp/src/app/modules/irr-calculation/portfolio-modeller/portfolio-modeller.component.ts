@@ -5,7 +5,7 @@ import { Component, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, timer } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { amountFormatter, removeDecimalFormatter, formatDate } from 'src/app/shared/functions/formatter';
@@ -15,6 +15,8 @@ import { AggridMaterialDatepickerComponent } from '../../facility-detail/aggrid-
 import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/portfolio-save-run-model.component';
 import { getLastBusinessDay, getMomentDateStr, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
+import cryptoRandomString from 'crypto-random-string';
+import { first, switchMap, takeUntil } from 'rxjs/operators';
 
 type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`
 type EmitParams = {
@@ -22,7 +24,7 @@ type EmitParams = {
   tabType: TabType,
   calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams
 }
-
+export type LoadStatusType = `Loading` | `Loaded` | `Failed`;
 let adaptable_Api: AdaptableApi
 
 @Component({
@@ -31,6 +33,7 @@ let adaptable_Api: AdaptableApi
   styleUrls: ['./portfolio-modeller.component.scss']
 })
 export class PortfolioModellerComponent implements OnInit {
+  closeTimer: Subject<any> = new Subject<any>();
 
   constructor(
     private dataSvc: DataService,
@@ -39,6 +42,7 @@ export class PortfolioModellerComponent implements OnInit {
   ) { }
 
   @Output() calcParamsEmitter = new EventEmitter<EmitParams>();
+  // @Output() cashflowLoadStatusEmitter = new EventEmitter<LoadStatusType>(false);
 
   multiSelectPlaceHolder: string = null;
   dropdownSettings: IDropdownSettings = null;
@@ -192,7 +196,100 @@ export class PortfolioModellerComponent implements OnInit {
     }
   }
 
-  fetchPortfolioModels(modelID?: number, context: string[] = ['SaveRunIRR'], contextData: {  //changes context type from string to string[]
+  saveModelCashflowsAndOpenTabs(modelID?: number, context: string[] = ['SaveRunIRR'], runID: string = null, contextData: {  //changes context type from string to string[]
+    baseMeasure?: string,
+    feePreset?: string
+  } = null){
+
+    if(!modelID)
+      console.error(`Model ID not received`)
+      
+    // Set calculation param configs and open all the tabs first
+    context.forEach(e => {
+        switch (e) {
+
+          case 'SaveRunPFees':
+            this.calculationStaging({ runID: runID, type: 'Performance Fees', feePreset: contextData?.feePreset })
+            break;
+          case 'SaveRunMReturns':
+            this.calculationStaging({ runID: runID, type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
+            break;  
+          case 'SaveRunIRR':
+            this.calculationStaging({ runID: runID, type: 'IRR'})
+            break;
+          default:
+            break;
+        }
+    });
+
+    // Create params for generating cashflows and trigger the virtual model cashflow generator
+    let m = <IRRCalcParams> {};
+    m.runID = runID;
+    m.asOfDate = this.asOfDate;
+    m.modelID = modelID;
+    m.positionIDs = this.selectedPositionIDs;
+
+    // this.irrCalcService.cashflowStatusMap[runID] = 'Loading';
+    this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loading' })
+
+    this.irrCalcService.getPositionCashflows(m).pipe(first()).subscribe({
+      next: resp => {
+
+        // this.cashflowLoadStatusEmitter.emit(`Loading`);
+        timer(0, 10000).pipe(
+          switchMap(() => this.irrCalcService.getIRRStatus(resp?.['statusQueryGetUri'])),
+          takeUntil(this.closeTimer)
+        ).subscribe({
+          next: (res: any) => {
+
+            if(res?.['runtimeStatus'] === 'Completed'){
+
+              // this.irrCalcService.cashflowStatusMap[runID] = 'Loaded';
+              this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loaded' })
+              this.dataSvc.setWarningMsg(`Generated ${res['output']} cashflows for the selected model`, `Dismiss`, `ark-theme-snackbar-normal`);
+
+              this.closeTimer.next();
+              // this.cashflowLoadStatusEmitter.emit(`Loaded`);
+
+            }
+            else if(res?.['runtimeStatus'] === 'Failed'){
+
+              // this.irrCalcService.cashflowStatusMap[runID] = 'Failed';
+              this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Failed' })
+              
+              this.dataSvc.setWarningMsg(`Failed to generate the cashflows`, `Dismiss`, `ark-theme-snackbar-error`);
+              this.closeTimer.next();
+              // this.cashflowLoadStatusEmitter.emit(`Failed`);
+            }
+          }
+        })
+      },
+      error: error => {
+        // this.irrCalcService.cashflowStatusMap[runID] = 'Failed';
+        this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Failed' });
+        console.error(`Error in saving cashflows to DB: ${error}`);
+        this.closeTimer.next();
+        // this.cashflowLoadStatusEmitter.emit(`Failed`)
+      } 
+    })
+
+    // if(!!modelID && context.includes('SaveRunIRR')){
+    //   // this.calcIRR();
+    //   this.calculationStaging({ runID: runID, type: 'IRR' })
+    // }
+    // if(!!modelID && context.includes('SaveRunMReturns')){
+    //   this.calculationStaging({ runID: runID, type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
+    //   // this.calcReturns(contextData?.baseMeasure);
+
+    // }
+    // if(!!modelID && context.includes('SaveRunPFees')){
+    //   this.calculationStaging({ runID: runID, type: 'Performance Fees', feePreset: contextData?.feePreset })
+    //   // this.calcPerfFees(contextData?.feePreset);
+    // }
+
+  }
+
+  fetchPortfolioModels(modelID?: number, context: string[] = ['SaveRunIRR'], runID: string = null, contextData: {  //changes context type from string to string[]
     baseMeasure?: string,
     feePreset?: string
   } = null){
@@ -201,19 +298,10 @@ export class PortfolioModellerComponent implements OnInit {
         this.parseFetchedModels(data);
         this.InitModelMap()
         this.setSelectedModel(modelID)
-        if(!!modelID && context.includes('SaveRunIRR')){
-          // this.calcIRR();
-          this.calculationStaging({ type: 'IRR' })
-        }
-        if(!!modelID && context.includes('SaveRunMReturns')){
-          this.calculationStaging({ type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
-          // this.calcReturns(contextData?.baseMeasure);
 
-        }
-        if(!!modelID && context.includes('SaveRunPFees')){
-          this.calculationStaging({ type: 'Performance Fees', feePreset: contextData?.feePreset })
-          // this.calcPerfFees(contextData?.feePreset);
-        }
+        if(modelID)
+        this.saveModelCashflowsAndOpenTabs(modelID, context, runID, contextData);
+
       },
       error: error => {
         console.error(`Failed to fetch Portfolio Rules: ${error}`)
@@ -568,9 +656,13 @@ export class PortfolioModellerComponent implements OnInit {
         if(res?.isSuccess){
           this.selectedModelID = dialogRef.componentInstance.modelID
 
+          // Generating runID to track all calc runs under this context. 
+          let runID: string = cryptoRandomString({length: 50});
+          
           this.fetchPortfolioModels(
             dialogRef.componentInstance.modelID,
             res.context,
+            runID,
             {
               baseMeasure: res?.['baseMeasure'],
               feePreset: res?.['feePreset']
@@ -591,6 +683,7 @@ export class PortfolioModellerComponent implements OnInit {
   }
 
   calculationStaging(p: {
+    runID: string,
     type: TabType,
     baseMeasure?: string,
     feePreset?: string
@@ -598,14 +691,7 @@ export class PortfolioModellerComponent implements OnInit {
 
     let calcParams
     let tabName: string, tabType: TabType
-    if(p.type === 'IRR'){
-      let cp = <IRRCalcParams> {};
-      cp.positionIDs = this.selectedPositionIDs;
-      cp.irrAggrType = this.modelMap[this.selectedModelID]?.irrAggrType;
-
-      calcParams = cp as IRRCalcParams
-    }
-    else if(p.type === 'Monthly Returns'){
+    if(p.type === 'Monthly Returns'){
       let cp = <MonthlyReturnsCalcParams> {};
       cp.baseMeasure = p.baseMeasure;
       let positionIDsSTR: string = ''
@@ -621,17 +707,32 @@ export class PortfolioModellerComponent implements OnInit {
       let cp = <PerfFeesCalcParams> {};
       cp.positionIDs = this.selectedPositionIDs;
       cp.feePreset = p.feePreset;
+      cp.modelID = this.selectedModelID,
+
 
       calcParams = cp as PerfFeesCalcParams
     }
+    else if(p.type === 'IRR'){
+      let cp = <IRRCalcParams> {};
+      cp.positionIDs = this.selectedPositionIDs;
+      cp.irrAggrType = this.modelMap[this.selectedModelID]?.irrAggrType;
+      cp.modelID = this.isLocal.value ? this.selectedModelID : null,
 
+
+      calcParams = cp as IRRCalcParams
+    }
+
+
+    calcParams.runID = p.runID;
     calcParams.asOfDate = this.asOfDate;
-    calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
     calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
 
     tabName = (p.type !== 'IRR') ? p.type : calcParams.modelName;
     tabType = p.type;
-    this.calcParamsEmitter.emit({calcParams: calcParams, tabName: tabName, tabType: tabType});
+
+    setTimeout(() => {
+      this.calcParamsEmitter.emit({calcParams: calcParams, tabName: tabName, tabType: tabType});
+    }, 5000)
   }
 
   // /** 

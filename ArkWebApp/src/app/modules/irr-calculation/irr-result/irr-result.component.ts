@@ -9,6 +9,7 @@ import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.ser
 import { amountFormatter, noDecimalAmountFormatter, nonAmountNumberFormatter2Dec } from 'src/app/shared/functions/formatter';
 import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/utilities';
 import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
+import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
 
 @Component({
   selector: 'app-irr-result',
@@ -18,7 +19,10 @@ import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 export class IrrResultComponent implements OnInit {
 
   @Input() calcParams: IRRCalcParams;
-  @Output() status = new EventEmitter<string>();
+  @Output() status = new EventEmitter<LoadStatusType>();
+
+  runID: string
+  closeStream: Subject<any> = new Subject<any>();
 
   aggregationType: string
   subscriptions: Subscription[] = []
@@ -268,51 +272,74 @@ export class IrrResultComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.Init();
+  
+    // setTimeout(function() {
+      this.Init();
+    // }, 5000)
+
+    this.irrCalcSvc.cashflowLoadStatusEvent.pipe(takeUntil(this.closeStream)).subscribe(
+      e => {
+        if(e.runID === this.runID && e.status === 'Loaded'){
+          this.closeStream.complete();
+
+          this.subscriptions.push(this.irrCalcSvc.getIRRCalculation(this.calcParams).subscribe({
+          next: response => {
+  
+            timer(0, 10000).pipe(
+              switchMap(() => this.irrCalcSvc.getIRRStatus(response?.['statusQueryGetUri'])),
+              takeUntil(this.closeTimer)
+            ).subscribe({
+              next: (res: any) => {
+  
+                if(res?.['runtimeStatus'] === 'Completed'){
+                  let calcs = []
+                  for(let i = 0 ; i < res?.['output'].length; i++){
+                    calcs.push({... res?.['output'][i].calcHelper, ... res?.['output'][i].MapGroupColValues, ... res?.['output'][i].paggr})
+                  }
+                  this.calcs = calcs
+                  this.status.emit('Loaded')
+  
+                  this.closeTimer.next();
+                }
+                else if(res?.['runtimeStatus'] === 'Failed'){
+                  this.closeTimer.next();
+                  this.status.emit('Failed')
+                  this.calcs = [];
+                }
+              }
+            })
+          },
+          error: error => {
+            this.closeTimer.next();
+            this.status.emit('Failed')
+            this.calcs = []
+            console.error(`Failed to fetch response: ${error}`);
+          }
+        }))  
+        }
+      }
+    )
   }
 
   ngOnChanges(changes: SimpleChanges){
+
+
     if(this.calcParams !== null){
+      this.runID = this.calcParams.runID;
+
       this.asOfDate = this.calcParams.asOfDate;
       this.positionIDs = this.calcParams.positionIDs;
       this.modelID = this.calcParams.modelID;
       this.modelName = this.calcParams.modelName;
       this.aggregationType = this.calcParams.irrAggrType
       
-      this.subscriptions.push(this.irrCalcSvc.getIRRCalculation(this.calcParams).subscribe({
-        next: response => {
+      // // Put valid condition to test against the runID from status map in service.
+      // if(false){
 
-          timer(0, 10000).pipe(
-            switchMap(() => this.irrCalcSvc.getIRRStatus(response?.['statusQueryGetUri'])),
-            takeUntil(this.closeTimer)
-          ).subscribe({
-            next: (res: any) => {
-
-              if(res?.['runtimeStatus'] === 'Completed'){
-                let calcs = []
-                for(let i = 0 ; i < res?.['output'].length; i++){
-                  calcs.push({... res?.['output'][i].calcHelper, ... res?.['output'][i].MapGroupColValues, ... res?.['output'][i].paggr})
-                }
-                this.calcs = calcs
-                this.status.emit('Loaded')
-
-                this.closeTimer.next();
-              }
-              else if(res?.['runtimeStatus'] === 'Failed'){
-                this.closeTimer.next();
-                this.status.emit('Failed')
-                this.calcs = [];
-              }
-            }
-          })
-        },
-        error: error => {
-          this.closeTimer.next();
-          this.status.emit('Failed')
-          this.calcs = []
-          console.error(`Failed to fetch response: ${error}`);
-        }
-      }))
+      // }
+      // else if(false){
+      //   this.status.emit(`Failed`);
+      // }
     }
   }
 
@@ -325,5 +352,6 @@ export class IrrResultComponent implements OnInit {
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApi = adaptableApi;
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
+    console.log("IRR Adaptable is ready")
   }
 }
