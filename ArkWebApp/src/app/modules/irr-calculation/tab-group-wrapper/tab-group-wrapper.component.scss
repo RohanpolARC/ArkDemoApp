@@ -1,32 +1,37 @@
-.highlight{
-    color: black !important;
-    // font-weight: bold;
-    // background-color: #0590ca;
-}
+// .highlight{
+//     color: black !important;
+//     font-weight: bold;
+// }
 
+
+/* 
+  Reference: https://stackoverflow.com/a/66213227 
+*/
 ::ng-deep {
     .mat-tab-label-active {
       color: black;
-    //   background-color: #0590ca;
-    //   font-weight: bold;
+      // background-color: white;
+      // opacity: 1;
+      // // border: 2px solid #0590ca;
+      font-weight: bold;
     }
 
-    .mat-tab-labels {
-      border-bottom: 2px solid #0590ca;
-    }
+    // .mat-tab-labels {
+    //   // border-bottom: 2px solid #0590ca;
+    // }
 
-    .mat-tab-group.mat-primary .mat-ink-bar {
-      background-color:transparent;
-      box-sizing: border-box;
-      border-top: 2px solid #0590ca;
-      border-left: 2px solid #0590ca;
-      border-right: 2px solid #0590ca;
-      border-bottom: 2px solid #0590ca;
-      height: 50px;
-    }
+    // .mat-tab-group.mat-primary .mat-ink-bar {
+    //   background-color:transparent;
+    //   box-sizing: border-box;
+    //   // border-top: 2px solid #0590ca;
+    //   // border-left: 2px solid #0590ca;
+    //   // border-right: 2px solid #0590ca;
+    //   // border-bottom: 2px solid #0590ca;
+    //   height: 50px;
+    // }
 
-    .mat-tab-nav-bar,
-    .mat-tab-header {
-      border-bottom: none;
-    }
+    // .mat-tab-nav-bar,
+    // .mat-tab-header {
+    //   border-bottom: none;
+    // }
   }

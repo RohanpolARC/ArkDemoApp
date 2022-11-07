@@ -1,7 +1,7 @@
 <div class="parent">
 
             <mat-tab-group [selectedIndex]="selected.value" 
-               (selectedIndexChange)="selected.setValue($event)" style="margin-right: 32px; width: 100vw;" [backgroundColor]="">
+               (selectedIndexChange)="selected.setValue($event)" style="margin-right: 32px; width: 100vw;" >
                 <mat-tab *ngFor="let parenttab of parenttabs; let index = index" [label]="parenttab.parentDisplayName">
                     <ng-template mat-tab-label>
                         
