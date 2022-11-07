@@ -57,6 +57,7 @@ export class FeePresetsGridComponent implements OnInit {
       ]
 
     ]
+
   }
 
   ngOnChanges(changes: SimpleChanges){
@@ -68,11 +69,12 @@ export class FeePresetsGridComponent implements OnInit {
 
         let D = []
 
-        console.log(d)
         D.push({ ...d[0][0],...d[1][0] })
         this.rowData = D;
 
         console.log(D)
+        
+        console.log(this.columnDefs)
       });
     }
   }

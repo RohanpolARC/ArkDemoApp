@@ -14,12 +14,12 @@ import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.compone
 export class PerformanceFeeComponent implements OnInit {
 
   @Input() calcParams: PerfFeesCalcParams;
-  @Input() cashflowLoadStatus: LoadStatusType;
   @Output() status = new EventEmitter<LoadStatusType>();
 
   feeSmy: any[] | null
   feeCashflows: any[] | null
 
+  loadingStatus: LoadStatusType = 'Loading';
   runID: string
   asOfDate: string
   feePreset: string
@@ -40,6 +40,7 @@ export class PerformanceFeeComponent implements OnInit {
           this.feeCalcSvc.fetchFeeCashflows(this.asOfDate, this.feePreset, this.positionIDs, this.calcParams.runID);
 
           this.feeCalcSvc.isCalculationLoaded.pipe(first()).subscribe(d => {
+            this.loadingStatus = 'Loaded';
             this.feeSmy = d.feeSmy;
             this.feeCashflows = d.feeCashflows;
       
@@ -60,10 +61,6 @@ export class PerformanceFeeComponent implements OnInit {
     this.positionIDs = this.calcParams.positionIDs;
     this.modelID = this.calcParams.modelID;
 
-    // Commenting out until we get position cashflows workflow set
-    if(this.calcParams && this.cashflowLoadStatus === 'Loaded'){
-      
-    }
   }
 
 }

@@ -36,15 +36,16 @@ export class FeeCashflowsComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges){
-    if(changes?.['feeCashflows']){
-      if(changes['feeCashflows'].currentValue == null){
-        this.gridApi?.showLoadingOverlay();
-      }
-      else if(changes['feeCashflows'].currentValue != null){
-        this.gridApi?.hideOverlay();
-      }
-    }
-    else if(changes?.['status'].currentValue){
+    // if(changes?.['feeCashflows']){
+    //   if(changes['feeCashflows'].currentValue == null){
+    //     this.gridApi?.showLoadingOverlay();
+    //   }
+    //   else if(changes['feeCashflows'].currentValue != null){
+    //     this.gridApi?.hideOverlay();
+    //   }
+    // }
+    // else
+     if(changes?.['status'].currentValue){
       if(this.status === 'Loading')
         this.gridApi.showLoadingOverlay();
       else 
@@ -132,7 +133,10 @@ export class FeeCashflowsComponent implements OnInit {
       },
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel();
-        this.gridApi = params.api;        
+        this.gridApi = params.api;       
+        if(this.status === 'Loading'){
+          this.gridApi.showLoadingOverlay();
+        } 
       },
       excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     }
