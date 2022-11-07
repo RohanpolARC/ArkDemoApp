@@ -435,9 +435,13 @@ export class PortfolioModellerComponent implements OnInit {
         }
       },
 
+      layoutOptions: {
+        autoSaveLayouts: false
+      },
+
       predefinedConfig: {  
         Dashboard: {
-          Revision: 3,
+          Revision: 4,
           ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
@@ -448,7 +452,7 @@ export class PortfolioModellerComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 5,
+          Revision: 6,
           CurrentLayout: 'Manual',
           Layouts: [
           {
@@ -847,6 +851,7 @@ export class PortfolioModellerComponent implements OnInit {
     /** Here, we clear all filters applied on the grid, overrides, toggles etc.*/
 
     console.log(adaptable_Api?.filterApi.getActiveColumnFilters());
+    adaptable_Api.filterApi.clearColumnFilters();
     
 
     this.selectedDropdownData = [];
@@ -950,6 +955,7 @@ export class PortfolioModellerComponent implements OnInit {
     this.selectedModelID = event.modelID
 
     adaptable_Api.filterApi.clearColumnFilters();
+    this.gridApi.deselectAll();
     this.selectedPositionIDs = []
 
     /** On model selection, data will be refetched with overrides, hence we do not want to programmatically set it again, hence emitEvent: false */
