@@ -851,7 +851,7 @@ export class PortfolioModellerComponent implements OnInit {
     /** Here, we clear all filters applied on the grid, overrides, toggles etc.*/
 
     console.log(adaptable_Api?.filterApi.getActiveColumnFilters());
-    adaptable_Api.filterApi.clearColumnFilters();
+    adaptable_Api?.filterApi?.clearColumnFilters();
     
 
     this.selectedDropdownData = [];

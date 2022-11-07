@@ -5,8 +5,12 @@ export const environment = {
   tenantId: '1aca2fbe-6078-4dfb-8c1f-9d98d6245214',  
   uiClienId: '9a06035c-d10f-4b52-817d-8cc7583721a1',  
   redirectUrl: 'https://arcwebuat.azurewebsites.net',
+
   arkFunctionUrl: 'https://irrcalcfunuatnew.azurewebsites.net',
-  // arkFunctionUrl: 'https://feecalcfuncuat.azurewebsites.net',
   arkFunctionScopeUri: ['api://1ade3513-1077-49b7-838d-681c7ea8f3a3/arc-irr-func'],
+
+  feeCalcFunctionUrl: 'https://feecalcfuncuat.azurewebsites.net',
+  feeCalcFunctionScopeUri: ['api://57d373b0-5305-4b6b-a3f7-ccdc0a4560ca/ark-fee-func']
+
  
 };

@@ -37,13 +37,13 @@ export class FeeCalculationService {
 
   public getFeeCalculation(model: FeeCalcParams){
     return this.http.post<any>(`${APIConfig.FEE_RUN_CALCS_API}`, model, { 
-      context: new HttpContext().set(RESOURCE_CONTEXT, 'IRRCalculatorFunction') 
+      context: new HttpContext().set(RESOURCE_CONTEXT, 'FeeCalculatorFunction') 
     }).pipe(catchError((ex) => throwError(ex)))
   }
 
   public getFeeCalcStatus(uri: string){
     return this.http.get<any>(`${uri}`, { 
-      context: new HttpContext().set(RESOURCE_CONTEXT, 'IRRCalculatorFunction') 
+      context: new HttpContext().set(RESOURCE_CONTEXT, 'FeeCalculatorFunction') 
     }).pipe(catchError((ex) => throwError(ex)))
   }
 
