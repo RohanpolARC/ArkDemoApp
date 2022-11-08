@@ -48,7 +48,8 @@ export const protectedResourceMap: any =
   [  
     // ["https://graph.microsoft.com/v1.0/me", ["user.read", "profile"]],
     [environment.baseUrl, environment.scopeUri  ],
-    [environment.arkFunctionUrl, environment.arkFunctionScopeUri]  
+    [environment.arkFunctionUrl, environment.arkFunctionScopeUri],
+    [environment.feeCalcFunctionUrl, environment.feeCalcFunctionScopeUri]  
   ];  
 
 export function loggerCallback(logLevel: LogLevel, message: string) {

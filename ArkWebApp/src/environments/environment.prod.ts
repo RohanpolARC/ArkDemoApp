@@ -6,5 +6,9 @@ export const environment = {
   uiClienId: '6d8edbdf-e35f-4150-8e20-dbe7cf6f8c73',  
   redirectUrl: 'https://arkweb.azurewebsites.net',
   arkFunctionUrl: 'https://irrcalcfunc.azurewebsites.net',
-  arkFunctionScopeUri: ['api://036238e9-d968-4450-8831-bd0d4db803d4/ark-irr-func'] 
+  arkFunctionScopeUri: ['api://036238e9-d968-4450-8831-bd0d4db803d4/ark-irr-func'],
+
+  feeCalcFunctionUrl: 'https://feecalcfunc.azurewebsites.net',
+  feeCalcFunctionScopeUri: ['api://8784c404-ffb6-4110-8c5a-a67c473b9a23/ark-fee-func']
+ 
 };
