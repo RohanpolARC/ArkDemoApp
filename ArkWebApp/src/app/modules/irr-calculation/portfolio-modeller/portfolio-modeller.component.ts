@@ -247,63 +247,55 @@ export class PortfolioModellerComponent implements OnInit {
     m.modelID = modelID;
     m.positionIDs = this.selectedPositionIDs;
 
-    // this.irrCalcService.cashflowStatusMap[runID] = 'Loading';
-    this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loading' })
+    // Load cashflows only if running IRR/Performance fees
 
-    this.irrCalcService.getPositionCashflows(m).pipe(first()).subscribe({
-      next: resp => {
+    if(context.includes('SaveRunIRR') || context.includes('SaveRunPFees')){
+      
+      this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loading' })
 
-        // this.cashflowLoadStatusEmitter.emit(`Loading`);
-        timer(0, 10000).pipe(
-          switchMap(() => this.irrCalcService.getIRRStatus(resp?.['statusQueryGetUri'])),
-          takeUntil(this.closeTimer)
-        ).subscribe({
-          next: (res: any) => {
+      this.irrCalcService.getPositionCashflows(m).pipe(first()).subscribe({
+        next: resp => {
 
-            if(res?.['runtimeStatus'] === 'Completed'){
+          // this.cashflowLoadStatusEmitter.emit(`Loading`);
+          timer(0, 10000).pipe(
+            switchMap(() => this.irrCalcService.getIRRStatus(resp?.['statusQueryGetUri'])),
+            takeUntil(this.closeTimer)
+          ).subscribe({
+            next: (res: any) => {
 
-              // this.irrCalcService.cashflowStatusMap[runID] = 'Loaded';
-              this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loaded' })
-              this.dataSvc.setWarningMsg(`Generated ${res['output']} cashflows for the selected model`, `Dismiss`, `ark-theme-snackbar-normal`);
+              if(res?.['runtimeStatus'] === 'Completed'){
 
-              this.closeTimer.next();
-              // this.cashflowLoadStatusEmitter.emit(`Loaded`);
+                // this.irrCalcService.cashflowStatusMap[runID] = 'Loaded';
+                this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loaded' })
+                this.dataSvc.setWarningMsg(`Generated ${res['output']} cashflows for the selected model`, `Dismiss`, `ark-theme-snackbar-normal`);
 
+                this.closeTimer.next();
+                // this.cashflowLoadStatusEmitter.emit(`Loaded`);
+
+              }
+              else if(res?.['runtimeStatus'] === 'Failed'){
+
+                // this.irrCalcService.cashflowStatusMap[runID] = 'Failed';
+                this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Failed' })
+                
+                this.dataSvc.setWarningMsg(`Failed to generate the cashflows`, `Dismiss`, `ark-theme-snackbar-error`);
+                this.closeTimer.next();
+                // this.cashflowLoadStatusEmitter.emit(`Failed`);
+              }
             }
-            else if(res?.['runtimeStatus'] === 'Failed'){
+          })
+        },
+        error: error => {
+          // this.irrCalcService.cashflowStatusMap[runID] = 'Failed';
+          this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Failed' });
+          console.error(`Error in saving cashflows to DB: ${error}`);
+          this.closeTimer.next();
+          // this.cashflowLoadStatusEmitter.emit(`Failed`)
+        } 
+      })
 
-              // this.irrCalcService.cashflowStatusMap[runID] = 'Failed';
-              this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Failed' })
-              
-              this.dataSvc.setWarningMsg(`Failed to generate the cashflows`, `Dismiss`, `ark-theme-snackbar-error`);
-              this.closeTimer.next();
-              // this.cashflowLoadStatusEmitter.emit(`Failed`);
-            }
-          }
-        })
-      },
-      error: error => {
-        // this.irrCalcService.cashflowStatusMap[runID] = 'Failed';
-        this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Failed' });
-        console.error(`Error in saving cashflows to DB: ${error}`);
-        this.closeTimer.next();
-        // this.cashflowLoadStatusEmitter.emit(`Failed`)
-      } 
-    })
+    }
 
-    // if(!!modelID && context.includes('SaveRunIRR')){
-    //   // this.calcIRR();
-    //   this.calculationStaging({ runID: runID, type: 'IRR' })
-    // }
-    // if(!!modelID && context.includes('SaveRunMReturns')){
-    //   this.calculationStaging({ runID: runID, type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
-    //   // this.calcReturns(contextData?.baseMeasure);
-
-    // }
-    // if(!!modelID && context.includes('SaveRunPFees')){
-    //   this.calculationStaging({ runID: runID, type: 'Performance Fees', feePreset: contextData?.feePreset })
-    //   // this.calcPerfFees(contextData?.feePreset);
-    // }
 
   }
 
@@ -320,19 +312,6 @@ export class PortfolioModellerComponent implements OnInit {
         if(modelID)
         this.saveModelCashflowsAndOpenTabs(modelID, context, runID, contextData);
 
-        // if(!!modelID && context.includes('SaveRunIRR')){
-        //   // this.calcIRR();
-        //   this.calculationStaging({ type: 'IRR' })
-        // }
-        // if(!!modelID && context.includes('SaveRunMReturns')){
-        //   this.calculationStaging({ type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
-        //   // this.calcReturns(contextData?.baseMeasure);
-
-        // }
-        // if(!!modelID && context.includes('SaveRunPFees')){
-        //   this.calculationStaging({ type: 'Performance Fees', feePreset: contextData?.feePreset })
-        //   // this.calcPerfFees(contextData?.feePreset);
-        // }
       },
       error: error => {
         console.error(`Failed to fetch Portfolio Rules: ${error}`)
@@ -397,9 +376,7 @@ export class PortfolioModellerComponent implements OnInit {
         sortable: true,
         filter: true
       },
-      // components: {
-      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      // },
+
       rowGroupPanelShow: 'always',
       rowSelection: 'multiple',
       groupSelectsFiltered: true,
@@ -704,14 +681,6 @@ export class PortfolioModellerComponent implements OnInit {
               feePreset: res?.['feePreset']
             }
           )
-
-          // if(res?.context === 'SaveRunIRR')
-          //   this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context);
-          // if(res?.context === 'SaveRunMReturns')
-          //   this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context, { baseMeasure: res?.['baseMeasure']});
-          // if(res?.context === 'SaveRunPFees')
-          //   this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context, { feePreset: res?.['feePreset'] });
-
           this.updateLocalFields()
         }
       }
@@ -789,58 +758,6 @@ export class PortfolioModellerComponent implements OnInit {
     //this.calcParamsEmitter.emit({calcParams: calcParams, tabName: tabName, tabType: tabType});
 
   }
-
-  // /** 
-  //  * Opening new tab for Monthly Return in IRR Calculation and sending MonthlyReturnCalcParams as `@Input` to `<app-monthly-returns>` component.
-  //  *  Portfolio Modeller -> IRR Calculation -> Monthly Returns
-  // */
-  // calcReturns(baseMeasure: string){
-
-  //   let calcParams: MonthlyReturnsCalcParams = <MonthlyReturnsCalcParams> {};
-  //   calcParams.baseMeasure = baseMeasure;
-
-  //   let positionIDsSTR: string = ''
-  //   this.selectedPositionIDs.forEach(posID => {
-  //     positionIDsSTR += String(posID) + ','
-  //   })
-  //   positionIDsSTR = positionIDsSTR.slice(0, -1) // Remove last delimeter
-
-  //   calcParams.positionIDs = positionIDsSTR;
-  //   calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
-  //   calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
-  //   calcParams.asOfDate = this.asOfDate
-
-  //   this.calcParamsEmitter.emit()
-  // }
-
-  // calcPerfFees(feePreset: string){
-  //   let calcParams: PerfFeesCalcParams = <PerfFeesCalcParams> {};
-  //   calcParams.feePreset = feePreset;
-  //   calcParams.asOfDate = this.asOfDate;
-  //   calcParams.positionIDs = this.selectedPositionIDs;
-  //   calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
-  //   calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
-
-  //   let e: EmitParams;
-  //   e.calcParams = calcParams
-  //   this.calcParamsEmitter.emit(e);
-  // }
-
-  // /** 
-  //  * Opening new tab for IRR Result in IRR Calculation and sending IRRCalcParams as `@Input` to `<app-irr-result>` component.
-  //  *  Portfolio Modeller -> IRR Calculation -> IRR Result 
-  // */
-  // calcIRR(){
-
-  //   let calcParams: IRRCalcParams = <IRRCalcParams>{};
-  //   calcParams.asOfDate = this.asOfDate;
-  //   calcParams.positionIDs = this.selectedPositionIDs;
-  //   calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
-  //   calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
-  //   calcParams.irrAggrType = this.modelMap[this.selectedModelID]?.irrAggrType;
-
-  //   // this.calcParamsEmitter.emit(calcParams);
-  // }
 
   runIRRCalc(){
     this.onSavePortfolio('SaveRunIRR');
