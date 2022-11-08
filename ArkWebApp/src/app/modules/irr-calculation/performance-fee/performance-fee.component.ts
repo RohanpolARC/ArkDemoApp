@@ -49,6 +49,10 @@ export class PerformanceFeeComponent implements OnInit {
             else this.status.emit('Failed')
           })      
         }
+        else if(e.runID === this.runID && e.status === 'Failed'){
+          this.closeStream.next();
+          this.status.emit('Failed')
+        }
       }
     )
   }

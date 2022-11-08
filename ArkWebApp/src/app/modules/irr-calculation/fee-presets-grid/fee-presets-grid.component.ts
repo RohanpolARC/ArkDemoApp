@@ -30,6 +30,17 @@ export class FeePresetsGridComponent implements OnInit {
 
     this.columnDefs = this.feePresetSvc.columnDefs;
 
+    this.columnDefs = [
+      ...this.columnDefs,
+      ...[
+        { field: 'cashYield' },
+        { field: 'financingRate' },
+        { field: 'financingRatio' },
+        { field: 'totalYield' }
+      ]
+
+    ]
+
     this.gridOptions = {
       enableRangeSelection: true,
       columnDefs: this.columnDefs,
@@ -47,16 +58,6 @@ export class FeePresetsGridComponent implements OnInit {
       excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     }
 
-    this.columnDefs = [
-      ...this.columnDefs,
-      ...[
-        { field: 'cashYield' },
-        { field: 'financingRate' },
-        { field: 'financingRatio' },
-        { field: 'totalYield' }
-      ]
-
-    ]
 
   }
 
@@ -71,10 +72,7 @@ export class FeePresetsGridComponent implements OnInit {
 
         D.push({ ...d[0][0],...d[1][0] })
         this.rowData = D;
-
-        console.log(D)
         
-        console.log(this.columnDefs)
       });
     }
   }

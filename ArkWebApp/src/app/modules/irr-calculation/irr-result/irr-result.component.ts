@@ -315,7 +315,11 @@ export class IrrResultComponent implements OnInit {
             this.calcs = []
             console.error(`Failed to fetch response: ${error}`);
           }
-        }))  
+          }))  
+        }
+        else if(e.runID === this.runID && e.status === 'Failed'){
+          this.closeStream.complete();
+          this.status.emit('Failed')
         }
       }
     )
