@@ -1,5 +1,4 @@
 import { ColumnFilter, AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
-import { FiltersToolPanelModule } from '@ag-grid-enterprise/filter-tool-panel';
 import { ColDef, EditableCallbackParams, GridOptions, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi, Module } from '@ag-grid-community/core';
 import { Component, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
@@ -19,11 +18,7 @@ import cryptoRandomString from 'crypto-random-string';
 import { first, switchMap, takeUntil } from 'rxjs/operators';
 
 type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`
-// type EmitParams = {
-//   tabName: string,
-//   tabType: TabType,
-//   calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams
-// }
+
 type EmitParams = {
   parentDisplayName: string,
   tabs:{
@@ -50,7 +45,6 @@ export class PortfolioModellerComponent implements OnInit {
   ) { }
 
   @Output() calcParamsEmitter = new EventEmitter<EmitParams>();
-  // @Output() cashflowLoadStatusEmitter = new EventEmitter<LoadStatusType>(false);
 
   multiSelectPlaceHolder: string = null;
   dropdownSettings: IDropdownSettings = null;
@@ -177,7 +171,6 @@ export class PortfolioModellerComponent implements OnInit {
             data[i] = this.setDateFields(data[i], ['expectedDate', 'localExpectedDate', 'globalExpectedDate', 'maturityDate'])
           }  
 
-          console.log(adaptable_Api)
           adaptable_Api.gridApi.setGridData(data)
           if(this.selectedModelID){
             if(this.modelMap[this.selectedModelID].positionIDs){
@@ -213,32 +206,26 @@ export class PortfolioModellerComponent implements OnInit {
       console.error(`Model ID not received`)
       
     let calcParamsData = []
-    if(context.includes('SaveRunIRR'))
-      calcParamsData.push({ runID: runID, type: 'IRR' })
-    if(context.includes('SaveRunMReturns'))
-      calcParamsData.push({ runID: runID, type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
-    if(context.includes('SaveRunPFees'))
-      calcParamsData.push({ runID: runID, type: 'Performance Fees', feePreset: contextData?.feePreset })
-    console.log(modelID)
-    this.multiCalculationStaging(this.modelMap[this.selectedModelID]?.modelName,calcParamsData)
 
-    // Set calculation param configs and open all the tabs first
-    // context.forEach(e => {
-    //     switch (e) {
+    //Set calculation param configs and open all the tabs first
+    context.forEach(e => {
+        switch (e) {
 
-    //       case 'SaveRunPFees':
-    //         this.calculationStaging({ runID: runID, type: 'Performance Fees', feePreset: contextData?.feePreset })
-    //         break;
-    //       case 'SaveRunMReturns':
-    //         this.calculationStaging({ runID: runID, type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
-    //         break;  
-    //       case 'SaveRunIRR':
-    //         this.calculationStaging({ runID: runID, type: 'IRR'})
-    //         break;
-    //       default:
-    //         break;
-    //     }
-    // });
+          case 'SaveRunPFees':
+            calcParamsData.push({ runID: runID, type: 'Performance Fees', feePreset: contextData?.feePreset })
+            break;
+          case 'SaveRunMReturns':
+            calcParamsData.push({ runID: runID, type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
+            break;  
+          case 'SaveRunIRR':
+            calcParamsData.push({ runID: runID, type: 'IRR'})
+            break;
+          default:
+            break;
+        }
+    });
+
+    this.multiCalculationStaging(this.modelMap[this.selectedModelID]?.modelName, calcParamsData)
 
     // Create params for generating cashflows and trigger the virtual model cashflow generator
     let m = <IRRCalcParams> {};
@@ -256,7 +243,6 @@ export class PortfolioModellerComponent implements OnInit {
       this.irrCalcService.getPositionCashflows(m).pipe(first()).subscribe({
         next: resp => {
 
-          // this.cashflowLoadStatusEmitter.emit(`Loading`);
           timer(0, 10000).pipe(
             switchMap(() => this.irrCalcService.getIRRStatus(resp?.['statusQueryGetUri'])),
             takeUntil(this.closeTimer)
@@ -265,32 +251,23 @@ export class PortfolioModellerComponent implements OnInit {
 
               if(res?.['runtimeStatus'] === 'Completed'){
 
-                // this.irrCalcService.cashflowStatusMap[runID] = 'Loaded';
                 this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loaded' })
                 this.dataSvc.setWarningMsg(`Generated ${res['output']} cashflows for the selected model`, `Dismiss`, `ark-theme-snackbar-normal`);
-
                 this.closeTimer.next();
-                // this.cashflowLoadStatusEmitter.emit(`Loaded`);
-
               }
               else if(res?.['runtimeStatus'] === 'Failed'){
 
-                // this.irrCalcService.cashflowStatusMap[runID] = 'Failed';
-                this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Failed' })
-                
+                this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Failed' })               
                 this.dataSvc.setWarningMsg(`Failed to generate the cashflows`, `Dismiss`, `ark-theme-snackbar-error`);
                 this.closeTimer.next();
-                // this.cashflowLoadStatusEmitter.emit(`Failed`);
               }
             }
           })
         },
         error: error => {
-          // this.irrCalcService.cashflowStatusMap[runID] = 'Failed';
           this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Failed' });
           console.error(`Error in saving cashflows to DB: ${error}`);
           this.closeTimer.next();
-          // this.cashflowLoadStatusEmitter.emit(`Failed`)
         } 
       })
 
@@ -694,11 +671,12 @@ export class PortfolioModellerComponent implements OnInit {
     feePreset?: string
   }[]) {
     let calcParamsEmitterData = []
+    
     calcStagingData.forEach((stagingData)=>{
       let _ = this.calculationStaging(stagingData)
       calcParamsEmitterData.push(_)
     })
-    //this.calcParamsEmitter.emit({calcParams: calcParams, tabName: tabName, tabType: tabType});
+
     this.calcParamsEmitter.emit({
       parentDisplayName: parentDisplayName,
       tabs:calcParamsEmitterData
@@ -751,12 +729,9 @@ export class PortfolioModellerComponent implements OnInit {
     calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
 
     tabName = p.type
-    //tabName = (p.type !== 'IRR') ? p.type : calcParams.modelName;
     tabType = p.type;
     let tabData = {calcParams: calcParams, tabName: tabName, tabType: tabType}
     return tabData
-    //this.calcParamsEmitter.emit({calcParams: calcParams, tabName: tabName, tabType: tabType});
-
   }
 
   runIRRCalc(){
@@ -767,7 +742,6 @@ export class PortfolioModellerComponent implements OnInit {
   onReset(userAction: boolean = false){
     /** Here, we clear all filters applied on the grid, overrides, toggles etc.*/
 
-    console.log(adaptable_Api?.filterApi.getActiveColumnFilters());
     adaptable_Api?.filterApi?.clearColumnFilters();
     
 
@@ -789,8 +763,6 @@ export class PortfolioModellerComponent implements OnInit {
       if(userAction)
         this.updateGridOverrides('Clear');
     }
-
-    console.log(adaptable_Api?.filterApi.getActiveColumnFilters());
   }
 
   updateGridWithOverrides(overrideInfo: any){
@@ -919,8 +891,6 @@ export class PortfolioModellerComponent implements OnInit {
     adaptable_Api.toolPanelApi.closeAdapTableToolPanel();
     adaptable_Api.filterApi.clearColumnFilters();
 
-    console.log(adaptable_Api)
-
     this.subscriptions.push(this.irrCalcService.currentSearchDate.subscribe(asOfDate => {
       this.asOfDate = asOfDate;
     }));
@@ -937,8 +907,6 @@ export class PortfolioModellerComponent implements OnInit {
 
   onGridReady(params: GridReadyEvent){
     this.gridApi = params.api;
-
-    console.log(adaptable_Api)
   }
   
   parseFetchedModels(data){

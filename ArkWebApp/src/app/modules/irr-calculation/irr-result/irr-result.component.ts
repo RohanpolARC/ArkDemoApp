@@ -356,6 +356,5 @@ export class IrrResultComponent implements OnInit {
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApi = adaptableApi;
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
-    console.log("IRR Adaptable is ready")
   }
 }

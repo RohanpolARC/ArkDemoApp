@@ -67,19 +67,29 @@ export class FeePresetsService {
   constructor(private http: HttpClient) { }
 
   public getFundInvestmentData(fund: string){
-    return this.http.get(`${APIConfig.FEE_PRESET_INVESTMENT_GET_API}`, {
-      params: {
-        fundName: fund
-      }
-    })
+    if(fund){
+      return this.http.get(`${APIConfig.FEE_PRESET_INVESTMENT_GET_API}`, {
+        params: {
+          fundName: fund
+        }
+      })
+    }
+    else {
+      return this.http.get(`${APIConfig.FEE_PRESET_INVESTMENT_GET_API}`);
+    }
   }
 
   public getFundFeeData(fund?: string){
-    return this.http.get(`${APIConfig.FEE_PRESET_DATA_GET_API}`, {
-      params: {
-        fundName: fund
-      }
-    })
+    if(fund){
+      return this.http.get(`${APIConfig.FEE_PRESET_DATA_GET_API}`, {
+        params: {
+          fundName: fund
+        }
+      })
+    }
+    else{
+      return this.http.get(`${APIConfig.FEE_PRESET_DATA_GET_API}`)
+    }
   }
 
   public putFundInvestmentData(model){

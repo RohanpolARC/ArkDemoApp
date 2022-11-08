@@ -36,15 +36,7 @@ export class FeeCashflowsComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges){
-    // if(changes?.['feeCashflows']){
-    //   if(changes['feeCashflows'].currentValue == null){
-    //     this.gridApi?.showLoadingOverlay();
-    //   }
-    //   else if(changes['feeCashflows'].currentValue != null){
-    //     this.gridApi?.hideOverlay();
-    //   }
-    // }
-    // else
+
      if(changes?.['status'].currentValue){
       if(this.status === 'Loading')
         this.gridApi.showLoadingOverlay();
@@ -54,6 +46,7 @@ export class FeeCashflowsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    
     this.columnDefs = [
       { field: 'Date', tooltipField:  'Date', valueFormatter: dateFormatter, cellClass: 'dateUK', minWidth: 122, type: 'abColDefDate' },
       { field: 'NumberDays', tooltipField:  'NumberDays', type: 'abColDefNumber' },
@@ -121,7 +114,6 @@ export class FeeCashflowsComponent implements OnInit {
       { field: 'NAVActual', tooltipField:  'NAVActual', valueFormatter: amountFormatter, type: 'abColDefNumber' },
       { field: 'scale', tooltipField:  'scale', type: 'abColDefNumber' },
     ]
-
 
     this.gridOptions = {
       enableRangeSelection: true,

@@ -36,16 +36,7 @@ export class FeeCalculationSummaryComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges){
-    // if(changes?.['feeSmy']){
-    //   if(changes['feeSmy'].currentValue == null){
-    //     this.gridApi?.showLoadingOverlay();
-    //   }
-    //   else if(changes['feeSmy'].currentValue != null){
-    //     this.gridApi?.hideOverlay();
-    //   }
-    // }
-    // else 
-    console.log(changes)
+
     if(changes?.['status'].currentValue){
       if(changes?.['status'].currentValue === 'Loading')
         this.gridApi.showLoadingOverlay();

@@ -100,32 +100,21 @@ export class IrrCalculationComponent implements OnInit {
     ){
       let p = params.tabs
 
-    //let calcParamsArray = {}
     let newTabSet:tabset =[]
     p.forEach((tabData)=>{
-      // let cnt:number = 0
-      // this.parenttabs.forEach(
-      //   (parenttab)=>{
-      //     cnt+=parenttab.tabset.filter(tab =>tab.actualName === tabData.tabName).length
-      //   }
-      // )
-      // let displayName = (cnt !== 0) ? `${tabData.tabName} ${cnt + 1}`: `${tabData.tabName}`
+
       newTabSet.push({
         displayName: tabData.tabName,
         status: 'Loading',
         resultType: tabData.tabType,
         calcParams: tabData.calcParams
       })
-
-      //calcParamsArray[tabData.tabName] = tabData.calcParams;
-
     })
 
     let cnt = this.parenttabs.filter(pt=>pt.parentActualName===params.parentDisplayName).length
    
 
     let parentDisplayName = (cnt !== 0) ? `${params.parentDisplayName} ${cnt + 1}`: `${params.parentDisplayName}`
-    //this.calcParamsMap[parentDisplayName]  = calcParamsArray
 
     let newParentTab = {
       parentDisplayName:parentDisplayName ,
@@ -134,72 +123,12 @@ export class IrrCalculationComponent implements OnInit {
       tabset:newTabSet}
     this.parenttabs.push(newParentTab);    
     this.selected.setValue(this.parenttabs.indexOf(newParentTab))
-   
-
-    //let cnt: number = this.tabs.filter(tab => tab.actualName === p.tabName).length;
-    // let newTab = {
-    //   displayName: (cnt !== 0) ? `${p.tabName} ${cnt + 1}`: `${p.tabName}`,
-    //   actualName: p.tabName,
-    //   status: 'Loading',
-    //   resultType: p.tabType
-    // }
 
   }
 
   cashflowLoadStatusReceived(status: LoadStatusType){
     this.cashflowLoadStatus = status;
   }
-
-  // irrCalcParamsReceived(params: IRRCalcParams){
-  //   /** 
-  //    * Calc params received from Portfolio Modeller. Now, creating a new tab for these params with IRR-result inside it.
-  //   */
-
-  //   let cnt: number = this.tabs.filter(tab => tab.actualName === params.modelName).length;
-  //   let newTab = {
-  //     displayName: (cnt !== 0) ? `${params.modelName} ${cnt + 1}`: `${params.modelName}`,
-  //     actualName: `${params.modelName}`,
-  //     status: 'Loading',
-  //     resultType: 'IRR'
-  //   }
-  //   this.tabs.push(newTab);    
-  //   this.selected.setValue(this.tabs.indexOf(newTab))
-  //   this.calcParamsMap[newTab.displayName] = params;
-  // }
-
-  // returnsParamsReceived(params: MonthlyReturnsCalcParams){
-  //   /** Return params received from Portfolio Modeller. Now creating a new tab for these params with Monthly Returns inside it */
-
-  //   let tabName: string = `Monthly Returns`
-  //   let cnt: number = this.tabs.filter(tab => tab.actualName === tabName).length;
-  //   let newTab = {
-  //     displayName: (cnt !== 0) ? `${tabName} ${cnt + 1}`: `${tabName}`,
-  //     actualName: tabName,
-  //     status: 'Loading',
-  //     resultType: 'MonthlyReturns'
-  //   }
-  //   this.tabs.push(newTab);    
-  //   this.selected.setValue(this.tabs.indexOf(newTab))
-  //   this.calcParamsMap[newTab.displayName] = params;
-
-  // }
-
-  // /**
-  //  * Originally: 
-  //  * MonthlyReturns, IRR  
-  //  */
-  // createNewTab(tabName: string, params: PerfFeesCalcParams | MonthlyReturnsCalcParams | IRRCalcParams){
-  //   let cnt: number = this.tabs.filter(tab => tab.actualName === tabName).length;
-  //   let newTab = {
-  //     displayName: (cnt !== 0) ? `${tabName} ${cnt + 1}`: `${tabName}`,
-  //     actualName: tabName,
-  //     status: 'Loading',
-  //     resultType: tabName
-  //   }
-  //   this.tabs.push(newTab);    
-  //   this.selected.setValue(this.tabs.indexOf(newTab))
-  //   this.calcParamsMap[newTab.displayName] = params;
-  // }
 
   reRun(index: number){
     if(index >= 1){

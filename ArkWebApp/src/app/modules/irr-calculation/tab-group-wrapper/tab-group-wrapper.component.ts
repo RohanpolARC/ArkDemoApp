@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 
 type tabset = {
   displayName: string,
@@ -16,10 +15,6 @@ type tabset = {
 })
 export class TabGroupWrapperComponent implements OnInit {
 
-
-
-  //@Input() calcParamsMap
-  //@Input() pDisplayName
   @Input() parentTab:{
     parentDisplayName: string,
     parentActualName:string,
@@ -31,30 +26,20 @@ export class TabGroupWrapperComponent implements OnInit {
 
   pDisplayName
   subtabs: tabset
-
   selected = new FormControl(0);
-
 
   constructor() { }
 
-  ngOnInit(): void {
-  }
-
-  ngAfterViewInit(){
-    
-
-  }
+  ngOnInit(): void { }
 
   async ngOnChanges(changes: SimpleChanges){
     this.pDisplayName = this.parentTab.parentDisplayName
-    // this.subtabs = this.parentTab.tabset
-    // console.log(this.subtabs)
 
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
     let subtabs = this.parentTab.tabset;
-
     this.subtabs = []
+
     for(let i = 0; i < subtabs?.length; i+= 1 ){
 
       await sleep(500);
@@ -73,17 +58,12 @@ export class TabGroupWrapperComponent implements OnInit {
         this.status.emit(status)
     }
     if(completeCount===this.subtabs.length && status==='Loaded'){
-        //this.subtabs.includes()
         this.status.emit(status)
     }
   }
 
-  reRun(index: number){
-      //let displayName: string = this.subtabs[index].displayName //to be changed later
-      // let params = this.calcParamsMap[displayName]
-      // this.calcParamsMap[displayName] = null;
-      // this.calcParamsMap[displayName] = params
-  }
+  reRun(index: number){ }
+
   removeTab(index: number) {
     this.subtabs.splice(index, 1);
     if(this.subtabs.length===0){
