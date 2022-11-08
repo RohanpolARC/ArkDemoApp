@@ -1,0 +1,40 @@
+<div class="parent">
+    <div class="header">
+        <div class="title">
+            Performance Fees
+        </div>
+        <div class="action">
+    
+        </div>
+    </div>
+
+    <div class="content">
+        <mat-card class="mat-content" >
+
+                        <app-fee-calculation-summary [feeSmy] = "feeSmy" 
+                            [status] = "loadingStatus"
+                        ></app-fee-calculation-summary>                        
+
+                        <app-fee-cashflows [feeCashflows] = "feeCashflows" 
+                            [status] = "loadingStatus"
+                            style="height: calc(100vh - 285px - 110px);">
+                        </app-fee-cashflows>
+    
+            <!-- <mat-accordion>
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Fee Cashflows
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <app-fee-cashflows [feeCashflows] = "feeCalcSvc.rowDataCFs" class="ag-grid">
+                    </app-fee-cashflows>
+
+            
+                </mat-expansion-panel>
+            </mat-accordion> -->
+
+        </mat-card>
+    </div>
+</div>

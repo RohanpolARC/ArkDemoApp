@@ -48,8 +48,16 @@ export class MsalHttpInterceptor implements HttpInterceptor {
 
     let applicableScopes: string[] = environment.scopeUri
   
-    if(request.context.get(RESOURCE_CONTEXT) === 'IRRCalculatorFunction')
-      applicableScopes = environment.arkFunctionScopeUri
+    switch(request.context.get(RESOURCE_CONTEXT)) {
+      case 'IRRCalculatorFunction':
+        applicableScopes = environment.arkFunctionScopeUri
+        break;
+      case 'FeeCalculatorFunction':
+        applicableScopes = environment.feeCalcFunctionScopeUri
+        break;
+      default: 
+        break;
+    }
 
     try {
       const tokenResponse = this.msalSvc.acquireTokenSilent({

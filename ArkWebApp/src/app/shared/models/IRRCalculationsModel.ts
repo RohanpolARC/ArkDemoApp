@@ -20,17 +20,31 @@ export interface VPortfolioLocalOverrideModel{
 }
 
 export interface IRRCalcParams{
+    runID: string,
     asOfDate: string,
     positionIDs: number[],
     modelID: number,
     modelName: string,
-    irrAggrType: string // single type
+    // Optional since can be used to fetch PositionCashflows for the model
+    irrAggrType?: string // single type
 }
 
 export interface MonthlyReturnsCalcParams {
+    runID: string,
     positionIDs: string,
     baseMeasure: string,
     baseMeasureID: number,
+
+    modelID?: number,
+    modelName?: string,
+    asOfDate?: string
+}
+
+export interface PerfFeesCalcParams {
+    runID: string,
+    positionIDs: number[],
+    feePreset: string,
+    feePresetID: number,
 
     modelID?: number,
     modelName?: string,

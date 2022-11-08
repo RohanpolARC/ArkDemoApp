@@ -15,6 +15,7 @@ import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/u
 export class FeeCalculationSummaryComponent implements OnInit {
 
   @Input() feeSmy;
+  @Input() status: 'Loading' | 'Loaded' | 'Failed';
   
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   subscriptions: Subscription[] = []
@@ -35,13 +36,12 @@ export class FeeCalculationSummaryComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges){
-    if(changes?.['feeSmy']){
-      if(changes['feeSmy'].currentValue == null){
-        this.gridApi?.showLoadingOverlay();
-      }
-      else if(changes['feeSmy'].currentValue != null){
-        this.gridApi?.hideOverlay();
-      }
+
+    if(changes?.['status'].currentValue){
+      if(changes?.['status'].currentValue === 'Loading')
+        this.gridApi.showLoadingOverlay();
+      else 
+        this.gridApi.hideOverlay();
     }
   }
 
@@ -163,7 +163,10 @@ export class FeeCalculationSummaryComponent implements OnInit {
       defaultColDef: this.defaultColDef,
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel();
-        this.gridApi = params.api;        
+        this.gridApi = params.api;   
+        if(this.status === 'Loading'){
+          this.gridApi.showLoadingOverlay();
+        }     
       },
       excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     }

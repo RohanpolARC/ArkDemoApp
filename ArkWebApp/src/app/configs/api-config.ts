@@ -9,7 +9,8 @@ export class APIConfig {
     public static BASEURL: string = environment.baseUrl
     // public static IRRCALC_BASEURL: string = (/^.*localhost.*/.test(window.location.host) && window.location.port == "4200") ? "http://localhost:7071" : environment.irrCalcFunUrl;
 
-    public static ARK_FUNCTION_BASEURL: string = environment.arkFunctionUrl;
+    public static ARK_IRR_FUNCTION_BASEURL: string = environment.arkFunctionUrl;
+    public static ARK_FEE_FUNCTION_BASEURL: string = environment.feeCalcFunctionUrl;
 
     public static ARKWEB_ACCESSIBLE_TABS_GET_API: string = APIConfig.BASEURL + "/api/Access/GetTabs";
     public static ARKWEB_TABROLE_ASSOCIATION_GET_API: string = APIConfig.BASEURL + "/api/Access/GetRoleTabAssociation";
@@ -53,7 +54,7 @@ export class APIConfig {
     public static IRR_PORTFOLIO_MODEL_PUT_API: string = APIConfig.BASEURL + "/api/IRRCalculation/PutModel";
     public static IRR_PORTFOLIO_MODEL_GET_API: string = APIConfig.BASEURL + "/api/IRRCalculation/GetModel";
     public static IRR_LOCAL_OVERRIDES_GET_API: string = APIConfig.BASEURL + "/api/IRRCalculation/GetLocalOverrides";
-    public static IRR_RUN_CALCS_API: string = APIConfig.ARK_FUNCTION_BASEURL + "/api/IRRCalculatorFunction_HttpTrigger";
+    public static IRR_RUN_CALCS_API: string = APIConfig.ARK_IRR_FUNCTION_BASEURL + "/api/IRRCalculatorFunction_HttpTrigger";
 
     public static PORTFOLIO_MAPPING_GET_API: string = APIConfig.BASEURL + "/api/PortfolioManager/GetPortfolioMapping";
     public static PORTFOLIO_MAPPING_PUT_API: string = APIConfig.BASEURL + "/api/PortfolioManager/PutPortfolioMapping";
@@ -66,7 +67,8 @@ export class APIConfig {
 
     public static CONTRACT_HISTORY_GET_API: string = APIConfig.BASEURL + "/api/ContractHistory/GetContractHistory";
 
-    public static FEE_RUN_CALCS_API: string = APIConfig.ARK_FUNCTION_BASEURL + "/api/FeeCalculatorFunction_HttpTrigger";
+    public static POSITION_CASHFLOWS_RUN_CALCS_API: string = APIConfig.ARK_IRR_FUNCTION_BASEURL + "/api/SavePositionCashflows_HttpTrigger";
+    public static FEE_RUN_CALCS_API: string = APIConfig.ARK_FEE_FUNCTION_BASEURL + "/api/FeeCalculatorFunction_HttpTrigger";
     public static MONTHLY_RETURNS_CALC_API: string = APIConfig.BASEURL + "/api/MonthlyReturns/GetMonthlyReturn";
 
     public static FEE_PRESET_INVESTMENT_GET_API: string = APIConfig.BASEURL + "/api/FeePresets/GetFundInvestmentData";

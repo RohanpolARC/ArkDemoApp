@@ -1,15 +1,13 @@
 import { Injectable } from '@angular/core';  
-import { HttpClient, HttpHeaders } from '@angular/common/http';  
+import { HttpClient } from '@angular/common/http';  
 import { MsalUserService } from './Auth/msaluser.service';  
 
 import { BehaviorSubject } from 'rxjs';
-import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { APIConfig } from 'src/app/configs/api-config';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { DetailedView } from 'src/app/shared/models/GeneralModel';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { getLastBusinessDay, getMomentDateStr } from 'src/app/shared/functions/utilities';
 
 
 @Injectable({  
@@ -81,9 +79,12 @@ export class DataService {
         );
     }
 
-    setWarningMsg(message: string, action: string, type: 'ark-theme-snackbar-normal' | 'ark-theme-snackbar-warning' | 'ark-theme-snackbar-error' | 'ark-theme-snackbar-success' = 'ark-theme-snackbar-normal'){
+    setWarningMsg(
+        message: string, action: string = 'Dismiss', 
+        type: 'ark-theme-snackbar-normal' | 'ark-theme-snackbar-warning' | 'ark-theme-snackbar-error' | 'ark-theme-snackbar-success' = 'ark-theme-snackbar-warning',
+        time: number = 5000){
         this.snackBar.open(message, action, {
-          duration: 5000,
+          duration: time,
           panelClass: [type]
         });
       }

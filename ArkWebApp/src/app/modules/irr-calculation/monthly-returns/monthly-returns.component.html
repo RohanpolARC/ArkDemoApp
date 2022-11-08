@@ -5,13 +5,13 @@
         </div>
         <div class="action">
             <div>
-                As Of Date : <b>{{ asOfDate | date:"dd MMM yyyy" }}</b>
+                As Of Date : {{ asOfDate | date:"dd MMM yyyy" }}
             </div>
 
             <div>
-                Model : <b>{{ modelName }}</b>
+                Model : {{ modelName }}
             </div>
-            <div>Base Measure: <b>{{ baseMeasure }}</b></div>
+            <div>Base Measure: {{ baseMeasure }}</div>
         </div>
     </div>
 
@@ -19,8 +19,9 @@
         <mat-card class="mat-content">
             <ag-grid-angular
             [gridOptions] = "gridOptionsMonthlyRets"
+            [modules] = "agGridModules"
             [rowData] = "monthlyReturns"
-            class="ag-theme-alpine grid"
+            class="ag-theme-alpine ag-grid"
             >
             </ag-grid-angular>
         </mat-card>

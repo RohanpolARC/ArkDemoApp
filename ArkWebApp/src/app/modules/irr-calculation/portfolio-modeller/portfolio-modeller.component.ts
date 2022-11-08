@@ -1,20 +1,34 @@
-import { ColumnFilter, AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { FiltersToolPanelModule } from '@ag-grid-enterprise/filter-tool-panel';
+import { ColumnFilter, AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { ColDef, EditableCallbackParams, GridOptions, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi, Module } from '@ag-grid-community/core';
 import { Component, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, timer } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { amountFormatter, removeDecimalFormatter, formatDate } from 'src/app/shared/functions/formatter';
-import { IRRCalcParams, MonthlyReturnsCalcParams, VPortfolioLocalOverrideModel } from 'src/app/shared/models/IRRCalculationsModel';
+import { IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams, VPortfolioLocalOverrideModel } from 'src/app/shared/models/IRRCalculationsModel';
 import { EventEmitter } from '@angular/core';
 import { AggridMaterialDatepickerComponent } from '../../facility-detail/aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/portfolio-save-run-model.component';
 import { getLastBusinessDay, getMomentDateStr, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
+import cryptoRandomString from 'crypto-random-string';
+import { first, switchMap, takeUntil } from 'rxjs/operators';
+
+type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`
+
+type EmitParams = {
+  parentDisplayName: string,
+  tabs:{
+    tabName: string,
+    tabType: TabType,
+    calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams
+  }[]
+}
+export type LoadStatusType = `Loading` | `Loaded` | `Failed`;
+let adaptable_Api: AdaptableApi
 
 @Component({
   selector: 'app-portfolio-modeller',
@@ -22,6 +36,7 @@ import { CommonConfig } from 'src/app/configs/common-config';
   styleUrls: ['./portfolio-modeller.component.scss']
 })
 export class PortfolioModellerComponent implements OnInit {
+  closeTimer: Subject<any> = new Subject<any>();
 
   constructor(
     private dataSvc: DataService,
@@ -29,8 +44,7 @@ export class PortfolioModellerComponent implements OnInit {
     public dialog: MatDialog
   ) { }
 
-  @Output() calcParamsEmitter = new EventEmitter<IRRCalcParams>();
-  @Output() returnsParamsEmitter = new EventEmitter<MonthlyReturnsCalcParams>();
+  @Output() calcParamsEmitter = new EventEmitter<EmitParams>();
 
   multiSelectPlaceHolder: string = null;
   dropdownSettings: IDropdownSettings = null;
@@ -137,6 +151,16 @@ export class PortfolioModellerComponent implements OnInit {
   adapTableApi: AdaptableApi;
   adaptableOptions: AdaptableOptions;
 
+  setDateFields(row: any, fields: string[]){
+    for(let i = 0; i < fields.length; i+= 1){
+      row[fields[i]] = formatDate(row[fields[i]]);
+      if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(row[fields[i]]))
+        row[fields[i]] = null;
+    }
+
+    return row;
+  }
+
   fetchIRRPostions() {
     if(this.asOfDate !== null){
       this.gridOptions?.api?.showLoadingOverlay();
@@ -144,31 +168,16 @@ export class PortfolioModellerComponent implements OnInit {
         next: data => {
           this.gridOptions?.api?.hideOverlay();
           for(let i: number = 0; i < data?.length; i+= 1){
-            data[i].expectedDate = formatDate(data[i]?.expectedDate)
-            if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].expectedDate)){
-              data[i].expectedDate = null;
-            }
-            data[i].localExpectedDate = formatDate(data[i]?.localExpectedDate)
-            if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].localExpectedDate)){
-              data[i].localExpectedDate = null;
-            }
-            data[i].globalExpectedDate = formatDate(data[i]?.globalExpectedDate)
-            if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].globalExpectedDate)){
-              data[i].globalExpectedDate = null;
-            }  
-            data[i].maturityDate = formatDate(data[i]?.maturityDate)
-            if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(data[i].maturityDate)){
-              data[i].maturityDate = null;
-            }
+            data[i] = this.setDateFields(data[i], ['expectedDate', 'localExpectedDate', 'globalExpectedDate', 'maturityDate'])
           }  
 
-          this.gridApi.setRowData(data)
+          adaptable_Api.gridApi.setGridData(data)
           if(this.selectedModelID){
             if(this.modelMap[this.selectedModelID].positionIDs){
 
               this.gridApi.deselectAll();
               this.modelMap[this.selectedModelID].positionIDs?.forEach(posID => {
-                let node: RowNode = this.adapTableApi.gridApi.getRowNodeForPrimaryKey(posID)
+                let node: RowNode = adaptable_Api.gridApi.getRowNodeForPrimaryKey(posID)
                 node.setSelected(true);
                 this.selectedPositionIDs = this.modelMap[this.selectedModelID].positionIDs
               })
@@ -188,26 +197,105 @@ export class PortfolioModellerComponent implements OnInit {
     }
   }
 
-  fetchPortfolioModels(modelID?: number, context: string = 'SaveRunIRR', contextData: {
-    baseMeasure: string
+  saveModelCashflowsAndOpenTabs(modelID?: number, context: string[] = ['SaveRunIRR'], runID: string = null, contextData: {  //changes context type from string to string[]
+    baseMeasure?: string,
+    feePreset?: string
+  } = null){
+
+    if(!modelID)
+      console.error(`Model ID not received`)
+      
+    let calcParamsData = []
+
+    //Set calculation param configs and open all the tabs first
+    context.forEach(e => {
+        switch (e) {
+
+          case 'SaveRunPFees':
+            calcParamsData.push({ runID: runID, type: 'Performance Fees', feePreset: contextData?.feePreset })
+            break;
+          case 'SaveRunMReturns':
+            calcParamsData.push({ runID: runID, type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
+            break;  
+          case 'SaveRunIRR':
+            calcParamsData.push({ runID: runID, type: 'IRR'})
+            break;
+          default:
+            break;
+        }
+    });
+
+    this.multiCalculationStaging(this.modelMap[this.selectedModelID]?.modelName, calcParamsData)
+
+    // Create params for generating cashflows and trigger the virtual model cashflow generator
+    let m = <IRRCalcParams> {};
+    m.runID = runID;
+    m.asOfDate = this.asOfDate;
+    m.modelID = modelID;
+    m.positionIDs = this.selectedPositionIDs;
+
+    // Load cashflows only if running IRR/Performance fees
+
+    if(context.includes('SaveRunIRR') || context.includes('SaveRunPFees')){
+      
+      this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loading' })
+
+      this.irrCalcService.getPositionCashflows(m).pipe(first()).subscribe({
+        next: resp => {
+
+          timer(0, 10000).pipe(
+            switchMap(() => this.irrCalcService.getIRRStatus(resp?.['statusQueryGetUri'])),
+            takeUntil(this.closeTimer)
+          ).subscribe({
+            next: (res: any) => {
+
+              if(res?.['runtimeStatus'] === 'Completed'){
+
+                this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loaded' })
+                this.dataSvc.setWarningMsg(`Generated ${res['output']} cashflows for the selected model`, `Dismiss`, `ark-theme-snackbar-normal`);
+                this.closeTimer.next();
+              }
+              else if(res?.['runtimeStatus'] === 'Failed'){
+
+                this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Failed' })               
+                this.dataSvc.setWarningMsg(`Failed to generate the cashflows`, `Dismiss`, `ark-theme-snackbar-error`);
+                this.closeTimer.next();
+              }
+            }
+          })
+        },
+        error: error => {
+          this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Failed' });
+          console.error(`Error in saving cashflows to DB: ${error}`);
+          this.closeTimer.next();
+        } 
+      })
+
+    }
+
+
+  }
+
+  fetchPortfolioModels(modelID?: number, context: string[] = ['SaveRunIRR'], runID: string = null, contextData: {  //changes context type from string to string[]
+    baseMeasure?: string,
+    feePreset?: string
   } = null){
     this.subscriptions.push(this.irrCalcService.getPortfolioModels(this.dataSvc.getCurrentUserName()).subscribe({
       next: data => {
         this.parseFetchedModels(data);
         this.InitModelMap()
         this.setSelectedModel(modelID)
-        if(!!modelID && context === 'SaveRunIRR'){
-            this.calcIRR();
-        }
-        else if(!!modelID && context === 'SaveRunMReturns'){
-          this.calcReturns(contextData?.baseMeasure);
-        }
+
+        if(modelID)
+        this.saveModelCashflowsAndOpenTabs(modelID, context, runID, contextData);
+
       },
       error: error => {
         console.error(`Failed to fetch Portfolio Rules: ${error}`)
       }
     }))
   }
+
 
   InitModelMap(){
     this.modelMap = {};
@@ -265,9 +353,7 @@ export class PortfolioModellerComponent implements OnInit {
         sortable: true,
         filter: true
       },
-      // components: {
-      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      // },
+
       rowGroupPanelShow: 'always',
       rowSelection: 'multiple',
       groupSelectsFiltered: true,
@@ -303,9 +389,13 @@ export class PortfolioModellerComponent implements OnInit {
         }
       },
 
+      layoutOptions: {
+        autoSaveLayouts: false
+      },
+
       predefinedConfig: {  
         Dashboard: {
-          Revision: 3,
+          Revision: 4,
           ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
@@ -316,7 +406,7 @@ export class PortfolioModellerComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 5,
+          Revision: 6,
           CurrentLayout: 'Manual',
           Layouts: [
           {
@@ -391,8 +481,6 @@ export class PortfolioModellerComponent implements OnInit {
       }
 
     }
-
-    this.changeListeners()
   }
 
   rows: number[]
@@ -478,10 +566,10 @@ export class PortfolioModellerComponent implements OnInit {
       return;
 
     let positionIDs = this.modelMap[modelID]?.positionIDs
-    this.adapTableApi?.gridApi?.deselectAll();
+    adaptable_Api?.gridApi?.deselectAll();
     if(positionIDs != null || positionIDs?.length != 0){
       positionIDs.forEachLeafNode(posID => {
-        let node: RowNode = this.adapTableApi?.gridApi?.getRowNodeForPrimaryKey(posID);
+        let node: RowNode = adaptable_Api?.gridApi?.getRowNodeForPrimaryKey(posID);
         node.setSelected(posID)
       })
       this.selectedPositionIDs = positionIDs;
@@ -529,7 +617,7 @@ export class PortfolioModellerComponent implements OnInit {
     }
     const dialogRef = this.dialog.open(PortfolioSaveRunModelComponent, {
       data: {
-        adaptableApi: this.adapTableApi, 
+        adaptableApi: adaptable_Api, 
         model: this.modelMap[this.selectedModelID], 
         asOfDate: this.asOfDate, 
         isAutomatic: this.isAutomatic.value, 
@@ -558,54 +646,92 @@ export class PortfolioModellerComponent implements OnInit {
         if(res?.isSuccess){
           this.selectedModelID = dialogRef.componentInstance.modelID
 
-          if(res?.context === 'SaveRunIRR')
-            this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context);
-          if(res?.context === 'SaveRunMReturns')
-            this.fetchPortfolioModels(dialogRef.componentInstance.modelID, res.context, { baseMeasure: res?.['baseMeasure']});
-
+          // Generating runID to track all calc runs under this context. 
+          let runID: string = cryptoRandomString({length: 50});
+          
+          this.fetchPortfolioModels(
+            dialogRef.componentInstance.modelID,
+            res.context,
+            runID,
+            {
+              baseMeasure: res?.['baseMeasure'],
+              feePreset: res?.['feePreset']
+            }
+          )
           this.updateLocalFields()
         }
       }
     }))
   }
 
-  /** 
-   * Opening new tab for Monthly Return in IRR Calculation and sending MonthlyReturnCalcParams as `@Input` to `<app-monthly-returns>` component.
-   *  Portfolio Modeller -> IRR Calculation -> Monthly Returns
-  */
-  calcReturns(baseMeasure: string){
-
-    let calcParams: MonthlyReturnsCalcParams = <MonthlyReturnsCalcParams> {};
-    calcParams.baseMeasure = baseMeasure;
-
-    let positionIDsSTR: string = ''
-    this.selectedPositionIDs.forEach(posID => {
-      positionIDsSTR += String(posID) + ','
+  multiCalculationStaging(parentDisplayName,calcStagingData: {
+    runID: string,
+    type: TabType,
+    baseMeasure?: string,
+    feePreset?: string
+  }[]) {
+    let calcParamsEmitterData = []
+    
+    calcStagingData.forEach((stagingData)=>{
+      let _ = this.calculationStaging(stagingData)
+      calcParamsEmitterData.push(_)
     })
-    positionIDsSTR = positionIDsSTR.slice(0, -1) // Remove last delimeter
 
-    calcParams.positionIDs = positionIDsSTR;
-    calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
-    calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
-    calcParams.asOfDate = this.asOfDate
-
-    this.returnsParamsEmitter.emit(calcParams)
+    this.calcParamsEmitter.emit({
+      parentDisplayName: parentDisplayName,
+      tabs:calcParamsEmitterData
+    })
   }
 
-  /** 
-   * Opening new tab for IRR Result in IRR Calculation and sending IRRCalcParams as `@Input` to `<app-irr-result>` component.
-   *  Portfolio Modeller -> IRR Calculation -> IRR Result 
-  */
-  calcIRR(){
+  calculationStaging(p: {
+    runID: string,
+    type: TabType,
+    baseMeasure?: string,
+    feePreset?: string
+  }){
 
-    let calcParams: IRRCalcParams = <IRRCalcParams>{};
+    let calcParams
+    let tabName: string, tabType: TabType
+    if(p.type === 'Monthly Returns'){
+      let cp = <MonthlyReturnsCalcParams> {};
+      cp.baseMeasure = p.baseMeasure;
+      let positionIDsSTR: string = ''
+      this.selectedPositionIDs.forEach(posID => {
+        positionIDsSTR += String(posID) + ','
+      })
+      positionIDsSTR = positionIDsSTR.slice(0, -1) // Remove last delimeter
+
+      cp.positionIDs = positionIDsSTR
+      calcParams = cp as MonthlyReturnsCalcParams
+    }
+    else if(p.type === 'Performance Fees'){
+      let cp = <PerfFeesCalcParams> {};
+      cp.positionIDs = this.selectedPositionIDs;
+      cp.feePreset = p.feePreset;
+      cp.modelID = this.selectedModelID,
+
+
+      calcParams = cp as PerfFeesCalcParams
+    }
+    else if(p.type === 'IRR'){
+      let cp = <IRRCalcParams> {};
+      cp.positionIDs = this.selectedPositionIDs;
+      cp.irrAggrType = this.modelMap[this.selectedModelID]?.irrAggrType;
+      cp.modelID = this.isLocal.value ? this.selectedModelID : null,
+
+
+      calcParams = cp as IRRCalcParams
+    }
+
+
+    calcParams.runID = p.runID;
     calcParams.asOfDate = this.asOfDate;
-    calcParams.positionIDs = this.selectedPositionIDs;
-    calcParams.modelID = this.isLocal.value ? this.selectedModelID : null,
     calcParams.modelName = this.modelMap[this.selectedModelID]?.modelName;
-    calcParams.irrAggrType = this.modelMap[this.selectedModelID]?.irrAggrType;
 
-    this.calcParamsEmitter.emit(calcParams);
+    tabName = p.type
+    tabType = p.type;
+    let tabData = {calcParams: calcParams, tabName: tabName, tabType: tabType}
+    return tabData
   }
 
   runIRRCalc(){
@@ -616,12 +742,9 @@ export class PortfolioModellerComponent implements OnInit {
   onReset(userAction: boolean = false){
     /** Here, we clear all filters applied on the grid, overrides, toggles etc.*/
 
-    if(this.adapTableApi){
-      this.adapTableApi.filterApi.clearColumnFilters();
-      this.gridApi.deselectAll();
-      if(userAction)
-        this.updateGridOverrides('Clear');
-    }
+    adaptable_Api?.filterApi?.clearColumnFilters();
+    
+
     this.selectedDropdownData = [];
     this.selectedPositionIDs = [];
 
@@ -633,6 +756,13 @@ export class PortfolioModellerComponent implements OnInit {
     this.isAutomatic.setValue(false)
     this.localOverrides = null
     this.selectedModelID = null
+
+    if(adaptable_Api){
+      adaptable_Api.filterApi.clearColumnFilters();
+      this.gridApi.deselectAll();
+      if(userAction)
+        this.updateGridOverrides('Clear');
+    }
   }
 
   updateGridWithOverrides(overrideInfo: any){
@@ -642,7 +772,7 @@ export class PortfolioModellerComponent implements OnInit {
             colName: string = overrideInfo[i].key,
             val: string = overrideInfo[i].value
 
-      let node: RowNode = this.adapTableApi.gridApi.getRowNodeForPrimaryKey(posID)
+      let node: RowNode = adaptable_Api.gridApi.getRowNodeForPrimaryKey(posID)
       if(colName === 'expectedDate'){
         node.setDataValue('expectedDate', val)
       }
@@ -713,12 +843,9 @@ export class PortfolioModellerComponent implements OnInit {
   onPortfolioModelSelect(event){
     this.selectedModelID = event.modelID
 
-    this.adapTableApi.filterApi.clearColumnFilters();
+    adaptable_Api.filterApi.clearColumnFilters();
+    this.gridApi.deselectAll();
     this.selectedPositionIDs = []
-
-    if(this.modelMap[this.selectedModelID].rules){
-      this.adapTableApi.filterApi.setColumnFilter(this.modelMap[this.selectedModelID].rules)
-    }
 
     /** On model selection, data will be refetched with overrides, hence we do not want to programmatically set it again, hence emitEvent: false */
     this.isLocal.setValue(this.modelMap[this.selectedModelID].isLocal, {emitEvent: false})
@@ -726,16 +853,20 @@ export class PortfolioModellerComponent implements OnInit {
     //emitEvent: true (Default) since we want to switch layouts programmatically. 
     this.isAutomatic.setValue(!this.modelMap[this.selectedModelID].isManual)
 
+    if(this.modelMap[this.selectedModelID].rules){
+      adaptable_Api.filterApi.setColumnFilter(this.modelMap[this.selectedModelID].rules)
+    }
+
     this.fetchIRRPostions()
  }
 
   changeListeners(){
     this.subscriptions.push(this.isAutomatic.valueChanges.subscribe( isAuto => {
       if(isAuto){
-        this.adapTableApi.layoutApi.setLayout('Automatic')
+        adaptable_Api.layoutApi.setLayout('Automatic')
       }
       else {
-        this.adapTableApi.layoutApi.setLayout('Manual')
+        adaptable_Api.layoutApi.setLayout('Manual')
       }
     }))
 
@@ -756,13 +887,9 @@ export class PortfolioModellerComponent implements OnInit {
   }
 
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
-    this.adapTableApi = adaptableApi;
-    this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
-    this.adapTableApi.filterApi.clearColumnFilters();
-  }
-
-  onGridReady(params: GridReadyEvent){
-    this.gridApi = params.api;
+    adaptable_Api = adaptableApi;
+    adaptable_Api.toolPanelApi.closeAdapTableToolPanel();
+    adaptable_Api.filterApi.clearColumnFilters();
 
     this.subscriptions.push(this.irrCalcService.currentSearchDate.subscribe(asOfDate => {
       this.asOfDate = asOfDate;
@@ -774,6 +901,12 @@ export class PortfolioModellerComponent implements OnInit {
         this.fetchIRRPostions();
       }
     }))  
+
+    this.changeListeners()
+  }
+
+  onGridReady(params: GridReadyEvent){
+    this.gridApi = params.api;
   }
   
   parseFetchedModels(data){
