@@ -3,7 +3,7 @@ import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
-import { IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
+import { CashFlowParams, IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 import { LoadStatusType } from './portfolio-modeller/portfolio-modeller.component';
 
 type tabset = {
@@ -100,7 +100,7 @@ export class IrrCalculationComponent implements OnInit {
   calcParamsReceived(
     params: {
       parentDisplayName: string,
-      tabs: {tabName: string, tabType: string, calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams}[]
+      tabs: {tabName: string, tabType: string, calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams | CashFlowParams}[]
     }
     ){
       let p = params.tabs
@@ -117,6 +117,14 @@ export class IrrCalculationComponent implements OnInit {
     })
 
     let cnt = this.irrCalcSvc.parentTabs.filter(pt=>pt.parentActualName===params.parentDisplayName).length
+    
+    newTabSet.push({
+      displayName:'Cashflows',
+      status: 'Loaded',
+      resultType: 'Cashflows',
+      calcParams: {}
+    })
+
    
 
     let parentDisplayName = (cnt !== 0) ? `${params.parentDisplayName} ${cnt + 1}`: `${params.parentDisplayName}`

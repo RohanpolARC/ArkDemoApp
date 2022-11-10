@@ -29,6 +29,7 @@ import { FeeCalculationService } from 'src/app/core/services/FeeCalculation/fee-
 import { MatExpansionModule } from '@angular/material/expansion';
 import { FeePresetsGridComponent } from './fee-presets-grid/fee-presets-grid.component';
 import { TabGroupWrapperComponent } from './tab-group-wrapper/tab-group-wrapper.component';
+import { CashFlowsComponent } from './cash-flows/cash-flows.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { TabGroupWrapperComponent } from './tab-group-wrapper/tab-group-wrapper.
     MonthlyReturnsComponent,
     PerformanceFeeComponent,
     FeePresetsGridComponent,
-    TabGroupWrapperComponent
+    TabGroupWrapperComponent,
+    CashFlowsComponent
   ],
   imports: [
     CommonModule,

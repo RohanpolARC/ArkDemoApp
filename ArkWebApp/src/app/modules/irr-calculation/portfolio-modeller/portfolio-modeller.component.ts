@@ -37,7 +37,7 @@ let adaptable_Api: AdaptableApi
 })
 export class PortfolioModellerComponent implements OnInit {
   closeTimer: Subject<any> = new Subject<any>();
-
+  
   constructor(
     private dataSvc: DataService,
     private irrCalcService: IRRCalcService,
@@ -251,8 +251,10 @@ export class PortfolioModellerComponent implements OnInit {
 
               if(res?.['runtimeStatus'] === 'Completed'){
 
+                this.irrCalcService.loadedPositionCashflows = res['output'] ?? [];
                 this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loaded' })
-                this.dataSvc.setWarningMsg(`Generated ${res['output']} cashflows for the selected model`, `Dismiss`, `ark-theme-snackbar-normal`);
+
+                this.dataSvc.setWarningMsg(`Generated ${res['output']?.length} cashflows for the selected model`, `Dismiss`, `ark-theme-snackbar-normal`);
                 this.closeTimer.next();
               }
               else if(res?.['runtimeStatus'] === 'Failed'){
