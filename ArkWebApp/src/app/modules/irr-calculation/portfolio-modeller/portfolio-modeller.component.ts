@@ -606,7 +606,22 @@ export class PortfolioModellerComponent implements OnInit {
     })
   }
 
+  checkRunningJobs(): number{
+
+    let runningTabs: string[] = this.irrCalcService.parentTabs
+                                    ?.filter(tab => tab.status === 'Loading')
+                                    ?.map(x => x.parentDisplayName);
+
+    return runningTabs?.length ?? 0;
+  }
+
   onSavePortfolio(context = 'Save'){
+
+    if(this.checkRunningJobs()){
+
+      this.dataSvc.setWarningMsg(`Please wait for the already triggered process to finish`);
+      return
+    }
 
     if(this.selectedDropdownData.length === 0 || this.selectedDropdownData === null){
       this.selectedModelID = null
@@ -647,7 +662,7 @@ export class PortfolioModellerComponent implements OnInit {
           this.selectedModelID = dialogRef.componentInstance.modelID
 
           // Generating runID to track all calc runs under this context. 
-          let runID: string = cryptoRandomString({length: 50});
+          let runID: string = cryptoRandomString({length: 20})
           
           this.fetchPortfolioModels(
             dialogRef.componentInstance.modelID,

@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { ParentTabType } from '../irr-calculation.component';
+import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
 
 type tabset = {
   displayName: string,
@@ -15,13 +17,8 @@ type tabset = {
 })
 export class TabGroupWrapperComponent implements OnInit {
 
-  @Input() parentTab:{
-    parentDisplayName: string,
-    parentActualName:string,
-    status:string,
-    tabset:tabset
-  }
-  @Output() status = new EventEmitter<string>();
+  @Input() parentTab: ParentTabType
+  @Output() status = new EventEmitter<LoadStatusType>();
   @Output() noSubTabs = new EventEmitter<{index?:number,pDisplayName:string}>();
 
   pDisplayName
@@ -50,7 +47,7 @@ export class TabGroupWrapperComponent implements OnInit {
 
   }
 
-  statusReceived(status: string, index: number){
+  statusReceived(status: LoadStatusType, index: number){
     this.subtabs[index].status = status
     let failCount = this.subtabs.filter(_=>_.status==='Failed').length
     let completeCount = this.subtabs.filter(_=>_.status==='Loaded').length

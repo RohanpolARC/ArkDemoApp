@@ -7,11 +7,23 @@ import { IRRCalcParams, VPortfolioModel } from 'src/app/shared/models/IRRCalcula
 import { BehaviorSubject } from 'rxjs';
 import { RESOURCE_CONTEXT } from '../../interceptors/msal-http.interceptor';
 import { LoadStatusType } from 'src/app/modules/irr-calculation/portfolio-modeller/portfolio-modeller.component';
+import { ParentTabType } from 'src/app/modules/irr-calculation/irr-calculation.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class IRRCalcService {
+
+  parentTabs: ParentTabType[] = [{
+    parentDisplayName: 'Portfolio Modeller',
+    parentActualName: 'Portfolio Modeller',
+    status: 'Loaded',
+    tabset: [{
+      displayName: 'Portfolio Modeller',
+      status: 'Loaded',
+      resultType: 'PortfolioModeller'
+    }]
+  }]
 
   // Mapping the cashflow load status against it's runID for result based tabs to trigger the corresponding calculation engine. 
   cashflowStatusMap: { 

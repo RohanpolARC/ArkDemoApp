@@ -7,6 +7,7 @@ import { MonthlyReturnsService } from 'src/app/core/services/MonthlyReturns/mont
 import { amountFormatter } from 'src/app/shared/functions/formatter';
 import { MonthlyReturnsCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 import { getNodes } from '../../capital-activity/utilities/functions';
+import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
 
 @Component({
   selector: 'app-monthly-returns',
@@ -17,7 +18,7 @@ import { getNodes } from '../../capital-activity/utilities/functions';
 export class MonthlyReturnsComponent implements OnInit {
 
   @Input() calcParams: MonthlyReturnsCalcParams;
-  @Output() status = new EventEmitter<string>();
+  @Output() status = new EventEmitter<LoadStatusType>();
   
   subscriptions: Subscription[] = []
   columnDefsMonthlyRets: ColDef[]
