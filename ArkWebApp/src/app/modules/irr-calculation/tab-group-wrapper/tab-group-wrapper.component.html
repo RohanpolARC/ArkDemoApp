@@ -45,6 +45,14 @@
                 (status)="statusReceived($event, index)"
                 [calcParams] = "subtab.calcParams"
             ></app-performance-fee>
+
+
+            <app-cash-flows
+                *ngIf="subtab.resultType === 'Cashflows'"
+                style="display: block; height: calc(100vh -205px);"
+                (status)="statusReceived($event, index)"
+                [calcParams] = "subtab.calcParams"
+            ></app-cash-flows>
        </mat-tab>
     </mat-tab-group>
 

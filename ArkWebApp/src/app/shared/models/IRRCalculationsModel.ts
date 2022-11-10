@@ -40,6 +40,10 @@ export interface MonthlyReturnsCalcParams {
     asOfDate?: string
 }
 
+export interface CashFlowParams {
+    runID: string
+}
+
 export interface PerfFeesCalcParams {
     runID: string,
     positionIDs: number[],
