@@ -243,7 +243,7 @@ export class PortfolioModellerComponent implements OnInit {
       this.irrCalcService.getPositionCashflows(m).pipe(first()).subscribe({
         next: resp => {
 
-          timer(0, 10000).pipe(
+          timer(0, 40000).pipe(
             switchMap(() => this.irrCalcService.getIRRStatus(resp?.['statusQueryGetUri'])),
             takeUntil(this.closeTimer)
           ).subscribe({
