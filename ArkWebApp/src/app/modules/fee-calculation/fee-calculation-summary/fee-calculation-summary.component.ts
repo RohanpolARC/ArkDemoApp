@@ -39,9 +39,9 @@ export class FeeCalculationSummaryComponent implements OnInit {
 
     if(changes?.['status'].currentValue){
       if(changes?.['status'].currentValue === 'Loading')
-        this.gridApi.showLoadingOverlay();
+        this.gridApi?.showLoadingOverlay();
       else 
-        this.gridApi.hideOverlay();
+        this.gridApi?.hideOverlay();
     }
   }
 
