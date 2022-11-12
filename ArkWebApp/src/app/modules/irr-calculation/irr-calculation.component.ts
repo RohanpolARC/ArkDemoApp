@@ -117,13 +117,16 @@ export class IrrCalculationComponent implements OnInit {
     })
 
     let cnt = this.irrCalcSvc.parentTabs.filter(pt=>pt.parentActualName===params.parentDisplayName).length
-    
-    newTabSet.push({
-      displayName:'Cashflows',
-      status: 'Loaded',
-      resultType: 'Cashflows',
-      calcParams: {}
-    })
+   
+    if(!(p.length===1 && p[0].tabType==='Monthly Returns')){
+      newTabSet.push({
+        displayName:'Cashflows',
+        status: 'Loading',
+        resultType: 'Cashflows',
+        calcParams: {}
+      })
+    }
+
 
    
 

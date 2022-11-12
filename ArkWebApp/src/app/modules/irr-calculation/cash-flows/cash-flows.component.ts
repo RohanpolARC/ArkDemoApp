@@ -1,11 +1,15 @@
-import { ColDef, GridOptions, GridReadyEvent, IAggFuncParams, Module, ValueFormatterParams } from '@ag-grid-community/core';
+
+import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColDef, GridOptions,GridApi, GridReadyEvent, IAggFuncParams, Module, ValueFormatterParams } from '@ag-grid-community/core';
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { CashFlowService } from 'src/app/core/services/CashFlows/cash-flow.service';
+import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { dateFormatter } from 'src/app/shared/functions/formatter';
+import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { CashFlowParams} from 'src/app/shared/models/IRRCalculationsModel';
 import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
 
@@ -22,7 +26,6 @@ export class CashFlowsComponent implements OnInit {
   subscriptions: Subscription[] = []
   columnDefs: ColDef[]
   gridOptions: GridOptions
-  cashFlows: Observable<any>
   runID: string
   rowData: any
 
@@ -31,24 +34,46 @@ export class CashFlowsComponent implements OnInit {
   baseMeasure: string
   asOfDate: string
   closeStream: Subject<any> = new Subject<any>();
+  gridApi: GridApi;
+  adaptableOptions: AdaptableOptions;
+  adaptableApi: AdaptableApi;
 
-  constructor(private cashFlowService:CashFlowService,
-    public irrCalcSvc: IRRCalcService) { }
+  constructor(
+    private cashFlowService:CashFlowService,
+    public irrCalcSvc: IRRCalcService,
+    private dataSvc: DataService  
+  ) { }
+
 
 
   ngOnInit(): void {
 
-    this.irrCalcSvc.cashflowLoadStatusEvent.subscribe(
-      e => {
+    this.irrCalcSvc.cashflowLoadStatusEvent.subscribe({
+      next:(e) => {
         if(e.status === 'Loaded'){
+          this.status.emit('Loaded')
           this.closeStream.next();
           this.rowData = this.irrCalcSvc.loadedPositionCashflows;
 
-          this.gridOptions?.api?.setRowData(this.rowData)
+          setTimeout(() => {
+            this.gridOptions?.api?.setRowData(this.rowData)
+            
+            this.adaptableApi.dashboardApi.setDashboardTitle(`Cashflows (${this.rowData.length})`)
+            this.adaptableApi.dashboardApi.refreshDashboard()
+            
+          }, 500);
 
+         
         }
+      },
+      error:(error)=>{
+        console.error(`Failed to get Cashflows : ${error}`)
+        this.rowData=[]
+        this.status.emit('Failed')
       }
+    }
     )
+
     this.columnDefs = [
       // {field:'RunID',type:'abColDefString'},
       {field:'Issuer',type:'abColDefString'},
@@ -58,7 +83,7 @@ export class CashFlowsComponent implements OnInit {
       {field:'PortfolioType',type:'abColDefString'},
       {field:'BookName',type:'abColDefString'},
       {field:'Entity',type:'abColDefString'},
-      {field:'CashDate',type:'abColDefString', valueFormatter: dateFormatter},
+      {field:'CashDate',valueFormatter: dateFormatter, cellClass: 'dateUK', minWidth: 122, type: 'abColDefDate' },
       {field:'FXRate',type:'abColDefString'},
       {field:'FXRateCapital',type:'abColDefString'},
       {field:'FXRateIncome',type:'abColDefString'},
@@ -150,16 +175,66 @@ export class CashFlowsComponent implements OnInit {
       },
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel()
+        this.gridApi = params.api;   
       }
     }
+
+    this.adaptableOptions = {
+      licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
+      autogeneratePrimaryKey: true,
+      primaryKey: '',
+      userName: this.dataSvc.getCurrentUserName(),
+      adaptableId: 'Cashflows',
+      adaptableStateKey: 'Cashflows Key',
+      teamSharingOptions: {
+        enableTeamSharing: true,
+        setSharedEntities: setSharedEntities.bind(this),
+        getSharedEntities: getSharedEntities.bind(this)
+      },
+      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
+      
+
+      predefinedConfig: {
+        Dashboard: {
+          Revision:6,
+          ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
+          IsCollapsed: true,
+          Tabs: [{
+            Name: 'Layout',
+            Toolbars: ['Layout']
+          }],
+          IsHidden: false,
+        },
+        Layout:{
+          CurrentLayout: 'Basic Cashflows Layout',
+          Layouts: [{
+            Name: 'Basic Cashflows Layout',
+            Columns: this.columnDefs.map(def => def.field)
+          }]
+        }
+      }
+    }
+
   }
 
+
+  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
+    this.adaptableApi = adaptableApi;
+    this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
+    this.adaptableApi.dashboardApi.setDashboardTitle(`Cashflows`)
+
+
+  }
   ngOnChanges(changes: SimpleChanges){
 
 
     if(this.calcParams !== null){
       this.runID = this.calcParams.runID;
     }
+  }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub => sub.unsubscribe())
   }
 }
 

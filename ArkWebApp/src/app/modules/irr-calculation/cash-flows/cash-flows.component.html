@@ -1,18 +1,20 @@
 <div class="parent">
-    <div class="header">
+    <!-- <div class="header">
         <div class="title">
             Cashflows
         </div>
 
-    </div>
+    </div> -->
 
     <div class="content">
         <mat-card class="mat-content">
             <ag-grid-angular
             [gridOptions] = "gridOptions"
             [modules] = "agGridModules"
-            [rowData] = "cashFlows | async"
+            [rowData] = "rowData"
             class="ag-theme-alpine ag-grid"
+            [adaptableOptions] = "adaptableOptions"
+            (adaptableReady)="onAdaptableReady($event)"
             >
             </ag-grid-angular>
         </mat-card>
