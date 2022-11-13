@@ -243,7 +243,7 @@ export class PortfolioModellerComponent implements OnInit {
       this.irrCalcService.getPositionCashflows(m).pipe(first()).subscribe({
         next: resp => {
 
-          timer(0, 40000).pipe(
+          timer(0, 10000).pipe(
             switchMap(() => this.irrCalcService.getIRRStatus(resp?.['statusQueryGetUri'])),
             takeUntil(this.closeTimer)
           ).subscribe({
@@ -251,10 +251,8 @@ export class PortfolioModellerComponent implements OnInit {
 
               if(res?.['runtimeStatus'] === 'Completed'){
 
-                this.irrCalcService.loadedPositionCashflows = res['output'] ?? [];
                 this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loaded' })
-
-                this.dataSvc.setWarningMsg(`Generated ${res['output']?.length} cashflows for the selected model`, `Dismiss`, `ark-theme-snackbar-normal`);
+                this.dataSvc.setWarningMsg(`Generated ${res['output']} cashflows for the selected model`, `Dismiss`, `ark-theme-snackbar-normal`);
                 this.closeTimer.next();
               }
               else if(res?.['runtimeStatus'] === 'Failed'){

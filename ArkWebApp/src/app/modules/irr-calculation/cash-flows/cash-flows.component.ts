@@ -1,16 +1,15 @@
 
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridOptions,GridApi, GridReadyEvent, IAggFuncParams, Module, ValueFormatterParams } from '@ag-grid-community/core';
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
-import { Observable, Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ColDef, GridOptions,GridApi, GridReadyEvent, Module } from '@ag-grid-community/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { first } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { CashFlowService } from 'src/app/core/services/CashFlows/cash-flow.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
-import { dateFormatter } from 'src/app/shared/functions/formatter';
+import { amountFormatter, dateFormatter } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
-import { CashFlowParams} from 'src/app/shared/models/IRRCalculationsModel';
 import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
 
 @Component({
@@ -20,20 +19,18 @@ import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.compone
 })
 export class CashFlowsComponent implements OnInit {
 
-  @Input() calcParams: CashFlowParams;
+  @Input() runID: string;
   @Output() status = new EventEmitter<LoadStatusType>();
   
   subscriptions: Subscription[] = []
   columnDefs: ColDef[]
   gridOptions: GridOptions
-  runID: string
   rowData: any
 
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   modelName: string
   baseMeasure: string
   asOfDate: string
-  closeStream: Subject<any> = new Subject<any>();
   gridApi: GridApi;
   adaptableOptions: AdaptableOptions;
   adaptableApi: AdaptableApi;
@@ -48,22 +45,23 @@ export class CashFlowsComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.irrCalcSvc.cashflowLoadStatusEvent.subscribe({
+    this.irrCalcSvc.cashflowLoadStatusEvent.pipe(first()).subscribe({
       next:(e) => {
         if(e.status === 'Loaded'){
-          this.status.emit('Loaded')
-          this.closeStream.next();
-          this.rowData = this.irrCalcSvc.loadedPositionCashflows;
 
-          setTimeout(() => {
-            this.gridOptions?.api?.setRowData(this.rowData)
-            
-            this.adaptableApi.dashboardApi.setDashboardTitle(`Cashflows (${this.rowData.length})`)
-            this.adaptableApi.dashboardApi.refreshDashboard()
-            
-          }, 500);
+          this.cashFlowService.getCashFlows(this.runID).pipe(first()).subscribe({
+            next: (d) => {
+              this.rowData = d;
+              this.adaptableApi.dashboardApi.setDashboardTitle(`Cashflows (${this.rowData.length})`)
+              this.adaptableApi.dashboardApi.refreshDashboard()
 
-         
+              this.status.emit('Loaded')
+            },
+            error: (e) => {
+              console.error(`Failed to get the cashflows: ${e}`)
+              this.status.emit('Failed')
+            }
+          })
         }
       },
       error:(error)=>{
@@ -71,93 +69,89 @@ export class CashFlowsComponent implements OnInit {
         this.rowData=[]
         this.status.emit('Failed')
       }
-    }
-    )
+    })
 
     this.columnDefs = [
-      // {field:'RunID',type:'abColDefString'},
-      {field:'Issuer',type:'abColDefString'},
-      {field:'AssetName',type:'abColDefString'},
-      {field:'id',type:'abColDefNumber'},
-      {field:'Portfolio',type:'abColDefString'},
-      {field:'PortfolioType',type:'abColDefString'},
-      {field:'BookName',type:'abColDefString'},
-      {field:'Entity',type:'abColDefString'},
-      {field:'CashDate',valueFormatter: dateFormatter, cellClass: 'dateUK', minWidth: 122, type: 'abColDefDate' },
-      {field:'FXRate',type:'abColDefString'},
-      {field:'FXRateCapital',type:'abColDefString'},
-      {field:'FXRateIncome',type:'abColDefString'},
-      {field:'FXRateMethod',type:'abColDefString'},
-      {field:'FXRateBase',type:'abColDefString'},
-      {field:'FXRateBaseCapital',type:'abColDefString'},
-      {field:'FXRateBaseIncome',type:'abColDefString'},
-      {field:'BaseGIR',type:'abColDefString'},
-      {field:'BaseGIRAsOfDate',type:'abColDefString'},
-      {field:'BaseGIRTradeDate',type:'abColDefString'},
-      {field:'BaseGIRWtAvgCommited',type:'abColDefString'},
-      {field:'BaseGIRWtAvgFunded',type:'abColDefString'},
-      {field:'FXRateEur',type:'abColDefString'},
-      {field:'FXRateEurCapital',type:'abColDefString'},
-      {field:'FXRateEurIncome',type:'abColDefString'},
-      {field:'EurGIR',type:'abColDefString'},
-      {field:'EurGIRAsOfDate',type:'abColDefString'},
-      {field:'EurGIRTradeDate',type:'abColDefString'},
-      {field:'EurGIRWtAvgCommited',type:'abColDefString'},
-      {field:'EurGIRWtAvgFunded',type:'abColDefString'},
-      {field:'FXFWDRate',type:'abColDefString'},
-      {field:'Principal',type:'abColDefString'},
-      {field:'PrincipalIndexed',type:'abColDefString'},
-      {field:'Pik',type:'abColDefString'},
-      {field:'Repayment',type:'abColDefString'},
-      {field:'FwdCurve',type:'abColDefString'},
-      {field:'Interest',type:'abColDefString'},
-      {field:'Fees',type:'abColDefString'},
-      {field:'PikInterest',type:'abColDefString'},
-      {field:'PurchaseDiscount',type:'abColDefString'},
-      {field:'MarketValue',type:'abColDefString'},
-      {field:'AccruedInterest',type:'abColDefString'},
-      {field:'AccruedFees',type:'abColDefString'},
-      {field:'TotalInterest',type:'abColDefString'},
-      {field:'TotalIncome',type:'abColDefString'},
-      {field:'Total',type:'abColDefString'},
-      {field:'TotalEur',type:'abColDefString'},
-      {field:'TotalBase',type:'abColDefString'},
-      {field:'Realized',type:'abColDefString'},
-      {field:'IsActual',type:'abColDefString'},
-      {field:'IsVirtual',type:'abColDefString'},
-      {field:'IsUnsettled',type:'abColDefString'},
-      {field:'IsCurrent',type:'abColDefString'},
-      {field:'IsExpected',type:'abColDefString'},
-      {field:'IsWorst',type:'abColDefString'},
-      {field:'IsExit',type:'abColDefString'},
-      {field:'IsCustom',type:'abColDefString'},
-      {field:'IsCashIRR',type:'abColDefString'},
-      {field:'IsYTE',type:'abColDefString'},
-      {field:'IsYTW',type:'abColDefString'},
-      {field:'FeesCcy',type:'abColDefString'},
-      {field:'InterestCcy',type:'abColDefString'},
-      {field:'RepaymentCcy',type:'abColDefString'},
-      {field:'CapitalInvestedCcy',type:'abColDefString'},
-      {field:'ActualFXRate',type:'abColDefString'},
-      {field:'FXHedgeCost',type:'abColDefString'},
-      {field:'FXBasisCost',type:'abColDefString'},
-      {field:'ActualCashBalance',type:'abColDefString'},
-      {field:'EURBasisRate',type:'abColDefString'},
-      {field:'HedgeBasisRate',type:'abColDefString'},
-      {field:'HedgeFinancingRate',type:'abColDefString'},
-      {field:'EURFinancingRate',type:'abColDefString'},
-      {field:'EffectiveFXRate',type:'abColDefString'},
-      {field:'EffectiveTotalEur',type:'abColDefString'},
-      {field:'TranslationFX',type:'abColDefString'},
-      {field:'MarketValueDaily',type:'abColDefString'},
-      {field:'MarketValueDailyEur',type:'abColDefString'},
-      {field:'FaceValue',type:'abColDefString'},
-      {field:'useBaseFXRate',type:'abColDefString'},
-      {field:'InternalTradeTotal',type:'abColDefString'},
-      {field:'InternalTradeTotalEur',type:'abColDefString'},
-      // {field:'AsOfDate',type:'abColDefString'},
-      // {field:'ExtractDatetime',type:'abColDefString', valueFormatter: dateFormatter},
-      {field:'Currency',type:'abColDefString'}
+      { field: 'issuer', type: 'abColDefString' },
+      { field: 'assetName', type: 'abColDefString' },
+      { field: 'id', type: 'abColDefNumber', headerName: 'Position ID' },
+      { field: 'portfolio', type: 'abColDefString' },
+      { field: 'portfolioType', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'bookName', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'entity', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'cashDate', valueFormatter:  dateFormatter,  cellClass: 'dateUK', minWidth: 122, type: 'abColDefDate' },
+      { field: 'fxRate', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'fxRateCapital', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'fxRateIncome', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'fxRateMethod', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'fxRateBase', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'fxRateBaseCapital', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'fxRateBaseIncome', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'baseGIR', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'baseGIRAsOfDate', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'baseGIRTradeDate', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'baseGIRWtAvgCommited', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'baseGIRWtAvgFunded', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'fxRateEur', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'fxRateEurCapital', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'fxRateEurIncome', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'eurGIR', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'eurGIRAsOfDate', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'eurGIRTradeDate', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'eurGIRWtAvgCommited', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'eurGIRWtAvgFunded', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'fxFWDRate', type: 'abColDefNumber', valueFormatter: amountFormatter, headerName: 'FX Forward Rate' },
+      { field: 'principal', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'principalIndexed', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'pik', type: 'abColDefNumber', valueFormatter: amountFormatter, headerName: 'PIK' },
+      { field: 'repayment', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'fwdCurve', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'interest', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'fees', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'pikInterest', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'purchaseDiscount', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'marketValue', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'accruedInterest', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'accruedFees', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'totalInterest', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'totalIncome', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'total', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'totalEur', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'totalBase', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'realized', type: 'abColDefNumber' },
+      { field: 'isActual', type: 'abColDefBoolean' },
+      { field: 'isVirtual', type: 'abColDefBoolean' },
+      { field: 'isUnsettled', type: 'abColDefBoolean' },
+      { field: 'isCurrent', type: 'abColDefBoolean' },
+      { field: 'isExpected', type: 'abColDefBoolean' },
+      { field: 'isWorst', type: 'abColDefBoolean' },
+      { field: 'isExit', type: 'abColDefBoolean' },
+      { field: 'isCustom', type: 'abColDefBoolean' },
+      { field: 'isCashIRR', type: 'abColDefBoolean' },
+      { field: 'isYTE', type: 'abColDefBoolean' },
+      { field: 'isYTW', type: 'abColDefBoolean' },
+      { field: 'feesCcy', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'interestCcy', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'repaymentCcy', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'capitalInvestedCcy', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'actualFXRate', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'fxHedgeCost', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'fxBasisCost', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'actualCashBalance', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'eurBasisRate', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'hedgeBasisRate', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'hedgeFinancingRate', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'eurFinancingRate', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'effectiveFXRate', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'effectiveTotalEur', type: 'abColDefNumber', valueFormatter: amountFormatter },
+      { field: 'translationFX', type: 'abColDefString' },
+      { field: 'marketValueDaily', type: 'abColDefString' },
+      { field: 'marketValueDailyEur', type: 'abColDefString' },
+      { field: 'faceValue', type: 'abColDefString' },
+      { field: 'useBaseFXRate', type: 'abColDefString' },
+      { field: 'internalTradeTotal', type: 'abColDefString' },
+      { field: 'internalTradeTotalEur', type: 'abColDefString' },
+      { field: 'currency', type: 'abColDefString' }
     ]
 
     this.gridOptions = {
@@ -207,6 +201,7 @@ export class CashFlowsComponent implements OnInit {
         },
         Layout:{
           CurrentLayout: 'Basic Cashflows Layout',
+          Revision: 2,
           Layouts: [{
             Name: 'Basic Cashflows Layout',
             Columns: this.columnDefs.map(def => def.field)
@@ -224,13 +219,6 @@ export class CashFlowsComponent implements OnInit {
     this.adaptableApi.dashboardApi.setDashboardTitle(`Cashflows`)
 
 
-  }
-  ngOnChanges(changes: SimpleChanges){
-
-
-    if(this.calcParams !== null){
-      this.runID = this.calcParams.runID;
-    }
   }
 
   ngOnDestroy(){

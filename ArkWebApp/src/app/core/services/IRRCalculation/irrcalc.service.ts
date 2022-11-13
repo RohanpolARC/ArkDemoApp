@@ -24,7 +24,6 @@ export class IRRCalcService {
       resultType: 'PortfolioModeller'
     }]
   }]
-  loadedPositionCashflows: any
 
   // Mapping the cashflow load status against it's runID for result based tabs to trigger the corresponding calculation engine. 
   cashflowStatusMap: { 

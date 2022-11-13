@@ -55,7 +55,7 @@ export class IrrCalculationComponent implements OnInit {
     if(params.index){
       this.irrCalcSvc.parentTabs.splice(params.index, 1);
     }else{
-      let index = this.irrCalcSvc.parentTabs.findIndex(parenttab=>params.pDisplayName==parenttab.parentDisplayName)
+      let index = this.irrCalcSvc.parentTabs.findIndex(parenttab => params.pDisplayName === parenttab.parentDisplayName)
       this.irrCalcSvc.parentTabs.splice(index, 1);
     }
     delete this.calcParamsMap[params.pDisplayName]
@@ -100,8 +100,11 @@ export class IrrCalculationComponent implements OnInit {
   calcParamsReceived(
     params: {
       parentDisplayName: string,
-      tabs: {tabName: string, tabType: string, calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams | CashFlowParams}[]
-    }
+      tabs: {
+        tabName: string, 
+        tabType: string, 
+        calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams | CashFlowParams}[]
+      }
     ){
       let p = params.tabs
 
@@ -118,12 +121,12 @@ export class IrrCalculationComponent implements OnInit {
 
     let cnt = this.irrCalcSvc.parentTabs.filter(pt=>pt.parentActualName===params.parentDisplayName).length
    
-    if(!(p.length===1 && p[0].tabType==='Monthly Returns')){
+    if(!(p.length === 1 && p[0].tabType === 'Monthly Returns')){
       newTabSet.push({
-        displayName:'Cashflows',
+        displayName: 'Cashflows',
         status: 'Loading',
         resultType: 'Cashflows',
-        calcParams: {}
+        calcParams: { runID: p[0].calcParams.runID }
       })
     }
 

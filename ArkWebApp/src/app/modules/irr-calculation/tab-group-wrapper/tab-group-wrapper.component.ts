@@ -49,12 +49,11 @@ export class TabGroupWrapperComponent implements OnInit {
 
   statusReceived(status: LoadStatusType, index: number){
     this.subtabs[index].status = status
-    let failCount = this.subtabs.filter(_=>_.status==='Failed').length
-    let completeCount = this.subtabs.filter(_=>_.status==='Loaded').length
-    if(failCount===0 && status==='Failed'){
+    let completeCount = this.subtabs.filter(_ => _.status === 'Loaded').length
+    if(status === 'Failed'){
         this.status.emit(status)
     }
-    if(completeCount===this.subtabs.length && status==='Loaded'){
+    if(completeCount === this.subtabs.length && status === 'Loaded'){
         this.status.emit(status)
     }
   }
