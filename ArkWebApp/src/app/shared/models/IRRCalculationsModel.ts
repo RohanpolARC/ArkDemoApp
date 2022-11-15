@@ -54,3 +54,13 @@ export interface PerfFeesCalcParams {
     modelName?: string,
     asOfDate?: string
 }
+
+export interface PortfolioModellerCalcParams {
+    runID: string,
+    modelID: number,
+    positionIDs: number[],
+    asOfDate: string,
+    feePreset: string,
+    irrAggrType: string,
+    runBy: string
+}

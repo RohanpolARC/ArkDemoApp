@@ -1,9 +1,9 @@
-import { HttpClient, HttpContext, HttpContextToken, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
-import { Subscription, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
-import { IRRCalcParams, VPortfolioModel } from 'src/app/shared/models/IRRCalculationsModel';
+import { IRRCalcParams, PortfolioModellerCalcParams, VPortfolioModel } from 'src/app/shared/models/IRRCalculationsModel';
 import { BehaviorSubject } from 'rxjs';
 import { RESOURCE_CONTEXT } from '../../interceptors/msal-http.interceptor';
 import { LoadStatusType } from 'src/app/modules/irr-calculation/portfolio-modeller/portfolio-modeller.component';
@@ -77,7 +77,7 @@ export class IRRCalcService {
                 }).pipe(catchError((ex) => throwError(ex)));
   }
 
-  public getPositionCashflows(model: IRRCalcParams){
+  public generatePositionCashflows(model: PortfolioModellerCalcParams){
     return this.http.post<any>(`${APIConfig.POSITION_CASHFLOWS_RUN_CALCS_API}`, model, 
     { 
       context: new HttpContext().set(RESOURCE_CONTEXT, 'IRRCalculatorFunction') 

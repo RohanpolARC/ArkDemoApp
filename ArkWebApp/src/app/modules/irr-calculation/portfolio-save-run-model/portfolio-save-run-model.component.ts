@@ -259,8 +259,9 @@ export class PortfolioSaveRunModelComponent implements OnInit {
             this.dialogRef.close({
               context: this.mapCalTypeToContext(this.modelForm.get('calculationType').value),
               isSuccess:true,
-              baseMeasure: this.isMonthlyReturnsDisabled? null: this.modelForm.get('baseMeasure').value,
-              feePreset: this.isFeePresetDisabled? null:  this.modelForm.get('feePreset').value
+              baseMeasure: this.isMonthlyReturnsDisabled ? null : this.modelForm.get('baseMeasure').value,
+              feePreset: this.isFeePresetDisabled ? null :  this.modelForm.get('feePreset').value,
+              irrAggrType: this.isIRRDisabled ? null : this.modelForm.get('aggregationType').value
             })
           }
 
@@ -279,9 +280,9 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       }
     }))
   }
+  
   mapCalTypeToContext(calulationTypes:string[]):string[] {
-    //['IRR','Fee Model','Monthly Returns']
-    //type Proceed = "Save" | "SaveRunIRR" | "SaveRunMReturns" | "SaveRunPFees"
+
     let mappedContext = []
     if(calulationTypes.includes('IRR')){
       mappedContext.push('SaveRunIRR')

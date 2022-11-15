@@ -12,12 +12,12 @@ export const environment = {
   redirectUrl: 'http://localhost:4200',
   
   arkFunctionScopeUri: ['api://1ade3513-1077-49b7-838d-681c7ea8f3a3/arc-irr-func'],
-  arkFunctionUrl: 'https://irrcalcfunuatnew.azurewebsites.net',
+  // arkFunctionUrl: 'https://irrcalcfunuatnew.azurewebsites.net',
   // // arkFunctionUrl: 'http://localhost:7071',
   // // arkFunctionUrl: 'https://feecalcfuncuat.azurewebsites.net',
   // arkFunctionScopeUri: ['api://57d373b0-5305-4b6b-a3f7-ccdc0a4560ca/ark-fee-func'],
 
-  // arkFunctionUrl: 'http://localhost:7031',
+  arkFunctionUrl: 'http://localhost:7031',
 
   // feeCalcFunctionUrl: 'http://localhost:7049',
   feeCalcFunctionUrl: 'https://feecalcfuncuat.azurewebsites.net',

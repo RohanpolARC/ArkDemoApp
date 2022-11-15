@@ -8,7 +8,7 @@ import { Subject, Subscription, timer } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { amountFormatter, removeDecimalFormatter, formatDate } from 'src/app/shared/functions/formatter';
-import { IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams, VPortfolioLocalOverrideModel } from 'src/app/shared/models/IRRCalculationsModel';
+import { IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams, PortfolioModellerCalcParams, VPortfolioLocalOverrideModel } from 'src/app/shared/models/IRRCalculationsModel';
 import { EventEmitter } from '@angular/core';
 import { AggridMaterialDatepickerComponent } from '../../facility-detail/aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/portfolio-save-run-model.component';
@@ -199,7 +199,8 @@ export class PortfolioModellerComponent implements OnInit {
 
   saveModelCashflowsAndOpenTabs(modelID?: number, context: string[] = ['SaveRunIRR'], runID: string = null, contextData: {  //changes context type from string to string[]
     baseMeasure?: string,
-    feePreset?: string
+    feePreset?: string,
+    irrAggrType?: string
   } = null){
 
     if(!modelID)
@@ -228,11 +229,14 @@ export class PortfolioModellerComponent implements OnInit {
     this.multiCalculationStaging(this.modelMap[this.selectedModelID]?.modelName, calcParamsData)
 
     // Create params for generating cashflows and trigger the virtual model cashflow generator
-    let m = <IRRCalcParams> {};
+    let m = <PortfolioModellerCalcParams> {};
     m.runID = runID;
-    m.asOfDate = this.asOfDate;
     m.modelID = modelID;
     m.positionIDs = this.selectedPositionIDs;
+    m.asOfDate = this.asOfDate;
+    m.feePreset = contextData.feePreset;
+    m.irrAggrType = contextData.irrAggrType
+    m.runBy = this.dataSvc.getCurrentUserName();
 
     // Load cashflows only if running IRR/Performance fees
 
@@ -240,7 +244,7 @@ export class PortfolioModellerComponent implements OnInit {
       
       this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loading' })
 
-      this.irrCalcService.getPositionCashflows(m).pipe(first()).subscribe({
+      this.irrCalcService.generatePositionCashflows(m).pipe(first()).subscribe({
         next: resp => {
 
           timer(0, 10000).pipe(
@@ -278,7 +282,8 @@ export class PortfolioModellerComponent implements OnInit {
 
   fetchPortfolioModels(modelID?: number, context: string[] = ['SaveRunIRR'], runID: string = null, contextData: {  //changes context type from string to string[]
     baseMeasure?: string,
-    feePreset?: string
+    feePreset?: string,
+    irrAggrType?: string
   } = null){
     this.subscriptions.push(this.irrCalcService.getPortfolioModels(this.dataSvc.getCurrentUserName()).subscribe({
       next: data => {
@@ -670,7 +675,8 @@ export class PortfolioModellerComponent implements OnInit {
             runID,
             {
               baseMeasure: res?.['baseMeasure'],
-              feePreset: res?.['feePreset']
+              feePreset: res?.['feePreset'],
+              irrAggrType: res?.['irrAggrType']
             }
           )
           this.updateLocalFields()
