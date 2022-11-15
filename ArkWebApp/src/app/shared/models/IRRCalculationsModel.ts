@@ -40,6 +40,10 @@ export interface MonthlyReturnsCalcParams {
     asOfDate?: string
 }
 
+export interface CashFlowParams {
+    runID: string
+}
+
 export interface PerfFeesCalcParams {
     runID: string,
     positionIDs: number[],
@@ -49,4 +53,14 @@ export interface PerfFeesCalcParams {
     modelID?: number,
     modelName?: string,
     asOfDate?: string
+}
+
+export interface PortfolioModellerCalcParams {
+    runID: string,
+    modelID: number,
+    positionIDs: number[],
+    asOfDate: string,
+    feePreset: string,
+    irrAggrType: string,
+    runBy: string
 }

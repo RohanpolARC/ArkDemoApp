@@ -39,9 +39,9 @@ export class FeeCashflowsComponent implements OnInit {
 
      if(changes?.['status'].currentValue){
       if(this.status === 'Loading')
-        this.gridApi.showLoadingOverlay();
+        this.gridApi?.showLoadingOverlay();
       else 
-        this.gridApi.hideOverlay();
+        this.gridApi?.hideOverlay();
     }
   }
 
@@ -148,6 +148,7 @@ export class FeeCashflowsComponent implements OnInit {
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
       predefinedConfig: {
         Dashboard: {
+          Revision:2,
           ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
@@ -155,7 +156,7 @@ export class FeeCashflowsComponent implements OnInit {
             Toolbars: ['Layout']
           }],
           IsHidden: false,
-          DashboardTitle: ' '
+          DashboardTitle: 'Fee Cashflows'
         },
         Layout:{
           CurrentLayout: 'Basic Fee Cashflow Layout',

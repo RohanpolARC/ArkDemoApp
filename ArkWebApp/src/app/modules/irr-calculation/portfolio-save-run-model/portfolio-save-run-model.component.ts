@@ -132,18 +132,6 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       this.positionIDs = this.data.positionIDs
     }
 
-    this.modelForm = new FormGroup({
-      modelName: new FormControl(this.data.model?.modelName, Validators.required),
-      modelDesc: new FormControl(this.data.model?.modelDesc),
-      isUpdate: new FormControl(!!this.modelID, Validators.required),
-      isShared: new FormControl(!!this.data.isShared, Validators.required),
-      aggregationType: new FormControl(this.data.aggregationType, Validators.required),
-      baseMeasure: new FormControl(this.baseMeasures[0]?.baseMeasure, Validators.required),
-      feePreset: new FormControl(this.feePresets[0]?.feePreset, Validators.required),
-      calculationType: new FormControl(this.calculationTypes[0], Validators.required)
-
-    })
-
     this.aggregationTypes = [
       {
         type: 'Fund > Realised/Unrealised > Issuer Short Name',
@@ -154,6 +142,20 @@ export class PortfolioSaveRunModelComponent implements OnInit {
         levels: ['IssuerFirmwide', 'FirmwideRealisedUnrealised', 'Firmwide']
       }
     ]
+
+    this.modelForm = new FormGroup({
+      modelName: new FormControl(this.data.model?.modelName, Validators.required),
+      modelDesc: new FormControl(this.data.model?.modelDesc),
+      isUpdate: new FormControl(!!this.modelID, Validators.required),
+      isShared: new FormControl(!!this.data.isShared, Validators.required),
+      aggregationType: new FormControl(this.data.aggregationType ?? this.aggregationTypes[0].type, Validators.required),
+      baseMeasure: new FormControl(this.baseMeasures[0]?.baseMeasure, Validators.required),
+      feePreset: new FormControl(this.feePresets[0]?.feePreset, Validators.required),
+      calculationType: new FormControl([], Validators.required)
+
+    })
+
+
   }
 
   changeListeners(){
@@ -257,31 +259,12 @@ export class PortfolioSaveRunModelComponent implements OnInit {
             this.dialogRef.close({
               context: this.mapCalTypeToContext(this.modelForm.get('calculationType').value),
               isSuccess:true,
-              baseMeasure: this.isMonthlyReturnsDisabled? null: this.modelForm.get('baseMeasure').value,
-              feePreset: this.isFeePresetDisabled? null:  this.modelForm.get('feePreset').value
+              baseMeasure: this.isMonthlyReturnsDisabled ? null : this.modelForm.get('baseMeasure').value,
+              feePreset: this.isFeePresetDisabled ? null :  this.modelForm.get('feePreset').value,
+              irrAggrType: this.isIRRDisabled ? null : this.modelForm.get('aggregationType').value
             })
           }
 
-          // if(context === 'SaveRunIRR'){
-          //   this.dialogRef.close({ 
-          //     context: 'SaveRunIRR',
-          //     isSuccess: true
-          //    });
-          // }
-          // else if(context === 'SaveRunMReturns'){
-          //   this.dialogRef.close({ 
-          //     context: 'SaveRunMReturns',
-          //     isSuccess: true,
-          //     baseMeasure: this.modelForm.get('baseMeasure').value
-          //   });  
-          // }
-          // else if(context === 'SaveRunPFees'){
-          //   this.dialogRef.close({
-          //     context: 'SaveRunPFees',
-          //     isSuccess: true,
-          //     feePreset: this.modelForm.get('feePreset').value
-          //   })
-          // }
         }
         else{
           this.isSuccess = false
@@ -297,9 +280,9 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       }
     }))
   }
+  
   mapCalTypeToContext(calulationTypes:string[]):string[] {
-    //['IRR','Fee Model','Monthly Returns']
-    //type Proceed = "Save" | "SaveRunIRR" | "SaveRunMReturns" | "SaveRunPFees"
+
     let mappedContext = []
     if(calulationTypes.includes('IRR')){
       mappedContext.push('SaveRunIRR')

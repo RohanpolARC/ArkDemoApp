@@ -137,7 +137,9 @@ export class IrrResultComponent implements OnInit {
       //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
       // },
       suppressAggFuncInHeader: true,
-      rowGroupPanelShow: 'always'
+      rowGroupPanelShow: 'always',
+      suppressScrollOnNewData: true,
+      deltaRowDataMode: true
     }
     
     this.adaptableOptions = {
@@ -337,13 +339,6 @@ export class IrrResultComponent implements OnInit {
       this.modelName = this.calcParams.modelName;
       this.aggregationType = this.calcParams.irrAggrType
       
-      // // Put valid condition to test against the runID from status map in service.
-      // if(false){
-
-      // }
-      // else if(false){
-      //   this.status.emit(`Failed`);
-      // }
     }
   }
 

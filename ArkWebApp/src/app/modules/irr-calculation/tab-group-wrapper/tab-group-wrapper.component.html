@@ -18,22 +18,22 @@
 
                 <span>{{ subtab.displayName }}</span>
                 <br>
-
-                <mat-icon (click)="removeTab(index)">close</mat-icon>
+<!-- 
+                <mat-icon (click)="removeTab(index)">close</mat-icon> -->
 
 
             </ng-template>
 
             <app-irr-result 
                 *ngIf="subtab.resultType === 'IRR'" 
-                style="display: block; height: calc(100vh -245px);"
+                style="display: block; height: calc(100vh -205px);"
                 (status)="statusReceived($event, index)"
                 [calcParams] = "subtab.calcParams"
             ></app-irr-result>
 
             <app-monthly-returns
                 *ngIf="subtab.resultType === 'Monthly Returns'"
-                style="display: block; height: calc(100vh -205px);"
+                style="display: block; height: calc(100vh -165px);"
                 (status)="statusReceived($event, index)"
                 [calcParams] = "subtab.calcParams"
             ></app-monthly-returns>
@@ -41,10 +41,18 @@
 
             <app-performance-fee
                 *ngIf="subtab.resultType === 'Performance Fees'"
-                style="display: block; height: calc(100vh -245px);"
+                style="display: block; height: calc(100vh -205px);"
                 (status)="statusReceived($event, index)"
                 [calcParams] = "subtab.calcParams"
             ></app-performance-fee>
+
+
+            <app-cash-flows
+                *ngIf="subtab.resultType === 'Cashflows'"
+                style="display: block; height: calc(100vh -205px);"
+                (status)="statusReceived($event, index)"
+                [runID] = "subtab.calcParams?.runID"
+            ></app-cash-flows>
        </mat-tab>
     </mat-tab-group>
 
