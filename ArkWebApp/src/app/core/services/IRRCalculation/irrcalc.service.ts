@@ -31,7 +31,8 @@ export class IRRCalcService {
   }
   
   cashflowLoadStatusEvent: EventEmitter<{ runID: string, status: LoadStatusType }> = new EventEmitter();
-
+  terminateCashflowSaveUri: string
+  
   private asOfDateMessage = new BehaviorSubject<string>(null)
   currentSearchDate = this.asOfDateMessage.asObservable();
   changeSearchDate(asOfDate: string){
@@ -75,6 +76,13 @@ export class IRRCalcService {
                 { 
                   context: new HttpContext().set(RESOURCE_CONTEXT, 'IRRCalculatorFunction') 
                 }).pipe(catchError((ex) => throwError(ex)));
+  }
+
+  public terminateInstance(uri: string){
+    return this.http.post<any>(`${uri}`, null, 
+    { 
+      context: new HttpContext().set(RESOURCE_CONTEXT, 'IRRCalculatorFunction') 
+    }).pipe(catchError((ex) => throwError(ex)))
   }
 
   public generatePositionCashflows(model: PortfolioModellerCalcParams){

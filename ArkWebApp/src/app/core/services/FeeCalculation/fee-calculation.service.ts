@@ -15,6 +15,7 @@ export class FeeCalculationService {
   feeSmy: any[] | null
   feeCashflows: any[] | null
   positionCashflows: any[] | null
+  terminateUri: string
   closeTimer: Subject<any> = new Subject<any>();
   isCalculationLoaded: EventEmitter<{ feeSmy: any[] | null, feeCashflows: any[] | null }> = new EventEmitter();
 
@@ -46,6 +47,13 @@ export class FeeCalculationService {
     }).pipe(catchError((ex) => throwError(ex)))
   }
 
+  public terminateInstance(uri: string){
+    return this.http.post<any>(`${uri}`, null, 
+    { 
+      context: new HttpContext().set(RESOURCE_CONTEXT, 'FeeCalculatorFunction') 
+    }).pipe(catchError((ex) => throwError(ex)))
+  }
+
   public fetchFeeCashflows(asOfDate: string, entity: string, positionIDs: number[] = null, runID = null){
 
     if(!asOfDate || !entity){
@@ -57,13 +65,17 @@ export class FeeCalculationService {
     this.subscriptions.push(this.getFeeCalculation({asOfDate: asOfDate, entity: entity, positionIDs: positionIDs, runID: runID}).subscribe({
     next: response => {
 
+      this.terminateUri = response?.['terminatePostUri']
       timer(0, 10000).pipe(
         switchMap(() => this.getFeeCalcStatus(response?.['statusQueryGetUri'])),
         takeUntil(this.closeTimer)
       ).subscribe({
         next: (res: any) => {
 
-          if(res?.['runtimeStatus'] === 'Completed'){
+          if(res?.['runtimeStatus'] === 'Terminated'){
+            this.closeTimer.next();
+          }
+          else if(res?.['runtimeStatus'] === 'Completed'){
             this.feeCashflows = res?.['output']['FeeCashflows'][0]
             this.feeSmy = res?.['output']['FeeOutput']
             this.closeTimer.next();            

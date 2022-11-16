@@ -247,6 +247,8 @@ export class PortfolioModellerComponent implements OnInit {
       this.irrCalcService.generatePositionCashflows(m).pipe(first()).subscribe({
         next: resp => {
 
+          this.irrCalcService.terminateCashflowSaveUri = resp?.['terminatePostUri'];
+
           timer(0, 10000).pipe(
             switchMap(() => this.irrCalcService.getIRRStatus(resp?.['statusQueryGetUri'])),
             takeUntil(this.closeTimer)
@@ -257,6 +259,9 @@ export class PortfolioModellerComponent implements OnInit {
 
                 this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loaded' })
                 this.dataSvc.setWarningMsg(`Generated ${res['output']} cashflows for the selected model`, `Dismiss`, `ark-theme-snackbar-normal`);
+                this.closeTimer.next();
+              }
+              else if(res?.['runtimeStatus'] === 'Terminated'){
                 this.closeTimer.next();
               }
               else if(res?.['runtimeStatus'] === 'Failed'){
