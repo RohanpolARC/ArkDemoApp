@@ -2,7 +2,7 @@ import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angula
 import { ColDef, ColGroupDef, GridOptions, Module, ValueFormatterParams } from '@ag-grid-community/core';
 import { Component, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
 import { Subject, Subscription, timer } from 'rxjs';
-import { switchMap, takeUntil } from 'rxjs/operators';
+import { first, switchMap, takeUntil } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
@@ -23,6 +23,7 @@ export class IrrResultComponent implements OnInit {
 
   runID: string
   closeStream: Subject<any> = new Subject<any>();
+  terminateUri: string
 
   aggregationType: string
   subscriptions: Subscription[] = []
@@ -287,13 +288,18 @@ export class IrrResultComponent implements OnInit {
           this.subscriptions.push(this.irrCalcSvc.getIRRCalculation(this.calcParams).subscribe({
           next: response => {
   
+            this.terminateUri = response?.['terminatePostUri'];
+
             timer(0, 10000).pipe(
               switchMap(() => this.irrCalcSvc.getIRRStatus(response?.['statusQueryGetUri'])),
               takeUntil(this.closeTimer)
             ).subscribe({
               next: (res: any) => {
   
-                if(res?.['runtimeStatus'] === 'Completed'){
+                if(res?.['runtimeStatus'] === 'Terminated'){
+                  this.closeTimer.next();
+                }
+                else if(res?.['runtimeStatus'] === 'Completed'){
                   let calcs = []
                   for(let i = 0 ; i < res?.['output'].length; i++){
                     calcs.push({... res?.['output'][i].calcHelper, ... res?.['output'][i].MapGroupColValues, ... res?.['output'][i].paggr})
@@ -345,7 +351,14 @@ export class IrrResultComponent implements OnInit {
   ngOnDestroy(){
     this.subscriptions.forEach(sub => {
       sub.unsubscribe()
-    })
+    }) 
+
+    // Will give 410 result, if the instance is already completed.
+
+    // Terminate cashflow save instance
+    this.irrCalcSvc.terminateInstance(this.irrCalcSvc.terminateCashflowSaveUri).pipe(first()).subscribe();
+    // Terminate irr calc instance
+    this.irrCalcSvc.terminateInstance(this.terminateUri).pipe(first()).subscribe();
   }
 
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {

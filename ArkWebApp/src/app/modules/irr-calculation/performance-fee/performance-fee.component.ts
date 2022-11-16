@@ -57,6 +57,12 @@ export class PerformanceFeeComponent implements OnInit {
     )
   }
 
+  ngOnDestroy(){
+    // Terminate fee calc instance
+    this.feeCalcSvc
+    .terminateInstance(this.feeCalcSvc.terminateUri).pipe(first()).subscribe();
+  }
+
   ngOnChanges(changes: SimpleChanges){
     this.runID = this.calcParams.runID;
 
