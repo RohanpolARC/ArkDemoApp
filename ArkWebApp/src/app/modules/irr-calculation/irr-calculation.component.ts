@@ -34,19 +34,6 @@ export class IrrCalculationComponent implements OnInit {
   ) { }
 
   subscriptions: Subscription[] = []
-  // parenttabs : ParentTabType[] = [{
-  //   parentDisplayName: 'Portfolio Modeller',
-  //   parentActualName: 'Portfolio Modeller',
-  //   status: 'Loaded',
-  //   tabset: [{
-  //     displayName: 'Portfolio Modeller',
-  //     status: 'Loaded',
-  //     resultType: 'PortfolioModeller'
-  //   }]
-  // }];
-
-
-
   selected = new FormControl(0);
   calcParamsMap = {} //<model name, IRRCalcParams>
   cashflowLoadStatus: LoadStatusType = 'Loading';

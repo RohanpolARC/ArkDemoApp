@@ -275,10 +275,8 @@ export class IrrResultComponent implements OnInit {
   }
 
   ngOnInit(): void {
-  
-    // setTimeout(function() {
-      this.Init();
-    // }, 5000)
+
+    this.Init();
 
     this.irrCalcSvc.cashflowLoadStatusEvent.pipe(takeUntil(this.closeStream)).subscribe(
       e => {
@@ -314,6 +312,13 @@ export class IrrResultComponent implements OnInit {
                   this.status.emit('Failed')
                   this.calcs = [];
                 }
+              },
+              error: (error) => {
+                this.closeTimer.next();
+                this.status.emit('Failed')
+                this.calcs = []
+                console.error(`Failed to fetch response: ${error}`);
+    
               }
             })
           },
