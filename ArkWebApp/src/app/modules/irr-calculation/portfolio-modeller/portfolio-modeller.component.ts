@@ -325,6 +325,7 @@ export class PortfolioModellerComponent implements OnInit {
           ).subscribe({
             next: (res: any) => {
 
+              console.log(runID)
               if(res?.['runtimeStatus'] === 'Completed'){
 
                 this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loaded' })
