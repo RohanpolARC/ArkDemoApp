@@ -99,7 +99,7 @@ export class PortfolioModellerComponent implements OnInit {
           // Saved override value
           return {
             'border-color': '#0590ca',
-            'background': 'lightgreen'
+            'background': '#dbc671'
           }
           // Dirty override value
         else return {                   
