@@ -14,7 +14,6 @@ import { AggridMaterialDatepickerComponent } from '../../facility-detail/aggrid-
 import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/portfolio-save-run-model.component';
 import { getLastBusinessDay, getMomentDateStr, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
-import cryptoRandomString from 'crypto-random-string';
 import { first, switchMap, takeUntil } from 'rxjs/operators';
 
 type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`
@@ -197,15 +196,11 @@ export class PortfolioModellerComponent implements OnInit {
     }
   }
 
-  saveModelCashflowsAndOpenTabs(modelID?: number, context: string[] = ['SaveRunIRR'], runID: string = null, contextData: {  //changes context type from string to string[]
+  createNewTabGroup(runID: string, context: string[] = ['SaveRunIRR'], contextData: {  //changes context type from string to string[]
     baseMeasure?: string,
     feePreset?: string,
     irrAggrType?: string
-  } = null){
-
-    if(!modelID)
-      console.error(`Model ID not received`)
-      
+  }){
     let calcParamsData = []
 
     //Set calculation param configs and open all the tabs first
@@ -226,11 +221,21 @@ export class PortfolioModellerComponent implements OnInit {
         }
     });
 
+    // This will create new tab configs and will emit the config for new tab config to IRR Calculation component. 
     this.multiCalculationStaging(this.modelMap[this.selectedModelID]?.modelName, calcParamsData)
+  }
+
+  saveModelCashflowsAndOpenTabs(modelID?: number, context: string[] = ['SaveRunIRR'], contextData: {  //changes context type from string to string[]
+    baseMeasure?: string,
+    feePreset?: string,
+    irrAggrType?: string
+  } = null){
+
+    if(!modelID)
+      console.error(`Model ID not received`)
 
     // Create params for generating cashflows and trigger the virtual model cashflow generator
     let m = <PortfolioModellerCalcParams> {};
-    m.runID = runID;
     m.modelID = modelID;
     m.positionIDs = this.selectedPositionIDs;
     m.asOfDate = this.asOfDate;
@@ -241,13 +246,17 @@ export class PortfolioModellerComponent implements OnInit {
     // Load cashflows only if running IRR/Performance fees
 
     if(context.includes('SaveRunIRR') || context.includes('SaveRunPFees')){
-      
-      this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loading' })
-
+    
       this.irrCalcService.generatePositionCashflows(m).pipe(first()).subscribe({
         next: resp => {
 
+          let runID: string = resp?.['id'];
           this.irrCalcService.terminateCashflowSaveUri = resp?.['terminatePostUri'];
+
+          // After save cashflows instance is registered, setting a new tab for the run.
+          this.createNewTabGroup(runID, context, contextData)
+
+          this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loading' })
 
           timer(0, 10000).pipe(
             switchMap(() => this.irrCalcService.getIRRStatus(resp?.['statusQueryGetUri'])),
@@ -255,10 +264,11 @@ export class PortfolioModellerComponent implements OnInit {
           ).subscribe({
             next: (res: any) => {
 
+              console.log(runID)
               if(res?.['runtimeStatus'] === 'Completed'){
 
                 this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loaded' })
-                this.dataSvc.setWarningMsg(`Generated ${res['output']} cashflows for the selected model`, `Dismiss`, `ark-theme-snackbar-normal`);
+                this.dataSvc.setWarningMsg(`Generated ${res['output']['cashflowCount']} cashflows for the selected model`, `Dismiss`, `ark-theme-snackbar-normal`);
                 this.closeTimer.next();
               }
               else if(res?.['runtimeStatus'] === 'Terminated'){
@@ -270,11 +280,16 @@ export class PortfolioModellerComponent implements OnInit {
                 this.dataSvc.setWarningMsg(`Failed to generate the cashflows`, `Dismiss`, `ark-theme-snackbar-error`);
                 this.closeTimer.next();
               }
+            },
+            error: (error) => {
+              this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Failed' });
+              console.error(`Error in saving cashflows to DB: ${error}`);
+              this.closeTimer.next();
             }
           })
         },
         error: error => {
-          this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Failed' });
+          this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: null, status: 'Failed' });
           console.error(`Error in saving cashflows to DB: ${error}`);
           this.closeTimer.next();
         } 
@@ -285,7 +300,7 @@ export class PortfolioModellerComponent implements OnInit {
 
   }
 
-  fetchPortfolioModels(modelID?: number, context: string[] = ['SaveRunIRR'], runID: string = null, contextData: {  //changes context type from string to string[]
+  fetchPortfolioModels(modelID?: number, context: string[] = ['SaveRunIRR'], contextData: {  //changes context type from string to string[]
     baseMeasure?: string,
     feePreset?: string,
     irrAggrType?: string
@@ -297,7 +312,7 @@ export class PortfolioModellerComponent implements OnInit {
         this.setSelectedModel(modelID)
 
         if(modelID)
-        this.saveModelCashflowsAndOpenTabs(modelID, context, runID, contextData);
+        this.saveModelCashflowsAndOpenTabs(modelID, context, contextData);
 
       },
       error: error => {
@@ -670,14 +685,10 @@ export class PortfolioModellerComponent implements OnInit {
         }
         if(res?.isSuccess){
           this.selectedModelID = dialogRef.componentInstance.modelID
-
-          // Generating runID to track all calc runs under this context. 
-          let runID: string = cryptoRandomString({length: 20})
           
           this.fetchPortfolioModels(
             dialogRef.componentInstance.modelID,
             res.context,
-            runID,
             {
               baseMeasure: res?.['baseMeasure'],
               feePreset: res?.['feePreset'],
