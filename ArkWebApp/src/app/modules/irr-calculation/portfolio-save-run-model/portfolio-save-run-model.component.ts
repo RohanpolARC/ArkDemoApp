@@ -125,6 +125,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
 
     if(this.isAutomatic){
       this.rules = JSON.parse(JSON.stringify(this.adaptableApi.filterApi.getActiveColumnFilters()))
+      this.rules = this.rules.filter(f => f['ColumnId'] !== 'isOverride')
       this.recursiveRemoveKey(this.rules, 'Uuid')
       this.recursiveRemoveKey(this.rules, 'Source')  
     }

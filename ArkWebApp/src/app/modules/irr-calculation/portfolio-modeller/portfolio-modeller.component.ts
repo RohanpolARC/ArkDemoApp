@@ -1,5 +1,5 @@
 import { ColumnFilter, AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, EditableCallbackParams, GridOptions, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi, Module } from '@ag-grid-community/core';
+import { ColDef, EditableCallbackParams, GridOptions, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi, Module, CellClassParams } from '@ag-grid-community/core';
 import { Component, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -67,13 +67,54 @@ export class PortfolioModellerComponent implements OnInit {
 
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
 
-  editableCellStyle = (params) => {
-    return (this.isLocal.value && !params.node.group) ? 
-    {
-      'border-color': '#0590ca',
-    } : {
-      'border-color': '#fff'
-    };
+  // Mapping visible columns against their local and global counterparts.
+  overrideColMap: {
+    [col: string] : {
+      local: string, global: string
+    }
+  } = {
+    expectedPrice: { 
+      local: 'localExpectedPrice', global: 'globalExpectedPrice'
+    },
+    expectedDate: {
+      local: 'localExpectedDate', global: 'globalExpectedDate'
+    },
+    positionPercent: {
+      local: 'localPositionPercent', global: 'globalPositionPercent'
+    },
+    spreadDiscount: {
+      local: 'localSpreadDiscount', global: 'globalSpreadDiscount'
+    }
+  }
+
+  editableCellStyle = (params: CellClassParams) => {
+    if(params.node.group)
+      return null;
+
+    let colID: string = params.column.getColId();
+    let row = params.data;
+    if(this.isLocal.value && Object.keys(this.overrideColMap).includes(colID)){
+      if(row[colID] !== row[this.overrideColMap[colID].global]){
+        if(row[colID] === row[this.overrideColMap[colID].local])
+          // Saved override value
+          return {
+            'border-color': '#0590ca',
+            'background': 'lightgreen'
+          }
+          // Dirty override value
+        else return {                   
+          'border-color': '#0590ca',
+          'background': '#ffcc00'
+        }
+      }
+      else
+        // No override 
+        return { 
+          'border-color': '#0590ca'
+        }     
+    }
+
+    return null;
   }
 
   columnDefs: ColDef[] = [    
@@ -136,7 +177,8 @@ export class PortfolioModellerComponent implements OnInit {
   { field: 'capStructureTranche', width: 145 },
   { field: 'securedUnsecured', width: 145 },
   { field: 'seniority', width: 145 },
-  { field: 'IsChecked', width: 50, headerName: 'Checked', type: 'abColDefBoolean', checkboxSelection: true }
+  { field: 'IsChecked', width: 50, headerName: 'Checked', type: 'abColDefBoolean', checkboxSelection: true },
+  { field: 'isOverride', width: 150, headerName: 'IsOverride', type: 'abColDefString' }
 ]
 
   autoGroupColumnDef: {
@@ -150,7 +192,7 @@ export class PortfolioModellerComponent implements OnInit {
   adapTableApi: AdaptableApi;
   adaptableOptions: AdaptableOptions;
 
-  setDateFields(row: any, fields: string[]){
+  getDateFields(row: any, fields: string[]){
     for(let i = 0; i < fields.length; i+= 1){
       row[fields[i]] = formatDate(row[fields[i]]);
       if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(row[fields[i]]))
@@ -160,6 +202,24 @@ export class PortfolioModellerComponent implements OnInit {
     return row;
   }
 
+  // Get the override flag value for the row.
+  getIsOverride(row: any){
+    let overrideColMap = {
+      expectedPrice: 'globalExpectedPrice',
+      expectedDate: 'globalExpectedDate',
+      spreadDiscount: 'globalSpreadDiscount',
+      positionPercent: 'globalPositionPercent'
+    }
+
+    let cols: string[] = Object.keys(overrideColMap)
+    let isOverride: boolean = false;
+    for(let i = 0 ; i < cols.length; i+= 1){
+      isOverride = isOverride || (row[cols[i]] !== row[overrideColMap[cols[i]]])
+    }
+
+    return isOverride ? 'Yes' : 'No';
+  }
+
   fetchIRRPostions() {
     if(this.asOfDate !== null){
       this.gridOptions?.api?.showLoadingOverlay();
@@ -167,7 +227,8 @@ export class PortfolioModellerComponent implements OnInit {
         next: data => {
           this.gridOptions?.api?.hideOverlay();
           for(let i: number = 0; i < data?.length; i+= 1){
-            data[i] = this.setDateFields(data[i], ['expectedDate', 'localExpectedDate', 'globalExpectedDate', 'maturityDate'])
+            data[i] = this.getDateFields(data[i], ['expectedDate', 'localExpectedDate', 'globalExpectedDate', 'maturityDate'])
+            data[i]['isOverride'] = this.getIsOverride(data[i])
           }  
 
           adaptable_Api.gridApi.setGridData(data)
@@ -264,7 +325,6 @@ export class PortfolioModellerComponent implements OnInit {
           ).subscribe({
             next: (res: any) => {
 
-              console.log(runID)
               if(res?.['runtimeStatus'] === 'Completed'){
 
                 this.irrCalcService.cashflowLoadStatusEvent.emit({ runID: runID, status: 'Loaded' })
@@ -431,7 +491,7 @@ export class PortfolioModellerComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 6,
+          Revision: 7,
           CurrentLayout: 'Manual',
           Layouts: [
           {
@@ -463,7 +523,8 @@ export class PortfolioModellerComponent implements OnInit {
               'capStructureTranche',
               'securedUnsecured',
               'seniority',
-              'IsChecked'
+              'IsChecked',
+              'isOverride'
             ],
             PinnedColumnsMap: {
               IsChecked: 'right'
@@ -498,7 +559,8 @@ export class PortfolioModellerComponent implements OnInit {
               'assetClass',
               'capStructureTranche',
               'securedUnsecured',
-              'seniority'
+              'seniority',
+              'isOverride'
             ],
             RowGroupedColumns: ['fund', 'issuerShortName'],
           }]
@@ -524,20 +586,26 @@ export class PortfolioModellerComponent implements OnInit {
 
   onCellValueChanged(params: CellValueChangedEvent){
     /** Updating all the filtered children nodes as Ag/Adaptable isn't doing itself */
-    let node: RowNode = params.node, colID: string, colVal;
+    let node: RowNode = params.node, colID: string = params.column.getColId(), colVal = params.data[colID];
+
+    let updates = [];
     if(node.group){
-      colID = params.column.getColId();
-      colVal = params.data[colID]
   
-      let updates = [];
       for(let i: number = 0; i < node.allLeafChildren.length; i++){
        let nodeData = node.allLeafChildren[i].data;
        nodeData[colID] = colVal
+       nodeData['isOverride'] = 'Yes'
        updates.push(nodeData)
       }
-      this.gridApi.applyTransaction({ update: updates})
-
     }
+    else {
+      if(node.data[colID] !== node.data[this.overrideColMap[colID].global]){
+        let nodeData = node.data
+        nodeData['isOverride'] = 'Yes'
+        updates.push(nodeData)
+      }
+    }
+    this.gridApi.applyTransaction({ update: updates})
   }
 
   getUpdatedValues(): VPortfolioLocalOverrideModel[]{
@@ -627,7 +695,8 @@ export class PortfolioModellerComponent implements OnInit {
     this.gridApi.applyTransaction({update: gridData})
     this.gridApi.refreshCells({
       force: true,
-      suppressFlash: true
+      suppressFlash: true,
+      columns: [ ...Object.keys(this.overrideColMap), 'isOverride'] 
     })
   }
 
@@ -848,12 +917,16 @@ export class PortfolioModellerComponent implements OnInit {
       gridData[i].expectedDate = (context === 'Clear') ? gridData[i]?.globalExpectedDate : gridData[i]?.localExpectedDate
       gridData[i].spreadDiscount = (context === 'Clear') ? gridData[i]?.globalSpreadDiscount : gridData[i]?.localSpreadDiscount
       gridData[i].positionPercent = (context === 'Clear') ? gridData[i]?.globalPositionPercent : gridData[i]?.localPositionPercent
+
+      gridData[i].isOverride = (context === 'Clear') ? 'No' : this.getIsOverride(gridData[i]); 
       updates.push(gridData[i])
     }
+
     this.gridApi.applyTransaction({ update: updates})
     this.gridApi.refreshCells({
       force: true,
-      suppressFlash: true
+      suppressFlash: true,
+      columns: [ ...Object.keys(this.overrideColMap), 'isOverride'] 
     })
   }
 
@@ -910,7 +983,8 @@ export class PortfolioModellerComponent implements OnInit {
     this.subscriptions.push(this.isLocal.valueChanges.subscribe(isLocal => {
       this.gridApi.refreshCells({
         force: true,
-        suppressFlash: true
+        suppressFlash: true,
+        columns: [ ...Object.keys(this.overrideColMap), 'isOverride'] 
       })
   
       if(!isLocal){
