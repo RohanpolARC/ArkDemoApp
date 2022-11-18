@@ -505,7 +505,7 @@ export class PortfolioModellerComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 7,
+          Revision: 8,
           CurrentLayout: 'Manual',
           Layouts: [
           {
@@ -525,7 +525,7 @@ export class PortfolioModellerComponent implements OnInit {
               'maturityDate',
               'benchMarkIndex',
               'spread',
-              'pikmargin',
+              'pikMargin',
               'unfundedMargin',
               'floorRate',
               'expectedDate',
@@ -562,7 +562,7 @@ export class PortfolioModellerComponent implements OnInit {
               'maturityDate',
               'benchMarkIndex',
               'spread',
-              'pikmargin',
+              'pikMargin',
               'unfundedMargin',
               'floorRate',
               'expectedDate',
