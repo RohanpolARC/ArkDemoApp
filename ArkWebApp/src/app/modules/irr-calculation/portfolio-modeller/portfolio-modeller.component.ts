@@ -99,7 +99,7 @@ export class PortfolioModellerComponent implements OnInit {
           // Saved override value
           return {
             'border-color': '#0590ca',
-            'background': '#dbc671'
+            'background': '#f79a28'
           }
           // Dirty override value
         else return {                   
@@ -117,6 +117,10 @@ export class PortfolioModellerComponent implements OnInit {
     return null;
   }
 
+  isEditable = (params: EditableCallbackParams) => {
+    return this.isLocal.value
+  }
+
   columnDefs: ColDef[] = [    
   {field: 'positionID', width:100, tooltipField: 'positionID', type:'abColDefNumber'},
   {field: 'fundHedging', width:150, tooltipField: 'fundHedging', rowGroup: true, pinned: 'left', type: 'abColDefString'}, 
@@ -130,13 +134,9 @@ export class PortfolioModellerComponent implements OnInit {
   {field: 'costPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 110, type:'abColDefNumber'},
   {field: 'mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 86, type:'abColDefNumber'},
   {field: 'maturityDate', type: 'abColDefDate', width: 135, cellClass: 'dateUK', 
-    editable: (params: EditableCallbackParams) => {
-      return this.isLocal.value
-    },
+    editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this), cellEditor: 'agGridMaterialDatepicker'},
-  {field: 'benchMarkIndex', width: 161, type: 'abColDefString', editable: (params: EditableCallbackParams) => {
-    return this.isLocal.value
-  },
+  {field: 'benchMarkIndex', width: 161, type: 'abColDefString',     editable: this.isEditable.bind(this),
   cellStyle: this.editableCellStyle.bind(this),
   cellEditor: 'autocompleteCellEditor',
   // This function will return when required and not on columndef init only
@@ -146,57 +146,41 @@ export class PortfolioModellerComponent implements OnInit {
       isStrict: true
   }}},
   { 
-    field: 'spread', width: 94, cellClass: 'ag-right-aligned-cell', valueFormatter: removeDecimalFormatter, type:'abColDefNumber'
+    field: 'spread', width: 94, cellClass: 'ag-right-aligned-cell', valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
+    editable: this.isEditable.bind(this),
+    cellStyle: this.editableCellStyle.bind(this)
   },
   {
     field: 'pikMargin', width: 120, headerName: 'PIK Margin', cellClass: 'ag-right-aligned-cell', valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
-    editable: (params: EditableCallbackParams) => {
-      return this.isLocal.value
-    },
+    editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this)
   },
   {
     field: 'unfundedMargin', width: 160, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber'
-    ,editable: (params: EditableCallbackParams) => {
-      return this.isLocal.value
-    },
+    ,editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this)
   },
   {
-    field: 'floorRate', width: 113, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber'
-    ,editable: (params: EditableCallbackParams) => {
-      return this.isLocal.value
-    },
+    field: 'floorRate', width: 113, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber',
+    editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this)
   },
   { field: 'expectedDate', maxWidth: 150, width: 150, type: 'abColDefDate', cellEditor: 'agGridMaterialDatepicker',
-    editable: (params: EditableCallbackParams) => {
-      return this.isLocal.value
-    },
+    editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this),
     cellClass: 'dateUK'
   },
   { field: 'expectedPrice', width: 140, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber',
-    editable: (params: EditableCallbackParams) => {
-      return this.isLocal.value
-    },
+    editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this)
   },
-  { 
-    field: 'maturityPrice', width: 136,valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber'
-  },
-  {
-    headerName: 'Spread Discount', width: 151, field: 'spreadDiscount', valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
-    editable: (params: EditableCallbackParams) => {
-      return this.isLocal.value
-    },
+  { field: 'maturityPrice', width: 136,valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber' },
+  { headerName: 'Spread Discount', width: 151, field: 'spreadDiscount', valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
+    editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this)
   },
-  {
-    field: 'positionPercent', width: 150, headerName: 'Position Percent', valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
-    editable: (params: EditableCallbackParams) => {
-      return this.isLocal.value
-    },
+  { field: 'positionPercent', width: 150, headerName: 'Position Percent', valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
+    editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this)
   },
   { field: 'assetClass', width: 145 },
@@ -246,7 +230,9 @@ export class PortfolioModellerComponent implements OnInit {
         next: data => {
           this.gridOptions?.api?.hideOverlay();
           for(let i: number = 0; i < data?.length; i+= 1){
-            data[i] = this.getDateFields(data[i], ['expectedDate', 'localExpectedDate', 'globalExpectedDate', 'maturityDate', 'localMaturityDate', 'globalMaturityDate'])
+            data[i] = this.getDateFields(data[i], [
+              ...['expectedDate', 'localExpectedDate', 'globalExpectedDate'], 
+              ...['maturityDate', 'localMaturityDate', 'globalMaturityDate']])
             data[i]['isOverride'] = this.getIsOverride(data[i])
           }  
 
