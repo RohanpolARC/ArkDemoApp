@@ -15,6 +15,7 @@ import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/port
 import { getLastBusinessDay, getMomentDateStr, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { first, switchMap, takeUntil } from 'rxjs/operators';
+import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 
 type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`
 
@@ -36,6 +37,7 @@ let adaptable_Api: AdaptableApi
 })
 export class PortfolioModellerComponent implements OnInit {
   closeTimer: Subject<any> = new Subject<any>();
+  benchMarkIndexes: string[];
   
   constructor(
     private dataSvc: DataService,
@@ -73,18 +75,16 @@ export class PortfolioModellerComponent implements OnInit {
       local: string, global: string
     }
   } = {
-    expectedPrice: { 
-      local: 'localExpectedPrice', global: 'globalExpectedPrice'
-    },
-    expectedDate: {
-      local: 'localExpectedDate', global: 'globalExpectedDate'
-    },
-    positionPercent: {
-      local: 'localPositionPercent', global: 'globalPositionPercent'
-    },
-    spreadDiscount: {
-      local: 'localSpreadDiscount', global: 'globalSpreadDiscount'
-    }
+    expectedPrice: { local: 'localExpectedPrice', global: 'globalExpectedPrice' },
+    expectedDate: { local: 'localExpectedDate', global: 'globalExpectedDate' },
+    positionPercent: { local: 'localPositionPercent', global: 'globalPositionPercent' },
+    spreadDiscount: { local: 'localSpreadDiscount', global: 'globalSpreadDiscount' },
+    maturityDate: { local: 'localMaturityDate', global: 'globalMaturityDate' },
+    benchMarkIndex: { local: 'localBenchMarkIndex', global: 'globalBenchMarkIndex' },
+    spread: { local: 'localSpread', global: 'globalSpread' },
+    pikMargin: { local: 'localPikMargin', global: 'globalPikMargin' },
+    unfundedMargin: { local: 'localUnfundedMargin', global: 'globalUnfundedMargin' },
+    floorRate: { local: 'localFloorRate', global: 'globalFloorRate' }
   }
 
   editableCellStyle = (params: CellClassParams) => {
@@ -129,28 +129,54 @@ export class PortfolioModellerComponent implements OnInit {
   {field: 'faceValueIssue',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 150, type:'abColDefNumber'},
   {field: 'costPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 110, type:'abColDefNumber'},
   {field: 'mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 86, type:'abColDefNumber'},
-  {field: 'maturityDate', type: 'abColDefDate', width: 135, cellClass: 'dateUK'},
-  {field: 'benchMarkIndex', width: 161, type: 'abColDefString'},
+  {field: 'maturityDate', type: 'abColDefDate', width: 135, cellClass: 'dateUK', 
+    editable: (params: EditableCallbackParams) => {
+      return this.isLocal.value
+    },
+    cellStyle: this.editableCellStyle.bind(this), cellEditor: 'agGridMaterialDatepicker'},
+  {field: 'benchMarkIndex', width: 161, type: 'abColDefString', editable: (params: EditableCallbackParams) => {
+    return this.isLocal.value
+  },
+  cellStyle: this.editableCellStyle.bind(this),
+  cellEditor: 'autocompleteCellEditor',
+  // This function will return when required and not on columndef init only
+  cellEditorParams: () => { 
+    return {
+      options: this.benchMarkIndexes,
+      isStrict: true
+  }}},
   { 
     field: 'spread', width: 94, cellClass: 'ag-right-aligned-cell', valueFormatter: removeDecimalFormatter, type:'abColDefNumber'
   },
   {
-    field: 'pikmargin', width: 120, headerName: 'PIK Margin', cellClass: 'ag-right-aligned-cell', valueFormatter: removeDecimalFormatter, type:'abColDefNumber'
+    field: 'pikMargin', width: 120, headerName: 'PIK Margin', cellClass: 'ag-right-aligned-cell', valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
+    editable: (params: EditableCallbackParams) => {
+      return this.isLocal.value
+    },
+    cellStyle: this.editableCellStyle.bind(this)
   },
   {
     field: 'unfundedMargin', width: 160, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber'
+    ,editable: (params: EditableCallbackParams) => {
+      return this.isLocal.value
+    },
+    cellStyle: this.editableCellStyle.bind(this)
   },
   {
     field: 'floorRate', width: 113, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber'
+    ,editable: (params: EditableCallbackParams) => {
+      return this.isLocal.value
+    },
+    cellStyle: this.editableCellStyle.bind(this)
   },
-  { field: 'expectedDate', maxWidth: 150, width: 150, type: 'abColDefDate', enableCellChangeFlash: true,           cellEditor: 'agGridMaterialDatepicker',
+  { field: 'expectedDate', maxWidth: 150, width: 150, type: 'abColDefDate', cellEditor: 'agGridMaterialDatepicker',
     editable: (params: EditableCallbackParams) => {
       return this.isLocal.value
     },
     cellStyle: this.editableCellStyle.bind(this),
     cellClass: 'dateUK'
   },
-  { field: 'expectedPrice', width: 140, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber', enableCellChangeFlash: true,
+  { field: 'expectedPrice', width: 140, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber',
     editable: (params: EditableCallbackParams) => {
       return this.isLocal.value
     },
@@ -160,14 +186,14 @@ export class PortfolioModellerComponent implements OnInit {
     field: 'maturityPrice', width: 136,valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber'
   },
   {
-    headerName: 'Spread Discount', width: 151, field: 'spreadDiscount', enableCellChangeFlash: true, valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
+    headerName: 'Spread Discount', width: 151, field: 'spreadDiscount', valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
     editable: (params: EditableCallbackParams) => {
       return this.isLocal.value
     },
     cellStyle: this.editableCellStyle.bind(this)
   },
   {
-    field: 'positionPercent', width: 150, headerName: 'Position Percent', enableCellChangeFlash: true, valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
+    field: 'positionPercent', width: 150, headerName: 'Position Percent', valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
     editable: (params: EditableCallbackParams) => {
       return this.isLocal.value
     },
@@ -204,17 +230,10 @@ export class PortfolioModellerComponent implements OnInit {
 
   // Get the override flag value for the row.
   getIsOverride(row: any){
-    let overrideColMap = {
-      expectedPrice: 'globalExpectedPrice',
-      expectedDate: 'globalExpectedDate',
-      spreadDiscount: 'globalSpreadDiscount',
-      positionPercent: 'globalPositionPercent'
-    }
-
-    let cols: string[] = Object.keys(overrideColMap)
+    let cols: string[] = Object.keys(this.overrideColMap)
     let isOverride: boolean = false;
     for(let i = 0 ; i < cols.length; i+= 1){
-      isOverride = isOverride || (row[cols[i]] !== row[overrideColMap[cols[i]]])
+      isOverride = isOverride || (row[cols[i]] !== row[this.overrideColMap[cols[i]].global])
     }
 
     return isOverride ? 'Yes' : 'No';
@@ -227,7 +246,7 @@ export class PortfolioModellerComponent implements OnInit {
         next: data => {
           this.gridOptions?.api?.hideOverlay();
           for(let i: number = 0; i < data?.length; i+= 1){
-            data[i] = this.getDateFields(data[i], ['expectedDate', 'localExpectedDate', 'globalExpectedDate', 'maturityDate'])
+            data[i] = this.getDateFields(data[i], ['expectedDate', 'localExpectedDate', 'globalExpectedDate', 'maturityDate', 'localMaturityDate', 'globalMaturityDate'])
             data[i]['isOverride'] = this.getIsOverride(data[i])
           }  
 
@@ -394,7 +413,15 @@ export class PortfolioModellerComponent implements OnInit {
 
   context
 
+  fetchUniqueBenchmarkIndexes(){
+    this.subscriptions.push(this.dataSvc.getUniqueValuesForField('BenchMark Index').subscribe(d => {
+      this.benchMarkIndexes = d.map((bmIdx) => bmIdx.value);
+    }))
+  }
+
   ngOnInit(): void {
+
+    this.fetchUniqueBenchmarkIndexes();
 
     this.isAutomatic = new FormControl()
     this.isLocal = new FormControl()
@@ -407,7 +434,8 @@ export class PortfolioModellerComponent implements OnInit {
     }
 
     let frameworkComponents = {
-      agGridMaterialDatepicker: AggridMaterialDatepickerComponent
+      agGridMaterialDatepicker: AggridMaterialDatepickerComponent,
+      autocompleteCellEditor: MatAutocompleteEditorComponent
     }
 
     this.fetchPortfolioModels()
@@ -614,41 +642,54 @@ export class PortfolioModellerComponent implements OnInit {
     let gridData = []
     this.gridApi.forEachLeafNode((node) => gridData.push(node.data))
 
+    let oCols: string[] = Object.keys(this.overrideColMap);
+
     for(let i = 0 ; i < gridData.length; i++){
 
-      if(gridData[i].expectedPrice !== gridData[i].globalExpectedPrice){
+      for(let j = 0; j < oCols.length; j+=1){
+
+        if(gridData[i][oCols[j]] !== gridData[i][this.overrideColMap[oCols[j]].global])
           temp.push({
             positionID: gridData[i].positionID,
             assetID: gridData[i].assetID,
-            key: 'expectedPrice',
-            value: gridData[i].expectedPrice
-          })
+            key: oCols[j],
+            value: gridData[i][oCols[j]]
+          });
+      }
+
+      // if(gridData[i].expectedPrice !== gridData[i].globalExpectedPrice){
+      //     temp.push({
+      //       positionID: gridData[i].positionID,
+      //       assetID: gridData[i].assetID,
+      //       key: 'expectedPrice',
+      //       value: gridData[i].expectedPrice
+      //     })
   
-      }
-      if(gridData[i].expectedDate !== gridData[i].globalExpectedDate){
-          temp.push({
-            positionID: gridData[i].positionID,
-            assetID: gridData[i].assetID,
-            key: 'expectedDate',
-            value: gridData[i].expectedDate
-          })  
-      }
-      if(gridData[i].spreadDiscount !== gridData[i].globalSpreadDiscount){
-          temp.push({
-            positionID: gridData[i].positionID,
-            assetID: gridData[i].assetID,
-            key: 'SpreadDiscount',
-            value: gridData[i].spreadDiscount,
-          })  
-      }
-      if(gridData[i].positionPercent !== gridData[i].globalPositionPercent){
-          temp.push({
-            positionID: gridData[i].positionID,
-            assetID: gridData[i].assetID,
-            key: 'PositionPercent',
-            value: gridData[i].positionPercent
-          })  
-      }
+      // }
+      // if(gridData[i].expectedDate !== gridData[i].globalExpectedDate){
+      //     temp.push({
+      //       positionID: gridData[i].positionID,
+      //       assetID: gridData[i].assetID,
+      //       key: 'expectedDate',
+      //       value: gridData[i].expectedDate
+      //     })  
+      // }
+      // if(gridData[i].spreadDiscount !== gridData[i].globalSpreadDiscount){
+      //     temp.push({
+      //       positionID: gridData[i].positionID,
+      //       assetID: gridData[i].assetID,
+      //       key: 'SpreadDiscount',
+      //       value: gridData[i].spreadDiscount,
+      //     })  
+      // }
+      // if(gridData[i].positionPercent !== gridData[i].globalPositionPercent){
+      //     temp.push({
+      //       positionID: gridData[i].positionID,
+      //       assetID: gridData[i].assetID,
+      //       key: 'PositionPercent',
+      //       value: gridData[i].positionPercent
+      //     })  
+      // }
     }
     return temp;
   }
@@ -686,10 +727,15 @@ export class PortfolioModellerComponent implements OnInit {
     this.gridApi.forEachLeafNode(node => gridData.push(node.data))
 
     for(let i: number = 0; i < gridData.length; i++){
-      gridData[i].localExpectedDate = gridData[i].expectedDate
-      gridData[i].localExpectedPrice = gridData[i].expectedPrice
-      gridData[i].localSpreadDiscount = gridData[i].spreadDiscount
-      gridData[i].localPositionPercent = gridData[i].positionPercent
+
+      let oCols: string[] = Object.keys(this.overrideColMap);
+      for(let j: number = 0; j < oCols.length; j+= 1){
+        gridData[i][this.overrideColMap[oCols[j]].local] = gridData[i][oCols[j]]
+      }
+      // gridData[i].localExpectedDate = gridData[i].expectedDate
+      // gridData[i].localExpectedPrice = gridData[i].expectedPrice
+      // gridData[i].localSpreadDiscount = gridData[i].spreadDiscount
+      // gridData[i].localPositionPercent = gridData[i].positionPercent
     }
 
     this.gridApi.applyTransaction({update: gridData})
@@ -879,12 +925,15 @@ export class PortfolioModellerComponent implements OnInit {
             val: string = overrideInfo[i].value
 
       let node: RowNode = adaptable_Api.gridApi.getRowNodeForPrimaryKey(posID)
-      if(colName === 'expectedDate'){
-        node.setDataValue('expectedDate', val)
-      }
-      if(colName === 'expectedPrice'){
-        node.setDataValue('expectedPrice', Number(val))
-      }
+      let oCols: string[] = Object.keys(this.overrideColMap);
+
+      oCols.forEach(c =>  node.setDataValue(c, val))
+      // if(colName === 'expectedDate'){
+      //   node.setDataValue('expectedDate', val)
+      // }
+      // if(colName === 'expectedPrice'){
+      //   node.setDataValue('expectedPrice', Number(val))
+      // }
     }
   }
 
@@ -912,11 +961,15 @@ export class PortfolioModellerComponent implements OnInit {
       gridData.push(node.data)
     })
 
+    let oCols: string[] = Object.keys(this.overrideColMap);
+
     for(let i: number = 0; i < gridData?.length; i++){
-      gridData[i].expectedPrice = (context === 'Clear') ? gridData[i]?.globalExpectedPrice : gridData[i]?.localExpectedPrice 
-      gridData[i].expectedDate = (context === 'Clear') ? gridData[i]?.globalExpectedDate : gridData[i]?.localExpectedDate
-      gridData[i].spreadDiscount = (context === 'Clear') ? gridData[i]?.globalSpreadDiscount : gridData[i]?.localSpreadDiscount
-      gridData[i].positionPercent = (context === 'Clear') ? gridData[i]?.globalPositionPercent : gridData[i]?.localPositionPercent
+
+      oCols.forEach(c => gridData[i][c] = (context === 'Clear') ? gridData[i][this.overrideColMap[c].global] : gridData[i][this.overrideColMap[c].local])
+      // gridData[i].expectedPrice = (context === 'Clear') ? gridData[i]?.globalExpectedPrice : gridData[i]?.localExpectedPrice 
+      // gridData[i].expectedDate = (context === 'Clear') ? gridData[i]?.globalExpectedDate : gridData[i]?.localExpectedDate
+      // gridData[i].spreadDiscount = (context === 'Clear') ? gridData[i]?.globalSpreadDiscount : gridData[i]?.localSpreadDiscount
+      // gridData[i].positionPercent = (context === 'Clear') ? gridData[i]?.globalPositionPercent : gridData[i]?.localPositionPercent
 
       gridData[i].isOverride = (context === 'Clear') ? 'No' : this.getIsOverride(gridData[i]); 
       updates.push(gridData[i])
@@ -981,6 +1034,10 @@ export class PortfolioModellerComponent implements OnInit {
     }))
 
     this.subscriptions.push(this.isLocal.valueChanges.subscribe(isLocal => {
+      
+      // Stop editing (i.e. get out of focus on just edited cells, if any)
+      this.gridApi.stopEditing();
+
       this.gridApi.refreshCells({
         force: true,
         suppressFlash: true,
