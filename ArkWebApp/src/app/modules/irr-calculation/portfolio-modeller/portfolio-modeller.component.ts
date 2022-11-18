@@ -642,40 +642,6 @@ export class PortfolioModellerComponent implements OnInit {
             value: gridData[i][oCols[j]]
           });
       }
-
-      // if(gridData[i].expectedPrice !== gridData[i].globalExpectedPrice){
-      //     temp.push({
-      //       positionID: gridData[i].positionID,
-      //       assetID: gridData[i].assetID,
-      //       key: 'expectedPrice',
-      //       value: gridData[i].expectedPrice
-      //     })
-  
-      // }
-      // if(gridData[i].expectedDate !== gridData[i].globalExpectedDate){
-      //     temp.push({
-      //       positionID: gridData[i].positionID,
-      //       assetID: gridData[i].assetID,
-      //       key: 'expectedDate',
-      //       value: gridData[i].expectedDate
-      //     })  
-      // }
-      // if(gridData[i].spreadDiscount !== gridData[i].globalSpreadDiscount){
-      //     temp.push({
-      //       positionID: gridData[i].positionID,
-      //       assetID: gridData[i].assetID,
-      //       key: 'SpreadDiscount',
-      //       value: gridData[i].spreadDiscount,
-      //     })  
-      // }
-      // if(gridData[i].positionPercent !== gridData[i].globalPositionPercent){
-      //     temp.push({
-      //       positionID: gridData[i].positionID,
-      //       assetID: gridData[i].assetID,
-      //       key: 'PositionPercent',
-      //       value: gridData[i].positionPercent
-      //     })  
-      // }
     }
     return temp;
   }
@@ -718,10 +684,6 @@ export class PortfolioModellerComponent implements OnInit {
       for(let j: number = 0; j < oCols.length; j+= 1){
         gridData[i][this.overrideColMap[oCols[j]].local] = gridData[i][oCols[j]]
       }
-      // gridData[i].localExpectedDate = gridData[i].expectedDate
-      // gridData[i].localExpectedPrice = gridData[i].expectedPrice
-      // gridData[i].localSpreadDiscount = gridData[i].spreadDiscount
-      // gridData[i].localPositionPercent = gridData[i].positionPercent
     }
 
     this.gridApi.applyTransaction({update: gridData})
@@ -914,12 +876,6 @@ export class PortfolioModellerComponent implements OnInit {
       let oCols: string[] = Object.keys(this.overrideColMap);
 
       oCols.forEach(c =>  node.setDataValue(c, val))
-      // if(colName === 'expectedDate'){
-      //   node.setDataValue('expectedDate', val)
-      // }
-      // if(colName === 'expectedPrice'){
-      //   node.setDataValue('expectedPrice', Number(val))
-      // }
     }
   }
 
@@ -952,10 +908,6 @@ export class PortfolioModellerComponent implements OnInit {
     for(let i: number = 0; i < gridData?.length; i++){
 
       oCols.forEach(c => gridData[i][c] = (context === 'Clear') ? gridData[i][this.overrideColMap[c].global] : gridData[i][this.overrideColMap[c].local])
-      // gridData[i].expectedPrice = (context === 'Clear') ? gridData[i]?.globalExpectedPrice : gridData[i]?.localExpectedPrice 
-      // gridData[i].expectedDate = (context === 'Clear') ? gridData[i]?.globalExpectedDate : gridData[i]?.localExpectedDate
-      // gridData[i].spreadDiscount = (context === 'Clear') ? gridData[i]?.globalSpreadDiscount : gridData[i]?.localSpreadDiscount
-      // gridData[i].positionPercent = (context === 'Clear') ? gridData[i]?.globalPositionPercent : gridData[i]?.localPositionPercent
 
       gridData[i].isOverride = (context === 'Clear') ? 'No' : this.getIsOverride(gridData[i]); 
       updates.push(gridData[i])
