@@ -7,7 +7,7 @@
            [matAutocomplete]="auto"
            class="input-field"
            >
-    <mat-autocomplete #auto="matAutocomplete" matAutocompletePosition="below">
+    <mat-autocomplete #auto="matAutocomplete" matAutocompletePosition="below" panelWidth="auto">
       <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
         {{option}}
       </mat-option>
