@@ -86,4 +86,6 @@ export class APIConfig {
 
     public static PORTFOLIO_CASHFLOWS_GET_API: string = APIConfig.BASEURL + "/api/Cashflows/Get";
     public static MANAGEMENT_FEE_GET_API: string = APIConfig.BASEURL + "/api/ManagementFee/GetManagementFee";
+
+    public static POSITIONS_GET_API: string = APIConfig.BASEURL + "/api/PositionsScreen/GetPositionsData";
 }
