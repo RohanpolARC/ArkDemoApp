@@ -38,6 +38,7 @@ let adaptable_Api: AdaptableApi
 export class PortfolioModellerComponent implements OnInit {
   closeTimer: Subject<any> = new Subject<any>();
   benchMarkIndexes: string[];
+  dealTypes: string[];
   
   constructor(
     private dataSvc: DataService,
@@ -84,7 +85,8 @@ export class PortfolioModellerComponent implements OnInit {
     spread: { local: 'localSpread', global: 'globalSpread' },
     pikMargin: { local: 'localPikMargin', global: 'globalPikMargin' },
     unfundedMargin: { local: 'localUnfundedMargin', global: 'globalUnfundedMargin' },
-    floorRate: { local: 'localFloorRate', global: 'globalFloorRate' }
+    floorRate: { local: 'localFloorRate', global: 'globalFloorRate' },
+    dealType: { local: 'localDealType', global: 'globalDealType' }
   }
 
   editableCellStyle = (params: CellClassParams) => {
@@ -143,7 +145,8 @@ export class PortfolioModellerComponent implements OnInit {
   cellEditorParams: () => { 
     return {
       options: this.benchMarkIndexes,
-      isStrict: true
+      isStrict: true,
+      oldValRestoreOnStrict: true
   }}},
   { 
     field: 'spread', width: 94, cellClass: 'ag-right-aligned-cell', valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
@@ -164,6 +167,21 @@ export class PortfolioModellerComponent implements OnInit {
     field: 'floorRate', width: 113, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber',
     editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this)
+  },
+  { field: 'dealType',
+    editable: this.isEditable.bind(this),
+    cellStyle: this.editableCellStyle.bind(this),
+    type: 'abColDefString',
+    cellEditor: 'autocompleteCellEditor',
+    // This function will return when required and not on columndef init only
+    cellEditorParams: () => { 
+      return {
+        options: this.dealTypes, isStrict: true, oldValRestoreOnStrict: true
+    }},
+  },
+  { 
+    field: 'dealTypeCS',
+    type: 'abColDefString'
   },
   { field: 'expectedDate', maxWidth: 150, width: 150, type: 'abColDefDate', cellEditor: 'agGridMaterialDatepicker',
     editable: this.isEditable.bind(this),
@@ -405,9 +423,16 @@ export class PortfolioModellerComponent implements OnInit {
     }))
   }
 
+  fetchUniqueDealTypes(){
+    this.subscriptions.push(this.dataSvc.getUniqueValuesForField('Deal Type').subscribe(d => {
+      this.dealTypes = d.map((dt) => dt.value);
+    }))
+  }
+  
   ngOnInit(): void {
 
     this.fetchUniqueBenchmarkIndexes();
+    this.fetchUniqueDealTypes();
 
     this.isAutomatic = new FormControl()
     this.isLocal = new FormControl()
@@ -505,7 +530,7 @@ export class PortfolioModellerComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 8,
+          Revision: 9,
           CurrentLayout: 'Manual',
           Layouts: [
           {
@@ -528,6 +553,8 @@ export class PortfolioModellerComponent implements OnInit {
               'pikMargin',
               'unfundedMargin',
               'floorRate',
+              'dealTypeCS',
+              'dealType',
               'expectedDate',
               'expectedPrice',
               'maturityPrice',
@@ -565,6 +592,8 @@ export class PortfolioModellerComponent implements OnInit {
               'pikMargin',
               'unfundedMargin',
               'floorRate',
+              'dealTypeCS',
+              'dealType',
               'expectedDate',
               'expectedPrice',
               'maturityPrice',

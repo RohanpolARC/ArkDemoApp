@@ -18,20 +18,27 @@ export class MatAutocompleteEditorComponent implements ICellEditorAngularComp, O
   params: ICellEditorParams;
   subscriptions: Subscription[] = []
   isStrict: boolean = false
+  oldValRestoreOnStrict: boolean = false
+  oldVal
 
   constructor() { }
 
   agInit(params: ICellEditorParams): void {
 
+    this.oldVal = params.value;
     this.params = params;
     this.options = params?.['options'];
     this.isStrict = params?.['isStrict'] ? true : false;
+    this.oldValRestoreOnStrict = params?.['oldValRestoreOnStrict'] ? true : false;
     this.field.setValue(params.value, { emitEvent: false })
   }
 
   getValue() {
-    if(this.isStrict && !this.options.includes(this.field.value))
-      return null;
+    if(this.isStrict && !this.options.includes(this.field.value)){
+      if(this.oldValRestoreOnStrict)
+        return this.oldVal
+      else null;
+    }
     else return this.field.value;  
   }
 

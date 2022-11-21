@@ -228,7 +228,7 @@ export class FacilityDetailComponent implements OnInit {
         cellEditorParams: () => { 
           return {
             options: this.dealTypes,
-            isStrict: true
+            isStrict: true, oldValRestoreOnStrict: true
         }} },
       { field: 'expectedDate', 
         maxWidth: 150,
