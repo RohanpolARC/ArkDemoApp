@@ -56,7 +56,8 @@ export class AppComponent {
   FeePresetStyle: any = {};
   FixingAttributesStyle:any = {};
   RefDataManagerStyle:any = {};
-  ManagementFeeStyle: any = {}
+  ManagementFeeStyle: any = {};
+  PositionsScreenStyle: any = {};
 
   funds
   fundHedgings
@@ -189,6 +190,9 @@ export class AppComponent {
     else if(this.location.path() === '/management-fee'){
       this.updateSelection('Management Fee')
     }
+    else if(this.location.path() === '/positions-screen'){
+      this.updateSelection('Positions Screen')
+    }
     else this.updateSelection('')
   }
 
@@ -204,7 +208,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle= this.notSelectedElement;
 
     this.lastClickedTabRoute = this.location.path();
 
@@ -296,10 +300,13 @@ export class AppComponent {
       this.refDataFilter = ['Attribute Fixing']
       this.router.navigate(['/ref-data-manager'])      
     }
-
     else if(screen === 'Management Fee'){
       this.ManagementFeeStyle = this.selectedElement;
       this.router.navigate(['/management-fee'])
+    }
+    else if(screen === 'Positions Screen'){
+      this.PositionsScreenStyle = this.selectedElement;
+      this.router.navigate(['/positions-screen'])
     }
   }
 }
