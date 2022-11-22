@@ -64,7 +64,9 @@ const routes: Routes = [
     loadChildren: () => import('./modules/attributes-fixing/attributes-fixing.module').then(m => m.AttributesFixingModule) },
   { path: 'ref-data-manager',
     loadChildren: () => import('./modules/ref-data-manager/ref-data-manager.module').then(m => m.RefDataManagerModule) },
-  { path: 'management-fee', loadChildren: () => import('./modules/management-fee/management-fee.module').then(m => m.ManagementFeeModule) }
+  { path: 'management-fee', loadChildren: () => import('./modules/management-fee/management-fee.module').then(m => m.ManagementFeeModule) },
+  { path: 'positions-screen', loadChildren: () => import('./modules/positions-screen/positions-screen.module').then(m => m.PositionsScreenModule) }
+  
 ];
 
 @NgModule({  

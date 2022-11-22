@@ -76,6 +76,24 @@
     </mat-expansion-panel>
   </mat-accordion>
 
+
+  <mat-accordion>
+    <mat-expansion-panel [expanded]="false" >
+      <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
+        <mat-panel-title>
+         Portfolio
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+  
+      <mat-list>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Positions Screen')" [ngStyle]="PositionsScreenStyle">
+          <div class="list-item-text">Positions</div>
+        </mat-list-item>
+      </mat-list>
+
+    </mat-expansion-panel>
+  </mat-accordion>
+
   <mat-accordion>
     <mat-expansion-panel [expanded]="false" >
       <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
@@ -120,7 +138,7 @@
         </mat-list>
 
       </mat-expansion-panel>
-    </mat-accordion>
+  </mat-accordion>
 
     <mat-accordion>
       <mat-expansion-panel [expanded]="false" >
@@ -152,7 +170,7 @@
       <button mat-raised-button id="apply-button"  
         *ngIf="[
         '/facility-detail', '/liquidity-summary', '/fee-calculation', '/management-fee',
-        '/irr/portfoliomodeller', '/contract-history', '/cash-balance'].includes(location.path())" 
+        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen'].includes(location.path())" 
         (click)="filterApply()">Apply</button>
     </div>
 
@@ -186,6 +204,10 @@
 
     <div *ngIf="location.path() === '/management-fee'" class="filter-element">
       <app-management-fee-filter></app-management-fee-filter>
+    </div>
+
+    <div *ngIf="location.path() === '/positions-screen'" class="filter-element">
+      <app-position-screen-filter></app-position-screen-filter>
     </div>
 
   </mat-sidenav>
