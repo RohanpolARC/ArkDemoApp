@@ -285,6 +285,16 @@ export class FacilityDetailComponent implements OnInit {
         menuTabs: []
       },
   
+      { field: 'adjustedEBITDAatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Adj EBITDA at Inv' },
+      { field: 'eBITDA', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'EBITDA' }, 
+      { field: 'ltmRevenues', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'LTM Revenues' },
+      { field: 'netLeverage', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Net Leverage' },
+      { field: 'netLeverageAtInv', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Net Leverage At Inv' },
+      { field: 'netLTV', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Net LTV' },
+      { field: 'netLTVatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Net LTV at Inv' },
+      { field: 'revenueatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Revenue at Inv' },
+      { field: 'revenuePipeline', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Revenue Pipeline' },
+
       { field: 'assetClass', width: 145, type: 'abColDefString' },
       { field: 'capStructureTranche', width: 145, type: 'abColDefString' },
       { field: 'securedUnsecured', width: 145, type: 'abColDefString' },
@@ -384,7 +394,7 @@ export class FacilityDetailComponent implements OnInit {
           Revision: 3
         },
         Layout:{
-          Revision: 4,
+          Revision: 6,
           CurrentLayout: 'Basic Facility Detail',
           Layouts: [{
             Name: 'Basic Facility Detail',
@@ -410,6 +420,15 @@ export class FacilityDetailComponent implements OnInit {
               'maturityPrice',
               'spreadDiscount',
               'isOverride',
+              'adjustedEBITDAatInv',
+              'eBITDA',
+              'ltmRevenues',
+              'netLeverage',
+              'netLeverageAtInv',
+              'netLTV',
+              'netLTVatInv',
+              'revenueatInv',
+              'revenuePipeline',
               'assetClass',
               'capStructureTranche',
               'securedUnsecured',
