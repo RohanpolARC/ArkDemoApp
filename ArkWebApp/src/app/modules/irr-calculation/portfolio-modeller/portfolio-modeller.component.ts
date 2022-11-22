@@ -86,7 +86,6 @@ export class PortfolioModellerComponent implements OnInit {
     pikMargin: { local: 'localPikMargin', global: 'globalPikMargin' },
     unfundedMargin: { local: 'localUnfundedMargin', global: 'globalUnfundedMargin' },
     floorRate: { local: 'localFloorRate', global: 'globalFloorRate' },
-    dealType: { local: 'localDealType', global: 'globalDealType' }
   }
 
   editableCellStyle = (params: CellClassParams) => {
@@ -169,15 +168,7 @@ export class PortfolioModellerComponent implements OnInit {
     cellStyle: this.editableCellStyle.bind(this)
   },
   { field: 'dealType',
-    editable: this.isEditable.bind(this),
-    cellStyle: this.editableCellStyle.bind(this),
     type: 'abColDefString',
-    cellEditor: 'autocompleteCellEditor',
-    // This function will return when required and not on columndef init only
-    cellEditorParams: () => { 
-      return {
-        options: this.dealTypes, isStrict: true, oldValRestoreOnStrict: true
-    }},
   },
   { 
     field: 'dealTypeCS',
@@ -433,17 +424,10 @@ export class PortfolioModellerComponent implements OnInit {
       this.benchMarkIndexes = d.map((bmIdx) => bmIdx.value);
     }))
   }
-
-  fetchUniqueDealTypes(){
-    this.subscriptions.push(this.dataSvc.getUniqueValuesForField('Deal Type').subscribe(d => {
-      this.dealTypes = d.map((dt) => dt.value);
-    }))
-  }
   
   ngOnInit(): void {
 
     this.fetchUniqueBenchmarkIndexes();
-    this.fetchUniqueDealTypes();
 
     this.isAutomatic = new FormControl()
     this.isLocal = new FormControl()

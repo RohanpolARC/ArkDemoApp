@@ -44,7 +44,7 @@ export class FacilityDetailComponent implements OnInit {
   actionClickedRowID: number = null;
   isWriteAccess: boolean = false;
   rowData: any[] = [];
-  dealTypes: string[];
+  dealTypesCS: string[];
 
   constructor(private facilityDetailsService: FacilityDetailService,
     private accessService: AccessService,
@@ -87,7 +87,7 @@ export class FacilityDetailComponent implements OnInit {
 
   toggleIsOverrideCheckbox(params: CellValueChangedEvent, newVal, column: string){
 
-    if(['expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount', 'isOverride', 'dealType'].includes(column)){
+    if(['expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount', 'isOverride', 'dealTypeCS'].includes(column)){
 
       let isChanged: boolean = false;
       if(['expectedPrice', 'maturityPrice', 'spreadDiscount'].includes(column)){
@@ -100,7 +100,7 @@ export class FacilityDetailComponent implements OnInit {
           isChanged = true
         }
       }
-      else if(column === 'dealType'){
+      else if(column === 'dealTypeCS'){
         if(params.newValue !== params.oldValue)
           isChanged = true
       }
@@ -112,7 +112,7 @@ export class FacilityDetailComponent implements OnInit {
   
         params.api.refreshCells({
           force: true,
-          columns: ['expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount', 'isOverride', 'dealType'],
+          columns: ['expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount', 'isOverride', 'dealTypeCS'],
           rowNodes: [params.api.getRowNode(params.node.id)]
         });
   
@@ -138,7 +138,7 @@ export class FacilityDetailComponent implements OnInit {
       data['expectedPrice'] = data?.['dealPFExpectedPrice'];
       data['modifiedOn'] = data?.['dealPFModifiedOn'];
       data['modifiedBy'] = data?.['dealPFModifiedBy'];
-      data['dealType'] = data?.['dealPFDealType'];
+      data['dealTypeCS'] = data?.['dealPFDealTypeCS'];
 
       params.api.applyTransaction({
         update: [data]
@@ -179,15 +179,15 @@ export class FacilityDetailComponent implements OnInit {
   asOfDate: string = null;
   funds: string[] = null;
 
-  fetchUniqueDealTypes(){
-    this.subscriptions.push(this.dataSvc.getUniqueValuesForField('Deal Type').subscribe(d => {
-      this.dealTypes = d.map((dt) => dt.value);
+  fetchUniqueDealTypesCS(){
+    this.subscriptions.push(this.dataSvc.getUniqueValuesForField('Deal Type (CS)').subscribe(d => {
+      this.dealTypesCS = d.map((dt) => dt.value);
     }))
   }
 
   ngOnInit(): void {
 
-    this.fetchUniqueDealTypes();
+    this.fetchUniqueDealTypesCS();
     
     this.columnDefs = [
       {field: 'issuerShortName', pinned: 'left', width: 170, tooltipField: 'issuerShortName', type: 'abColDefString'},
@@ -220,16 +220,15 @@ export class FacilityDetailComponent implements OnInit {
       {field: 'floorRate', 
       width: 113,
       valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-      { field: 'dealTypeCS', type: 'abColDefString' },
-      { field: 'dealType', type: 'abColDefString',     
-        cellEditor: 'autocompleteCellEditor',        
-        editable: this.isEditable,
-        cellStyle: this.editableCellStyle,
-        cellEditorParams: () => { 
-          return {
-            options: this.dealTypes,
-            isStrict: true, oldValRestoreOnStrict: true
-        }} },
+      { field: 'dealType', type: 'abColDefString' },
+      { field: 'dealTypeCS', type: 'abColDefString', cellEditor: 'autocompleteCellEditor',        
+      editable: this.isEditable,
+      cellStyle: this.editableCellStyle,
+      cellEditorParams: () => { 
+        return {
+          options: this.dealTypesCS,
+          isStrict: true, oldValRestoreOnStrict: true
+      }}},
       { field: 'expectedDate', 
         maxWidth: 150,
         width: 150,
@@ -394,7 +393,7 @@ export class FacilityDetailComponent implements OnInit {
           Revision: 3
         },
         Layout:{
-          Revision: 6,
+          Revision: 7,
           CurrentLayout: 'Basic Facility Detail',
           Layouts: [{
             Name: 'Basic Facility Detail',
@@ -413,8 +412,8 @@ export class FacilityDetailComponent implements OnInit {
               'pikmargin',
               'unfundedMargin',
               'floorRate',
-              'dealTypeCS',
               'dealType',
+              'dealTypeCS',
               'expectedDate',
               'expectedPrice',
               'maturityPrice',
