@@ -10,7 +10,7 @@ const routes: Routes = [
     canActivate: [
         MsalGuard, RoleGuard
     ], 
-    data: { tab: 'Ref Data Manager' }
+    data: { tab: 'Positions Screen' }
   }
 ];
 
