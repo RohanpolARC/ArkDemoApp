@@ -15,6 +15,7 @@ import { IrrCalculationFilterComponent } from './irr-calculation-filter/irr-calc
 import { FeeCalculationFilterComponent } from './fee-calculation-filter/fee-calculation-filter.component';
 import { RefDataManagerFilterComponent } from './ref-data-manager-filter/ref-data-manager-filter.component';
 import { ManagementFeeFilterComponent } from './management-fee-filter/management-fee-filter.component';
+import { PositionScreenFilterComponent } from './position-screen-filter/position-screen-filter.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { ManagementFeeFilterComponent } from './management-fee-filter/management
     IrrCalculationFilterComponent,
     FeeCalculationFilterComponent,
     RefDataManagerFilterComponent,
-    ManagementFeeFilterComponent
+    ManagementFeeFilterComponent,
+    PositionScreenFilterComponent
   ],
   imports: [
     CommonModule,
@@ -46,7 +48,8 @@ import { ManagementFeeFilterComponent } from './management-fee-filter/management
     IrrCalculationFilterComponent,
     FeeCalculationFilterComponent,
     RefDataManagerFilterComponent,
-    ManagementFeeFilterComponent
+    ManagementFeeFilterComponent,
+    PositionScreenFilterComponent
   ]
 })
 export class FilterPaneModule { }
