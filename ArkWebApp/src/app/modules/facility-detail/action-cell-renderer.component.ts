@@ -60,7 +60,10 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp {
 
     if(this.componentParent.getSelectedRowID() === null || (this.componentParent.getSelectedRowID() === this.params.node.rowIndex)){
 
-      this.params.columnApi.setColumnsVisible(['expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount', 'isOverride'], true)
+      this.params.columnApi.setColumnsVisible(['dealType', 'expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount', 'isOverride'], true)
+      this.params.api.startEditingCell({ 
+        rowIndex: this.params.node.rowIndex, colKey: 'dealType'
+      });    
       this.params.api.startEditingCell({ 
         rowIndex: this.params.node.rowIndex, colKey: 'expectedPrice'
       });    
@@ -107,6 +110,7 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp {
     }
     else model.expectedDate = null
 
+    model.dealType = data.dealType;
     model.assetID = (data.assetID === null) ? null : parseInt(data.assetID);
     model.expectedPrice = (data.expectedPrice === null) ? null : parseFloat(data.expectedPrice);
     model.maturityPrice = (data.maturityPrice === null) ? null : parseFloat(data.maturityPrice);
