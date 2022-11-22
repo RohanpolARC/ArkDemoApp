@@ -8,9 +8,9 @@ const routes: Routes = [
   {
     path: '', component: PositionsScreenComponent, 
     canActivate: [
-        //MsalGuard, RoleGuard
+        MsalGuard, RoleGuard
     ], 
-    data: { tab: 'Ref Data Manager' }
+    data: { tab: 'Positions Screen' }
   }
 ];
 
