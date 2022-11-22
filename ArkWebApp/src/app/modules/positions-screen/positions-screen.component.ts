@@ -6,7 +6,7 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { PositionScreenService } from 'src/app/core/services/PositionsScreen/positions-screen.service';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
-import { amountFormatter, dateFormatter } from 'src/app/shared/functions/formatter';
+import { amountFormatter, dateFormatter, noDecimalAmountFormatter, nonAmountNumberFormatter2Dec } from 'src/app/shared/functions/formatter';
 
 
 
@@ -33,8 +33,7 @@ export class PositionsScreenComponent implements OnInit {
     public positionScreenSvc: PositionScreenService
   ) { }
 
-  ngOnInit(): void {
-
+  getPositionsData(){
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if(isHit){
         this.gridApi.showLoadingOverlay();
@@ -54,29 +53,34 @@ export class PositionsScreenComponent implements OnInit {
     
       }
     }))
+  }
 
-    this.subscriptions.push(this.positionScreenSvc.currentSearchDate.subscribe(asOfDate => {
-      this.asOfDate = asOfDate
-    }))
+  ngOnInit(): void {
 
-    this.subscriptions.push(this.positionScreenSvc.getPositions(this.asOfDate).subscribe({
-      next: (d) => {
-        this.gridApi?.hideOverlay();
+    
 
-        this.rowData = d;
-      },
-      error: (e) => {
-        console.error(`Failed to get the Positions: ${e}`)
-      }
-    }))
+    // this.subscriptions.push(this.positionScreenSvc.currentSearchDate.subscribe(asOfDate => {
+    //   this.asOfDate = asOfDate
+    // }))
+
+    // this.subscriptions.push(this.positionScreenSvc.getPositions(this.asOfDate).subscribe({
+    //   next: (d) => {
+    //     this.gridApi?.hideOverlay();
+
+    //     this.rowData = d;
+    //   },
+    //   error: (e) => {
+    //     console.error(`Failed to get the Positions: ${e}`)
+    //   }
+    // }))
     
     this.columnDefs = [
       
       {field:'issuer',type:'abColDefString'}, 
       {field:'issuerShortName',type:'abColDefString'},
       {field:'asset',type:'abColDefString'},
-      {field:'fund',type:'abColDefString'},
-      {field:'fundAdmin',type:'abColDefString'},
+      // {field:'fund',type:'abColDefString'},
+      // {field:'fundAdmin',type:'abColDefString'},
       {field:'fundLegalEntity',type:'abColDefString'},
       {field:'fundHedging',type:'abColDefString'},
       {field:'fundStrategy',type:'abColDefString'},
@@ -108,15 +112,15 @@ export class PositionsScreenComponent implements OnInit {
       {field:'spread',type:'abColDefNumber', valueFormatter: amountFormatter },
       {field:'spreadFrequency',type:'abColDefNumber', valueFormatter: amountFormatter },
       {field:'assetId',type:'abColDefNumber'},
-      {field:'pIKMargin',headerName:'PIK Margin'},
+      {field:'pikMargin',headerName:'PIK Margin',type:'abColDefNumber'},
       {field:'unfundedMargin',type:'abColDefNumber', valueFormatter: amountFormatter },
       {field:'maturityDate',valueFormatter:  dateFormatter,cellClass:'dateUK',type: 'abColDefDate' },
       {field:'primaryId',type:'abColDefNumber' },
       {field:'assetTypeName',type:'abColDefString'},
       {field:'isMultiCurrency',type:'abColDefBoolean'},
       {field:'positionId',type:'abColDefNumber' },
-      {field:'fXRateEur',headerName:'FX Rate EUR',type:'abColDefNumber', valueFormatter: amountFormatter },
-      {field:'fXRateBase',headerName:'FX Rate Base',type:'abColDefNumber', valueFormatter: amountFormatter },
+      {field:'fxRateEur',headerName:'FX Rate EUR',type:'abColDefNumber',valueFormatter:nonAmountNumberFormatter2Dec},
+      {field:'fxRateBase',headerName:'FX Rate Base',type:'abColDefNumber',valueFormatter:nonAmountNumberFormatter2Dec},
       {field:'feesIssue',type:'abColDefNumber', valueFormatter: amountFormatter },
       {field:'fees',type:'abColDefNumber', valueFormatter: amountFormatter },
       {field:'feesFX',type:'abColDefNumber', valueFormatter: amountFormatter },
@@ -138,27 +142,27 @@ export class PositionsScreenComponent implements OnInit {
       {field:'contractBaseRate',type:'abColDefNumber', valueFormatter: amountFormatter },
       {field:'contractSpread',type:'abColDefNumber', valueFormatter: amountFormatter },
       {field:'contractAllinRate',type:'abColDefNumber', valueFormatter: amountFormatter },
-      {field:'contractType',type:'abColDefNumber', valueFormatter: amountFormatter },
+      // {field:'contractType',type:'abColDefNumber', valueFormatter: amountFormatter },
       {field:'dirtyMarketValueIssue',type:'abColDefNumber', valueFormatter: amountFormatter },
       {field:'dirtyMarketValueIssueFunded',type:'abColDefNumber', valueFormatter: amountFormatter },
       {field:'dirtyMarketValueIssueFundedSD',type:'abColDefNumber', valueFormatter: amountFormatter },
       {field:'asOfDate',valueFormatter:  dateFormatter,cellClass:'dateUK',type: 'abColDefDate' },
-      {field:'issuerId',type:'abColDefNumber'},
-      {field:'faceValueGIR',type:'abColDefNumber', valueFormatter: amountFormatter },
-      {field:'faceValueGIRFunded',type:'abColDefNumber', valueFormatter: amountFormatter },
-      {field:'costValueGIR',type:'abColDefNumber', valueFormatter: amountFormatter },
-      {field:'costValueGIRFunded',type:'abColDefNumber', valueFormatter: amountFormatter },
+      // {field:'issuerId',type:'abColDefNumber'},
+      // {field:'faceValueGIR',type:'abColDefNumber', valueFormatter: amountFormatter },
+      // {field:'faceValueGIRFunded',type:'abColDefNumber', valueFormatter: amountFormatter },
+      // {field:'costValueGIR',type:'abColDefNumber', valueFormatter: amountFormatter },
+      // {field:'costValueGIRFunded',type:'abColDefNumber', valueFormatter: amountFormatter },
       {field:'quantity',type:'abColDefNumber', valueFormatter: amountFormatter },
-      {field:'fundRecon',type:'abColDefString'},
+      // {field:'fundRecon',type:'abColDefString'},
       {field:'capitalisedInterestBase',type:'abColDefNumber', valueFormatter: amountFormatter },
       {field:'capitalisedInterestEur',type:'abColDefNumber', valueFormatter: amountFormatter },
       {field:'capitalisedInterestLocal',type:'abColDefNumber', valueFormatter: amountFormatter },
       {field:'status',type:'abColDefString'},
-      {field:'isFinancing',type:'abColDefBoolean'},
+      // {field:'isFinancing',type:'abColDefBoolean'},
       {field:'settleType',type:'abColDefString'},
-      {field:'globalIssueAmount',type:'abColDefNumber', valueFormatter: amountFormatter },
-      {field:'m_lPortfolioType',headerName:'Portfolio Type',type:'abColDefNumber', valueFormatter: amountFormatter },
-      {field:'rCFType',headerName:'RCF Type',type:'abColDefNumber', valueFormatter: amountFormatter }
+      // {field:'globalIssueAmount',type:'abColDefNumber', valueFormatter: amountFormatter },
+      // {field:'m_lPortfolioType',headerName:'Portfolio Type',type:'abColDefNumber', valueFormatter: amountFormatter },
+      // {field:'rCFType',headerName:'RCF Type',type:'abColDefNumber', valueFormatter: amountFormatter }
     ]
 
     this.gridOptions = {
@@ -208,7 +212,7 @@ export class PositionsScreenComponent implements OnInit {
         },
         Layout:{
           CurrentLayout: 'Basic Positions Layout',
-          Revision: 9,
+          Revision: 14,
           Layouts: [{
             Name: 'Basic Positions Layout',
             Columns: this.columnDefs.map(def => def.field)
@@ -220,9 +224,10 @@ export class PositionsScreenComponent implements OnInit {
   }
 
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
-    this.gridApi?.showLoadingOverlay();
+    //this.gridApi?.showLoadingOverlay();
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
+    this.getPositionsData();
   }
 
   ngOnDestroy(){

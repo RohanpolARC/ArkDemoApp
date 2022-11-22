@@ -73,14 +73,20 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'issuer', type: 'abColDefString' },
       { field: 'asset', type: 'abColDefString' },
       { field: 'managementDate', type: 'abColDefDate', valueFormatter: dateFormatter, cellClass: 'dateUK', headerName: 'Trade Date' },
-      { field: 'aumBase', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, aggFunc: 'sum' },
+      { field: 'aumBase',headerName:'AUM Base', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, aggFunc: 'sum' },
       { field: 'feeRate', type: 'abColDefNumber', valueFormatter: amountFormatter, aggFunc: 'max', headerName: 'Fee Rate Percent'  },
       { field: 'calculatedITDFee', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, aggFunc: 'sum'  },
       { field: 'fixingDate', type: 'abColDefDate', valueFormatter: dateFormatter, aggFunc: 'Max', allowedAggFuncs: ['Max'], cellClass: 'dateUK' },
       { field: 'fixing', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, aggFunc: 'max'  },
       { field: 'adjustment', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, aggFunc: 'sum',   },
       { field: 'adjustedITDFee', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, allowedAggFuncs: ['Sum'], aggFunc: 'Sum' },
+      { field: 'noOfMgmtDays',headerName: 'No of Management Days', type: 'abColDefNumber'},
+      { field: 'positionCCY',headerName:'Position Ccy',type: 'abColDefString'},
+      { field: 'aumPosition', headerName:'AUM Position',type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter},
       { field: 'aggregatedAdjustment', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter }
+
+
+
     ].map(c => {
       if(c.allowedAggFuncs == null)
         c.allowedAggFuncs = allowedAggFunc
@@ -167,7 +173,7 @@ export class ManagementFeeComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 11,
+          Revision: 14,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
