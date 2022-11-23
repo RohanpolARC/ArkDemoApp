@@ -14,7 +14,7 @@ export interface FacilityDetailModel{
     unfundedMargin: number,
     floorRate: number,
     
-    dealType?: string,
+    dealTypeCS?: string,
     expectedDate?: string,
     expectedPrice?: number,
     maturityPrice?: number,
