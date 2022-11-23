@@ -86,7 +86,6 @@ export class PortfolioModellerComponent implements OnInit {
     pikMargin: { local: 'localPikMargin', global: 'globalPikMargin' },
     unfundedMargin: { local: 'localUnfundedMargin', global: 'globalUnfundedMargin' },
     floorRate: { local: 'localFloorRate', global: 'globalFloorRate' },
-    dealType: { local: 'localDealType', global: 'globalDealType' }
   }
 
   editableCellStyle = (params: CellClassParams) => {
@@ -759,6 +758,8 @@ export class PortfolioModellerComponent implements OnInit {
       }
     }
     this.gridApi.applyTransaction({ update: updates})
+    adaptable_Api.gridApi.refreshCells([node], ['clear_override',...Object.keys(this.overrideColMap), 'isOverride']);
+
   }
 
   getUpdatedValues(): VPortfolioLocalOverrideModel[]{
