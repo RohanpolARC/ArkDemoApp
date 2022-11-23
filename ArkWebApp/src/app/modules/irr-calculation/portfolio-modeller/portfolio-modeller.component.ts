@@ -1,4 +1,4 @@
-import { ColumnFilter, AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColumnFilter, AdaptableOptions, AdaptableApi, AdaptableButton, ActionColumnContext } from '@adaptabletools/adaptable-angular-aggrid';
 import { ColDef, EditableCallbackParams, GridOptions, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi, Module, CellClassParams } from '@ag-grid-community/core';
 import { Component, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
@@ -16,6 +16,7 @@ import { getLastBusinessDay, getMomentDateStr, getSharedEntities, setSharedEntit
 import { CommonConfig } from 'src/app/configs/common-config';
 import { first, switchMap, takeUntil } from 'rxjs/operators';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
+import { getNodes } from '../../capital-activity/utilities/functions';
 
 type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`
 
@@ -38,7 +39,6 @@ let adaptable_Api: AdaptableApi
 export class PortfolioModellerComponent implements OnInit {
   closeTimer: Subject<any> = new Subject<any>();
   benchMarkIndexes: string[];
-  dealTypes: string[];
   
   constructor(
     private dataSvc: DataService,
@@ -86,6 +86,7 @@ export class PortfolioModellerComponent implements OnInit {
     pikMargin: { local: 'localPikMargin', global: 'globalPikMargin' },
     unfundedMargin: { local: 'localUnfundedMargin', global: 'globalUnfundedMargin' },
     floorRate: { local: 'localFloorRate', global: 'globalFloorRate' },
+    dealType: { local: 'localDealType', global: 'globalDealType' }
   }
 
   editableCellStyle = (params: CellClassParams) => {
@@ -207,7 +208,8 @@ export class PortfolioModellerComponent implements OnInit {
   { field: 'securedUnsecured', width: 145 },
   { field: 'seniority', width: 145 },
   { field: 'IsChecked', width: 50, headerName: 'Checked', type: 'abColDefBoolean', checkboxSelection: true },
-  { field: 'isOverride', width: 150, headerName: 'IsOverride', type: 'abColDefString' }
+  { field: 'isOverride', width: 150, headerName: 'IsOverride', type: 'abColDefString' },
+  { field: 'clear_override', width: 50, headerName: 'Override', type: 'abSpecialColumn' }
 ]
 
   autoGroupColumnDef: {
@@ -269,6 +271,9 @@ export class PortfolioModellerComponent implements OnInit {
           
             this.selectManualPositions(this.selectedModelID);
           }
+
+          // Refreshing clear_override column based on dataset
+          adaptable_Api.gridApi.refreshCells(adaptable_Api.gridApi.getAllRowNodes(), ['clear_override']);
 
         },
         error: error => {
@@ -512,6 +517,92 @@ export class PortfolioModellerComponent implements OnInit {
         autoSaveLayouts: false
       },
 
+      actionOptions: {
+        actionColumns: 
+        [{
+            columnId: 'clear_override',
+            friendlyName: ' ',
+            includeGroupedRows: true,
+            actionColumnSettings: {
+              suppressMenu: true,
+              suppressMovable: true,
+              resizable: true
+            },
+            actionColumnButton: [
+              {
+                onClick:(
+                  button: AdaptableButton<ActionColumnContext>,
+                  context: ActionColumnContext
+                ) => {
+                  let node: RowNode = context.rowNode;
+                  let rowData = getNodes(node)
+                  let oCols: string[] = Object.keys(this.overrideColMap);
+                  for(let i: number = 0; i < rowData?.length; i++){
+                    for(let j: number = 0; j < oCols?.length; j+= 1){
+                      rowData[i][oCols[j]] = rowData[i][this.overrideColMap[oCols[j]].global]
+                    }
+                    rowData[i]['isOverride'] = 'No'
+                  }
+                  this.gridApi.applyTransaction({
+                    update: [rowData]
+                  });
+                },
+                hidden: (
+                  button: AdaptableButton<ActionColumnContext>,
+                  context: ActionColumnContext
+                ) => {
+                  let rowData: any = context.rowNode?.data;
+                  if(!context.rowNode.group && this.isLocal.value)
+                    return rowData?.['isOverride'] === 'Yes' ? false : true;
+                  
+                    return true;
+                },
+                tooltip: 'Clear Override',
+                icon: {
+                  src: '../assets/img/cancel.svg',
+                  style: {
+                    height: 25, width: 25
+                  }
+                }
+              },
+              {
+                onClick:(
+                  button: AdaptableButton<ActionColumnContext>,
+                  context: ActionColumnContext
+                ) => {
+                  let node: RowNode = context.rowNode;
+                  let rowData = getNodes(node)
+                  let oCols: string[] = Object.keys(this.overrideColMap);
+                  for(let i: number = 0; i < rowData?.length; i++){
+                    for(let j: number = 0; j < oCols?.length; j+= 1){
+                      rowData[i][oCols[j]] = rowData[i][this.overrideColMap[oCols[j]].local]
+                    }
+                    rowData[i]['isOverride'] = 'Yes'
+                  }
+                  this.gridApi.applyTransaction({
+                    update: [rowData]
+                  });
+                },
+                hidden: (
+                  button: AdaptableButton<ActionColumnContext>,
+                  context: ActionColumnContext
+                ) => {
+                  let rowData: any = context.rowNode?.data;
+                  if(!context.rowNode.group && this.isLocal.value)
+                    return rowData?.['isOverride'] === 'Yes' ? true : false;
+                  return true
+                },
+                tooltip: 'Undo clear',
+                icon: {
+                  src: '../assets/img/redo.svg',
+                  style: {
+                    height: 25, width: 25
+                  }
+                }
+              }
+            ]
+          }]
+      },
       predefinedConfig: {  
         Dashboard: {
           Revision: 4,
@@ -525,7 +616,7 @@ export class PortfolioModellerComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 11,
+          Revision: 14,
           CurrentLayout: 'Manual',
           Layouts: [
           {
@@ -569,9 +660,11 @@ export class PortfolioModellerComponent implements OnInit {
               'securedUnsecured',
               'seniority',
               'IsChecked',
-              'isOverride'
+              'isOverride',
+              'clear_override'
             ],
             PinnedColumnsMap: {
+              clear_override: 'right',
               IsChecked: 'right'
             },
             RowGroupedColumns: ['fund', 'issuerShortName']
@@ -616,8 +709,12 @@ export class PortfolioModellerComponent implements OnInit {
               'capStructureTranche',
               'securedUnsecured',
               'seniority',
-              'isOverride'
+              'isOverride',
+              'clear_override'
             ],
+            PinnedColumnsMap: {
+              clear_override: 'right'
+            },
             RowGroupedColumns: ['fund', 'issuerShortName'],
           }]
         },
@@ -956,11 +1053,12 @@ export class PortfolioModellerComponent implements OnInit {
     }
 
     this.gridApi.applyTransaction({ update: updates})
-    this.gridApi.refreshCells({
-      force: true,
-      suppressFlash: true,
-      columns: [ ...Object.keys(this.overrideColMap), 'isOverride'] 
-    })
+    // this.gridApi.refreshCells({
+    //   force: true,
+    //   suppressFlash: true,
+    //   columns: [ ...Object.keys(this.overrideColMap), 'isOverride'] 
+    // })
+    adaptable_Api.gridApi.refreshCells(adaptable_Api.gridApi.getAllRowNodes(), ['clear_override',...Object.keys(this.overrideColMap), 'isOverride']);
   }
 
   fetchOverridesForModel(modelID: number){
@@ -1031,6 +1129,7 @@ export class PortfolioModellerComponent implements OnInit {
       else{
         this.updateGridOverrides('Set')
       }
+
     }))
   }
 
