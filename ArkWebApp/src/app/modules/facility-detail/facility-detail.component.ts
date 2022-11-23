@@ -284,16 +284,19 @@ export class FacilityDetailComponent implements OnInit {
         menuTabs: []
       },
   
-      { field: 'adjustedEBITDAatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Adj EBITDA at Inv' },
-      { field: 'eBITDA', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'EBITDA' }, 
-      { field: 'ltmRevenues', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'LTM Revenues' },
-      { field: 'netLeverage', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Net Leverage' },
-      { field: 'netLeverageAtInv', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Net Leverage At Inv' },
-      { field: 'netLTV', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Net LTV' },
-      { field: 'netLTVatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Net LTV at Inv' },
-      { field: 'revenueatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Revenue at Inv' },
-      { field: 'revenuePipeline', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Revenue Pipeline' },
-
+      { field: 'adjustedEBITDAatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Adj EBITDA at Inv' },
+      { field: 'ebitda', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'EBITDA' }, 
+      { field: 'ltmRevenues', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'LTM Revenues' },
+      { field: 'netLeverage', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net Leverage' },
+      { field: 'netLeverageAtInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net Leverage At Inv' },
+      { field: 'netLTV', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net LTV' },
+      { field: 'netLTVatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net LTV at Inv' },
+      { field: 'revenueatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Revenue at Inv' },
+      { field: 'revenuePipeline', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Revenue Pipeline' },
+      { field: 'reportingEBITDA', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Reporting EBITDA' },
+      { field: 'reportingNetLeverage', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Reporting Net Leverage' },
+      { field: 'reportingNetLeverageComment', type: 'abColDefString', headerName: 'Reporting Net Leverage Comment' },
+    
       { field: 'assetClass', width: 145, type: 'abColDefString' },
       { field: 'capStructureTranche', width: 145, type: 'abColDefString' },
       { field: 'securedUnsecured', width: 145, type: 'abColDefString' },
@@ -393,7 +396,7 @@ export class FacilityDetailComponent implements OnInit {
           Revision: 3
         },
         Layout:{
-          Revision: 7,
+          Revision: 8,
           CurrentLayout: 'Basic Facility Detail',
           Layouts: [{
             Name: 'Basic Facility Detail',
@@ -420,7 +423,7 @@ export class FacilityDetailComponent implements OnInit {
               'spreadDiscount',
               'isOverride',
               'adjustedEBITDAatInv',
-              'eBITDA',
+              'ebitda',
               'ltmRevenues',
               'netLeverage',
               'netLeverageAtInv',
@@ -428,6 +431,9 @@ export class FacilityDetailComponent implements OnInit {
               'netLTVatInv',
               'revenueatInv',
               'revenuePipeline',
+              'reportingEBITDA',
+              'reportingNetLeverage',
+              'reportingNetLeverageComment',
               'assetClass',
               'capStructureTranche',
               'securedUnsecured',
