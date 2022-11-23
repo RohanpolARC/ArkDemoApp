@@ -222,7 +222,7 @@ export class FacilityDetailComponent implements OnInit {
       valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
       { field: 'dealType', type: 'abColDefString' },
       { field: 'dealTypeCS', type: 'abColDefString', cellEditor: 'autocompleteCellEditor',        
-      editable: this.isEditable,
+      editable: this.isEditable, filter: false,
       cellStyle: this.editableCellStyle,
       cellEditorParams: () => { 
         return {
@@ -234,7 +234,7 @@ export class FacilityDetailComponent implements OnInit {
         width: 150,
       //  valueFormatter: dateFormatter, 
   
-        editable: this.isEditable,
+        editable: this.isEditable,filter: false,
         cellEditor: 'agGridMaterialDatepicker',
         cellStyle: this.editableCellStyle,
         cellClass: 'dateUK'
@@ -243,14 +243,14 @@ export class FacilityDetailComponent implements OnInit {
         width: 140,
         valueFormatter: amountFormatter, 
         cellClass: 'ag-right-aligned-cell', 
-        editable: this.isEditable,
+        editable: this.isEditable,filter: false,
         cellStyle: this.editableCellStyle, type: 'abColDefNumber'
       },
       { field: 'maturityPrice', 
         width: 136,
         valueFormatter: amountFormatter, 
         cellClass: 'ag-right-aligned-cell',
-        editable: this.isEditable,
+        editable: this.isEditable,filter: false,
         cellStyle: this.editableCellStyle,
         type: 'abColDefNumber'
       },
@@ -259,7 +259,7 @@ export class FacilityDetailComponent implements OnInit {
         width: 151,
         field: 'spreadDiscount',
         editable: this.isEditable,
-        cellStyle: this.editableCellStyle,
+        cellStyle: this.editableCellStyle,filter: false,
         valueFormatter: removeDecimalFormatter, type: 'abColDefNumber'
       },
       {
