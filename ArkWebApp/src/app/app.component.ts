@@ -86,9 +86,9 @@ export class AppComponent {
       this.subscriptions.push(this.accessService.getTabs().subscribe({
         next: tabs => {
           this.accessService.accessibleTabs = tabs;
-          if(localStorage.getItem('lastClickedTabRoute')!==null){
-            this.router.navigate([ localStorage.getItem('lastClickedTabRoute')]);
-            localStorage.removeItem('lastClickedTabRoute');
+          if(sessionStorage.getItem('lastClickedTabRoute')!==null){
+            this.router.navigate([ sessionStorage.getItem('lastClickedTabRoute')]);
+            sessionStorage.removeItem('lastClickedTabRoute');
           }
         },
         error: error => {
@@ -130,7 +130,7 @@ export class AppComponent {
 
   ngOnInit(): void { 
     if(this.location.path()!=='/accessibility' && this.location.path()!==''){
-      localStorage.setItem('lastClickedTabRoute',this.location.path())
+      sessionStorage.setItem('lastClickedTabRoute',this.location.path())
     }
 
 
