@@ -141,6 +141,10 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       {
         type: 'Realised/Unrealised > Issuer Short Name',
         levels: ['IssuerFirmwide', 'FirmwideRealisedUnrealised', 'Firmwide']
+      },
+      {
+        type: 'Issuer Short Name > Deal Type(CS)',
+        levels: []
       }
     ]
 

@@ -76,6 +76,7 @@ export class IrrResultComponent implements OnInit {
       { field: 'IssuerID', type: 'abColDefNumber' },
       { field: 'Fund', type: 'abColDefString'},
       { field: 'Issuer Short Name', type: 'abColDefString'},
+      { field: 'DealTypeCS', type: 'abColDefString' },
       { field: 'CapitalInvestedEur', valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
       {field: 'RealizedProceedsEur', valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
       { field: 'CashCarryingValueEur', valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
@@ -206,7 +207,7 @@ export class IrrResultComponent implements OnInit {
           ]
         },
         Layout: {
-          Revision: 11,
+          Revision: 12,
           CurrentLayout: 'Default IRR Result',
           Layouts: [
           {
@@ -214,6 +215,7 @@ export class IrrResultComponent implements OnInit {
             Columns: [
               'Fund',
               'Issuer Short Name',
+              'DealTypeCS',
               'CapitalInvestedEur',
               'RealizedProceedsEur',
               'CashCarryingValueEur',
