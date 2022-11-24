@@ -546,7 +546,7 @@ export class PortfolioModellerComponent implements OnInit {
                     rowData[i]['isOverride'] = 'No'
                   }
                   this.gridApi.applyTransaction({
-                    update: [rowData]
+                    update: rowData
                   });
                 },
                 hidden: (
@@ -582,7 +582,7 @@ export class PortfolioModellerComponent implements OnInit {
                     rowData[i]['isOverride'] = 'Yes'
                   }
                   this.gridApi.applyTransaction({
-                    update: [rowData]
+                    update: rowData
                   });
                 },
                 hidden: (
@@ -777,6 +777,12 @@ export class PortfolioModellerComponent implements OnInit {
       }
     }
     this.gridApi.applyTransaction({ update: updates})
+
+    if(params.node.group){
+      let rownodes = params.node.allLeafChildren;
+      adaptable_Api.gridApi.refreshCells(rownodes, ['clear_override',...Object.keys(this.overrideColMap), 'isOverride'])
+    }
+    else 
     adaptable_Api.gridApi.refreshCells([node], ['clear_override',...Object.keys(this.overrideColMap), 'isOverride']);
 
   }
