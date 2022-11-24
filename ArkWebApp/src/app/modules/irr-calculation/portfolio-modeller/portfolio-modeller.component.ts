@@ -559,7 +559,7 @@ export class PortfolioModellerComponent implements OnInit {
                   
                     return true;
                 },
-                tooltip: 'Clear Override',
+                tooltip: 'Clear override',
                 icon: {
                   src: '../assets/img/cancel.svg',
                   style: {
@@ -590,11 +590,21 @@ export class PortfolioModellerComponent implements OnInit {
                   context: ActionColumnContext
                 ) => {
                   let rowData: any = context.rowNode?.data;
-                  if(!context.rowNode.group && this.isLocal.value)
-                    return rowData?.['isOverride'] === 'Yes' ? true : false;
+                  if(!context.rowNode.group && this.isLocal.value){
+
+                    let isOvrde: boolean = false;
+                    let oCols: string[] = Object.keys(this.overrideColMap);
+
+                    oCols.forEach(c => {
+                      isOvrde = isOvrde || (rowData[c] !== rowData[this.overrideColMap[c].local]) && (rowData[this.overrideColMap[c].local] !== rowData[this.overrideColMap[c].global])
+                    })
+
+                    return isOvrde ? false : true
+                  }
+                    
                   return true
                 },
-                tooltip: 'Undo clear',
+                tooltip: 'Apply override',
                 icon: {
                   src: '../assets/img/redo.svg',
                   style: {
