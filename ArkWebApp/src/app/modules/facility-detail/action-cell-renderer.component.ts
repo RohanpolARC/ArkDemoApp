@@ -60,26 +60,14 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp {
 
     if(this.componentParent.getSelectedRowID() === null || (this.componentParent.getSelectedRowID() === this.params.node.rowIndex)){
 
-      this.params.columnApi.setColumnsVisible(['dealType', 'expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount', 'isOverride'], true)
-      this.params.api.startEditingCell({ 
-        rowIndex: this.params.node.rowIndex, colKey: 'dealType'
-      });    
-      this.params.api.startEditingCell({ 
-        rowIndex: this.params.node.rowIndex, colKey: 'expectedPrice'
-      });    
-      this.params.api.startEditingCell({ 
-        rowIndex: this.params.node.rowIndex, colKey: 'maturityPrice'
-      });
-      this.params.api.startEditingCell({ 
-        rowIndex: this.params.node.rowIndex, colKey: 'spreadDiscount'
-      });
-      this.params.api.startEditingCell({ 
-        rowIndex: this.params.node.rowIndex, colKey: 'expectedDate'
-      });
-      this.params.api.startEditingCell({
-        rowIndex: this.params.node.rowIndex, colKey: 'isOverride'
+      let oCols: string[] = ['dealTypeCS', 'expectedDate', 'expectedPrice', 'maturityPrice', 'spreadDiscount', 'isOverride'];
+      this.params.columnApi.setColumnsVisible(oCols, true)
+      oCols.forEach((c) => {
+        this.params.api.startEditingCell({ 
+          rowIndex: this.params.node.rowIndex, colKey: c
+        });      
       })
-
+      
       this.params.api.refreshCells({
         force: true,
         suppressFlash: true
@@ -110,7 +98,7 @@ export class ActionCellRendererComponent implements ICellRendererAngularComp {
     }
     else model.expectedDate = null
 
-    model.dealType = data.dealType;
+    model.dealTypeCS = data.dealTypeCS;
     model.assetID = (data.assetID === null) ? null : parseInt(data.assetID);
     model.expectedPrice = (data.expectedPrice === null) ? null : parseFloat(data.expectedPrice);
     model.maturityPrice = (data.maturityPrice === null) ? null : parseFloat(data.maturityPrice);

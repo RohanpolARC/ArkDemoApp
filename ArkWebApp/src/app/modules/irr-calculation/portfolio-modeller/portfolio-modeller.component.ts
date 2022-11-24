@@ -1,4 +1,4 @@
-import { ColumnFilter, AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColumnFilter, AdaptableOptions, AdaptableApi, AdaptableButton, ActionColumnContext } from '@adaptabletools/adaptable-angular-aggrid';
 import { ColDef, EditableCallbackParams, GridOptions, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi, Module, CellClassParams } from '@ag-grid-community/core';
 import { Component, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
@@ -16,6 +16,7 @@ import { getLastBusinessDay, getMomentDateStr, getSharedEntities, setSharedEntit
 import { CommonConfig } from 'src/app/configs/common-config';
 import { first, switchMap, takeUntil } from 'rxjs/operators';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
+import { getNodes } from '../../capital-activity/utilities/functions';
 
 type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`
 
@@ -38,7 +39,6 @@ let adaptable_Api: AdaptableApi
 export class PortfolioModellerComponent implements OnInit {
   closeTimer: Subject<any> = new Subject<any>();
   benchMarkIndexes: string[];
-  dealTypes: string[];
   
   constructor(
     private dataSvc: DataService,
@@ -86,7 +86,6 @@ export class PortfolioModellerComponent implements OnInit {
     pikMargin: { local: 'localPikMargin', global: 'globalPikMargin' },
     unfundedMargin: { local: 'localUnfundedMargin', global: 'globalUnfundedMargin' },
     floorRate: { local: 'localFloorRate', global: 'globalFloorRate' },
-    dealType: { local: 'localDealType', global: 'globalDealType' }
   }
 
   editableCellStyle = (params: CellClassParams) => {
@@ -154,7 +153,7 @@ export class PortfolioModellerComponent implements OnInit {
     cellStyle: this.editableCellStyle.bind(this)
   },
   {
-    field: 'pikMargin', width: 120, headerName: 'PIK Margin', cellClass: 'ag-right-aligned-cell', valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
+    field: 'pikmargin', width: 120, headerName: 'PIK Margin', cellClass: 'ag-right-aligned-cell', valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
     editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this)
   },
@@ -169,15 +168,7 @@ export class PortfolioModellerComponent implements OnInit {
     cellStyle: this.editableCellStyle.bind(this)
   },
   { field: 'dealType',
-    editable: this.isEditable.bind(this),
-    cellStyle: this.editableCellStyle.bind(this),
     type: 'abColDefString',
-    cellEditor: 'autocompleteCellEditor',
-    // This function will return when required and not on columndef init only
-    cellEditorParams: () => { 
-      return {
-        options: this.dealTypes, isStrict: true, oldValRestoreOnStrict: true
-    }},
   },
   { 
     field: 'dealTypeCS',
@@ -201,22 +192,26 @@ export class PortfolioModellerComponent implements OnInit {
     editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this)
   },
-  { field: 'adjustedEBITDAatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Adj EBITDA at Inv' },
-  { field: 'eBITDA', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'EBITDA' }, 
-  { field: 'ltmRevenues', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'LTM Revenues' },
-  { field: 'netLeverage', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Net Leverage' },
-  { field: 'netLeverageAtInv', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Net Leverage At Inv' },
-  { field: 'netLTV', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Net LTV' },
-  { field: 'netLTVatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Net LTV at Inv' },
-  { field: 'revenueatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Revenue at Inv' },
-  { field: 'revenuePipeline', valueFormatter: amountFormatter, type: 'abColDefNumber', headerName: 'Revenue Pipeline' },
+  { field: 'adjustedEBITDAatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Adj EBITDA at Inv' },
+  { field: 'ebitda', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'EBITDA' }, 
+  { field: 'ltmRevenues', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'LTM Revenues' },
+  { field: 'netLeverage', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net Leverage' },
+  { field: 'netLeverageAtInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net Leverage At Inv' },
+  { field: 'netLTV', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net LTV' },
+  { field: 'netLTVatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net LTV at Inv' },
+  { field: 'revenueatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Revenue at Inv' },
+  { field: 'revenuePipeline', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Revenue Pipeline' },
+  { field: 'reportingEBITDA', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Reporting EBITDA' },
+  { field: 'reportingNetLeverage', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Reporting Net Leverage' },
+  { field: 'reportingNetLeverageComment', type: 'abColDefString', headerName: 'Reporting Net Leverage Comment' },
 
   { field: 'assetClass', width: 145 },
   { field: 'capStructureTranche', width: 145 },
   { field: 'securedUnsecured', width: 145 },
   { field: 'seniority', width: 145 },
   { field: 'IsChecked', width: 50, headerName: 'Checked', type: 'abColDefBoolean', checkboxSelection: true },
-  { field: 'isOverride', width: 150, headerName: 'IsOverride', type: 'abColDefString' }
+  { field: 'isOverride', width: 150, headerName: 'IsOverride', type: 'abColDefString' },
+  { field: 'clear_override', width: 50, headerName: 'Override', type: 'abSpecialColumn' }
 ]
 
   autoGroupColumnDef: {
@@ -278,6 +273,9 @@ export class PortfolioModellerComponent implements OnInit {
           
             this.selectManualPositions(this.selectedModelID);
           }
+
+          // Refreshing clear_override column based on dataset
+          adaptable_Api.gridApi.refreshCells(adaptable_Api.gridApi.getAllRowNodes(), ['clear_override']);
 
         },
         error: error => {
@@ -433,17 +431,10 @@ export class PortfolioModellerComponent implements OnInit {
       this.benchMarkIndexes = d.map((bmIdx) => bmIdx.value);
     }))
   }
-
-  fetchUniqueDealTypes(){
-    this.subscriptions.push(this.dataSvc.getUniqueValuesForField('Deal Type').subscribe(d => {
-      this.dealTypes = d.map((dt) => dt.value);
-    }))
-  }
   
   ngOnInit(): void {
 
     this.fetchUniqueBenchmarkIndexes();
-    this.fetchUniqueDealTypes();
 
     this.isAutomatic = new FormControl()
     this.isLocal = new FormControl()
@@ -528,6 +519,92 @@ export class PortfolioModellerComponent implements OnInit {
         autoSaveLayouts: false
       },
 
+      actionOptions: {
+        actionColumns: 
+        [{
+            columnId: 'clear_override',
+            friendlyName: ' ',
+            includeGroupedRows: true,
+            actionColumnSettings: {
+              suppressMenu: true,
+              suppressMovable: true,
+              resizable: true
+            },
+            actionColumnButton: [
+              {
+                onClick:(
+                  button: AdaptableButton<ActionColumnContext>,
+                  context: ActionColumnContext
+                ) => {
+                  let node: RowNode = context.rowNode;
+                  let rowData = getNodes(node)
+                  let oCols: string[] = Object.keys(this.overrideColMap);
+                  for(let i: number = 0; i < rowData?.length; i++){
+                    for(let j: number = 0; j < oCols?.length; j+= 1){
+                      rowData[i][oCols[j]] = rowData[i][this.overrideColMap[oCols[j]].global]
+                    }
+                    rowData[i]['isOverride'] = 'No'
+                  }
+                  this.gridApi.applyTransaction({
+                    update: [rowData]
+                  });
+                },
+                hidden: (
+                  button: AdaptableButton<ActionColumnContext>,
+                  context: ActionColumnContext
+                ) => {
+                  let rowData: any = context.rowNode?.data;
+                  if(!context.rowNode.group && this.isLocal.value)
+                    return rowData?.['isOverride'] === 'Yes' ? false : true;
+                  
+                    return true;
+                },
+                tooltip: 'Clear Override',
+                icon: {
+                  src: '../assets/img/cancel.svg',
+                  style: {
+                    height: 25, width: 25
+                  }
+                }
+              },
+              {
+                onClick:(
+                  button: AdaptableButton<ActionColumnContext>,
+                  context: ActionColumnContext
+                ) => {
+                  let node: RowNode = context.rowNode;
+                  let rowData = getNodes(node)
+                  let oCols: string[] = Object.keys(this.overrideColMap);
+                  for(let i: number = 0; i < rowData?.length; i++){
+                    for(let j: number = 0; j < oCols?.length; j+= 1){
+                      rowData[i][oCols[j]] = rowData[i][this.overrideColMap[oCols[j]].local]
+                    }
+                    rowData[i]['isOverride'] = 'Yes'
+                  }
+                  this.gridApi.applyTransaction({
+                    update: [rowData]
+                  });
+                },
+                hidden: (
+                  button: AdaptableButton<ActionColumnContext>,
+                  context: ActionColumnContext
+                ) => {
+                  let rowData: any = context.rowNode?.data;
+                  if(!context.rowNode.group && this.isLocal.value)
+                    return rowData?.['isOverride'] === 'Yes' ? true : false;
+                  return true
+                },
+                tooltip: 'Undo clear',
+                icon: {
+                  src: '../assets/img/redo.svg',
+                  style: {
+                    height: 25, width: 25
+                  }
+                }
+              }
+            ]
+          }]
+      },
       predefinedConfig: {  
         Dashboard: {
           Revision: 4,
@@ -541,7 +618,7 @@ export class PortfolioModellerComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 11,
+          Revision: 15,
           CurrentLayout: 'Manual',
           Layouts: [
           {
@@ -561,7 +638,7 @@ export class PortfolioModellerComponent implements OnInit {
               'maturityDate',
               'benchMarkIndex',
               'spread',
-              'pikMargin',
+              'pikmargin',
               'unfundedMargin',
               'floorRate',
               'dealTypeCS',
@@ -572,7 +649,7 @@ export class PortfolioModellerComponent implements OnInit {
               'spreadDiscount',
               'positionPercent',
               'adjustedEBITDAatInv',
-              'eBITDA',
+              'ebitda',
               'ltmRevenues',
               'netLeverage',
               'netLeverageAtInv',
@@ -580,14 +657,19 @@ export class PortfolioModellerComponent implements OnInit {
               'netLTVatInv',
               'revenueatInv',
               'revenuePipeline',
+              'reportingEBITDA',
+              'reportingNetLeverage',
+              'reportingNetLeverageComment',
               'assetClass',
               'capStructureTranche',
               'securedUnsecured',
               'seniority',
               'IsChecked',
-              'isOverride'
+              'isOverride',
+              'clear_override'
             ],
             PinnedColumnsMap: {
+              clear_override: 'right',
               IsChecked: 'right'
             },
             RowGroupedColumns: ['fund', 'issuerShortName']
@@ -620,7 +702,7 @@ export class PortfolioModellerComponent implements OnInit {
               'spreadDiscount',
               'positionPercent',
               'adjustedEBITDAatInv',
-              'eBITDA',
+              'ebitda',
               'ltmRevenues',
               'netLeverage',
               'netLeverageAtInv',
@@ -628,12 +710,19 @@ export class PortfolioModellerComponent implements OnInit {
               'netLTVatInv',
               'revenueatInv',
               'revenuePipeline',
+              'reportingEBITDA',
+              'reportingNetLeverage',
+              'reportingNetLeverageComment',
               'assetClass',
               'capStructureTranche',
               'securedUnsecured',
               'seniority',
-              'isOverride'
+              'isOverride',
+              'clear_override'
             ],
+            PinnedColumnsMap: {
+              clear_override: 'right'
+            },
             RowGroupedColumns: ['fund', 'issuerShortName'],
           }]
         },
@@ -678,6 +767,8 @@ export class PortfolioModellerComponent implements OnInit {
       }
     }
     this.gridApi.applyTransaction({ update: updates})
+    adaptable_Api.gridApi.refreshCells([node], ['clear_override',...Object.keys(this.overrideColMap), 'isOverride']);
+
   }
 
   getUpdatedValues(): VPortfolioLocalOverrideModel[]{
@@ -972,11 +1063,12 @@ export class PortfolioModellerComponent implements OnInit {
     }
 
     this.gridApi.applyTransaction({ update: updates})
-    this.gridApi.refreshCells({
-      force: true,
-      suppressFlash: true,
-      columns: [ ...Object.keys(this.overrideColMap), 'isOverride'] 
-    })
+    // this.gridApi.refreshCells({
+    //   force: true,
+    //   suppressFlash: true,
+    //   columns: [ ...Object.keys(this.overrideColMap), 'isOverride'] 
+    // })
+    adaptable_Api.gridApi.refreshCells(adaptable_Api.gridApi.getAllRowNodes(), ['clear_override',...Object.keys(this.overrideColMap), 'isOverride']);
   }
 
   fetchOverridesForModel(modelID: number){
@@ -1047,6 +1139,7 @@ export class PortfolioModellerComponent implements OnInit {
       else{
         this.updateGridOverrides('Set')
       }
+
     }))
   }
 
