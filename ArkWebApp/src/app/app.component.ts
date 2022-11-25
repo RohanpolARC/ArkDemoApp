@@ -12,6 +12,9 @@ import { MsalBroadcastService } from '@azure/msal-angular';
 import { filter } from 'rxjs/operators';
 import { AuthenticationResult, EventMessage, EventType } from '@azure/msal-browser';
 
+let lastClickedTabRoute :string
+// var count = 0 
+
 @Component({  
   selector: 'app-root',  
   templateUrl: './app.component.html',  
@@ -83,7 +86,10 @@ export class AppComponent {
       this.subscriptions.push(this.accessService.getTabs().subscribe({
         next: tabs => {
           this.accessService.accessibleTabs = tabs;
-          this.router.navigate([this.lastClickedTabRoute]);
+          if(sessionStorage.getItem('lastClickedTabRoute')!==null){
+            this.router.navigate([ sessionStorage.getItem('lastClickedTabRoute')]);
+            sessionStorage.removeItem('lastClickedTabRoute');
+          }
         },
         error: error => {
           console.error("Failed to fetch accessible tabs " + error);
@@ -92,7 +98,7 @@ export class AppComponent {
     }    
   }
 
-  lastClickedTabRoute: string = '/accessibility';
+
 
   filterApply(){
 
@@ -123,6 +129,11 @@ export class AppComponent {
   }
 
   ngOnInit(): void { 
+    if(this.location.path()!=='/accessibility' && this.location.path()!==''){
+      sessionStorage.setItem('lastClickedTabRoute',this.location.path())
+    }
+
+
     this.subscriptions.push(this.msalBroadcastSvc.msalSubject$
     // .pipe(filter((msg: EventMessage) => msg.eventType === EventType.LOGIN_SUCCESS || msg.eventType === EventType.SSO_SILENT_SUCCESS))
     .subscribe((result: EventMessage) => {
@@ -130,16 +141,16 @@ export class AppComponent {
 
         const payload = result.payload as AuthenticationResult;
         this.msalSvc.msalSvc.instance.setActiveAccount(payload.account);
-  
         this.fetchTabs();
         this.userName=this.dataService.getCurrentUserName();  
       }
-      else if(result.eventType === EventType.ACQUIRE_TOKEN_FAILURE || result.eventType === EventType.ACQUIRE_TOKEN_BY_CODE_FAILURE){
-        this.msalSvc.msalSvc.loginRedirect();
-      }
+      // if refresh token is expired the msal will redirect itself to microsoft login so this snippet is not needed.
+      // else if(result.eventType === EventType.ACQUIRE_TOKEN_FAILURE || result.eventType === EventType.ACQUIRE_TOKEN_BY_CODE_FAILURE){
+      //   this.msalSvc.msalSvc.loginRedirect();
+        
+      // }
     }))
 
-    this.lastClickedTabRoute = this.location.path();
     this.fetchTabs();
     this.userName=this.dataService.getCurrentUserName();
 
@@ -209,8 +220,6 @@ export class AppComponent {
       /** On Subsequent Load (Dynamic) */
 
     this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle= this.notSelectedElement;
-
-    this.lastClickedTabRoute = this.location.path();
 
     if(screen === 'GIREditor'){
       this.GIREditorStyle = this.selectedElement;
