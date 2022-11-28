@@ -1,4 +1,4 @@
-import { AdaptableApi, Layout } from "@adaptabletools/adaptable-angular-aggrid";
+import { AdaptableApi, ColumnSort, Layout } from "@adaptabletools/adaptable-angular-aggrid";
 import { ColDef, ValueFormatterParams } from "@ag-grid-community/core";
 import { amountFormatter, dateFormatter, dateTimeFormatter } from "./formatter";
 
@@ -13,7 +13,7 @@ export { GENERAL_FORMATTING_EXCEPTIONS }
 
 export { GENERAL_DATETIME_FORMATTING_COLUMNS }
 
-export function saveAndSetLayout(columnDefs: ColDef[], adaptableApi: AdaptableApi, layoutName: string = 'Basic Layout'){
+export function saveAndSetLayout(columnDefs: ColDef[], adaptableApi: AdaptableApi, layoutName: string = 'Basic Layout', columnSorts: ColumnSort[] = null){
 
   if(adaptableApi == null)
     return;
@@ -24,12 +24,13 @@ export function saveAndSetLayout(columnDefs: ColDef[], adaptableApi: AdaptableAp
   if(existingLayout != null){
     layout = existingLayout     // Will have Uuid and other dynamically added properties.
     layout.Columns = columnDefs.map(col => col.field)
-
+    layout.ColumnSorts = columnSorts
   }
   else{
     layout = {
       Columns: columnDefs.map(col => col.field),
-      Name: layoutName
+      Name: layoutName,
+      ColumnSorts: columnSorts
     }
   }
 
