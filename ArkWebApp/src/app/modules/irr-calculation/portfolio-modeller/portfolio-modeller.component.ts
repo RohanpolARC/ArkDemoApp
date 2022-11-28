@@ -153,7 +153,7 @@ export class PortfolioModellerComponent implements OnInit {
     cellStyle: this.editableCellStyle.bind(this)
   },
   {
-    field: 'pikmargin', width: 120, headerName: 'PIK Margin', cellClass: 'ag-right-aligned-cell', valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
+    field: 'pikMargin', width: 120, headerName: 'PIK Margin', cellClass: 'ag-right-aligned-cell', valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
     editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this)
   },
@@ -628,7 +628,7 @@ export class PortfolioModellerComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 15,
+          Revision: 16,
           CurrentLayout: 'Manual',
           Layouts: [
           {
@@ -648,7 +648,7 @@ export class PortfolioModellerComponent implements OnInit {
               'maturityDate',
               'benchMarkIndex',
               'spread',
-              'pikmargin',
+              'pikMargin',
               'unfundedMargin',
               'floorRate',
               'dealTypeCS',
