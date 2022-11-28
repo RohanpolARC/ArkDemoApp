@@ -45,7 +45,7 @@ export class IrrResultComponent implements OnInit {
     { field: 'Fund', type: 'abColDefString'},
     { field: 'Issuer Short Name', type: 'abColDefString'},
     { field: 'DealTypeCS', type: 'abColDefString' },
-    { field: 'Sort Order', type: 'abColDefString' }
+    // Sort Order will always be part in the result set. So adding it in calcColDefs at the end.
   ]
 
   calcColDefs: ColDef[] = [    
@@ -53,44 +53,45 @@ export class IrrResultComponent implements OnInit {
     { field: 'RealizedProceedsEur', valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
     { field: 'CashCarryingValueEur', valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
     { field: 'CashIRR', valueFormatter: this.percentFormatter},
-    { field: 'Cost', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-    { field: 'Mark', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-    { field: 'DiscountPriceE', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-    { field: 'DiscountPriceW', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-    { field: 'NPVE', headerName: 'NPVE', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-    { field: 'NPVEActual', headerName: 'NPVE Actual',valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-    { field: 'NPVEMinus100', headerName: 'NPVE -100',valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-    { field: 'NPVEPlus100', headerName: 'NPVE +100',valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
     { field: 'YTE', headerName: 'YTE', valueFormatter: this.percentFormatter},
     { field: 'CurrentYTE', headerName: 'Current YTE', valueFormatter: this.percentFormatter},
     { field: 'YTEHedged', headerName: 'YTE Hedged', valueFormatter: this.percentFormatter},
     { field: 'YTW', headerName: 'YTW', valueFormatter: this.percentFormatter},
     { field: 'CurrentYTW', valueFormatter: this.percentFormatter},
     { field: 'YTWHedged', headerName: 'YTW Hedged', valueFormatter: this.percentFormatter},
-    { field: 'AccFees', headerName: 'Accrued Fees', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'  },
-    { field: 'AccInterest', headerName: 'Accrued Interest', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
-    { field: 'AllInRate', valueFormatter: amountFormatter,  type: 'abColDefNumber',},
-    { field:  'AverageCashMargin', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-    { field: 'CashMargin', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-    { field: 'CashYield', valueFormatter: this.percentFormatter},   
-    { field: 'CostValue', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-    { field: 'ExitPrice', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    { field: 'DiscountPriceE', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    { field: 'DiscountPriceW', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    { field: 'NPVE', headerName: 'NPVE', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    { field: 'NPVEActual', headerName: 'NPVE Actual',valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    { field: 'NPVEMinus100', headerName: 'NPVE -100',valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    { field: 'NPVEPlus100', headerName: 'NPVE +100',valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    { field: 'Cost', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    { field: 'Mark', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
     { field: 'ExpectedPrice', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
     { field: 'ExpectedAge', valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
-    { field: 'FaceValue', valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-    { field: 'FaceValueExpected', valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-    { field: 'AverageLifeE', valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
-    { field: 'AverageLifeW', valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
-    { field: 'CashMOM', valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
-    { field: 'MOME', headerName: 'MOM E', valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
-    { field: 'MOMW', headerName: 'MOM W', valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
-    { field: 'PaybackE', headerName: 'Payback E', valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
-    { field: 'PaybackW', valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
-    { field: 'TotalRealizedIncome', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-    { field: 'RealisedUnrealised', type: 'abColDefString'},
+    { field: 'AccFees', headerName: 'Accrued Fees', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'  },
+    { field: 'AccInterest', headerName: 'Accrued Interest', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
+    { field: 'CashYield', valueFormatter: this.percentFormatter},   
+    { field: 'AverageCashMargin', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    { field: 'CashMargin', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
     { field: 'PIKMargin', headerName: 'PIK Margin', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-    // {field: 'pikmargin', headerName: 'PIK Margin', valueFormatter: amountFormatter} type: 'abColDefNumber',,
     { field: 'UnfundedMargin', headerName: 'Unfunded Margin', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'}, 
+
+    { field: 'AllInRate', hide:true, valueFormatter: amountFormatter,  type: 'abColDefNumber',},
+    { field: 'CostValue', hide:true, valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    { field: 'ExitPrice', hide:true, valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    { field: 'FaceValue', hide:true, valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    { field: 'FaceValueExpected', hide:true, valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    { field: 'AverageLifeE', hide:true, valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
+    { field: 'AverageLifeW', hide:true, valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
+    { field: 'CashMOM', hide:true, valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
+    { field: 'MOME', hide:true, headerName: 'MOM E', valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
+    { field: 'MOMW', hide:true, headerName: 'MOM W', valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
+    { field: 'PaybackE', hide:true, headerName: 'Payback E', valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
+    { field: 'PaybackW', hide:true, valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
+    { field: 'TotalRealizedIncome', hide:true, valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
+    { field: 'RealisedUnrealised', hide:true, type: 'abColDefString'},
+    { field: 'Sort Order', type: 'abColDefString' }
   ]
 
   closeTimer = new Subject<any>();
@@ -306,7 +307,7 @@ export class IrrResultComponent implements OnInit {
                   cSorts.push({ ColumnId: 'Sort Order', SortOrder: 'Asc' });
                   cSorts.push({ ColumnId: 'Issuer Short Name', SortOrder: 'Asc' });
 
-                  saveAndSetLayout(this.columnDefs, this.adapTableApi, 'IRR Result', cSorts);
+                  saveAndSetLayout(this.columnDefs.filter(c => !c?.['hide']), this.adapTableApi, 'IRR Result', cSorts);
 
                   for(let i = 0 ; i < res?.['output'].length; i++){
                     calcs.push({... res?.['output'][i].calcHelper, ... res?.['output'][i].MapGroupColValues, ... res?.['output'][i].paggr})
