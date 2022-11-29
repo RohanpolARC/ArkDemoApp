@@ -43,8 +43,8 @@ export class IrrResultComponent implements OnInit {
 
   mapGroupColDefs: ColDef[] = [
     { field: 'Fund', type: 'abColDefString'},
-    { field: 'Issuer Short Name', type: 'abColDefString'},
     { field: 'DealTypeCS', type: 'abColDefString' },
+    { field: 'Issuer Short Name', type: 'abColDefString'},
     // Sort Order will always be part in the result set. So adding it in calcColDefs at the end.
   ]
 
@@ -76,6 +76,17 @@ export class IrrResultComponent implements OnInit {
     { field: 'CashMargin', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
     { field: 'PIKMargin', headerName: 'PIK Margin', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
     { field: 'UnfundedMargin', headerName: 'Unfunded Margin', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'}, 
+    { field: 'NetLTV', headerName: 'Net LTV', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'NetLTVAtInvestement', headerName: 'Net LTV at Inv', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'NetLeverage', headerName: 'Net Leverage', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'NetLeverageAtInvestment', headerName: 'Net Leverage at Inv', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'EBITDA', headerName: 'EBITDA', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'EBITDAAtInvestment', headerName: 'EBITDA at Inv', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'ReportingEBITDA', headerName: 'Reporting EBITDA', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'ReportingNetLeverage', headerName: 'Reporting Net Leverage', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'Revenue', headerName: 'Revenue', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'RevenueAtInvestment', headerName: 'Revenue at Inv', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'ReportingNetLeverageComment', headerName: 'Reporting Net Leverage Comment', type: 'abColDefString' },
 
     { field: 'AllInRate', hide:true, valueFormatter: amountFormatter,  type: 'abColDefNumber',},
     { field: 'CostValue', hide:true, valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
