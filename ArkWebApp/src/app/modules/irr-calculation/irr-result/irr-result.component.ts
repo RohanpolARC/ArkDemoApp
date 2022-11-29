@@ -328,8 +328,6 @@ export class IrrResultComponent implements OnInit {
                   this.status.emit('Loaded')
   
                   this.closeTimer.next();
-
-                  this.adapTableApi.columnApi.autosizeAllColumns();
                 }
                 else if(res?.['runtimeStatus'] === 'Failed'){
                   this.closeTimer.next();
