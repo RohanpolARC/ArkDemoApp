@@ -141,6 +141,10 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       {
         type: 'Realised/Unrealised > Issuer Short Name',
         levels: ['IssuerFirmwide', 'FirmwideRealisedUnrealised', 'Firmwide']
+      },
+      {
+        type: 'Firmwide > Deal Type(CS) > Issuer Short Name',
+        levels: []
       }
     ]
 
@@ -153,10 +157,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       baseMeasure: new FormControl(this.baseMeasures[0]?.baseMeasure, Validators.required),
       feePreset: new FormControl(this.feePresets[0]?.feePreset, Validators.required),
       calculationType: new FormControl([], Validators.required)
-
     })
-
-
   }
 
   changeListeners(){
