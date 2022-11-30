@@ -206,7 +206,7 @@ export class IrrResultComponent implements OnInit {
           ]
         },
         Layout: {
-          Revision: 12,
+          Revision: 13,
           CurrentLayout: 'Default IRR Result',
           Layouts: [
           {
@@ -242,6 +242,17 @@ export class IrrResultComponent implements OnInit {
               'AccFees',
               'AccInterest',
               'UnfundedMargin',
+              'NetLTV',
+              'NetLTVAtInvestement',
+              'NetLeverage',
+              'NetLeverageAtInvestment',
+              'EBITDA',
+              'EBITDAAtInvestment',
+              'ReportingEBITDA',
+              'ReportingNetLeverage',
+              'Revenue',
+              'RevenueAtInvestment',
+              'ReportingNetLeverageComment',
               // 'averageLifeE', 
               // 'averageLifeW',
               // 'cashMOM', 
@@ -322,7 +333,16 @@ export class IrrResultComponent implements OnInit {
                   saveAndSetLayout(this.columnDefs.filter(c => !c?.['hide']), this.adapTableApi, 'IRR Result', cSorts);
 
                   for(let i = 0 ; i < res?.['output'].length; i++){
-                    calcs.push({... res?.['output'][i].calcHelper, ... res?.['output'][i].MapGroupColValues, ... res?.['output'][i].paggr})
+                    let calcProps: string[] = Object.keys(res?.['output'][i].calcHelper)
+                    let paggrProps: string[] = Object.keys(res?.['output'][i].paggr)
+                    
+                    let paggr = {}
+                    paggrProps.filter(p => !calcProps.includes(p)).forEach(p => {
+                      paggr[p] = res?.['output'][i].paggr[p]
+                    });
+
+
+                    calcs.push({... res?.['output'][i].calcHelper, ... res?.['output'][i].MapGroupColValues, ... paggr })
                   }
                   this.calcs = calcs
                   this.status.emit('Loaded')
