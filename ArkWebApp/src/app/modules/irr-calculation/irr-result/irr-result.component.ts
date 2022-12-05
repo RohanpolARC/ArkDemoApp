@@ -48,6 +48,11 @@ export class IrrResultComponent implements OnInit {
     // Sort Order will always be part in the result set. So adding it in calcColDefs at the end.
   ]
 
+  paggrColDefs: ColDef[] = [
+    { field: 'DealName', type: 'abColDefString', cellClass: '' },
+    { field: 'DealCcy', type: 'abColDefString', cellClass: '' },
+  ]
+
   calcColDefs: ColDef[] = [    
     { field: 'CapitalInvestedEur', valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber' },
     { field: 'RealizedProceedsEur', valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber' },
@@ -76,16 +81,16 @@ export class IrrResultComponent implements OnInit {
     { field: 'CashMargin', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'PIKMargin', headerName: 'PIK Margin', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'UnfundedMargin', headerName: 'Unfunded Margin', valueFormatter: amountFormatter, type: 'abColDefNumber' }, 
-    { field: 'NetLTV', headerName: 'Net LTV', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'NetLTVAtInvestement', headerName: 'Net LTV at Inv', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'NetLTV', headerName: 'Net LTV', valueFormatter: this.percentFormatter, type: 'abColDefNumber' },
+    { field: 'NetLTVAtInvestement', headerName: 'Net LTV at Inv', valueFormatter: this.percentFormatter, type: 'abColDefNumber' },
     { field: 'NetLeverage', headerName: 'Net Leverage', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'NetLeverageAtInvestment', headerName: 'Net Leverage at Inv', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'EBITDA', headerName: 'EBITDA', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'EBITDAAtInvestment', headerName: 'EBITDA at Inv', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'EBITDA', headerName: 'EBITDA(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'EBITDAAtInvestment', headerName: 'EBITDA at Inv(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'ReportingEBITDA', headerName: 'Reporting EBITDA', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'ReportingNetLeverage', headerName: 'Reporting Net Leverage', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'Revenue', headerName: 'Revenue', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'RevenueAtInvestment', headerName: 'Revenue at Inv', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'Revenue', headerName: 'Revenue(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'RevenueAtInvestment', headerName: 'Revenue at Inv(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'ReportingNetLeverageComment', headerName: 'Reporting Net Leverage Comment', type: 'abColDefString', cellClass: '' },
 
     { field: 'AllInRate', hide:true, valueFormatter: amountFormatter,  type: 'abColDefNumber',},
@@ -215,6 +220,8 @@ export class IrrResultComponent implements OnInit {
               'Fund',
               'Issuer Short Name',
               'Deal Type CS',
+              'DealName',
+              'DealCcy',
               'CapitalInvestedEur',
               'RealizedProceedsEur',
               'CashCarryingValueEur',
@@ -311,12 +318,16 @@ export class IrrResultComponent implements OnInit {
                   
                   let calcs = []
                   let mapGroupCols: string[] = [];
+                  let paggrCols: string[] = [];
 
-                  if(res?.['output']?.length > 0)
+                  if(res?.['output']?.length > 0){
                     mapGroupCols = Object.keys(res?.['output'][0].MapGroupColValues);
+                    paggrCols = Object.keys(res?.['output'][0].paggr)
+                  }
 
                   this.columnDefs = [ 
                     ...this.mapGroupColDefs.filter(c => mapGroupCols.includes(c.field)),
+                    ...this.paggrColDefs.filter(c => paggrCols.includes(c.field)),
                     ...this.calcColDefs,
                   ]
 
