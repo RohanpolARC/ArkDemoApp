@@ -87,7 +87,7 @@ export class IrrResultComponent implements OnInit {
     { field: 'NetLeverageAtInvestment', headerName: 'Net Leverage at Inv', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'EBITDA', headerName: 'EBITDA(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'EBITDAAtInvestment', headerName: 'EBITDA at Inv(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'ReportingEBITDA', headerName: 'Reporting EBITDA', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'ReportingEBITDA', headerName: 'Reporting EBITDA(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'ReportingNetLeverage', headerName: 'Reporting Net Leverage', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'Revenue', headerName: 'Revenue(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'RevenueAtInvestment', headerName: 'Revenue at Inv(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
