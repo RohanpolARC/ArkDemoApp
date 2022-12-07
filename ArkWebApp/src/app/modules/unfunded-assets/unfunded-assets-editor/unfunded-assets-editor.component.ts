@@ -129,7 +129,7 @@ export class UnfundedAssetsEditorComponent implements OnInit {
     this.disableSubmit = true;
 
 
-    this.issuerSNOptions = [... new Set<string>(this.assetRef.map(ref => String(ref['issuerShortName'])))]
+    this.issuerSNOptions = [... new Set<string>(this.assetRef?.map(ref => String(ref['issuerShortName'])))]
     this.assetOptions = this.assetRef.map(ref => ref['asset'])
 
     this.initForm();
