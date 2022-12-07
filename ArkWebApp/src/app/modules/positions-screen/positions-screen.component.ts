@@ -200,7 +200,7 @@ export class PositionsScreenComponent implements OnInit {
 
       predefinedConfig: {
         Dashboard: {
-          Revision:9,
+          Revision:10,
           ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{

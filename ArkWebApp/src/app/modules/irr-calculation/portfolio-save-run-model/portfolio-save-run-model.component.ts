@@ -135,16 +135,16 @@ export class PortfolioSaveRunModelComponent implements OnInit {
 
     this.aggregationTypes = [
       {
-        type: 'Fund > Realised/Unrealised > Issuer Short Name',
-        levels: ['IssuerFundMerged', 'FundRealisedUnrealised', 'Fund']
+        type: 'Fund > Realised/Unrealised > Issuer Short Name', levels: ['IssuerFundMerged', 'FundRealisedUnrealised', 'Fund']
       },
       {
-        type: 'Realised/Unrealised > Issuer Short Name',
-        levels: ['IssuerFirmwide', 'FirmwideRealisedUnrealised', 'Firmwide']
+        type: 'Realised/Unrealised > Issuer Short Name', levels: ['IssuerFirmwide', 'FirmwideRealisedUnrealised', 'Firmwide']
       },
       {
-        type: 'Firmwide > Deal Type(CS) > Issuer Short Name',
-        levels: []
+        type: 'Firmwide > Deal Type(CS) > Issuer Short Name', levels: []
+      },
+      {
+        type: 'Firmwide > Issuer Short Name > Seniority', levels: []
       }
     ]
 

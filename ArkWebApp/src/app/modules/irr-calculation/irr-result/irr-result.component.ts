@@ -45,7 +45,19 @@ export class IrrResultComponent implements OnInit {
     { field: 'Fund', type: 'abColDefString', cellClass: ''},
     { field: 'DealTypeCS', type: 'abColDefString', cellClass: '' },
     { field: 'Issuer Short Name', type: 'abColDefString', cellClass: ''},
+    { field: 'Seniority', type: 'abColDefString', cellClass: '' }
     // Sort Order will always be part in the result set. So adding it in calcColDefs at the end.
+  ]
+
+  paggrColDefs: ColDef[] = [
+    { field: 'DealName', type: 'abColDefString', cellClass: '' },
+    { field: 'DealCcy', type: 'abColDefString', cellClass: '' },
+  ]
+
+  sortColDefs: ColDef[] = [
+    { field: 'Sort Order1', type: 'abColDefString' },
+    { field: 'Sort Order2', type: 'abColDefString' },
+    { field: 'Sort Order', type: 'abColDefString' }
   ]
 
   calcColDefs: ColDef[] = [    
@@ -76,16 +88,16 @@ export class IrrResultComponent implements OnInit {
     { field: 'CashMargin', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'PIKMargin', headerName: 'PIK Margin', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'UnfundedMargin', headerName: 'Unfunded Margin', valueFormatter: amountFormatter, type: 'abColDefNumber' }, 
-    { field: 'NetLTV', headerName: 'Net LTV', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'NetLTVAtInvestement', headerName: 'Net LTV at Inv', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'NetLTV', headerName: 'Net LTV', valueFormatter: this.percentFormatter, type: 'abColDefNumber' },
+    { field: 'NetLTVAtInvestement', headerName: 'Net LTV at Inv', valueFormatter: this.percentFormatter, type: 'abColDefNumber' },
     { field: 'NetLeverage', headerName: 'Net Leverage', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'NetLeverageAtInvestment', headerName: 'Net Leverage at Inv', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'EBITDA', headerName: 'EBITDA', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'EBITDAAtInvestment', headerName: 'EBITDA at Inv', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'ReportingEBITDA', headerName: 'Reporting EBITDA', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'EBITDA', headerName: 'EBITDA(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'EBITDAAtInvestment', headerName: 'EBITDA at Inv(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'ReportingEBITDA', headerName: 'Reporting EBITDA(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'ReportingNetLeverage', headerName: 'Reporting Net Leverage', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'Revenue', headerName: 'Revenue', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'RevenueAtInvestment', headerName: 'Revenue at Inv', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'Revenue', headerName: 'Revenue(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
+    { field: 'RevenueAtInvestment', headerName: 'Revenue at Inv(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'ReportingNetLeverageComment', headerName: 'Reporting Net Leverage Comment', type: 'abColDefString', cellClass: '' },
 
     { field: 'AllInRate', hide:true, valueFormatter: amountFormatter,  type: 'abColDefNumber',},
@@ -102,7 +114,7 @@ export class IrrResultComponent implements OnInit {
     { field: 'PaybackW', hide:true, valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
     { field: 'TotalRealizedIncome', hide:true, valueFormatter: amountFormatter, type: 'abColDefNumber' },
     { field: 'RealisedUnrealised', hide:true, type: 'abColDefString'},
-    { field: 'Sort Order', type: 'abColDefString' }
+
   ]
 
   closeTimer = new Subject<any>();
@@ -180,7 +192,7 @@ export class IrrResultComponent implements OnInit {
           DashboardTitle: ' '
         },
         ConditionalStyle:{
-          Revision: 9,
+          Revision: 12,
           ConditionalStyles: [
             {
               Scope: {All: true},
@@ -199,9 +211,18 @@ export class IrrResultComponent implements OnInit {
                 FontWeight: 'Bold'
               },
               Rule: {
-                BooleanExpression: '[Issuer Short Name] =  "Realised" OR [Issuer Short Name] = "Unrealised"'
+                BooleanExpression: '[Issuer Short Name] =  "Realised" OR [Issuer Short Name] = "Unrealised"  OR [Seniority] = "Total"' 
               }
-
+            },
+            {
+              Scope: {All: true},
+              Style: {
+                BackColor: '#69bcdf',
+                FontWeight: 'Bold'
+              },
+              Rule: {
+                BooleanExpression: '[Issuer Short Name] =  "Realised" OR [Issuer Short Name] = "Unrealised"' 
+              }
             },
           ]
         },
@@ -215,6 +236,8 @@ export class IrrResultComponent implements OnInit {
               'Fund',
               'Issuer Short Name',
               'Deal Type CS',
+              'DealName',
+              'DealCcy',
               'CapitalInvestedEur',
               'RealizedProceedsEur',
               'CashCarryingValueEur',
@@ -311,24 +334,44 @@ export class IrrResultComponent implements OnInit {
                   
                   let calcs = []
                   let mapGroupCols: string[] = [];
-
-                  if(res?.['output']?.length > 0)
+                  let paggrCols: string[] = [];
+                  
+                  if(res?.['output']?.length > 0){
                     mapGroupCols = Object.keys(res?.['output'][0].MapGroupColValues);
+                    paggrCols = Object.keys(res?.['output'][0].paggr);
+                  }
 
                   this.columnDefs = [ 
                     ...this.mapGroupColDefs.filter(c => mapGroupCols.includes(c.field)),
+                    ...this.paggrColDefs.filter(c => paggrCols.includes(c.field)),
                     ...this.calcColDefs,
+                    ...this.sortColDefs.filter(c => mapGroupCols.includes(c.field))
                   ]
 
                   this.gridOptions?.api?.setColumnDefs(this.columnDefs);
 
                   let cSorts: ColumnSort[] = []
 
-                  cSorts.push({ ColumnId: 'Fund', SortOrder: 'Asc' });
+                  if(mapGroupCols.includes('Fund'))
+                    cSorts.push({ ColumnId: 'Fund', SortOrder: 'Asc' });
+
                   if(mapGroupCols.includes('DealTypeCS'))
                     cSorts.push({ ColumnId: 'DealTypeCS', SortOrder: 'Asc' })
-                  cSorts.push({ ColumnId: 'Sort Order', SortOrder: 'Asc' });
-                  cSorts.push({ ColumnId: 'Issuer Short Name', SortOrder: 'Asc' });
+
+                  if(mapGroupCols.includes('Sort Order'))
+                    cSorts.push({ ColumnId: 'Sort Order', SortOrder: 'Asc' });
+
+                  if(mapGroupCols.includes('Sort Order1'))
+                    cSorts.push({ ColumnId: 'Sort Order1', SortOrder: 'Asc' });
+
+                  if(mapGroupCols.includes('Issuer Short Name'))
+                    cSorts.push({ ColumnId: 'Issuer Short Name', SortOrder: 'Asc' });
+
+                  if(mapGroupCols.includes('Sort Order2'))
+                    cSorts.push({ ColumnId: 'Sort Order2', SortOrder: 'Asc' });
+
+                  if(mapGroupCols.includes('Seniority'))
+                    cSorts.push({ ColumnId: 'Seniority', SortOrder: 'Asc'});
 
                   saveAndSetLayout(this.columnDefs.filter(c => !c?.['hide']), this.adapTableApi, 'IRR Result', cSorts);
 
