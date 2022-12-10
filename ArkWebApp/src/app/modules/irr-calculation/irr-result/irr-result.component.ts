@@ -42,16 +42,16 @@ export class IrrResultComponent implements OnInit {
   adapTableApi: AdaptableApi;
 
   mapGroupColDefs: ColDef[] = [
-    { field: 'Fund', type: 'abColDefString', cellClass: ''},
+    { field: 'Fund', type: 'abColDefString', cellClass: '', minWidth: 122},
     { field: 'DealTypeCS', type: 'abColDefString', cellClass: '' },
     { field: 'Issuer Short Name', type: 'abColDefString', cellClass: ''},
-    { field: 'Seniority', type: 'abColDefString', cellClass: '' }
+    { field: 'Seniority', type: 'abColDefString', cellClass: '', minWidth: 155 }
     // Sort Order will always be part in the result set. So adding it in calcColDefs at the end.
   ]
 
   paggrColDefs: ColDef[] = [
     { field: 'DealName', type: 'abColDefString', cellClass: '' },
-    { field: 'DealCcy', type: 'abColDefString', cellClass: '' },
+    { field: 'DealCcy', type: 'abColDefString', cellClass: '', minWidth: 115 },
   ]
 
   sortColDefs: ColDef[] = [
@@ -61,44 +61,44 @@ export class IrrResultComponent implements OnInit {
   ]
 
   calcColDefs: ColDef[] = [    
-    { field: 'CapitalInvestedEur', valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber' },
-    { field: 'RealizedProceedsEur', valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber' },
-    { field: 'CashCarryingValueEur', valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber' },
-    { field: 'CashIRR', valueFormatter: this.percentFormatter},
-    { field: 'YTE', headerName: 'YTE', valueFormatter: this.percentFormatter},
-    { field: 'CurrentYTE', headerName: 'Current YTE', valueFormatter: this.percentFormatter},
-    { field: 'YTEHedged', headerName: 'YTE Hedged', valueFormatter: this.percentFormatter},
-    { field: 'YTW', headerName: 'YTW', valueFormatter: this.percentFormatter},
-    { field: 'CurrentYTW', valueFormatter: this.percentFormatter},
-    { field: 'YTWHedged', headerName: 'YTW Hedged', valueFormatter: this.percentFormatter},
-    { field: 'DiscountPriceE', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'DiscountPriceW', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'NPVE', headerName: 'NPVE', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'NPVEActual', headerName: 'NPVE Actual',valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'NPVEMinus100', headerName: 'NPVE -100',valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'NPVEPlus100', headerName: 'NPVE +100',valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'Cost', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'Mark', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'ExpectedPrice', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'ExpectedAge', valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber'},
-    { field: 'AccFees', headerName: 'Accrued Fees', valueFormatter: amountFormatter, type: 'abColDefNumber'   },
-    { field: 'AccInterest', headerName: 'Accrued Interest', valueFormatter: amountFormatter, type: 'abColDefNumber'  },
-    { field: 'CashYield', valueFormatter: this.percentFormatter},   
-    { field: 'AverageCashMargin', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'CashMargin', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'PIKMargin', headerName: 'PIK Margin', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'UnfundedMargin', headerName: 'Unfunded Margin', valueFormatter: amountFormatter, type: 'abColDefNumber' }, 
-    { field: 'NetLTV', headerName: 'Net LTV', valueFormatter: this.percentFormatter, type: 'abColDefNumber' },
-    { field: 'NetLTVAtInvestement', headerName: 'Net LTV at Inv', valueFormatter: this.percentFormatter, type: 'abColDefNumber' },
-    { field: 'NetLeverage', headerName: 'Net Leverage', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'NetLeverageAtInvestment', headerName: 'Net Leverage at Inv', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'EBITDA', headerName: 'EBITDA(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'EBITDAAtInvestment', headerName: 'EBITDA at Inv(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'ReportingEBITDA', headerName: 'Reporting EBITDA(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'ReportingNetLeverage', headerName: 'Reporting Net Leverage', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'Revenue', headerName: 'Revenue(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'RevenueAtInvestment', headerName: 'Revenue at Inv(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber' },
-    { field: 'ReportingNetLeverageComment', headerName: 'Reporting Net Leverage Comment', type: 'abColDefString', cellClass: '' },
+    { field: 'CapitalInvestedEur', valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber', minWidth: 180 },
+    { field: 'RealizedProceedsEur', valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber', minWidth: 185 },
+    { field: 'CashCarryingValueEur', valueFormatter: noDecimalAmountFormatter, type: 'abColDefNumber', minWidth: 200 },
+    { field: 'CashIRR', valueFormatter: this.percentFormatter, minWidth: 110},
+    { field: 'YTE', headerName: 'YTE', valueFormatter: this.percentFormatter, minWidth: 95},
+    { field: 'CurrentYTE', headerName: 'Current YTE', valueFormatter: this.percentFormatter, minWidth: 130},
+    { field: 'YTEHedged', headerName: 'YTE Hedged', valueFormatter: this.percentFormatter, minWidth: 135},
+    { field: 'YTW', headerName: 'YTW', valueFormatter: this.percentFormatter, minWidth: 88},
+    { field: 'CurrentYTW', valueFormatter: this.percentFormatter, minWidth: 136},
+    { field: 'YTWHedged', headerName: 'YTW Hedged', valueFormatter: this.percentFormatter, minWidth: 136},
+    { field: 'DiscountPriceE', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 154 },
+    { field: 'DiscountPriceW', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 154 },
+    { field: 'NPVE', headerName: 'NPVE', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 140 },
+    { field: 'NPVEActual', headerName: 'NPVE Actual',valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 140 },
+    { field: 'NPVEMinus100', headerName: 'NPVE -100',valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 140 },
+    { field: 'NPVEPlus100', headerName: 'NPVE +100',valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 140 },
+    { field: 'Cost', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 85 },
+    { field: 'Mark', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 85 },
+    { field: 'ExpectedPrice', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 150 },
+    { field: 'ExpectedAge', valueFormatter: nonAmountNumberFormatter2Dec, type: 'abColDefNumber', minWidth: 133},
+    { field: 'AccFees', headerName: 'Accrued Fees', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 133 },
+    { field: 'AccInterest', headerName: 'Accrued Interest', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 153  },
+    { field: 'CashYield', valueFormatter: this.percentFormatter, minWidth: 117},   
+    { field: 'AverageCashMargin', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 180 },
+    { field: 'CashMargin', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 130 },
+    { field: 'PIKMargin', headerName: 'PIK Margin', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 121 },
+    { field: 'UnfundedMargin', headerName: 'Unfunded Margin', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 170 }, 
+    { field: 'NetLTV', headerName: 'Net LTV', valueFormatter: this.percentFormatter, type: 'abColDefNumber', minWidth: 110 },
+    { field: 'NetLTVAtInvestement', headerName: 'Net LTV at Inv', valueFormatter: this.percentFormatter, type: 'abColDefNumber', minWidth: 145 },
+    { field: 'NetLeverage', headerName: 'Net Leverage', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 136 },
+    { field: 'NetLeverageAtInvestment', headerName: 'Net Leverage at Inv', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 180 },
+    { field: 'EBITDA', headerName: 'EBITDA(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 120 },
+    { field: 'EBITDAAtInvestment', headerName: 'EBITDA at Inv(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 155 },
+    { field: 'ReportingEBITDA', headerName: 'Reporting EBITDA(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 185 },
+    { field: 'ReportingNetLeverage', headerName: 'Reporting Net Leverage', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 200 },
+    { field: 'Revenue', headerName: 'Revenue(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 125 },
+    { field: 'RevenueAtInvestment', headerName: 'Revenue at Inv(\u20AC)', valueFormatter: amountFormatter, type: 'abColDefNumber', minWidth: 200 },
+    { field: 'ReportingNetLeverageComment', headerName: 'Reporting Net Leverage Comment', type: 'abColDefString', cellClass: '', minWidth: 300 },
 
     { field: 'AllInRate', hide:true, valueFormatter: amountFormatter,  type: 'abColDefNumber',},
     { field: 'CostValue', hide:true, valueFormatter: amountFormatter, type: 'abColDefNumber' },
@@ -454,5 +454,6 @@ export class IrrResultComponent implements OnInit {
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApi = adaptableApi;
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
+    this.gridOptions.columnApi.autoSizeColumns([ ...this.calcColDefs, ...this.paggrColDefs ].filter(x => x.minWidth).map(x => x.filter));
   }
 }
