@@ -1,21 +1,21 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PositionsScreenComponent } from './positions-screen.component';
-import { PositionScreenRoutingModule } from './positions-screen-routing.module';
 import { MatCardModule } from '@angular/material/card';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MatIconModule } from '@angular/material/icon';
+import { HedgingMarkComponent } from './hedging-mark.component';
+import { HedgingMarkRoutingModule } from './hedging-mark-routing.module';
 
 
 
 @NgModule({
   declarations: [
-    PositionsScreenComponent
+    HedgingMarkComponent
   ],
   imports: [
     CommonModule,
-    PositionScreenRoutingModule,
+    HedgingMarkRoutingModule,
 
     AdaptableAngularAgGridModule,
     AgGridModule,
@@ -24,4 +24,4 @@ import { MatIconModule } from '@angular/material/icon';
     MatCardModule
   ]
 })
-export class PositionsScreenModule { }
+export class HedgingMarkModule { }

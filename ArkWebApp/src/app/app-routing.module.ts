@@ -65,8 +65,9 @@ const routes: Routes = [
   { path: 'ref-data-manager',
     loadChildren: () => import('./modules/ref-data-manager/ref-data-manager.module').then(m => m.RefDataManagerModule) },
   { path: 'management-fee', loadChildren: () => import('./modules/management-fee/management-fee.module').then(m => m.ManagementFeeModule) },
-  { path: 'positions-screen', loadChildren: () => import('./modules/positions-screen/positions-screen.module').then(m => m.PositionsScreenModule) }
-  
+  { path: 'positions-screen', loadChildren: () => import('./modules/positions-screen/positions-screen.module').then(m => m.PositionsScreenModule) },
+  { path: 'hedging-mark', loadChildren: () => import('./modules/hedging-mark/hedging-mark.module').then(m => m.HedgingMarkModule) },
+
 ];
 
 @NgModule({  

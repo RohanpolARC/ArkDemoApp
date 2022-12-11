@@ -1,7 +1,10 @@
 <div class="parent">
     <div class="header">
         <div class="title">
-            Positions
+            Hedging Mark 
+            <span *ngIf = "asOfDate" style="font-size: 1rem; font-weight: normal;">
+                ({{asOfDate | date:"dd/MM/yyyy" }})
+            </span>
         </div>
 
 
@@ -17,6 +20,7 @@
             class="ag-theme-alpine ag-grid"
             [adaptableOptions] = "adaptableOptions"
             (adaptableReady)="onAdaptableReady($event)"
+            (cellValueChanged)="onCellValueChanged($event)"
             >
             </ag-grid-angular>
         </mat-card>
