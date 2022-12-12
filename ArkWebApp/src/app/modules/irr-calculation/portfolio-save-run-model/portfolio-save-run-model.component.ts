@@ -134,18 +134,12 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     }
 
     this.aggregationTypes = [
-      {
-        type: 'Fund > Realised/Unrealised > Issuer Short Name', levels: ['IssuerFundMerged', 'FundRealisedUnrealised', 'Fund']
-      },
-      {
-        type: 'Realised/Unrealised > Issuer Short Name', levels: ['IssuerFirmwide', 'FirmwideRealisedUnrealised', 'Firmwide']
-      },
-      {
-        type: 'Firmwide > Deal Type(CS) > Issuer Short Name', levels: []
-      },
-      {
-        type: 'Firmwide > Issuer Short Name > Seniority', levels: []
-      }
+      { type: 'Fund > Realised/Unrealised > Issuer Short Name', levels: ['IssuerFundMerged', 'FundRealisedUnrealised', 'Fund'] },
+      { type: 'Realised/Unrealised > Issuer Short Name', levels: ['IssuerFirmwide', 'FirmwideRealisedUnrealised', 'Firmwide'] },
+      { type: 'Firmwide > Deal Type(CS) > Issuer Short Name', levels: [] },
+      { type: 'Firmwide > Issuer Short Name > Seniority', levels: [] },
+      { type: 'Firmwide > Realised/Unrealised > Issuer Seniority', levels: [] },
+      { type: 'Fund > Realised/Unrealised > Issuer Seniority', levels: [] }
     ]
 
     this.modelForm = new FormGroup({
