@@ -112,3 +112,13 @@ export function percentFormatter(params : ValueFormatterParams) {
       return `${Number(params.value * 100).toFixed(2)}%`
     }
 }
+
+export function booleanYesNoFormatter(params : ValueFormatterParams) {
+    if(params.value===true || params.value === "true")
+      return "Yes"
+    else if(params.value===false || params.value === "false"){
+      return "No"
+    }else{
+        return ""
+    }
+}

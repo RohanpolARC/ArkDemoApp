@@ -61,6 +61,7 @@ export class AppComponent {
   RefDataManagerStyle:any = {};
   ManagementFeeStyle: any = {};
   PositionsScreenStyle: any = {};
+  HedgingMarkStyle:any = {};
 
   funds
   fundHedgings
@@ -204,6 +205,9 @@ export class AppComponent {
     else if(this.location.path() === '/positions-screen'){
       this.updateSelection('Positions Screen')
     }
+    else if(this.location.path() === '/hedging-mark'){
+      this.updateSelection('Hedging Mark')
+    }
     else this.updateSelection('')
   }
 
@@ -219,7 +223,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle= this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle=this.HedgingMarkStyle= this.notSelectedElement;
 
     if(screen === 'GIREditor'){
       this.GIREditorStyle = this.selectedElement;
@@ -316,6 +320,10 @@ export class AppComponent {
     else if(screen === 'Positions Screen'){
       this.PositionsScreenStyle = this.selectedElement;
       this.router.navigate(['/positions-screen'])
+    }
+    else if(screen === 'Hedging Mark'){
+      this.HedgingMarkStyle = this.selectedElement;
+      this.router.navigate(['/hedging-mark'])
     }
   }
 }

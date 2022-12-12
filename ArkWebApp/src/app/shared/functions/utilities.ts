@@ -1,3 +1,4 @@
+import { RowNode } from "@ag-grid-community/core";
 import { DecimalPipe } from "@angular/common";
 import * as moment from "moment";
 
@@ -109,4 +110,18 @@ export function getLastBusinessDay(){
   }
   return workday.subtract(diff, 'days').toDate();
 }
+
+export function getRowNodes(node: RowNode, rowNodes: any[] = []){
+  /** Get all filtered children nodes recursively (Depth First Search)*/
+  if(node.group){
+      for(let i = 0; i < node.childrenAfterFilter.length; i+= 1){
+          getRowNodes(node.childrenAfterFilter[i], rowNodes);
+      }
+  }
+  else{
+      rowNodes.push(node);
+  }
+  return rowNodes;
+}
+
 

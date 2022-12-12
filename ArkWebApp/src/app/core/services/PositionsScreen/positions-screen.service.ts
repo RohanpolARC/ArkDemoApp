@@ -30,6 +30,12 @@ export class PositionScreenService {
   );
   }
 
+  public updateHedgingMark(data){
+    return this.http.post<any[]>(`${APIConfig.HEDGING_MARK_PUT_API}`,data).pipe(
+      catchError((ex)=>throwError(ex))
+    )
+  }
+
 
 
 }
