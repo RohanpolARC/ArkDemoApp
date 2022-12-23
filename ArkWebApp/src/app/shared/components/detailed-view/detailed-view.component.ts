@@ -85,6 +85,7 @@ export class DetailedViewComponent implements OnInit {
 
     if(!!this.rowData){
 
+
       this.columnDefs = createColumnDefs(this.rowData[0].columnValues);
       this.rowData = parseFetchedData(this.rowData);  
       params.api.setColumnDefs(this.columnDefs);

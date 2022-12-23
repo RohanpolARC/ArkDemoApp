@@ -25,7 +25,7 @@ import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/C
 
 import { Subscription } from 'rxjs';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
-import { dateFormatter, dateTimeFormatter, amountFormatter, nullOrZeroFormatter, formatDate, nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, dateTimeFormatter, amountFormatter, nullOrZeroFormatter, formatDate, nonAmountNumberFormatter, BLANK_DATETIME_FORMATTER_CONFIG, DATE_FORMATTER_CONFIG_ddMMyyyy, AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, AMOUNT_FORMATTER_CONFIG_Zero, CUSTOM_DISPLAY_FORMATTERS_CONFIG } from 'src/app/shared/functions/formatter';
 
 import { getNodes, validateLinkSelect }from './utilities/functions';
 import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
@@ -84,7 +84,7 @@ export class CapitalActivityComponent implements OnInit {
   columnDefsInvstmnt: ColDef[] = [
     { field: 'unqiueID', tooltipField: 'unqiueID', type: 'abColDefNumber'},
     { field: 'positionID', tooltipField: 'positionID', headerName: 'Position ID', type: 'abColDefNumber'},
-    { field: 'cashDate', tooltipField: 'cashDate', headerName: 'Cash Date', valueFormatter: dateFormatter, type: 'abColDefDate', cellClass: 'dateUK'},
+    { field: 'cashDate', tooltipField: 'cashDate', headerName: 'Cash Date', type: 'abColDefDate', cellClass: 'dateUK'},
     { field: 'fund', tooltipField: 'fund', headerName: 'Fund', type: 'abColDefString'},
     { field: 'fundHedging', tooltipField: 'fundHedging', headerName: 'Fund Hedging', type: 'abColDefString'},
     { field: 'portfolio', tooltipField: 'portfolio', headerName: 'Portfolio', type: 'abColDefString'},
@@ -94,31 +94,31 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'assetID', tooltipField: 'assetID', headerName: 'AssetID', type: 'abColDefNumber'},
     { field: 'fundCcy', tooltipField: 'fundCcy', headerName: 'Fund Ccy', type: 'abColDefString'},
     { field: 'positionCcy', tooltipField: 'positionCcy', headerName: 'Position Ccy', type: 'abColDefString'},
-    { field: 'amount', tooltipField: 'amount', headerName: 'Total', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-    { field: 'linkedAmount', tooltipField: 'linkedAmount', headerName: 'Linked Amount Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-    { field: 'totalBase', tooltipValueGetter: (params) => { return "Detailed View" }, headerName: 'Total Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', onCellClicked: this.onTotalBaseClick.bind(this), 
+    { field: 'amount', tooltipField: 'amount', headerName: 'Total', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+    { field: 'linkedAmount', tooltipField: 'linkedAmount', headerName: 'Linked Amount Base', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+    { field: 'totalBase', tooltipValueGetter: (params) => { return "Detailed View" }, headerName: 'Total Base', cellClass: 'ag-right-aligned-cell', onCellClicked: this.onTotalBaseClick.bind(this), 
       cellStyle: (params) => {
         if(params.node.group)
           return { color: '#0590ca' };
         return null;
       }, type: 'abColDefNumber'},
-    { field: 'totalEur', headerName: 'Total Eur', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+    { field: 'totalEur', headerName: 'Total Eur', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
     { field: 'type', type: 'abColDefString'}
   ]
 
   columnDefs: ColDef[] = [
     { field: 'capitalID', tooltipField: 'capitalID', headerName: 'Capital ID', type: 'abColDefNumber'},
-    { field: 'callDate', tooltipField: 'callDate', headerName: 'Call Date', type: 'abColDefDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
-    { field: 'valueDate', tooltipField: 'valueDate', headerName: 'Value Date', type: 'abColDefDate', valueFormatter: dateFormatter, cellClass: 'dateUK'},
+    { field: 'callDate', tooltipField: 'callDate', headerName: 'Call Date', type: 'abColDefDate', cellClass: 'dateUK' },
+    { field: 'valueDate', tooltipField: 'valueDate', headerName: 'Value Date', type: 'abColDefDate', cellClass: 'dateUK'},
     { field: 'capitalType', tooltipField: 'capitalType', headerName: 'Capital Type', type:'abColDefString'},
     { field: 'capitalSubType', tooltipField: 'capitalSubType', headerName: 'Capital Subtype', type:'abColDefString'},
     { field: 'fundHedging', tooltipField: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
     { field: 'fundCcy', tooltipField: 'fundCcy', headerName: 'Fund Ccy', type:'abColDefString'},
     { field: 'posCcy', tooltipField: 'posCcy', headerName: 'Position Ccy', type: 'abColDefString'},
-    { field: 'fxRate', tooltipField: 'fxRate', headerName: 'FXRate', valueFormatter: nonAmountNumberFormatter, type: 'abColDefNumber'},
+    { field: 'fxRate', tooltipField: 'fxRate', headerName: 'FXRate', valueFormatter: nonAmountNumberFormatter, type: 'abColDefNumber',cellClass: 'ag-right-aligned-cell'},
     { field: 'fxRateOverride', tooltipField: 'fxRateOverride', headerName: 'FXRate Override', type: 'abColDefBoolean' },
     { field: 'fxRateSource', tooltipField: 'fxRateSource', type: 'abColDefString' },
-    { field: 'totalAmount', tooltipField: 'totalAmount', headerName: 'Total Amount', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+    { field: 'totalAmount', tooltipField: 'totalAmount', headerName: 'Total Amount', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
     { field: 'wsoIssuerID', tooltipField: 'wsoIssuerID', headerName: 'WSO Issuer ID', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
     { field: 'issuerShortName', tooltipField: 'issuerShortName', headerName: 'Issuer Short Name', type:'abColDefString'},
     { field: 'wsoAssetID', tooltipField: 'wsoAssetID', headerName: 'WSO Asset ID', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
@@ -127,10 +127,10 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'source', tooltipField: 'source', headerName: 'Source', type:'abColDefString'},
     { field: 'sourceID', tooltipField: 'sourceID', headerName: 'Source ID', type:'abColDefNumber', valueFormatter: nullOrZeroFormatter},
     { field: 'isLinked', tooltipField: 'isLinked', headerName: 'Is Linked', type:'abColDefBoolean'},
-    { field: 'linkedAmount', tooltipField: 'linkedAmount', headerName: 'Linked Total Base', type:'abColDefNumber', valueFormatter: amountFormatter},
-    { field: 'createdOn', tooltipField: 'createdOn', headerName: 'Created On', type:'abColDefDate', valueFormatter: dateTimeFormatter, cellClass: 'dateUK'},
+    { field: 'linkedAmount', tooltipField: 'linkedAmount', headerName: 'Linked Total Base', type:'abColDefNumber'},
+    { field: 'createdOn', tooltipField: 'createdOn', headerName: 'Created On', type:'abColDefDate', cellClass: 'dateUK'},
     { field: 'createdBy', tooltipField: 'createdBy', headerName: 'Created By', type:'abColDefString'},
-    { field: 'modifiedOn', tooltipField: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', valueFormatter: dateTimeFormatter, cellClass: 'dateUK'},
+    { field: 'modifiedOn', tooltipField: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', cellClass: 'dateUK'},
     { field: 'modifiedBy', tooltipField: 'modifiedBy', headerName: 'Modified By', type:'abColDefString'},
   ]
 
@@ -284,6 +284,12 @@ export class CapitalActivityComponent implements OnInit {
           }
         ]
       },
+
+      userInterfaceOptions:{
+        customDisplayFormatters: [
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['totalAmount','linkedAmount'])
+          ],
+      },
   
       predefinedConfig: {
         Dashboard: {
@@ -332,6 +338,18 @@ export class CapitalActivityComponent implements OnInit {
             },
   
           }]
+        },
+        FormatColumn:{
+          Revision:5,
+          FormatColumns:[
+            BLANK_DATETIME_FORMATTER_CONFIG(['callDate','valueDate','createdOn','modifiedOn']),
+            DATE_FORMATTER_CONFIG_ddMMyyyy(['callDate','valueDate']),
+            DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['createdOn','modifiedOn']),
+
+            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['totalAmount','linkedAmount'],2,['amountZeroFormat']),
+            AMOUNT_FORMATTER_CONFIG_Zero(['totalAmount','linkedAmount'],2,['amountZeroFormat']),
+
+          ]
         }
       }
     }
@@ -393,6 +411,13 @@ export class CapitalActivityComponent implements OnInit {
         ]
       },
   
+      userInterfaceOptions:{
+        customDisplayFormatters:[
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['amount','linkedAmount','totalBase','totalEur'])
+
+        ]
+      },
+
       predefinedConfig: {
         Dashboard: {
           Revision: 3,
@@ -439,6 +464,15 @@ export class CapitalActivityComponent implements OnInit {
               linkedAmount: 'sum',
             }
           }]
+        },
+        FormatColumn:{
+          Revision:6,
+          FormatColumns:[
+            DATE_FORMATTER_CONFIG_ddMMyyyy(['cashDate']),
+
+            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['amount','linkedAmount','totalBase','totalEur'],2,['amountZeroFormat']),
+            AMOUNT_FORMATTER_CONFIG_Zero(['amount','linkedAmount','totalBase','totalEur'],2,['amountZeroFormat'])
+          ]
         }  
       }
     }

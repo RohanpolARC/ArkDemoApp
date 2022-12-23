@@ -6,8 +6,8 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { PositionScreenService } from 'src/app/core/services/PositionsScreen/positions-screen.service';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
-import { amountFormatter, booleanYesNoFormatter,  dateTimeFormatter, formatDate} from 'src/app/shared/functions/formatter';
-import { GRID_OPTIONS, POSITIONS_COLUMN_DEF } from '../positions-screen/grid-structure';
+import { amountFormatter, AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy, formatDate} from 'src/app/shared/functions/formatter';
+import { AMOUNT_COLUMNS_LIST, DATE_COLUMNS_LIST, GRID_OPTIONS,  POSITIONS_COLUMN_DEF } from '../positions-screen/grid-structure';
 import { getRowNodes } from 'src/app/shared/functions/utilities';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 
@@ -91,8 +91,8 @@ export class HedgingMarkComponent implements OnInit {
           next: (data) => {
             this.gridApi?.hideOverlay();
             for(let i: number = 0; i < data?.length; i+= 1){
-              data[i] = this.getDateFields(data[i], [
-                'lastHedgingMarkDate','asOfDate'])
+              // data[i] = this.getDateFields(data[i], [
+              //   'lastHedgingMarkDate','asOfDate'])
                 data[i]['originalHedgingMark'] =  data[i]['isOverriden'] ? data[i]['hedgingMark'] : null
                 data[i]['hedgingMark'] = data[i]['isOverriden']  ? data[i]['hedgingMark']  :  null 
             }  
@@ -180,17 +180,16 @@ export class HedgingMarkComponent implements OnInit {
     this.columnDefs = [
       ...POSITIONS_COLUMN_DEF,
       {
-        field:'hedgingMark',headerName:'Hedging Mark',type:'abColDefNumber',
-        valueFormatter:this.withZeroAmountFormatter,editable:this.isEditable.bind(this),
+        field:'hedgingMark',headerName:'Hedging Mark',type:'abColDefNumber',editable:this.isEditable.bind(this),valueFormatter:this.withZeroAmountFormatter,
         cellStyle:this.editableCellStyle.bind(this),width: 150
       },
       {field:'lastHedgingMarkDate',headerName:'Last Hedging Mark Date',type:'abColDefDate',
       cellClass:'dateUK',filter:false,sortable:false,width:210
       },
-      {field:'isOverriden',type:'abColDefBoolean',valueFormatter:booleanYesNoFormatter,width: 100,filter:false,sortable:false},
+      {field:'isOverriden',type:'abColDefString',width: 100,filter:false,sortable:false},
       
       {field:'modifiedBy',type:'abColDefString',filter:false,sortable:false},
-      {field:'modifiedOn',type:'abColDefDate',valueFormatter:dateTimeFormatter,cellClass:'dateUK',filter:false,sortable:false},
+      {field:'modifiedOn',type:'abColDefDate',cellClass:'dateUK',filter:false,sortable:false},
       { field: 'mark_override', width: 130, headerName: 'Override', type: 'abSpecialColumn',cellClass:'ag-right-aligned-cell' ,filter:false,sortable:false}
     ].map(coldef=>{
       coldef = coldef as ColDef
@@ -313,7 +312,7 @@ export class HedgingMarkComponent implements OnInit {
                         let override:Override ={
                         PositionId : (childNode.data.positionId as number),
                         HedgingMark : (childNode.data.hedgingMark as number),
-                        LastHedgingMarkDate : (childNode.data.lastHedgingMarkDate as string)
+                        LastHedgingMarkDate : (formatDate(childNode.data.lastHedgingMarkDate) as string)
                         }
                         hedgingMarkOverrides.push(override)
 
@@ -386,7 +385,7 @@ export class HedgingMarkComponent implements OnInit {
                     let rowNodes = getRowNodes(context.rowNode)
                       rowNodes.forEach(childNode=>{
                           childNode.data['hedgingMark'] = childNode.data['originalHedgingMark']
-                          childNode.data['lastHedgingMarkDate'] = childNode.data['isOverriden']?formatDate(this.asOfDate):null
+                          childNode.data['lastHedgingMarkDate'] = childNode.data['isOverriden']?this.asOfDate:null
                       })
                     if(context.rowNode.group){
                       context.rowNode.groupData['state'] = ' '
@@ -425,6 +424,11 @@ export class HedgingMarkComponent implements OnInit {
         ]
       },
 
+      userInterfaceOptions:{
+        customDisplayFormatters: [
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',[...AMOUNT_COLUMNS_LIST])
+          ],
+      },
       predefinedConfig: {
         Dashboard: {
           Revision:9,
@@ -468,6 +472,19 @@ export class HedgingMarkComponent implements OnInit {
             }]
           }]
           
+        },
+        FormatColumn:{
+          Revision:8,
+          FormatColumns:[
+            BLANK_DATETIME_FORMATTER_CONFIG([...DATE_COLUMNS_LIST,'lastHedgingMarkDate','modifiedOn']),
+            DATE_FORMATTER_CONFIG_ddMMyyyy([...DATE_COLUMNS_LIST,'lastHedgingMarkDate']),
+            DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn']),
+
+            
+            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(AMOUNT_COLUMNS_LIST,2,['amountFormatter']),
+            AMOUNT_FORMATTER_CONFIG_Zero(AMOUNT_COLUMNS_LIST,2,['amountFormatter']),
+            
+          ]
         }
       }
     }
@@ -482,16 +499,18 @@ export class HedgingMarkComponent implements OnInit {
         if(params.data?.['hedgingMark'] || params.data?.['hedgingMark']===0){
           childNode.data['hedgingMark'] = params.data['hedgingMark']
         }
-          childNode.data['lastHedgingMarkDate'] =  formatDate(this.asOfDate)
+          //childNode.data['lastHedgingMarkDate'] =  formatDate(this.asOfDate)
+          childNode.data['lastHedgingMarkDate'] =  this.asOfDate
+
 
       })
-      params.node.data['lastHedgingMarkDate'] =  formatDate(this.asOfDate)
+      params.node.data['lastHedgingMarkDate'] =  this.asOfDate
       rows = [...childNodes,params.node]
 
     }else{
       let colid = params.column.getColId()
       if(colid ==='hedgingMark'){
-          params.node.data['lastHedgingMarkDate'] =  formatDate(this.asOfDate)
+          params.node.data['lastHedgingMarkDate'] =  this.asOfDate
       }
 
       rows = [params.node]

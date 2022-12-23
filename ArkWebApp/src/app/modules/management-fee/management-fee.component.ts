@@ -4,7 +4,7 @@ import { map } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { ManagementFeeService } from 'src/app/core/services/ManagementFee/management-fee.service';
-import { amountFormatter, dateFormatter, formatDate, noDecimalAmountFormatter } from 'src/app/shared/functions/formatter';
+import { amountFormatter, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, dateFormatter, DATE_FORMATTER_CONFIG_ddMMyyyy, formatDate, noDecimalAmountFormatter } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { getNodes } from '../capital-activity/utilities/functions';
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
@@ -31,6 +31,20 @@ export class ManagementFeeComponent implements OnInit {
     private managementFeeSvc: ManagementFeeService,
     private dataSvc: DataService
   ) { }
+
+  NO_DEC_AMOUNT_COLUMNS = [
+    'aumBase',
+    'calculatedITDFee',
+    'fixing',
+    'adjustment',
+    'adjustedITDFee',
+    'aggregatedAdjustment',
+    'aumPosition']
+
+  DATE_COLUMNS = [
+      'fixingDate',
+      'managementDate'
+  ]
 
   fetchManagementFee(){
 
@@ -72,18 +86,18 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'issuerShortName', type: 'abColDefString' },
       { field: 'issuer', type: 'abColDefString' },
       { field: 'asset', type: 'abColDefString' },
-      { field: 'managementDate', type: 'abColDefDate', valueFormatter: dateFormatter, cellClass: 'dateUK', headerName: 'Trade Date' },
-      { field: 'aumBase',headerName:'AUM Base', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, aggFunc: 'sum' },
-      { field: 'feeRate', type: 'abColDefNumber', valueFormatter: amountFormatter, aggFunc: 'max', headerName: 'Fee Rate Percent'  },
-      { field: 'calculatedITDFee', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, aggFunc: 'sum'  },
-      { field: 'fixingDate', type: 'abColDefDate', valueFormatter: dateFormatter, aggFunc: 'Max', allowedAggFuncs: ['Max'], cellClass: 'dateUK' },
-      { field: 'fixing', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, aggFunc: 'max'  },
-      { field: 'adjustment', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, aggFunc: 'sum',   },
-      { field: 'adjustedITDFee', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter, allowedAggFuncs: ['Sum'], aggFunc: 'Sum' },
+      { field: 'managementDate', type: 'abColDefDate',  cellClass: 'dateUK', headerName: 'Trade Date' },
+      { field: 'aumBase',headerName:'AUM Base', type: 'abColDefNumber', aggFunc: 'sum' },
+      { field: 'feeRate', type: 'abColDefNumber',aggFunc: 'max', headerName: 'Fee Rate Percent'  },
+      { field: 'calculatedITDFee', type: 'abColDefNumber', aggFunc: 'sum'  },
+      { field: 'fixingDate', type: 'abColDefDate',  aggFunc: 'Max', allowedAggFuncs: ['Max'], cellClass: 'dateUK' },
+      { field: 'fixing', type: 'abColDefNumber', aggFunc: 'max'  },
+      { field: 'adjustment', type: 'abColDefNumber', aggFunc: 'sum',   },
+      { field: 'adjustedITDFee', type: 'abColDefNumber', allowedAggFuncs: ['Sum'], aggFunc: 'Sum' },
       { field: 'noOfMgmtDays',headerName: 'No of Management Days', type: 'abColDefNumber'},
       { field: 'positionCCY',headerName:'Position Ccy',type: 'abColDefString'},
-      { field: 'aumPosition', headerName:'AUM Position',type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter},
-      { field: 'aggregatedAdjustment', type: 'abColDefNumber', valueFormatter: noDecimalAmountFormatter }
+      { field: 'aumPosition', headerName:'AUM Position',type: 'abColDefNumber'},
+      { field: 'aggregatedAdjustment', type: 'abColDefNumber' }
 
 
 
@@ -107,7 +121,7 @@ export class ManagementFeeComponent implements OnInit {
               maxDate = d
           })
 
-          if(formatDate(maxDate) === '01/01/1')
+          if(formatDate(maxDate) === '01/01/1' || formatDate(maxDate) === '01/01/1970')
             return null;
           else return maxDate;
         }
@@ -160,6 +174,12 @@ export class ManagementFeeComponent implements OnInit {
         setSharedEntities: setSharedEntities.bind(this),
         getSharedEntities: getSharedEntities.bind(this)
       },
+      userInterfaceOptions:{
+        customDisplayFormatters:[
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',['feeRate']),
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('noDecimalAmountFormatter',this.NO_DEC_AMOUNT_COLUMNS)
+        ]
+      },
       predefinedConfig: {
         Dashboard: {
           Revision: 2,
@@ -192,6 +212,15 @@ export class ManagementFeeComponent implements OnInit {
               aggregatedAdjustment: true
             }
           }]
+        },
+        FormatColumn:{
+          Revision:3,
+          FormatColumns:[
+            BLANK_DATETIME_FORMATTER_CONFIG(this.DATE_COLUMNS),
+            DATE_FORMATTER_CONFIG_ddMMyyyy(this.DATE_COLUMNS),
+            CUSTOM_FORMATTER(this.NO_DEC_AMOUNT_COLUMNS,['noDecimalAmountFormatter']),
+            CUSTOM_FORMATTER(['feeRate'],['amountFormatter'])
+          ]
         }
       }
     }

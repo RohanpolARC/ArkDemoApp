@@ -9,6 +9,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { RefDataManagerService } from 'src/app/core/services/RefDataManager/ref-data-manager.service';
 import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 import { createColumnDefs, GENERAL_FORMATTING_EXCEPTIONS, parseFetchedData, saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
+import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { RefDataProc } from 'src/app/shared/models/GeneralModel';
 import { AddRefDataFormComponent } from './add-ref-data-form/add-ref-data-form.component';
@@ -34,6 +35,10 @@ export class RefDataManagerComponent implements OnInit {
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   preSelectedColumns: any[] = [];
   rowRefData = []
+
+  DATE_COLUMNS = []
+  DATETIME_COLUMNS = []
+  AMOUNT_COLUMNS = []
 
 
   gridOptions:GridOptions = {
@@ -174,13 +179,18 @@ export class RefDataManagerComponent implements OnInit {
           this.preSelectedColumns = dynamicColumns.filter(r=>r?.['IsDefault']==='True').map(r=>r?.['Column'].toLowerCase())
           let doNotFormat :string[] = dynamicColumns.filter(r=>r?.['EscapeGridFormat']==='True').map(r=>r?.['Column'].toLowerCase());
 
+          this.DATETIME_COLUMNS = dynamicColumns.filter(r => (r?.['DataType'] === 'Date' && r?.['Column']==='CreatedOn' || r?.['Column']==='ModifiedOn')).map(r => r?.['Column']);
+
           this.columnDefs = createColumnDefs(
             refData[0].columnValues,
             [
               ...GENERAL_FORMATTING_EXCEPTIONS,
-              ...doNotFormat
-            ]
+              ...doNotFormat,
+            ],
+            ['createdOn','modifiedOn']
           )
+
+
           this.rowRefData = parseFetchedData(refData)
           this.gridApi?.setColumnDefs(this.columnDefs);
 
@@ -225,7 +235,13 @@ export class RefDataManagerComponent implements OnInit {
           }
           this.adaptableApi.configApi.reloadPredefinedConfig({
             Dashboard: this.dashBoard,
-            Layout: this.layout
+            Layout: this.layout,
+            FormatColumn:{
+              FormatColumns:[
+              BLANK_DATETIME_FORMATTER_CONFIG([...this.DATETIME_COLUMNS]),
+              DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm([...this.DATETIME_COLUMNS]),
+              ]
+            }
           })
           this.gridApi?.setRowData(this.rowRefData)
         },

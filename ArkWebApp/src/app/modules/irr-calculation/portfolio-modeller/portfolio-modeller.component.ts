@@ -7,7 +7,7 @@ import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Subject, Subscription, timer } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
-import { amountFormatter, removeDecimalFormatter, formatDate } from 'src/app/shared/functions/formatter';
+import { amountFormatter, removeDecimalFormatter, formatDate, AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, DATE_FORMATTER_CONFIG_ddMMyyyy, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER } from 'src/app/shared/functions/formatter';
 import { IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams, PortfolioModellerCalcParams, VPortfolioLocalOverrideModel } from 'src/app/shared/models/IRRCalculationsModel';
 import { EventEmitter } from '@angular/core';
 import { AggridMaterialDatepickerComponent } from '../../facility-detail/aggrid-material-datepicker/aggrid-material-datepicker.component';
@@ -122,6 +122,27 @@ export class PortfolioModellerComponent implements OnInit {
     return this.isLocal.value
   }
 
+  AMOUNT_COLUMNS = [
+    'maturityPrice',
+    'expectedPrice',
+    'floorRate',
+    'faceValueIssue',
+    'costPrice',
+    'mark',
+    'adjustedEBITDAatInv',
+    'ebitda',
+    'ltmRevenues',
+    'netLeverage',
+    'netLeverageAtInv',
+    'netLTV',
+    'netLTVatInv',
+    'revenueatInv',
+    'revenuePipeline',
+    'reportingEBITDA',
+    'reportingNetLeverage',
+    'unfundedMargin',
+  'floorRate']
+
   columnDefs: ColDef[] = [    
   {field: 'positionID', width:100, tooltipField: 'positionID', type:'abColDefNumber'},
   {field: 'fundHedging', width:150, tooltipField: 'fundHedging', rowGroup: true, pinned: 'left', type: 'abColDefString'}, 
@@ -131,9 +152,9 @@ export class PortfolioModellerComponent implements OnInit {
   {field: 'assetTypeName', width: 153, type: 'abColDefString'},
   {field: 'fund', width: 150, tooltipField: 'fund', type: 'abColDefString'},
   {field: 'ccy', width: 80},
-  {field: 'faceValueIssue',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 150, type:'abColDefNumber'},
-  {field: 'costPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 110, type:'abColDefNumber'},
-  {field: 'mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 86, type:'abColDefNumber'},
+  {field: 'faceValueIssue', cellClass: 'ag-right-aligned-cell', width: 150, type:'abColDefNumber'},
+  {field: 'costPrice',  cellClass: 'ag-right-aligned-cell', width: 110, type:'abColDefNumber'},
+  {field: 'mark',  cellClass: 'ag-right-aligned-cell', width: 86, type:'abColDefNumber'},
   {field: 'maturityDate', type: 'abColDefDate', width: 135, cellClass: 'dateUK', 
     editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this), cellEditor: 'agGridMaterialDatepicker'},
@@ -158,12 +179,12 @@ export class PortfolioModellerComponent implements OnInit {
     cellStyle: this.editableCellStyle.bind(this)
   },
   {
-    field: 'unfundedMargin', width: 160, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber'
+    field: 'unfundedMargin', width: 160,  cellClass: 'ag-right-aligned-cell', type:'abColDefNumber'
     ,editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this)
   },
   {
-    field: 'floorRate', width: 113, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber',
+    field: 'floorRate', width: 113,  cellClass: 'ag-right-aligned-cell', type:'abColDefNumber',
     editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this)
   },
@@ -179,11 +200,11 @@ export class PortfolioModellerComponent implements OnInit {
     cellStyle: this.editableCellStyle.bind(this),
     cellClass: 'dateUK'
   },
-  { field: 'expectedPrice', width: 140, valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber',
+  { field: 'expectedPrice', width: 140,  cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber',
     editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this)
   },
-  { field: 'maturityPrice', width: 136,valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber' },
+  { field: 'maturityPrice', width: 136, cellClass: 'ag-right-aligned-cell', type:'abColDefNumber' },
   { headerName: 'Spread Discount', width: 151, field: 'spreadDiscount', valueFormatter: removeDecimalFormatter, type:'abColDefNumber',
     editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this)
@@ -192,17 +213,17 @@ export class PortfolioModellerComponent implements OnInit {
     editable: this.isEditable.bind(this),
     cellStyle: this.editableCellStyle.bind(this)
   },
-  { field: 'adjustedEBITDAatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Adj EBITDA at Inv' },
-  { field: 'ebitda', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'EBITDA' }, 
-  { field: 'ltmRevenues', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'LTM Revenues' },
-  { field: 'netLeverage', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net Leverage' },
-  { field: 'netLeverageAtInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net Leverage At Inv' },
-  { field: 'netLTV', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net LTV' },
-  { field: 'netLTVatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net LTV at Inv' },
-  { field: 'revenueatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Revenue at Inv' },
-  { field: 'revenuePipeline', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Revenue Pipeline' },
-  { field: 'reportingEBITDA', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Reporting EBITDA' },
-  { field: 'reportingNetLeverage', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Reporting Net Leverage' },
+  { field: 'adjustedEBITDAatInv',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Adj EBITDA at Inv' },
+  { field: 'ebitda',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'EBITDA' }, 
+  { field: 'ltmRevenues',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'LTM Revenues' },
+  { field: 'netLeverage',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net Leverage' },
+  { field: 'netLeverageAtInv',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net Leverage At Inv' },
+  { field: 'netLTV',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net LTV' },
+  { field: 'netLTVatInv',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net LTV at Inv' },
+  { field: 'revenueatInv',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Revenue at Inv' },
+  { field: 'revenuePipeline',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Revenue Pipeline' },
+  { field: 'reportingEBITDA',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Reporting EBITDA' },
+  { field: 'reportingNetLeverage',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Reporting Net Leverage' },
   { field: 'reportingNetLeverageComment', type: 'abColDefString', headerName: 'Reporting Net Leverage Comment' },
 
   { field: 'assetClass', width: 145 },
@@ -258,7 +279,6 @@ export class PortfolioModellerComponent implements OnInit {
               ...['maturityDate', 'localMaturityDate', 'globalMaturityDate']])
             data[i]['isOverride'] = this.getIsOverride(data[i])
           }  
-
           adaptable_Api.gridApi.setGridData(data)
           if(this.selectedModelID){
             if(this.modelMap[this.selectedModelID].positionIDs){
@@ -511,7 +531,11 @@ export class PortfolioModellerComponent implements OnInit {
         dateInputOptions: {
           dateFormat: 'dd/MM/yyyy',
           locale: 'en-GB'
-        }
+        },
+        customDisplayFormatters:[
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',[...this.AMOUNT_COLUMNS]),
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('customDateFormat',['expectedDate', 'localExpectedDate', 'globalExpectedDate','maturityDate', 'localMaturityDate', 'globalMaturityDate'])
+        ]
       },
 
       layoutOptions: {
@@ -614,6 +638,8 @@ export class PortfolioModellerComponent implements OnInit {
             ]
           }]
       },
+
+
       predefinedConfig: {  
         Dashboard: {
           Revision: 4,
@@ -735,6 +761,12 @@ export class PortfolioModellerComponent implements OnInit {
             RowGroupedColumns: ['fund', 'issuerShortName'],
           }]
         },
+        FormatColumn:{
+          Revision:11,
+          FormatColumns:[
+            CUSTOM_FORMATTER([...this.AMOUNT_COLUMNS],['amountFormatter']),
+            ]
+        }
       }
 
     }

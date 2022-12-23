@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable/types';
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from 'src/app/core/services/FacilityDetails/facility-detail.service';
-import { amountFormatter, removeDecimalFormatter, formatDate, dateTimeFormatter } from 'src/app/shared/functions/formatter';
+import { removeDecimalFormatter, formatDate,DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm,CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER } from 'src/app/shared/functions/formatter';
 import { ActionCellRendererComponent } from './action-cell-renderer.component';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { AggridMaterialDatepickerComponent } from './aggrid-material-datepicker/aggrid-material-datepicker.component';
@@ -45,6 +45,27 @@ export class FacilityDetailComponent implements OnInit {
   isWriteAccess: boolean = false;
   rowData: any[] = [];
   dealTypesCS: string[];
+
+  AMOUNT_COLUMNS = [
+    'maturityPrice',
+    'expectedPrice',
+    'floorRate',
+    'faceValueIssue',
+    'costPrice',
+    'mark',
+    'adjustedEBITDAatInv',
+    'ebitda',
+    'ltmRevenues',
+    'netLeverage',
+    'netLeverageAtInv',
+    'netLTV',
+    'netLTVatInv',
+    'revenueatInv',
+    'revenuePipeline',
+    'reportingEBITDA',
+    'reportingNetLeverage',
+    'unfundedMargin',
+  'floorRate']
 
   constructor(private facilityDetailsService: FacilityDetailService,
     private accessService: AccessService,
@@ -195,9 +216,9 @@ export class FacilityDetailComponent implements OnInit {
       {field: 'assetID', width: 103, type: 'abColDefNumber'},
       {field: 'assetTypeName', width: 153, type: 'abColDefString'},
       {field: 'ccy', width: 80, type: 'abColDefString'},
-      {field: 'faceValueIssue',valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 150, type: 'abColDefNumber'},
-      {field: 'costPrice', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 110, type: 'abColDefNumber'},
-      {field: 'mark', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', width: 86, type: 'abColDefNumber'},
+      {field: 'faceValueIssue', cellClass: 'ag-right-aligned-cell', width: 150, type: 'abColDefNumber'},
+      {field: 'costPrice',  cellClass: 'ag-right-aligned-cell', width: 110, type: 'abColDefNumber'},
+      {field: 'mark',  cellClass: 'ag-right-aligned-cell', width: 86, type: 'abColDefNumber'},
       {field: 'maturityDate', //valueFormatter: dateFormatter,
        width: 135, cellClass: 'dateUK'},
       {field: 'benchMarkIndex', width: 161, type: 'abColDefString'},
@@ -216,10 +237,10 @@ export class FacilityDetailComponent implements OnInit {
       },
       {field: 'unfundedMargin', 
        width: 160,
-      valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+       cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
       {field: 'floorRate', 
       width: 113,
-      valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+       cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
       { field: 'dealType', type: 'abColDefString' },
       { field: 'dealTypeCS', type: 'abColDefString', cellEditor: 'autocompleteCellEditor',        
       editable: this.isEditable, filter: false,
@@ -241,14 +262,14 @@ export class FacilityDetailComponent implements OnInit {
       },
       { field: 'expectedPrice', 
         width: 140,
-        valueFormatter: amountFormatter, 
+         
         cellClass: 'ag-right-aligned-cell', 
         editable: this.isEditable,filter: false,
         cellStyle: this.editableCellStyle, type: 'abColDefNumber'
       },
       { field: 'maturityPrice', 
         width: 136,
-        valueFormatter: amountFormatter, 
+         
         cellClass: 'ag-right-aligned-cell',
         editable: this.isEditable,filter: false,
         cellStyle: this.editableCellStyle,
@@ -284,17 +305,17 @@ export class FacilityDetailComponent implements OnInit {
         menuTabs: []
       },
   
-      { field: 'adjustedEBITDAatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Adj EBITDA at Inv' },
-      { field: 'ebitda', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'EBITDA' }, 
-      { field: 'ltmRevenues', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'LTM Revenues' },
-      { field: 'netLeverage', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net Leverage' },
-      { field: 'netLeverageAtInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net Leverage At Inv' },
-      { field: 'netLTV', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net LTV' },
-      { field: 'netLTVatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net LTV at Inv' },
-      { field: 'revenueatInv', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Revenue at Inv' },
-      { field: 'revenuePipeline', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Revenue Pipeline' },
-      { field: 'reportingEBITDA', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Reporting EBITDA' },
-      { field: 'reportingNetLeverage', valueFormatter: amountFormatter, type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Reporting Net Leverage' },
+      { field: 'adjustedEBITDAatInv',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Adj EBITDA at Inv' },
+      { field: 'ebitda',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'EBITDA' }, 
+      { field: 'ltmRevenues',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'LTM Revenues' },
+      { field: 'netLeverage',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net Leverage' },
+      { field: 'netLeverageAtInv',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net Leverage At Inv' },
+      { field: 'netLTV',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net LTV' },
+      { field: 'netLTVatInv',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Net LTV at Inv' },
+      { field: 'revenueatInv',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Revenue at Inv' },
+      { field: 'revenuePipeline',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Revenue Pipeline' },
+      { field: 'reportingEBITDA',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Reporting EBITDA' },
+      { field: 'reportingNetLeverage',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Reporting Net Leverage' },
       { field: 'reportingNetLeverageComment', type: 'abColDefString', headerName: 'Reporting Net Leverage Comment' },
     
       { field: 'assetClass', width: 145, type: 'abColDefString' },
@@ -302,7 +323,7 @@ export class FacilityDetailComponent implements OnInit {
       { field: 'securedUnsecured', width: 145, type: 'abColDefString' },
       { field: 'seniority', width: 145, type: 'abColDefString' },
       { field: 'modifiedBy', width: 145, type: 'abColDefString' },
-      { field: 'modifiedOn', width: 150, valueFormatter: dateTimeFormatter, cellClass: 'dateUK' }
+      { field: 'modifiedOn',type:'abColDefDate', width: 150, cellClass: 'dateUK' }
     ]
     /** Making this component available to child components in Ag-grid */
     
@@ -388,6 +409,12 @@ export class FacilityDetailComponent implements OnInit {
         getSharedEntities: getSharedEntities.bind(this)
       },
 
+      userInterfaceOptions:{
+        customDisplayFormatters:[
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',this.AMOUNT_COLUMNS)
+        ]
+      },
+
       predefinedConfig: {
         Dashboard: {
           ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
@@ -450,7 +477,12 @@ export class FacilityDetailComponent implements OnInit {
           }]
         },
         FormatColumn: {
-          Revision: 2
+          Revision: 6,
+          FormatColumns:[
+            DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn']),
+            CUSTOM_FORMATTER([...this.AMOUNT_COLUMNS],['amountFormatter']),
+
+          ]
         }
       }
     }

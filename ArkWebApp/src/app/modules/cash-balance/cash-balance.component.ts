@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 import { CashBalanceService } from 'src/app/core/services/CashBalance/cash-balance.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
-import { dateFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, amountFormatter, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy, BLANK_DATETIME_FORMATTER_CONFIG } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -26,26 +26,36 @@ export class CashBalanceComponent implements OnInit {
   gridColumnApi: ColumnApi;
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
 
+
+  AMOUNT_COLUMNS=[
+    'pbClosingBalance',
+    'accountBalance',
+    'accountBalanceBase',
+    'accountBalanceEur',
+    'mvFundHedging',
+    'mvLegalEntity'
+  ]
+
   columnDefs: ColDef[] = [
-    { field: 'asofDate', headerName: 'As of Date', type: 'abColDefDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
+    { field: 'asofDate', headerName: 'As of Date', type: 'abColDefDate', cellClass: 'dateUK' },
     { field: 'pbName', headerName: 'Fund Accounting', type: 'abColDefString' },
     { field: 'mapName', headerName: 'Map', type: 'abColDefString' },
     { field: 'account', headerName: 'Account', type:'abColDefNumber' },
     { field: 'accountDescription', headerName: 'Account Description', type:'abColDefString' },
     { field: 'currency', headerName: 'Currency', type: 'abColDefString' },
-    { field: 'pbClosingBalance', headerName: 'PB Closing Balance', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
+    { field: 'pbClosingBalance', headerName: 'PB Closing Balance', type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
     { field: 'fundCcy', headerName: 'Fund Ccy', type: 'abColDefString' },
-    { field: 'accountBalance', headerName: 'Account Balance', type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', valueFormatter: amountFormatter },
-    { field: 'accountBalanceBase', headerName: 'Account Balance Base', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
+    { field: 'accountBalance', headerName: 'Account Balance', type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
+    { field: 'accountBalanceBase', headerName: 'Account Balance Base', type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
     { field: 'portfolioName', headerName: 'Portfolio', type: 'abColDefString' },
     { field: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString' },
     { field: 'fundLegalEntity', headerName: 'Fund Legal Entity', type: 'abColDefString' },
     { field: 'fund', headerName: 'Fund', type: 'abColDefString' },
     { field: 'fundStrategy', headerName: 'Fund Strategy', type: 'abColDefString' },
     { field: 'marketValueFactor', headerName: 'MV Factor', type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
-    { field: 'accountBalanceEur', headerName: 'Account Balance Eur', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
-    { field: 'mvFundHedging', headerName: 'MV FundHedging', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
-    { field: 'mvLegalEntity', headerName: 'MV FundLegalEntity', type:'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
+    { field: 'accountBalanceEur', headerName: 'Account Balance Eur', type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
+    { field: 'mvFundHedging', headerName: 'MV FundHedging', type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
+    { field: 'mvLegalEntity', headerName: 'MV FundLegalEntity', type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
     { field: 'isSplited', headerName: 'IsSplited', type:'abColDefBoolean' },
   ];
 
@@ -97,6 +107,12 @@ export class CashBalanceComponent implements OnInit {
         setSharedEntities: setSharedEntities.bind(this),
         getSharedEntities: getSharedEntities.bind(this)
       },
+
+      userInterfaceOptions:{
+        customDisplayFormatters:[
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',this.AMOUNT_COLUMNS)
+        ]
+      },
   
       predefinedConfig: {
         Dashboard: {
@@ -134,6 +150,15 @@ export class CashBalanceComponent implements OnInit {
             ],
             RowGroupedColumns : [],
           }]
+        },
+        FormatColumn:{
+          Revision:1,
+          FormatColumns:[
+            CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountFormatter'),
+            BLANK_DATETIME_FORMATTER_CONFIG(this.AMOUNT_COLUMNS),
+            DATE_FORMATTER_CONFIG_ddMMyyyy(['asofDate']),
+            
+          ]
         }
       }
     }

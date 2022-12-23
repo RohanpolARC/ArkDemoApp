@@ -4,8 +4,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { PositionScreenService } from 'src/app/core/services/PositionsScreen/positions-screen.service';
+import {  AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero,  BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
-import {  GRID_OPTIONS, POSITIONS_COLUMN_DEF } from './grid-structure';
+import {  AMOUNT_COLUMNS_LIST, DATE_COLUMNS_LIST, GRID_OPTIONS, POSITIONS_COLUMN_DEF } from './grid-structure';
 
 @Component({
   selector: 'app-positions-screen',
@@ -93,6 +94,13 @@ export class PositionsScreenComponent implements OnInit {
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
+      userInterfaceOptions:{
+        customDisplayFormatters: [
+          //CUSTOM_AMOUNT_FORMATTER('amountFormatter',[...AMOUNT_COLUMNS_LIST])
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',[...AMOUNT_COLUMNS_LIST])
+          ],
+      },
+
       predefinedConfig: {
         Dashboard: {
           Revision:1,
@@ -113,8 +121,18 @@ export class PositionsScreenComponent implements OnInit {
             Columns: this.columnDefs.map(def => def.field)
           }]
           
-        }
-      }
+        },
+        FormatColumn :{
+          Revision:17,
+          FormatColumns: [
+          BLANK_DATETIME_FORMATTER_CONFIG([...DATE_COLUMNS_LIST]),
+          DATE_FORMATTER_CONFIG_ddMMyyyy([...DATE_COLUMNS_LIST]),
+          //AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(AMOUNT_COLUMNS_LIST,2,['amountFormatter']),
+          CUSTOM_FORMATTER(AMOUNT_COLUMNS_LIST,['amountFormatter'])
+          //AMOUNT_FORMATTER_CONFIG_Zero(AMOUNT_COLUMNS_LIST,2,['amountZeroFormat'])
+        ]
+      }}
+
     }
 
   }

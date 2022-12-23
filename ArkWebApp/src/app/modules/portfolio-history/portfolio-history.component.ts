@@ -1,10 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { Observable, Subscription} from 'rxjs';
-import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
-import { MenuModule } from '@ag-grid-enterprise/menu';
-import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
 import {
   AdaptableOptions,
   AdaptableApi,
@@ -17,13 +12,12 @@ import {PortfolioHistoryService} from '../../core/services/PortfolioHistory/port
 import {MatDialog } from '@angular/material/dialog';
 import {DialogDeleteComponent} from './dialog-delete/dialog-delete.component';
 
-import { ExcelExportModule } from "@ag-grid-enterprise/excel-export";
-import { dateFormatter, dateTimeFormatter, amountFormatter, nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { map } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { ColDef, GridOptions, Module } from '@ag-grid-community/core';
-import { ActionColumnContext } from '@adaptabletools/adaptable-angular-aggrid';
+import { ActionColumnContext, CustomDisplayFormatterContext } from '@adaptabletools/adaptable-angular-aggrid';
+import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 
 let adapTableApi: AdaptableApi;
 
@@ -60,20 +54,20 @@ export class PortfolioHistoryComponent implements OnInit {
   { headerName: "Fund",field : 'fund', type:'abColDefString' },
   { headerName: "Fund Hedging", field: 'fundHedging', type:'abColDefString' },
   { headerName: "Fund Ccy",  field: 'fundCcy', type:'abColDefString' },
-  { headerName: "As Of Date ", field: 'asOfDate',  valueFormatter: dateFormatter, cellClass: 'dateUK' ,hide: true, type:'abColDefDate' },
-  { headerName: "Trade Date", field: 'tradeDate', rowGroup: true, hide: true, valueFormatter: dateFormatter, cellClass: 'dateUK' , type:'abColDefDate' },
+  { headerName: "As Of Date ", field: 'asOfDate',  cellClass: 'dateUK' ,hide: true, type:'abColDefDate' },
+  { headerName: "Trade Date", field: 'tradeDate', rowGroup: true, hide: true, cellClass: 'dateUK' , type:'abColDefDate' },
   { headerName: "Type", field : 'typeDesc', type:'abColDefString'},
-  { headerName: "Settle Date", field: 'settleDate',  valueFormatter: dateFormatter, cellClass: 'dateUK' , type:'abColDefDate' },
+  { headerName: "Settle Date", field: 'settleDate',  cellClass: 'dateUK' , type:'abColDefDate' },
   { headerName: "Position Ccy", field: 'positionCcy', type:'abColDefString'},
-  { headerName: "Amount",field : 'amount',enableValue: true ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
-  { headerName: "Par Amount", field: 'parAmount' ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
-  { headerName: "ParAmountLocal",field : 'parAmountLocal' ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-  { headerName: "FundedParAmountLocal",field : 'fundedParAmountLocal' ,  valueFormatter: amountFormatter, type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-  { headerName: "CostAmountLocal",field : 'costAmountLocal',  valueFormatter: amountFormatter , type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-  { headerName: "FundedCostAmountLocal",field : 'fundedCostAmountLocal',  valueFormatter: amountFormatter , type:'abColDefNumber', cellClass: 'ag-right-aligned-cell'},
-  { headerName: "Edited Going In Rate",field: 'fxRateBaseEffective',editable:true , type:'abColDefNumber', cellClass: 'ag-right-aligned-cell', valueFormatter: nonAmountNumberFormatter},
+  { headerName: "Amount",field : 'amount',enableValue: true , type:'abColDefNumber' },
+  { headerName: "Par Amount", field: 'parAmount' , type:'abColDefNumber' },
+  { headerName: "ParAmountLocal",field : 'parAmountLocal' , type:'abColDefNumber'},
+  { headerName: "FundedParAmountLocal",field : 'fundedParAmountLocal' , type:'abColDefNumber'},
+  { headerName: "CostAmountLocal",field : 'costAmountLocal', type:'abColDefNumber'},
+  { headerName: "FundedCostAmountLocal",field : 'fundedCostAmountLocal', type:'abColDefNumber'},
+  { headerName: "Edited Going In Rate",field: 'fxRateBaseEffective', type:'abColDefNumber'},
   { headerName: "Modified By",  field: 'modifiedBy', type:'abColDefString'},
-  { headerName: "Modified On",  field: "modifiedOn", valueFormatter: dateTimeFormatter, type:'abColDefDate', cellClass: 'dateUK'},
+  { headerName: "Modified On",  field: "modifiedOn", type:'abColDefDate', cellClass: 'dateUK'},
   {
     headerName:"",
     field: 'actionNew',
@@ -85,9 +79,9 @@ export class PortfolioHistoryComponent implements OnInit {
   { headerName: "GIR Edited", field:'isEdited', type:'abColDefString'},
   { headerName: 'GIR Override', field: 'isOverride', type: 'abColDefString' },
   { headerName: 'GIR Source', field: 'girSource', type: 'abColDfString' },
-  { headerName: 'GIR SourceID', field: 'girSourceID', type: 'abColDefNumber', valueFormatter: nonAmountNumberFormatter },
+  { headerName: 'GIR SourceID', field: 'girSourceID', type: 'abColDefNumber' },
   { field:'uniqueID', type:'abColDefNumber'},
-  { field: 'pgh_FXRateBaseEffective', headerName: 'Effective Going In Rate', valueFormatter: nonAmountNumberFormatter, cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'}
+  { field: 'pgh_FXRateBaseEffective', headerName: 'Effective Going In Rate', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'}
 ];
 
   constructor(
@@ -112,6 +106,7 @@ export class PortfolioHistoryComponent implements OnInit {
         adaptableApi: adapTableApi
       },
       excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
+
     };
 
     this.defaultColDef = {
@@ -226,6 +221,12 @@ export class PortfolioHistoryComponent implements OnInit {
       ]
     },
 
+    userInterfaceOptions:{
+      customDisplayFormatters: [
+        CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['amount','parAmount', 'parAmountLocal', 'fundedParAmountLocal', 'costAmountLocal', 'fundedCostAmountLocal'])
+        ],
+    },
+
     predefinedConfig: {
       Dashboard: {
         Revision: 1,
@@ -245,9 +246,13 @@ export class PortfolioHistoryComponent implements OnInit {
         },
       
       },
-    
+      Export: {
+        CurrentReport: 'Portfolio History',
+        CurrentDestination: 'Excel'
+      },
+
       Layout:{
-        Revision: 2,
+        Revision: 5,
         CurrentLayout: 'Basic Portfolio History',
         Layouts: [{
           Name: 'Basic Portfolio History',
@@ -300,7 +305,20 @@ export class PortfolioHistoryComponent implements OnInit {
             },
           ],
         }]
-      }  
+      },
+
+      FormatColumn: {
+        Revision: 22,
+        FormatColumns: [
+          
+          BLANK_DATETIME_FORMATTER_CONFIG(['asOfDate', 'tradeDate', 'settleDate', 'modifiedOn']),
+          DATE_FORMATTER_CONFIG_ddMMyyyy(['asOfDate', 'tradeDate', 'settleDate']),
+          DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn']),
+          AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['fxRateBaseEffective', 'pgh_FXRateBaseEffective'], 8),
+          AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['amount','parAmount', 'parAmountLocal', 'fundedParAmountLocal', 'costAmountLocal', 'fundedCostAmountLocal'] ),
+          AMOUNT_FORMATTER_CONFIG_Zero(['amount','parAmount', 'parAmountLocal', 'fundedParAmountLocal', 'costAmountLocal', 'fundedCostAmountLocal','fxRateBaseEffective', 'pgh_FXRateBaseEffective'],2,['amountZeroFormat'])
+        ]
+      }
     }
   }
 

@@ -7,7 +7,7 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
-import { amountFormatter, dateFormatter, dateTimeFormatter } from 'src/app/shared/functions/formatter';
+import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { UnfundedAssetsEditorComponent } from './unfunded-assets-editor/unfunded-assets-editor.component';
 
@@ -55,15 +55,15 @@ export class UnfundedAssetsComponent implements OnInit {
       { field: 'assetID', type: 'abColDefNumber' },
       { field: 'issuerShortName', type: 'abColDefString' },
       { field: 'ccy', type: 'abColDefString'},
-      { field: 'commitmentAmount', type: 'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
-      { field: 'fundedAmount', type: 'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
-      { field: 'unfundedAmount', type: 'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
-      { field: 'tobefundedAmount', headerName: 'To be funded', type: 'abColDefNumber', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell' },
-      { field: 'fundingDate', type: 'abColDefDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
+      { field: 'commitmentAmount', type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
+      { field: 'fundedAmount', type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
+      { field: 'unfundedAmount', type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
+      { field: 'tobefundedAmount', headerName: 'To be funded', type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
+      { field: 'fundingDate', type: 'abColDefDate', cellClass: 'dateUK' },
       { field: 'createdBy', type: 'abColDefString' },
-      { field: 'createdOn', type: 'abColDefDate', valueFormatter: dateTimeFormatter, cellClass: 'dateUK' },
+      { field: 'createdOn', type: 'abColDefDate',  cellClass: 'dateUK' },
       { field: 'modifiedBy', type: 'abColDefString' },
-      { field: 'modifiedOn', type: 'abColDefDate', valueFormatter: dateTimeFormatter, cellClass: 'dateUK' }
+      { field: 'modifiedOn', type: 'abColDefDate',  cellClass: 'dateUK' }
     ]
 
     this.gridOptions = {
@@ -131,6 +131,17 @@ export class UnfundedAssetsComponent implements OnInit {
         ]
       },
 
+      userInterfaceOptions:{
+        customDisplayFormatters:[
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',[
+            'commitmentAmount',
+            'fundedAmount',
+            'unfundedAmount',
+            'tobefundedAmount'
+          ])
+        ]
+      },
+
       predefinedConfig: {
         Dashboard: {
           Revision: 2,
@@ -168,6 +179,21 @@ export class UnfundedAssetsComponent implements OnInit {
             }
 
           }]
+        },
+        FormatColumn:{
+          Revision:5,
+          FormatColumns:[
+            BLANK_DATETIME_FORMATTER_CONFIG(['fundingDate','createdOn','modifiedOn']),
+            DATE_FORMATTER_CONFIG_ddMMyyyy(['fundingDate']),
+            DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['createdOn','modifiedOn']),
+            CUSTOM_FORMATTER([
+              'commitmentAmount',
+              'fundedAmount',
+              'unfundedAmount',
+              'tobefundedAmount'
+            ],['amountFormatter'])
+
+          ]
         }
       }
     }

@@ -9,55 +9,90 @@ import { amountFormatter, dateFormatter, dateTimeFormatter } from 'src/app/share
 })
 export class FeePresetsService {
 
+  DATE_COLUMNS = ['startDate',
+  'financingEndDate',
+  'financingStartDate',
+  'financingStage1EndDate',
+  'financingStage2EndDate',
+  'holdingDate',
+  'investmentDate']
+
+  AMOUNT_COLUMNS = [
+    'commitment',
+    'currentCapitalCalled',
+    'otherExpensesFixed',
+    'maxCapitalDeploymentPerMonth',
+    'financingMaxCapitalDeploymentPerMonth'
+  ]
+
+  DATETIME_COLUMNS = [
+    'createdOn',
+    'modifiedOn'
+  ]
+
+  NON_AMOUNT_2DEC_COLUMNS= [
+    'financingCommitment',
+    'financingStage1Ratio',
+    'financingStage2Ratio',
+    'financingStage3Ratio',
+    'holdback',
+    'catchupRate',
+    'hurdleRate',
+    'mgmtFeesRate',
+    'otherExpenseRate',
+    'perfFeesRate',
+    'undrawnCommitFeesRate'
+  ]
+
   columnDefs: ColDef[] = [
     { field: 'fundName', headerName: 'Fee Preset' },
-    { field: 'commitment', valueFormatter: amountFormatter },
-    { field: 'currentCapitalCalled', valueFormatter: amountFormatter },
-    { field: 'startDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
+    { field: 'commitment' ,type:'abColDefNumber', valueFormatter:amountFormatter},
+    { field: 'currentCapitalCalled' ,type:'abColDefNumber', valueFormatter:amountFormatter},
+    { field: 'startDate', cellClass: 'dateUK',type:'abColDefDate',valueFormatter:dateFormatter },
     { field: 'curveCurrency' },
     { field: 'curveName' },
     { field: 'entity' },
     
-    { field: 'financingCommitment' },
-    { field: 'financingEndDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
-    { field: 'financingMaxCapitalDeploymentPerMonth' },
-    { field: 'financingStartDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
+    { field: 'financingCommitment' ,type:'abColDefNumber'},
+    { field: 'financingEndDate', cellClass: 'dateUK' ,type:'abColDefDate',valueFormatter:dateFormatter },
+    { field: 'financingMaxCapitalDeploymentPerMonth' ,type:'abColDefNumber'},
+    { field: 'financingStartDate', cellClass: 'dateUK' ,type:'abColDefDate',valueFormatter:dateFormatter },
     
-    { field: 'financingStage1Ratio' },
-    { field: 'financingStage2Ratio' },
-    { field: 'financingStage3Ratio' },
-    { field: 'financingStage1EndDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
-    { field: 'financingStage2EndDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
+    { field: 'financingStage1Ratio',type:'abColDefNumber' },
+    { field: 'financingStage2Ratio' ,type:'abColDefNumber'},
+    { field: 'financingStage3Ratio',type:'abColDefNumber' },
+    { field: 'financingStage1EndDate', cellClass: 'dateUK' ,type:'abColDefDate',valueFormatter:dateFormatter },
+    { field: 'financingStage2EndDate', cellClass: 'dateUK' ,type:'abColDefDate',valueFormatter:dateFormatter },
 
-    { field: 'holdback' },
-    { field: 'holdingDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
-    { field: 'maxCapitalDeploymentPerMonth' },
-    { field: 'reinvestInterest' },
+    { field: 'holdback',type:'abColDefNumber' },
+    { field: 'holdingDate', cellClass: 'dateUK' ,type:'abColDefDate',valueFormatter:dateFormatter },
+    { field: 'maxCapitalDeploymentPerMonth' ,type:'abColDefNumber' },
+    { field: 'reinvestInterest'},
 
-    { field: 'catchupRate' },
+    { field: 'catchupRate',type:'abColDefNumber' },
     { field: 'hasCatchup' },
     { field: 'hurdleCompoundingYears' },
-    { field: 'hurdleRate' },
+    { field: 'hurdleRate' ,type:'abColDefNumber'},
     { field: 'includeMgmtFee' },
     { field: 'includeOtherExpense' },
-    { field: 'investmentDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
+    { field: 'investmentDate', cellClass: 'dateUK' ,type:'abColDefDate',valueFormatter:dateFormatter },
     { field: 'isMgmtFeesPaidAtEnd' },
     { field: 'isPerfFeesPaidAtEnd' },
     { field: 'isQuarterEndMgmtFees' },
-    { field: 'mgmtFeesRate' },
-    { field: 'otherExpenseRate' },
-    { field: 'perfFeesRate' },
-    { field: 'undrawnCommitFeesRate' },
+    { field: 'mgmtFeesRate',type:'abColDefNumber' },
+    { field: 'otherExpenseRate',type:'abColDefNumber' },
+    { field: 'perfFeesRate',type:'abColDefNumber' },
+    { field: 'undrawnCommitFeesRate' ,type:'abColDefNumber'},
 
     { field: 'overrideExpected' },
     { field: 'useFXHedgingCashflows' },
-    { field: 'otherExpensesFixed' },
+    { field: 'otherExpensesFixed' ,type:'abColDefNumber'},
 
     // { field: 'isParallel' },
     { field: 'modifiedBy' },
-    { field: 'modifiedOn', valueFormatter: dateTimeFormatter, cellClass: 'dateUK' },
+    { field: 'modifiedOn',type:'abColDefDate', cellClass: 'dateUK',valueFormatter:dateFormatter },
     { field: 'createdBy' },
-    { field: 'createdOn', valueFormatter: dateTimeFormatter },
+    { field: 'createdOn',type:'abColDefDate',valueFormatter:dateFormatter },
 ].map(col => { 
   col['tooltipField'] = col.field;
   return col;  

@@ -7,7 +7,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { PortfolioManagerService } from 'src/app/core/services/PortfolioManager/portfolio-manager.service';
 import { PortfolioMappingDataService } from 'src/app/core/services/PortfolioManager/portfolio-mapping-data.service';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
-import { dateTimeFormatter } from 'src/app/shared/functions/formatter';
+import { BLANK_DATETIME_FORMATTER_CONFIG, dateTimeFormatter, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm } from 'src/app/shared/functions/formatter';
 import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/utilities';
 import { ApprovalActionCellRendererComponent } from '../approval-action-cell-renderer/approval-action-cell-renderer.component';
 import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, validateAndUpdate } from '../utilities/functions';
@@ -335,9 +335,9 @@ export class ApprovalComponent implements OnInit {
       },
       { field: "action", cellRenderer: 'actionCellRenderer'},
       { field: 'modifiedBy', headerName: 'Requested By',  type: 'abColDefString' },
-      { field: 'modifiedOn', headerName: 'Requested On', valueFormatter: dateTimeFormatter, type: 'abColDefDate', cellClass: 'dateUK'},
+      { field: 'modifiedOn', headerName: 'Requested On', type: 'abColDefDate', cellClass: 'dateUK'},
       { field: 'reviewedBy', type: 'abColDefString'},
-      { field: 'reviewedOn', valueFormatter: dateTimeFormatter, type: 'abColDefDate', cellClass: 'dateUK' },
+      { field: 'reviewedOn', type: 'abColDefDate', cellClass: 'dateUK' },
       { field: 'remark', type: 'abColDefString' }
     ]
 
@@ -456,6 +456,13 @@ export class ApprovalComponent implements OnInit {
               }
             }]  
           }]
+        },
+        FormatColumn:{
+          Revision:2,
+          FormatColumns:[
+            BLANK_DATETIME_FORMATTER_CONFIG(['reviewedOn','modifiedOn']),
+            DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['reviewedOn','modifiedOn'])
+          ]
         }
       }
     }

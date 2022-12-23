@@ -58,47 +58,45 @@ export function parseFetchedData(data: {
 
   return rowData;
 }
-
 export function createColumnDefs(
-    row: {column: string, value: string}[],
-    exceptions: string[] =  GENERAL_FORMATTING_EXCEPTIONS,
-    dateTimeColumns: string[] = GENERAL_DATETIME_FORMATTING_COLUMNS
+  row: {column: string, value: string}[],
+  exceptions: string[] =  GENERAL_FORMATTING_EXCEPTIONS,
+  dateTimeColumns: string[] = GENERAL_DATETIME_FORMATTING_COLUMNS,
+  skipAgGridValueFormatter:boolean=false
 ): any[]{
 
-    exceptions = exceptions.map(col => col.toLowerCase())
-    
-    let columnDefs = []
+  exceptions = exceptions.map(col => col.toLowerCase())
+let columnDefs = []
 
-    for(let i:number = 0; i < row.length; i+= 1){
-      let col: string = row[i].column;
-      let colDef: ColDef = {
-        field: col,
-        tooltipField: col,
-        valueFormatter: (params: ValueFormatterParams) => {
-          if(!params.value)
-            return ""
-          return String(params.value)
-        }
-      }
-      if(col.toLowerCase().includes('date') || col.toLowerCase()==='createdon'|| col.toLowerCase()==='modifiedon'){
-        colDef.valueFormatter = dateFormatter;
-        colDef.type = 'abColDefDate'
-        colDef.cellClass = 'dateUK'
-      }
-      else if(dateTimeColumns.includes(col.toLowerCase())){
-        colDef.valueFormatter = dateTimeFormatter;
-        colDef.type = 'abColDefDate'
-        colDef.cellClass = 'dateUK'
-      }
-      else if(exceptions.includes(col.toLowerCase())){
-        colDef.valueFormatter = null;
-      }
-      else if(!isNaN(parseFloat(row[i].value))){
-        colDef.valueFormatter = amountFormatter;
-        colDef.type = 'abColDefNumber'
-      }
-      columnDefs.push(colDef);
+for(let i:number = 0; i < row.length; i+= 1){
+  let col: string = row[i].column;
+  let colDef: ColDef = {
+    field: col,
+    tooltipField: col,
+    valueFormatter: (params: ValueFormatterParams) => {
+      if(!params.value)
+        return ""
+      return String(params.value)
     }
-    return columnDefs;
   }
-
+  if(col.toLowerCase().includes('date') || col.toLowerCase()==='createdon'|| col.toLowerCase()==='modifiedon'){
+    colDef.valueFormatter = skipAgGridValueFormatter?null: dateFormatter;
+    colDef.type = 'abColDefDate'
+    colDef.cellClass = 'dateUK'
+  }
+  else if(dateTimeColumns.includes(col.toLowerCase())){
+    colDef.valueFormatter = skipAgGridValueFormatter?null: dateTimeFormatter;
+    colDef.type = 'abColDefDate'
+    colDef.cellClass = 'dateUK'
+  }
+  else if(exceptions.includes(col.toLowerCase())){
+    colDef.valueFormatter = null;
+  }
+  else if(!isNaN(parseFloat(row[i].value))){
+    colDef.valueFormatter = skipAgGridValueFormatter?null: amountFormatter;
+    colDef.type = 'abColDefNumber'
+  }
+  columnDefs.push(colDef);
+}
+return columnDefs;
+}

@@ -303,6 +303,10 @@ export class IrrResultComponent implements OnInit {
             ]
           }]
         },
+        FormatColumn:{
+          Revision:3,
+          FormatColumns:[ ]
+        }
       }
     }
   }

@@ -20,7 +20,7 @@ export class CommonConfig{
     public static ADAPTABLE_LICENSE_KEY: string = `AppName=ArkWebApp|Owner=Arcmont|StartDate=2022-10-24|EndDate=2023-10-24|Ref=AdaptableLicense|TS=1666602091846|C=1746416962,3532872810,1260976079,3570867046,1923092690,3250147371,2536545759`   
 
     public static GENERAL_EXPORT_OPTIONS: ExportOptions = {
-        exportDateFormat: 'yyyy/MM/dd',
+        // exportDateFormat: 'yyyy/MM/dd',
         exportFormatType: 'formattedValue'
     }
 

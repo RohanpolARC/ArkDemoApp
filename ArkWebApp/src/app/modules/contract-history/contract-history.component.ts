@@ -7,6 +7,7 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { ContractHistoryService } from 'src/app/core/services/ContractHistory/contract-history.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { createColumnDefs, GENERAL_FORMATTING_EXCEPTIONS, parseFetchedData, saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
+import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/utilities';
 
 @Component({
@@ -76,6 +77,12 @@ export class ContractHistoryComponent implements OnInit {
       autoSizeColumnsInLayout: true
     },
 
+    userInterfaceOptions:{
+      customDisplayFormatters:[
+        CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter')
+      ]
+    },
+
     predefinedConfig: {
       Dashboard: {
         Revision: 2,
@@ -90,6 +97,8 @@ export class ContractHistoryComponent implements OnInit {
       }
     }
   }
+  DATE_COLUMNS: string[]=[];
+  AMOUNT_COLUMNS: string[]=[];
 
   constructor(
     private contractHistorySvc: ContractHistoryService,
@@ -138,8 +147,33 @@ export class ContractHistoryComponent implements OnInit {
             let doNotFormat: string[] = dynamicColumns.filter(r => r?.['EscapeGridFormat'] === 'True').map(r => r?.['Column'].toLowerCase());
 
             if(contractData.length > 0)
-              this.columnDefs = createColumnDefs(contractData[0].columnValues, [...GENERAL_FORMATTING_EXCEPTIONS, ...doNotFormat])
+              this.columnDefs = createColumnDefs(contractData[0].columnValues, [...GENERAL_FORMATTING_EXCEPTIONS, ...doNotFormat,'AssetType','Position Id','DateTo','StartDateInRange','EndDateInRange'],[],true)
+        
+            this.DATE_COLUMNS = dynamicColumns.filter(r => (r?.['DataType'] === 'Date' && r?.['Column']!=='StartDateInRange' && r?.['Column']!=='EndDateInRange')).map(r => r?.['Column']);
+
+            this.AMOUNT_COLUMNS = dynamicColumns.filter(r => r?.['DataType'] === 'Number' && !['BaseRate','AllInRate','Position Id'].includes(r?.['Column'])).map(r => r?.['Column']);
+
+            this.columnDefs.forEach(col=>{
+              if(col.type==='abColDefNumber'){
+                this.AMOUNT_COLUMNS.push(col.field)
+              }
+            })
             
+
+
+            this.columnDefs.forEach(col=>{
+              if( this.DATE_COLUMNS.includes(col.field)){
+                col.type = 'abColDefDate'
+              }else if(this.AMOUNT_COLUMNS.includes(col.field)){
+                col.type = 'abColDefNumber'
+              }
+            })
+
+            this.adaptableApi.formatColumnApi.addFormatColumns([
+              BLANK_DATETIME_FORMATTER_CONFIG(this.DATE_COLUMNS),
+              DATE_FORMATTER_CONFIG_ddMMyyyy(this.DATE_COLUMNS),
+              CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,['amountFormatter'])
+            ])
             this.rowData = parseFetchedData(contractData)
             
             this.gridApi?.setColumnDefs(this.columnDefs);

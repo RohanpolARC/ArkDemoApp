@@ -3,7 +3,7 @@ import { CellClickedEvent, ColDef, GridApi, GridOptions, GridReadyEvent, Module,
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { Observable, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { dateTimeFormatter,dateFormatter, formatDate } from 'src/app/shared/functions/formatter';
+import { dateTimeFormatter,dateFormatter, formatDate, CUSTOM_FORMATTER, BLANK_DATETIME_FORMATTER_CONFIG, DATE_FORMATTER_CONFIG_ddMMyyyy, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm } from 'src/app/shared/functions/formatter';
 import { AttributesFixingService } from 'src/app/core/services/AttributesFixing/attributes-fixing.service';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { DataService } from 'src/app/core/services/data.service';
@@ -65,7 +65,7 @@ export class AttributesFixingComponent implements OnInit {
 
     this.columnDefs = [
       { field: 'fixingID', type: 'abColDefNumber' },
-      { field: 'asOfDate',valueFormatter:dateFormatter, type: 'abColDefDate', cellClass: 'dateUK' },
+      { field: 'asOfDate', type: 'abColDefDate', cellClass: 'dateUK' },
       { 
         field: 'attributeName',
         cellStyle: {
@@ -86,9 +86,9 @@ export class AttributesFixingComponent implements OnInit {
       }
       },
       { field: 'modifiedBy', type: 'abColDefString' },
-      { field: 'modifiedOn', valueFormatter: dateTimeFormatter, type: 'abColDefDate', cellClass: 'dateUK' },
+      { field: 'modifiedOn', type: 'abColDefDate', cellClass: 'dateUK' },
       { field: 'createdBy', type: 'abColDefString' },
-      { field: 'createdOn', valueFormatter: dateTimeFormatter, type: 'abColDefDate', cellClass: 'dateUK' },
+      { field: 'createdOn', type: 'abColDefDate', cellClass: 'dateUK' },
     ]
 
     this.gridOptions = {
@@ -106,6 +106,7 @@ export class AttributesFixingComponent implements OnInit {
       excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
     }
 
+    
     this.adaptableOptions= {
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'fixingID',
@@ -203,6 +204,14 @@ export class AttributesFixingComponent implements OnInit {
               ActionDelete: 18
             }
           }]
+        },
+        FormatColumn:{
+          Revision:1,
+          FormatColumns:[
+            BLANK_DATETIME_FORMATTER_CONFIG(['asOfDate']),
+            DATE_FORMATTER_CONFIG_ddMMyyyy(['asOfDate']),
+            DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn','createdOn'])
+          ]
         }
       }
 

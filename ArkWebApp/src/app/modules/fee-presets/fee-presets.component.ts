@@ -8,7 +8,7 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { FeePresetsService } from 'src/app/core/services/FeePresets/fee-presets.service';
-import { amountFormatter, dateFormatter, dateTimeFormatter, formatDate } from 'src/app/shared/functions/formatter';
+import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy, formatDate } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { PresetsFormComponent } from './presets-form/presets-form.component';
 
@@ -113,9 +113,15 @@ export class FeePresetsComponent implements OnInit {
           }
         ]
       },
+      userInterfaceOptions:{
+        customDisplayFormatters:[
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',this.feePresetsSvc.AMOUNT_COLUMNS),
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('nonAmountNumberFormatter2Dec',this.feePresetsSvc.NON_AMOUNT_2DEC_COLUMNS)
+        ]
+      },
       predefinedConfig: {
         Dashboard: {
-          Revision: 1,
+          Revision: 2,
           ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
@@ -126,7 +132,7 @@ export class FeePresetsComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 7,
+          Revision: 8,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -138,6 +144,20 @@ export class FeePresetsComponent implements OnInit {
               ActionEdit: 18
             }
           }]
+        },
+        FormatColumn:{
+          Revision:13,
+          FormatColumns:[
+
+
+
+            BLANK_DATETIME_FORMATTER_CONFIG([...this.feePresetsSvc.DATETIME_COLUMNS,...this.feePresetsSvc.DATE_COLUMNS]),
+            DATE_FORMATTER_CONFIG_ddMMyyyy(this.feePresetsSvc.DATE_COLUMNS),
+            DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(this.feePresetsSvc.DATETIME_COLUMNS),
+            CUSTOM_FORMATTER(this.feePresetsSvc.AMOUNT_COLUMNS,['amountFormatter']),
+            CUSTOM_FORMATTER(this.feePresetsSvc.NON_AMOUNT_2DEC_COLUMNS,['nonAmountNumberFormatter2Dec'])
+
+          ]
         }
       }
     }
@@ -151,6 +171,7 @@ export class FeePresetsComponent implements OnInit {
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
+
   }
 
   fetchFundInvestmentData(fundName: string, 
@@ -196,7 +217,9 @@ export class FeePresetsComponent implements OnInit {
 
           return row;
         }))
+
       );
+
   }
 
   openDialog(action: 'ADD' | 'EDIT' = 'ADD', fundFee = [], fundInvestment = []) { 
