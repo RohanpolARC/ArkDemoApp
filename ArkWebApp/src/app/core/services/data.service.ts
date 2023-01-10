@@ -56,6 +56,11 @@ export class DataService {
             catchError((ex) => throwError(ex)));
     }
 
+    getRefDatatable(tableName: string){
+        return this.http.get<any[]>(`${APIConfig.REFDATA_GET_DATATABLE}/?tableName=${tableName}`).pipe(
+            catchError((ex) => throwError(ex)));
+    }
+
     getDetailedView(model: DetailedView){
         return this.http.post<any[]>(`${APIConfig.GET_DETAILED_VIEW}`, model).pipe(
             catchError((ex) => throwError(ex)));      

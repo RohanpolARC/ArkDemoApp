@@ -66,7 +66,7 @@
                                 [disabled]="modelForm?.invalid ? true : isSuccess" type="button" class="w-10"
                                 color="primary" (click)="onProceed('Save')">Save</button>
 
-                                <button mat-raised-button [disabled]="(modelForm?.invalid || (isFeePresetDisabled && isMonthlyReturnsDisabled && isIRRDisabled))? true : isSuccess " type="button"
+                                <button mat-raised-button [disabled]="(modelForm?.invalid || (isFeePresetDisabled && isMonthlyReturnsDisabled && isIRRDisabled) || !aggrCols?.length) ? true : isSuccess " type="button"
                                 color="primary" (click)="onProceed('SaveRun')" class="w-18">Save & Run</button>
 
                                 <div class="w-10"></div>
@@ -112,23 +112,33 @@
                         </mat-select>
                     </mat-form-field>
 
+                    <mat-form-field class="col-12" appearance="outline">
+                        <mat-label>Aggregation Order</mat-label>
+                        <mat-chip-list #aggrColList aria-label="Aggregation column selection">
+                          <mat-chip *ngFor="let aggrCol of aggrCols"
+                            [selectable]="true"
+                            [removable]="true"
+                            (removed)="removeAggrCol(aggrCol)">
+                            {{aggrCol}}
+                            <button matChipRemove *ngIf="removableChip">
+                              <mat-icon>cancel</mat-icon>
+                            </button>
+                          </mat-chip>
+                          <input
+                            placeholder="New aggregation..."
+                            #aggrColInput
+                            formControlName="aggrStr"
+                            [matAutocomplete]="autoAggrStr"
+                            [matChipInputFor]="aggrColList"
+                            (matChipInputTokenEnd)="addAggrCol($event)">
+                        </mat-chip-list>
+                        <mat-autocomplete #autoAggrStr="matAutocomplete" (optionSelected)="selectedAggrCol($event)">
+                          <mat-option *ngFor="let aggrCol of filteredAggrCols | async" [value]="aggrCol">
+                            {{aggrCol}}
+                          </mat-option>
+                        </mat-autocomplete>
+                      </mat-form-field>
 
-
-                    <!-- <div class="col-3">    
-                        <button mat-raised-button [disabled]="modelForm?.invalid ? true : isSuccess" type="button"
-                        color="primary" (click)="onProceed('SaveRunIRR')">Save & Run IRR</button>
-                    </div>
-
-
-                    <div class="col-3">
-                        <button mat-raised-button [disabled]="modelForm?.invalid ? true : isSuccess" type="button"
-                        color="primary" (click)="onProceed('SaveRunMReturns')">Save & Run Monthly Returns</button>
-                    </div>                
-                    
-                    <div class="col-3">
-                        <button mat-raised-button [disabled]="modelForm?.invalid ? true : isSuccess" type="button"
-                        color="primary" (click)="onProceed('SaveRunPFees')">Save & Run Performance Fees</button>
-                    </div> -->
             </div>
             <div class="row">
     

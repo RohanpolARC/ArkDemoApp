@@ -30,6 +30,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { FeePresetsGridComponent } from './fee-presets-grid/fee-presets-grid.component';
 import { TabGroupWrapperComponent } from './tab-group-wrapper/tab-group-wrapper.component';
 import { CashFlowsComponent } from './cash-flows/cash-flows.component';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import {MatChipsModule} from '@angular/material/chips';
 
 @NgModule({
   declarations: [
@@ -65,7 +67,9 @@ import { CashFlowsComponent } from './cash-flows/cash-flows.component';
     MatTabsModule,
     MatProgressSpinnerModule,
     MatSelectModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatAutocompleteModule,
+    MatChipsModule
   ],
   providers: [
     FeeCalculationService,

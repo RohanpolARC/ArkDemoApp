@@ -35,7 +35,7 @@ export function saveAndSetLayout(columnDefs: ColDef[], adaptableApi: AdaptableAp
   }
 
   if(layout.Columns.length > 0){
-    adaptableApi?.layoutApi.saveLayout(layout)
+    adaptableApi?.layoutApi.createOrUpdateLayout(layout)
     adaptableApi?.layoutApi.setLayout(layout.Name)  
   }
 }

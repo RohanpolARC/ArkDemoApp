@@ -1,9 +1,11 @@
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { forkJoin, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { forkJoin, Observable, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { VPortfolioModel } from 'src/app/shared/models/IRRCalculationsModel';
@@ -54,6 +56,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   isIRRDisabled: boolean = true;
   isFeePresetDisabled: boolean = true;
   isMonthlyReturnsDisabled: boolean = true;
+  removableChip: boolean = false;
 
   constructor(
     public dialogRef: MatDialogRef<PortfolioSaveRunModelComponent>,
@@ -74,18 +77,25 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     this.subscriptions.push(
       forkJoin([
         this.dataService.getUniqueValuesForField('Returns-Base-Measures'),
-        this.dataService.getUniqueValuesForField('PortfolioModeller-Fee-Calculation-Entities')
+        this.dataService.getUniqueValuesForField('PortfolioModeller-Fee-Calculation-Entities'),
+        this.dataService.getRefDatatable('[ArkUI].[IRRAggregationLevelRef]')
       ]).subscribe({
         next: (d: any[]) => {
           let bm = d[0]
           let fp = d[1]
+          let aggrRefDt = d[2]
+
+          if(typeof aggrRefDt === 'string')
+            aggrRefDt = JSON.parse(aggrRefDt)
 
           this.baseMeasures = bm.map(item => { return { baseMeasure: item.value, id: item.id } })
           this.feePresets = fp.map(item => { return { feePreset: item.value, id: item.id } })
+          this.allAggrCols = aggrRefDt.map(x => x?.['Fields'])
 
           this.Init();
           this.changeListeners();
-          this.modelForm.updateValueAndValidity()      
+          this.modelForm.updateValueAndValidity() 
+          
         },
         error: (e) => {
           this.dataService.setWarningMsg(`Failed to load fee presets and base measures`)
@@ -134,27 +144,40 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     }
 
     this.aggregationTypes = [
-      { type: 'Fund > Realised/Unrealised > Issuer Short Name', levels: ['IssuerFundMerged', 'FundRealisedUnrealised', 'Fund'] },
-      { type: 'Realised/Unrealised > Issuer Short Name', levels: ['IssuerFirmwide', 'FirmwideRealisedUnrealised', 'Firmwide'] },
-      { type: 'Firmwide > Deal Type(CS) > Issuer Short Name', levels: [] },
-      { type: 'Firmwide > Issuer Short Name > Seniority', levels: [] },
-      { type: 'Firmwide > Realised/Unrealised > Issuer Seniority', levels: [] },
-      { type: 'Fund > Realised/Unrealised > Issuer Seniority', levels: [] }
+      { type: 'Fund > Realised/Unrealised > Issuer Short Name', levels: ['Fund', 'RealisedUnrealised', 'Issuer Short Name'] },
+      { type: 'Realised/Unrealised > Issuer Short Name', levels: ['RealisedUnrealised', 'Issuer Short Name'] },
+      { type: 'Firmwide > Deal Type(CS) > Issuer Short Name', levels: ['Firmwide', 'DealTypeCS', 'Issuer Short Name'] },
+      { type: 'Firmwide > Issuer Short Name > Seniority', levels: ['Firmwide', 'Issuer Short Name', 'Seniority'] },
+      { type: 'Firmwide > Realised/Unrealised > Issuer Seniority', levels: ['Firmwide', 'RealisedUnrealised', 'Issuer Short Name', 'Seniority'] },
+      { type: 'Fund > Realised/Unrealised > Issuer Seniority', levels: ['Fund', 'RealisedUnrealised', 'Issuer Short Name', 'Seniority'] },
+      { type: 'Custom', levels: [] }
     ]
 
+    let aggrStr: string = this.data.aggregationType ?? this.aggregationTypes[0].type
+    
     this.modelForm = new FormGroup({
       modelName: new FormControl(this.data.model?.modelName, Validators.required),
       modelDesc: new FormControl(this.data.model?.modelDesc),
       isUpdate: new FormControl(!!this.modelID, Validators.required),
       isShared: new FormControl(!!this.data.isShared, Validators.required),
-      aggregationType: new FormControl(this.data.aggregationType ?? this.aggregationTypes[0].type, Validators.required),
+      aggregationType: new FormControl(aggrStr, Validators.required),
       baseMeasure: new FormControl(this.baseMeasures[0]?.baseMeasure, Validators.required),
       feePreset: new FormControl(this.feePresets[0]?.feePreset, Validators.required),
-      calculationType: new FormControl([], Validators.required)
+      calculationType: new FormControl([], Validators.required),
+      aggrStr: new FormControl('')
     })
+
+    this.updateAggregationOrder(aggrStr);
   }
 
   changeListeners(){
+
+    this.filteredAggrCols = this.modelForm.get('aggrStr').valueChanges.pipe(
+      startWith(''),
+      map((aggrCol: string | null) => (
+        aggrCol ? this._filter(aggrCol) : this.allAggrCols.slice()
+      )),
+    );
 
     this.subscriptions.push(this.modelForm.get('isUpdate').valueChanges.
     pipe(
@@ -180,6 +203,14 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       
     }))
 
+    this.subscriptions.push(this.modelForm.get('aggregationType').valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe((aggrStr) => {
+
+      this.updateAggregationOrder(aggrStr);
+    }))
+
     this.subscriptions.push(this.modelForm.get('modelName').valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged()
@@ -191,6 +222,29 @@ export class PortfolioSaveRunModelComponent implements OnInit {
         this.modelForm.patchValue({ isUpdate: true }, { emitEvent: false })
       }
     }))
+  }
+
+  updateAggregationOrder(aggrStr: string){
+    
+    this.removableChip = false;
+    if(aggrStr === 'Custom'){
+      this.removableChip = true
+      this.aggrCols = []
+      this.modelForm.get('aggrStr').enable();
+      return;
+    }
+
+    for(let i: number = 0; i < this.aggregationTypes.length; i+=1){
+      if(aggrStr === this.aggregationTypes[i].type){
+        this.aggrCols = this.aggregationTypes[i].levels;
+        break;
+      }
+    }
+
+    // Input disable wasn't working on initial form load, hence wrapping in setTimeout to push it to browser queue and to run at last.
+    setTimeout(() => {
+      this.modelForm.get('aggrStr').disable();
+    }, 0)
   }
 
   onProceed(context: Proceed){
@@ -257,7 +311,10 @@ export class PortfolioSaveRunModelComponent implements OnInit {
               isSuccess:true,
               baseMeasure: this.isMonthlyReturnsDisabled ? null : this.modelForm.get('baseMeasure').value,
               feePreset: this.isFeePresetDisabled ? null :  this.modelForm.get('feePreset').value,
-              irrAggrType: this.isIRRDisabled ? null : this.modelForm.get('aggregationType').value
+              irrAggrType: this.isIRRDisabled ? null : this.modelForm.get('aggregationType').value,
+              
+              // Setting dynamically set aggregation order.
+              aggrStr: this.aggrCols
             })
           }
 
@@ -306,5 +363,51 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     this.dialogRef.close({
       context: this.context,
       isSuccess: this.isSuccess})
+  }
+
+
+  filteredAggrCols: Observable<string[]>;
+  aggrCols: string[] = ['Fund'];
+  allAggrCols: string[] = ['Fund', 'DealTypeCS', 'Issuer Short Name', 'Seniority', 'Realised/Unrealised'];
+  @ViewChild('aggrColInput') aggrColInput: ElementRef<HTMLInputElement>;
+
+  addAggrCol(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+
+    // Add our aggrCol
+    if (this.allAggrCols.includes(value) && !this.aggrCols.includes(value)) {
+      this.aggrCols.push(value);
+    }
+
+    // Clear the input value
+    event.chipInput!.clear();
+
+    this.modelForm.get('aggrStr').setValue('');
+  }
+
+  removeAggrCol(aggrCol: string): void {
+    const index = this.aggrCols.indexOf(aggrCol);
+
+    if (index >= 0) {
+      this.aggrCols.splice(index, 1);
+    }
+  }
+
+  selectedAggrCol(event: MatAutocompleteSelectedEvent): void {
+
+    let value: string = event.option.viewValue;
+
+    // Add our aggrCol
+    if (this.allAggrCols.includes(value) && !this.aggrCols.includes(value)) {
+      this.aggrCols.push(value);
+    }
+    this.aggrColInput.nativeElement.value = '';
+    this.modelForm.get('aggrStr').setValue('');
+  }
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.allAggrCols.filter(aggrCol => aggrCol.toLowerCase().includes(filterValue));
   }
 }

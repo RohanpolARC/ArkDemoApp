@@ -379,7 +379,7 @@ export class ApprovalComponent implements OnInit {
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
       layoutOptions: {
-        includeExpandedRowGroups: true
+        displayRowGroups:'expanded'
       },
 
       // toolPanelOptions: {

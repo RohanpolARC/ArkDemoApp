@@ -41,6 +41,9 @@ export class TabGroupWrapperComponent implements OnInit {
 
       await sleep(500);
 
+      if(subtabs[i].resultType === 'IRR')
+        subtabs[i].displayName = `IRR (${subtabs[i].calcParams?.['aggrStr']?.join(' > ')})`;
+
       this.subtabs.push(subtabs[i])
       this.selected.setValue(i)
     }

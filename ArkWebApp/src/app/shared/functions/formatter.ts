@@ -122,10 +122,10 @@ export function BLANK_DATETIME_FORMATTER_CONFIG(dateFields: string[], IncludeGro
           ColumnIds: dateFields
         }, 
         Rule: {
-          Predicate: {
+          Predicates: [{
             PredicateId: 'Before',
             Inputs: ['1753-01-01T00:00:00']
-          }
+          }]
         },
         DisplayFormat:{
           Formatter: 'DateFormatter',
@@ -176,10 +176,10 @@ export function AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(fields: string[], decim
             ColumnIds: fields
         },
         Rule: {
-            Predicate: {
+            Predicates: [{
                 PredicateId: 'NotEquals',
                 Inputs: [0, null]
-            }
+            }]
         }, 
         DisplayFormat: {
             Formatter: 'NumberFormatter',
@@ -200,10 +200,10 @@ export function AMOUNT_FORMATTER_CONFIG_Zero(fields: string[], decimalPoints: nu
             ColumnIds: fields
         },
         Rule: {
-            Predicate: {
+            Predicates: [{
                 PredicateId: 'Equals',
                 Inputs: [0, null]
-            }
+            }]
         }, 
         DisplayFormat: {
             Formatter: 'NumberFormatter',
@@ -236,7 +236,6 @@ export function CUSTOM_DISPLAY_FORMATTERS_CONFIG(id,columnIds:any[]=[]){
     }else if(id==='amountFormatter'){
         handlerFunc = (customDisplayFormatterContext: CustomDisplayFormatterContext)=>{
             const currentValue:any = customDisplayFormatterContext.cellValue;
-            //console.log(currentValue)
 
             if(currentValue!=undefined && Number(Number(currentValue).toFixed(2))!=0    ){
                 if(Number.isInteger(Number(Number(currentValue).toFixed(2)))){         // Don't show trailing 0's if number rounded off to 2 decimals is an integer
@@ -316,6 +315,10 @@ export function CUSTOM_DISPLAY_FORMATTERS_CONFIG(id,columnIds:any[]=[]){
                 return str;
             }
             else return ""
+        }
+    }else if(id==='attributeValueFormatter'){
+        handlerFunc = (customDisplayFormatterContext:CustomDisplayFormatterContext)=>{
+            
         }
     }
 

@@ -26,7 +26,10 @@ export interface IRRCalcParams{
     modelID: number,
     modelName: string,
     // Optional since can be used to fetch PositionCashflows for the model
-    irrAggrType?: string // single type
+    irrAggrType?: string // single type,
+    
+    // Dynamically created aggregations order
+    aggrStr?: string[]
 }
 
 export interface MonthlyReturnsCalcParams {

@@ -46,6 +46,7 @@ export class APIConfig {
     public static LIQUIDITY_SUMMARY_REF_GET_API: string = APIConfig.BASEURL + "/api/LiquiditySummary/GetRef";
     public static LIQUIDITY_SUMMARY_PUT_UPDATE_API: string = APIConfig.BASEURL + "/api/LiquiditySummary/Update";
 
+    public static REFDATA_GET_DATATABLE: string = APIConfig.BASEURL + "/api/GetRef/GetRefDatatable";
     public static REFDATA_GET_UNIQUE_VALUES_API: string = APIConfig.BASEURL + "/api/GetRef/GetUnqiueValuesForField";
     public static REFDATA_GET_FUNDHEDGINGS_API: string = APIConfig.BASEURL + "/api/GetRef/GetFundHedgings";
     public static REFDATA_GET_WSOPORTFOLIO_API: string = APIConfig.BASEURL + "/api/GetRef/GetWSOPortfolioRef";

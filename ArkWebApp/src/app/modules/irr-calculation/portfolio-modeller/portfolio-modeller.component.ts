@@ -7,7 +7,7 @@ import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Subject, Subscription, timer } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
-import { amountFormatter, removeDecimalFormatter, formatDate, AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, DATE_FORMATTER_CONFIG_ddMMyyyy, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER } from 'src/app/shared/functions/formatter';
+import { removeDecimalFormatter, formatDate, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER } from 'src/app/shared/functions/formatter';
 import { IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams, PortfolioModellerCalcParams, VPortfolioLocalOverrideModel } from 'src/app/shared/models/IRRCalculationsModel';
 import { EventEmitter } from '@angular/core';
 import { AggridMaterialDatepickerComponent } from '../../facility-detail/aggrid-material-datepicker/aggrid-material-datepicker.component';
@@ -311,7 +311,8 @@ export class PortfolioModellerComponent implements OnInit {
   createNewTabGroup(runID: string, context: string[] = ['SaveRunIRR'], contextData: {  //changes context type from string to string[]
     baseMeasure?: string,
     feePreset?: string,
-    irrAggrType?: string
+    irrAggrType?: string,
+    aggrStr?: string[]
   }){
     let calcParamsData = []
 
@@ -326,7 +327,7 @@ export class PortfolioModellerComponent implements OnInit {
             calcParamsData.push({ runID: runID, type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
             break;  
           case 'SaveRunIRR':
-            calcParamsData.push({ runID: runID, type: 'IRR'})
+            calcParamsData.push({ runID: runID, type: 'IRR', aggrStr: contextData?.aggrStr})
             break;
           default:
             break;
@@ -340,7 +341,8 @@ export class PortfolioModellerComponent implements OnInit {
   saveModelCashflowsAndOpenTabs(modelID?: number, context: string[] = ['SaveRunIRR'], contextData: {  //changes context type from string to string[]
     baseMeasure?: string,
     feePreset?: string,
-    irrAggrType?: string
+    irrAggrType?: string,
+    aggrStr?: string[]
   } = null){
 
     if(!modelID)
@@ -414,7 +416,8 @@ export class PortfolioModellerComponent implements OnInit {
   fetchPortfolioModels(modelID?: number, context: string[] = ['SaveRunIRR'], contextData: {  //changes context type from string to string[]
     baseMeasure?: string,
     feePreset?: string,
-    irrAggrType?: string
+    irrAggrType?: string,
+    aggrStr?: string[]
   } = null){
     this.subscriptions.push(this.irrCalcService.getPortfolioModels(this.dataSvc.getCurrentUserName()).subscribe({
       next: data => {
@@ -951,7 +954,8 @@ export class PortfolioModellerComponent implements OnInit {
             {
               baseMeasure: res?.['baseMeasure'],
               feePreset: res?.['feePreset'],
-              irrAggrType: res?.['irrAggrType']
+              irrAggrType: res?.['irrAggrType'],
+              aggrStr: res?.['aggrStr']
             }
           )
           this.updateLocalFields()
@@ -964,7 +968,8 @@ export class PortfolioModellerComponent implements OnInit {
     runID: string,
     type: TabType,
     baseMeasure?: string,
-    feePreset?: string
+    feePreset?: string,
+    aggrStr?: string[]
   }[]) {
     let calcParamsEmitterData = []
     
@@ -983,7 +988,8 @@ export class PortfolioModellerComponent implements OnInit {
     runID: string,
     type: TabType,
     baseMeasure?: string,
-    feePreset?: string
+    feePreset?: string,
+    aggrStr?: string[]
   }){
 
     let calcParams
@@ -1014,7 +1020,7 @@ export class PortfolioModellerComponent implements OnInit {
       cp.positionIDs = this.selectedPositionIDs;
       cp.irrAggrType = this.modelMap[this.selectedModelID]?.irrAggrType;
       cp.modelID = this.isLocal.value ? this.selectedModelID : null,
-
+      cp.aggrStr = p.aggrStr;
 
       calcParams = cp as IRRCalcParams
     }
