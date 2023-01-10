@@ -30,6 +30,7 @@ export interface IRRCalcParams{
     
     // Dynamically created aggregations order
     aggrStr?: string[]
+    mapGroupCols?: string[]
 }
 
 export interface MonthlyReturnsCalcParams {

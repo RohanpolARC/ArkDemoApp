@@ -41,14 +41,7 @@ export class IrrResultComponent implements OnInit {
   modelName: string;
   adapTableApi: AdaptableApi;
 
-  mapGroupColDefs: ColDef[] = [
-    { field: 'Fund', type: 'abColDefString', cellClass: '', minWidth: 122},
-    // { field: 'RealisedUnrealised' },
-    { field: 'DealTypeCS', type: 'abColDefString', cellClass: '' },
-    { field: 'Issuer Short Name', type: 'abColDefString', cellClass: ''},
-    { field: 'Seniority', type: 'abColDefString', cellClass: '', minWidth: 155 },
-    // Sort Order will always be part in the result set. So adding it in calcColDefs at the end.
-  ]
+  mapGroupColDefs: ColDef[] = []
 
   paggrColDefs: ColDef[] = [
     { field: 'DealName', type: 'abColDefString', cellClass: '' },
@@ -452,6 +445,13 @@ export class IrrResultComponent implements OnInit {
       this.modelName = this.calcParams.modelName;
       this.aggregationType = this.calcParams.irrAggrType
       
+
+      // Setting mapGroupColDefs based on AggrStr
+      this.mapGroupColDefs = [];
+      this.calcParams.mapGroupCols.forEach(aggr => {
+          this.mapGroupColDefs.push({ field: aggr, type: 'abColDefString', cellClass: '' })
+      })
+
     }
   }
 

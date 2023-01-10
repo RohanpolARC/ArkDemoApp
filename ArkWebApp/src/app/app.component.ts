@@ -145,11 +145,11 @@ export class AppComponent {
         this.fetchTabs();
         this.userName=this.dataService.getCurrentUserName();  
       }
-      // if refresh token is expired the msal will redirect itself to microsoft login so this snippet is not needed.
-      // else if(result.eventType === EventType.ACQUIRE_TOKEN_FAILURE || result.eventType === EventType.ACQUIRE_TOKEN_BY_CODE_FAILURE){
-      //   this.msalSvc.msalSvc.loginRedirect();
+      // if refresh token is expired the msal will redirect itself to microsoft login.
+      else if(result.eventType === EventType.ACQUIRE_TOKEN_FAILURE || result.eventType === EventType.ACQUIRE_TOKEN_BY_CODE_FAILURE){
+        this.msalSvc.msalSvc.loginRedirect();
         
-      // }
+      }
     }))
 
     this.fetchTabs();

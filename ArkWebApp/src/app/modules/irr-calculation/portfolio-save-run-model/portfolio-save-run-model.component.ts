@@ -91,6 +91,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
           this.baseMeasures = bm.map(item => { return { baseMeasure: item.value, id: item.id } })
           this.feePresets = fp.map(item => { return { feePreset: item.value, id: item.id } })
           this.allAggrCols = aggrRefDt.map(x => x?.['Fields'])
+          this.mapGroupCols = aggrRefDt.filter(x => x?.['IsResultColumn']).map(x => x?.['Fields'])
 
           this.Init();
           this.changeListeners();
@@ -314,7 +315,8 @@ export class PortfolioSaveRunModelComponent implements OnInit {
               irrAggrType: this.isIRRDisabled ? null : this.modelForm.get('aggregationType').value,
               
               // Setting dynamically set aggregation order.
-              aggrStr: this.aggrCols
+              aggrStr: this.aggrCols,
+              mapGroupCols: this.mapGroupCols
             })
           }
 
@@ -369,6 +371,8 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   filteredAggrCols: Observable<string[]>;
   aggrCols: string[] = ['Fund'];
   allAggrCols: string[] = ['Fund', 'DealTypeCS', 'Issuer Short Name', 'Seniority', 'Realised/Unrealised'];
+  mapGroupCols: string[] = [];
+
   @ViewChild('aggrColInput') aggrColInput: ElementRef<HTMLInputElement>;
 
   addAggrCol(event: MatChipInputEvent): void {

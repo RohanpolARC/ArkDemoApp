@@ -312,7 +312,8 @@ export class PortfolioModellerComponent implements OnInit {
     baseMeasure?: string,
     feePreset?: string,
     irrAggrType?: string,
-    aggrStr?: string[]
+    aggrStr?: string[],
+    mapGroupCols?: string[]
   }){
     let calcParamsData = []
 
@@ -327,7 +328,7 @@ export class PortfolioModellerComponent implements OnInit {
             calcParamsData.push({ runID: runID, type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
             break;  
           case 'SaveRunIRR':
-            calcParamsData.push({ runID: runID, type: 'IRR', aggrStr: contextData?.aggrStr})
+            calcParamsData.push({ runID: runID, type: 'IRR', aggrStr: contextData?.aggrStr, mapGroupCols: contextData?.mapGroupCols})
             break;
           default:
             break;
@@ -342,7 +343,8 @@ export class PortfolioModellerComponent implements OnInit {
     baseMeasure?: string,
     feePreset?: string,
     irrAggrType?: string,
-    aggrStr?: string[]
+    aggrStr?: string[],
+    mapGroupCols?: string[]
   } = null){
 
     if(!modelID)
@@ -417,7 +419,8 @@ export class PortfolioModellerComponent implements OnInit {
     baseMeasure?: string,
     feePreset?: string,
     irrAggrType?: string,
-    aggrStr?: string[]
+    aggrStr?: string[],
+    mapGroupCols?: string[]
   } = null){
     this.subscriptions.push(this.irrCalcService.getPortfolioModels(this.dataSvc.getCurrentUserName()).subscribe({
       next: data => {
@@ -955,7 +958,8 @@ export class PortfolioModellerComponent implements OnInit {
               baseMeasure: res?.['baseMeasure'],
               feePreset: res?.['feePreset'],
               irrAggrType: res?.['irrAggrType'],
-              aggrStr: res?.['aggrStr']
+              aggrStr: res?.['aggrStr'],
+              mapGroupCols: res?.['mapGroupCols']
             }
           )
           this.updateLocalFields()
@@ -969,7 +973,8 @@ export class PortfolioModellerComponent implements OnInit {
     type: TabType,
     baseMeasure?: string,
     feePreset?: string,
-    aggrStr?: string[]
+    aggrStr?: string[],
+    mapGroupCols?: string[]
   }[]) {
     let calcParamsEmitterData = []
     
@@ -989,7 +994,8 @@ export class PortfolioModellerComponent implements OnInit {
     type: TabType,
     baseMeasure?: string,
     feePreset?: string,
-    aggrStr?: string[]
+    aggrStr?: string[],
+    mapGroupCols?: string[]
   }){
 
     let calcParams
@@ -1021,6 +1027,7 @@ export class PortfolioModellerComponent implements OnInit {
       cp.irrAggrType = this.modelMap[this.selectedModelID]?.irrAggrType;
       cp.modelID = this.isLocal.value ? this.selectedModelID : null,
       cp.aggrStr = p.aggrStr;
+      cp.mapGroupCols = p.mapGroupCols;
 
       calcParams = cp as IRRCalcParams
     }
