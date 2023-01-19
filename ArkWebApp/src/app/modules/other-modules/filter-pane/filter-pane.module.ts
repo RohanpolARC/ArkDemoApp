@@ -16,6 +16,7 @@ import { FeeCalculationFilterComponent } from './fee-calculation-filter/fee-calc
 import { RefDataManagerFilterComponent } from './ref-data-manager-filter/ref-data-manager-filter.component';
 import { ManagementFeeFilterComponent } from './management-fee-filter/management-fee-filter.component';
 import { PositionScreenFilterComponent } from './position-screen-filter/position-screen-filter.component';
+import { AumDeltaFilterComponent } from './aum-delta-filter/aum-delta-filter.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { PositionScreenFilterComponent } from './position-screen-filter/position
     FeeCalculationFilterComponent,
     RefDataManagerFilterComponent,
     ManagementFeeFilterComponent,
-    PositionScreenFilterComponent
+    PositionScreenFilterComponent,
+    AumDeltaFilterComponent
   ],
   imports: [
     CommonModule,
@@ -49,7 +51,9 @@ import { PositionScreenFilterComponent } from './position-screen-filter/position
     FeeCalculationFilterComponent,
     RefDataManagerFilterComponent,
     ManagementFeeFilterComponent,
-    PositionScreenFilterComponent
+    PositionScreenFilterComponent,
+    AumDeltaFilterComponent
+
   ]
 })
 export class FilterPaneModule { }

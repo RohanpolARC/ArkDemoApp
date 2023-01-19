@@ -97,6 +97,12 @@
         </mat-list-item>
       </mat-list>
 
+      <mat-list>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('AUM Delta')" [ngStyle]="AUMDeltaStyle">
+          <div class="list-item-text">AUM Delta</div>
+        </mat-list-item>
+      </mat-list>
+
     </mat-expansion-panel>
   </mat-accordion>
 
@@ -176,7 +182,7 @@
       <button mat-raised-button id="apply-button"  
         *ngIf="[
         '/facility-detail', '/liquidity-summary', '/fee-calculation', '/management-fee',
-        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/hedging-mark'].includes(location.path())" 
+        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/hedging-mark','/aum-delta'].includes(location.path())" 
         (click)="filterApply()">Apply</button>
     </div>
 
@@ -218,6 +224,10 @@
 
     <div *ngIf="location.path() === '/hedging-mark'" class="filter-element">
       <app-position-screen-filter></app-position-screen-filter>
+    </div>
+
+    <div *ngIf="location.path() === '/aum-delta'" class="filter-element">
+      <app-aum-delta-filter></app-aum-delta-filter>
     </div>
 
   </mat-sidenav>

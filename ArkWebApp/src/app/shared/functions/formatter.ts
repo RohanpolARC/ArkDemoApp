@@ -1,7 +1,9 @@
 import { AdaptableFormat, CustomDisplayFormatter, CustomDisplayFormatterContext, FormatColumn } from '@adaptabletools/adaptable-angular-aggrid';
-import { ValueFormatterParams } from '@ag-grid-community/core';
+import { ValueFormatterParams, ValueGetterParams } from '@ag-grid-community/core';
 import * as moment from 'moment';
 import { idText } from 'typescript';
+
+
 
 export function dateFormatter(params) {
     if(params.value != undefined && params.value != '0001-01-01T00:00:00' && !!params.value){

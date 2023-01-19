@@ -16,8 +16,9 @@ import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/u
 import { map } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { ColDef, GridOptions, Module } from '@ag-grid-community/core';
-import { ActionColumnContext, CustomDisplayFormatterContext } from '@adaptabletools/adaptable-angular-aggrid';
+import { ActionColumnContext} from '@adaptabletools/adaptable-angular-aggrid';
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
+import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
 
 let adapTableApi: AdaptableApi;
 
@@ -67,7 +68,12 @@ export class PortfolioHistoryComponent implements OnInit {
   { headerName: "FundedCostAmountLocal",field : 'fundedCostAmountLocal', type:'abColDefNumber'},
   { headerName: "Edited Going In Rate",field: 'fxRateBaseEffective', type:'abColDefNumber'},
   { headerName: "Modified By",  field: 'modifiedBy', type:'abColDefString'},
-  { headerName: "Modified On",  field: "modifiedOn", type:'abColDefDate', cellClass: 'dateUK'},
+  { headerName: "Modified On",  
+    field: "modifiedOn", 
+    type:'abColDefDate', 
+    cellClass: 'dateUK',
+    valueGetter:dateNullValueGetter
+  },
   {
     headerName:"",
     field: 'actionNew',

@@ -67,6 +67,7 @@ export class AppComponent {
   fundHedgings
   entities
   refDataFilter: string[];
+  AUMDeltaStyle: any = {};
 
   constructor(private http: HttpClient,
     private dataService: DataService,
@@ -208,6 +209,9 @@ export class AppComponent {
     else if(this.location.path() === '/hedging-mark'){
       this.updateSelection('Hedging Mark')
     }
+    else if(this.location.path() === '/aum-delta'){
+      this.updateSelection('AUM Delta')
+    }
     else this.updateSelection('')
   }
 
@@ -223,7 +227,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle=this.HedgingMarkStyle= this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle=this.HedgingMarkStyle=this.AUMDeltaStyle = this.notSelectedElement;
 
     if(screen === 'GIREditor'){
       this.GIREditorStyle = this.selectedElement;
@@ -324,6 +328,10 @@ export class AppComponent {
     else if(screen === 'Hedging Mark'){
       this.HedgingMarkStyle = this.selectedElement;
       this.router.navigate(['/hedging-mark'])
+    }
+    else if(screen === 'AUM Delta'){
+      this.AUMDeltaStyle = this.selectedElement;
+      this.router.navigate(['/aum-delta'])
     }
   }
 }

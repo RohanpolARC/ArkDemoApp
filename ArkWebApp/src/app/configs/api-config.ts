@@ -90,4 +90,6 @@ export class APIConfig {
 
     public static POSITIONS_GET_API: string = APIConfig.BASEURL + "/api/PositionsScreen/GetPositionsData";
     public static HEDGING_MARK_PUT_API: string = APIConfig.BASEURL + "/api/PositionsScreen/PutHedgingMark";
+
+    public static AUM_DELTA_GET_API: string = APIConfig.BASEURL + "/api/AUMDelta/GetAUMDelta";
 }

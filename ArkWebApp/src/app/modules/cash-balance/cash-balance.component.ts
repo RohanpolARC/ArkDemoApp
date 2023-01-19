@@ -152,10 +152,9 @@ export class CashBalanceComponent implements OnInit {
           }]
         },
         FormatColumn:{
-          Revision:1,
+          Revision:2,
           FormatColumns:[
             CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountFormatter'),
-            BLANK_DATETIME_FORMATTER_CONFIG(this.AMOUNT_COLUMNS),
             DATE_FORMATTER_CONFIG_ddMMyyyy(['asofDate']),
             
           ]

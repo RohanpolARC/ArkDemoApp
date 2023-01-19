@@ -1,11 +1,12 @@
 import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridApi, GridOptions, GridReadyEvent, Module, ValueFormatterParams } from '@ag-grid-community/core';
+import { ColDef, GridApi, GridOptions, GridReadyEvent, Module, ValueFormatterParams, ValueGetterParams } from '@ag-grid-community/core';
 import { Component, Input, OnInit, SimpleChange, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
-import { amountFormatter, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, dateFormatter, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy, nonAmountNumberFormatter2Dec } from 'src/app/shared/functions/formatter';
+import {  BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,   DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
 
 @Component({
   selector: 'app-fee-calculation-summary',
@@ -223,14 +224,29 @@ NON_AMOUNT_2DEC_COLUMNS=['GrossMOM',
     { field: 'MOMAfterFXHedgeCost' , type:'abColDefNumber'},
     { field: 'MOMAfterMgmtFees' , type:'abColDefNumber'},
     { field: 'MOMAfterPerfFees' , type:'abColDefNumber'},
-    { field: 'FinancingStartDate', cellClass: 'dateUK' , type:'abColDefDate'},
-    { field: 'FinancingEndDate', cellClass: 'dateUK' , type:'abColDefDate'},
+    { field: 'FinancingStartDate', 
+    valueGetter:(params:ValueGetterParams)=>{
+      return dateNullValueGetter(params,'FinancingStartDate')
+    },
+    cellClass: 'dateUK' , type:'abColDefDate'},
+    { field: 'FinancingEndDate', 
+    valueGetter:(params:ValueGetterParams)=>{
+      return dateNullValueGetter(params,'FinancingEndDate')
+    },cellClass: 'dateUK' , type:'abColDefDate'},
     { field: 'CashYield', type:'abColDefNumber'},
     { field: 'TotalYield', type:'abColDefNumber'},
     { field: 'FinancingRate', type:'abColDefNumber'},
     { field: 'InvestmentPeriod' , type:'abColDefNumber'},
-    { field: 'FirstCashFlowDate', cellClass: 'dateUK' , type:'abColDefDate'},
-    { field: 'LastCashFlowDate', cellClass: 'dateUK' , type:'abColDefDate'},
+    { field: 'FirstCashFlowDate', 
+    valueGetter:(params:ValueGetterParams)=>{
+      return dateNullValueGetter(params,'FirstCashFlowDate')
+    },
+    cellClass: 'dateUK' , type:'abColDefDate'},
+    { field: 'LastCashFlowDate',
+    valueGetter:(params:ValueGetterParams)=>{
+      return dateNullValueGetter(params,'LastCashFlowDate')
+    },
+    cellClass: 'dateUK' , type:'abColDefDate'},
     { field: 'ProjCapDeployed' , type:'abColDefNumber'},
     { field: 'ProjCapDeployedRepayement' , type:'abColDefNumber'},
     { field: 'ProjCapDeployedInterest' , type:'abColDefNumber'},

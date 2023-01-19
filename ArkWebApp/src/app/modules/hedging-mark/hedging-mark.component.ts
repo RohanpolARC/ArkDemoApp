@@ -6,10 +6,11 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { PositionScreenService } from 'src/app/core/services/PositionsScreen/positions-screen.service';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
-import { amountFormatter, AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy, formatDate} from 'src/app/shared/functions/formatter';
+import { amountFormatter, AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG,  DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy, formatDate} from 'src/app/shared/functions/formatter';
 import { AMOUNT_COLUMNS_LIST, DATE_COLUMNS_LIST, GRID_OPTIONS,  POSITIONS_COLUMN_DEF } from '../positions-screen/grid-structure';
 import { getRowNodes } from 'src/app/shared/functions/utilities';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
+import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
 
 interface Override {
   PositionId :number,
@@ -189,7 +190,12 @@ export class HedgingMarkComponent implements OnInit {
       {field:'isOverriden',type:'abColDefString',width: 100,filter:false,sortable:false},
       
       {field:'modifiedBy',type:'abColDefString',filter:false,sortable:false},
-      {field:'modifiedOn',type:'abColDefDate',cellClass:'dateUK',filter:false,sortable:false},
+      {field:'modifiedOn',
+      type:'abColDefDate',
+      cellClass:'dateUK',
+      valueGetter:dateNullValueGetter,
+      filter:false,
+      sortable:false},
       { field: 'mark_override', width: 130, headerName: 'Override', type: 'abSpecialColumn',cellClass:'ag-right-aligned-cell' ,filter:false,sortable:false}
     ].map(coldef=>{
       coldef = coldef as ColDef

@@ -4,11 +4,12 @@ import { map } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { ManagementFeeService } from 'src/app/core/services/ManagementFee/management-fee.service';
-import { amountFormatter, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, dateFormatter, DATE_FORMATTER_CONFIG_ddMMyyyy, formatDate, noDecimalAmountFormatter } from 'src/app/shared/functions/formatter';
+import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,  DATE_FORMATTER_CONFIG_ddMMyyyy, formatDate } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { getNodes } from '../capital-activity/utilities/functions';
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { GridApi, GridOptions, Module, ColDef, IAggFuncParams, GridReadyEvent } from '@ag-grid-community/core';
+import { GridApi, GridOptions, Module, ColDef, IAggFuncParams, GridReadyEvent, ValueGetterParams, ValueParserParams } from '@ag-grid-community/core';
+import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
 
 @Component({
   selector: 'app-management-fee',
@@ -90,7 +91,11 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'aumBase',headerName:'AUM Base', type: 'abColDefNumber', aggFunc: 'sum' },
       { field: 'feeRate', type: 'abColDefNumber',aggFunc: 'max', headerName: 'Fee Rate Percent'  },
       { field: 'calculatedITDFee', type: 'abColDefNumber', aggFunc: 'sum'  },
-      { field: 'fixingDate', type: 'abColDefDate',  aggFunc: 'Max', allowedAggFuncs: ['Max'], cellClass: 'dateUK' },
+      { field: 'fixingDate', 
+      valueGetter:(params:ValueGetterParams)=>{
+        return dateNullValueGetter(params,'fixingDate')
+      },
+      type: 'abColDefDate',  aggFunc: 'Max', allowedAggFuncs: ['Max'], cellClass: 'dateUK' },
       { field: 'fixing', type: 'abColDefNumber', aggFunc: 'max'  },
       { field: 'adjustment', type: 'abColDefNumber', aggFunc: 'sum',   },
       { field: 'adjustedITDFee', type: 'abColDefNumber', allowedAggFuncs: ['Sum'], aggFunc: 'Sum' },
@@ -225,6 +230,7 @@ export class ManagementFeeComponent implements OnInit {
       }
     }
   }
+
 
   ngOnDestroy(){
     this.subscriptions.forEach(sub => sub.unsubscribe());
