@@ -301,11 +301,11 @@ export class BulkUploadComponent implements OnInit {
     this.adapTableApi = adaptableApi;
 
     if(this.invalidRowData.length > 0){
-      this.adapTableApi.gridApi.loadGridData(this.invalidRowData)
+      //this.adapTableApi.gridApi.loadGridData(this.invalidRowData)
       this.adapTableApi.layoutApi.setLayout('Invalid Excel Grid')
     }
     else if(this.bulkRowData.length > 0){
-      this.adapTableApi.gridApi.loadGridData(this.bulkRowData)
+      //this.adapTableApi.gridApi.loadGridData(this.bulkRowData)
       this.adapTableApi.layoutApi.setLayout('Bulk Grid')
     }
 
