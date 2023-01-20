@@ -51,6 +51,7 @@ export class IrrResultComponent implements OnInit {
   calcColDefs: ColDef[] = [    
     { field: 'CapitalInvestedEur', type: 'abColDefNumber', minWidth: 180 },
     { field: 'RealizedProceedsEur', type: 'abColDefNumber', minWidth: 185 },
+    { field: 'GrossCostAmountEur', type: 'abColDefNumber', minWidth: 180, hide: true },
     { field: 'CashCarryingValueEur', type: 'abColDefNumber', minWidth: 200 },
     { field: 'CashIRR', minWidth: 110, type: 'abColDefNumber'},
     { field: 'YTE', headerName: 'YTE', minWidth: 95,type: 'abColDefNumber'},
@@ -85,9 +86,10 @@ export class IrrResultComponent implements OnInit {
     { field: 'ReportingEBITDA', headerName: 'Reporting EBITDA(\u20AC)', type: 'abColDefNumber', minWidth: 185 },
     { field: 'ReportingNetLeverage', headerName: 'Reporting Net Leverage', type: 'abColDefNumber', minWidth: 200 },
     { field: 'Revenue', headerName: 'Revenue(\u20AC)', type: 'abColDefNumber', minWidth: 125 },
+    { field: 'SeniorityRevenue', headerName: 'Revenue(\u20AC)', type: 'abColDefNumber', minWidth: 125},
     { field: 'RevenueAtInvestment', headerName: 'Revenue at Inv(\u20AC)', type: 'abColDefNumber', minWidth: 200 },
+    { field: 'SeniorityRevenueAtInvestment',  headerName: 'Revenue at Inv(\u20AC)', type: 'abColDefNumber', minWidth: 200 },
     { field: 'ReportingNetLeverageComment', headerName: 'Reporting Net Leverage Comment', type: 'abColDefString', cellClass: '', minWidth: 300 },
-
     { field: 'AllInRate', hide:true,  type: 'abColDefNumber',},
     { field: 'CostValue', hide:true, type: 'abColDefNumber' },
     { field: 'ExitPrice', hide:true, type: 'abColDefNumber' },
@@ -188,67 +190,7 @@ export class IrrResultComponent implements OnInit {
           Revision: 15,
         },
         Layout: {
-          Revision: 13,
-          CurrentLayout: 'Default IRR Result',
-          Layouts: [
-          {
-            Name: 'Default IRR Result',
-            Columns: [
-              'Fund',
-              'Issuer Short Name',
-              'Deal Type CS',
-              'DealName',
-              'DealCcy',
-              'CapitalInvestedEur',
-              'RealizedProceedsEur',
-              'CashCarryingValueEur',
-              'CashIRR',
-              'YTE',
-              'CurrentYTE',
-              'YTEHedged',
-              'YTW',
-              'CurrentYTW',
-              'YTWHedged',
-              'DiscountPriceE',
-              'DiscountPriceW',
-              'NPVE',
-              'NPVEActual',
-              'NPVEMinus100',
-              'NPVEPlus100',
-              'Cost',
-              'Mark',
-              'ExpectedPrice',
-              'ExpectedAge',
-              'CashMargin',
-              'CashYield',
-              'PIKMargin',
-              'AllInRate',
-              'AccFees',
-              'AccInterest',
-              'UnfundedMargin',
-              'NetLTV',
-              'NetLTVAtInvestement',
-              'NetLeverage',
-              'NetLeverageAtInvestment',
-              'EBITDA',
-              'EBITDAAtInvestment',
-              'ReportingEBITDA',
-              'ReportingNetLeverage',
-              'Revenue',
-              'RevenueAtInvestment',
-              'ReportingNetLeverageComment',
-              // 'averageLifeE', 
-              // 'averageLifeW',
-              // 'cashMOM', 
-              // 'mome', 
-              // 'momw', 
-              // 'paybackE',
-              // 'paybackW',
-              // 'totalRealizedIncome',
-              // 'realisedUnrealised',
-              'Sort Order' 
-            ]
-          }]
+          Revision: 14,
         },
         FormatColumn:{
           Revision:4,
@@ -377,17 +319,23 @@ export class IrrResultComponent implements OnInit {
 
     this.rearrangeMapgroupColDefs(this.calcParams.aggrStr);
 
-    let excludePaggrCols: string[] = [];
+    let excludePaggrCols: string[] = [], excludeCalcCols: string[] = [];
 
     // DealName, DealCcy is only applicable for `Issuer Short Name`
     if(!mapGroupCols.includes("Issuer Short Name")){
-      excludePaggrCols = ['DealName', 'DealCcy']
+      excludePaggrCols = [...excludePaggrCols, ...['DealName', 'DealCcy']]
     }
-    
+    if(mapGroupCols.includes("Seniority")){
+      excludeCalcCols = [...excludeCalcCols, ...['Revenue', 'RevenueAtInvestment']]
+    }
+    else{
+      excludeCalcCols = [...excludeCalcCols, ...['SeniorityRevenue', 'SeniorityRevenueAtInvestment']]
+    }
+
     this.columnDefs = [ 
       ...this.mapGroupColDefs.filter(c => mapGroupCols.includes(c.field)),
       ...this.paggrColDefs.filter(c => paggrCols.includes(c.field) && !excludePaggrCols.includes(c.field)),
-      ...this.calcColDefs
+      ...this.calcColDefs.filter(c => !excludeCalcCols.includes(c.field))
     ]
 
     this.gridOptions?.api?.setColumnDefs(this.columnDefs);
@@ -477,6 +425,7 @@ export class IrrResultComponent implements OnInit {
   NO_DECIMAL_AMOUNT_COLUMNS=[
     'CapitalInvestedEur',
     'RealizedProceedsEur',
+    'GrossCostAmountEur',
     'CashCarryingValueEur',
     'FaceValue',
     'FaceValueExpected'
@@ -505,6 +454,8 @@ export class IrrResultComponent implements OnInit {
     'ReportingNetLeverage',
     'Revenue',
     'RevenueAtInvestment',
+    'SeniorityRevenue',
+    'SeniorityRevenueAtInvestment',
     'AllInRate',
     'CostValue',
     'ExitPrice',
