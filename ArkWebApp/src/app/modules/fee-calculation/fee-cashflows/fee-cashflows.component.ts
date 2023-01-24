@@ -4,8 +4,10 @@ import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { amountFormatter, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, dateFormatter, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
   selector: 'app-fee-cashflows',
@@ -24,6 +26,7 @@ export class FeeCashflowsComponent implements OnInit {
   columnDefs: ColDef[]
   defaultColDef: ColDef
   gridApi: GridApi
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
 
   constructor(private dataSvc: DataService) { }
 
@@ -41,6 +44,9 @@ export class FeeCashflowsComponent implements OnInit {
       if(this.status === 'Loading')
         this.gridApi?.showLoadingOverlay();
       else 
+        if(this.feeCashflows.length === 0){
+          this.noRowsToDisplayMsg = 'No data found for applied filter.'
+        }
         this.gridApi?.hideOverlay();
     }
   }
@@ -194,7 +200,11 @@ export class FeeCashflowsComponent implements OnInit {
           this.gridApi.showLoadingOverlay();
         } 
       },
-      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+      noRowsOverlayComponent: NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
 
     this.adaptableOptions = {

@@ -6,9 +6,11 @@ import { first, switchMap, takeUntil } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
 import { amountFormatter, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, noDecimalAmountFormatter, nonAmountNumberFormatter2Dec } from 'src/app/shared/functions/formatter';
 import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/utilities';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
 
@@ -107,6 +109,7 @@ export class IrrResultComponent implements OnInit {
   ]
 
   closeTimer = new Subject<any>();
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
 
   constructor(
     private irrCalcSvc: IRRCalcService,
@@ -143,7 +146,11 @@ export class IrrResultComponent implements OnInit {
       suppressAggFuncInHeader: true,
       rowGroupPanelShow: 'always',
       suppressScrollOnNewData: true,
-      deltaRowDataMode: true
+      deltaRowDataMode: true,
+      noRowsOverlayComponent : NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
     
     this.adaptableOptions = {

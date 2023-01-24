@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs-compat';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { AumDeltaService } from 'src/app/core/services/AumDelta/aumDelta.service';
 import { DataService } from 'src/app/core/services/data.service';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import {  CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, formatDate, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
@@ -26,6 +27,7 @@ export class AumDeltaComponent implements OnInit {
   adaptableApi: AdaptableApi;
   subscriptions: Subscription[] = []
   sDate: AsOfDateRange = null;
+  noRowsToDisplayMsg = 'Please select the filter.'
 
   AMOUNT_COLUMNS = [
     "aum",
@@ -153,6 +155,11 @@ export class AumDeltaComponent implements OnInit {
         this.gridApi = params.api;   
       },
 
+      noRowsOverlayComponent: NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
+
     }
 
 
@@ -229,6 +236,9 @@ export class AumDeltaComponent implements OnInit {
           this.gridApi.showLoadingOverlay();
           this.subscriptions.push(this.aumDeltaSvc.getAumDelta(this.sDate).subscribe({
             next: data => {
+              if(data.length === 0){
+                this.noRowsToDisplayMsg = 'No data found for applied filter.'
+              }
               let unpackedData = []
               data.forEach(k => { 
                 unpackedData.push(
@@ -267,6 +277,7 @@ export class AumDeltaComponent implements OnInit {
     this.subscriptions.forEach(sub=>{
       sub.unsubscribe()
     })
+
   }
 
 }

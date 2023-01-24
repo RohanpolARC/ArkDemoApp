@@ -12,6 +12,8 @@ import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/u
 import { CommonConfig } from 'src/app/configs/common-config';
 import { CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, GridOptions, ICellRendererParams, Module } from '@ag-grid-community/core';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
   selector: 'app-facility-detail',
@@ -66,6 +68,7 @@ export class FacilityDetailComponent implements OnInit {
     'reportingNetLeverage',
     'unfundedMargin',
   'floorRate']
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
 
   constructor(private facilityDetailsService: FacilityDetailService,
     private accessService: AccessService,
@@ -347,6 +350,9 @@ export class FacilityDetailComponent implements OnInit {
           this.gridOptions?.api?.showLoadingOverlay();
           this.subscriptions.push(this.facilityDetailsService.getFacilityDetails(this.funds, this.asOfDate).subscribe({
             next: data => {
+              if(data){
+                this.noRowsToDisplayMsg = 'No data found for applied filter.'
+              }
               this.gridOptions?.api?.hideOverlay();
               for(let i: number = 0; i < data?.length; i+= 1){
                 data[i].expectedDate = formatDate(data[i]?.expectedDate)
@@ -391,7 +397,11 @@ export class FacilityDetailComponent implements OnInit {
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:true, 
       onCellValueChanged: this.onCellValueChanged.bind(this),
-      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+      noRowsOverlayComponent:NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
 
     this.adaptableOptions = {

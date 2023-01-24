@@ -32,9 +32,10 @@ import { UpdateConfirmComponent } from './update-confirm/update-confirm.componen
 import { DetailedViewComponent } from '../../shared/components/detailed-view/detailed-view.component';
 import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
 import { DataService } from 'src/app/core/services/data.service';
-import { DetailedView } from 'src/app/shared/models/GeneralModel';
+import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 
 @Component({
   selector: 'app-capital-activity',
@@ -51,6 +52,8 @@ export class CapitalActivityComponent implements OnInit {
   rowGroupPanelShow:string = 'always';
 
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
+  noRowsToDisplay: NoRowsCustomMessages = 'No data found.';
+  
 
   onTotalBaseClick(event: CellClickedEvent){
     if(event.node.group){
@@ -222,7 +225,11 @@ export class CapitalActivityComponent implements OnInit {
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:false,
       suppressScrollOnNewData: true,
-      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+      noRowsOverlayComponent: NoRowsOverlayComponent,
+            noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplay,
+      },
     }
 
     this.gridOptionsInvstmnt = JSON.parse(JSON.stringify(this.gridOptions));

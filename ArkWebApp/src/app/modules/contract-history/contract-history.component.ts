@@ -6,9 +6,11 @@ import { first } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { ContractHistoryService } from 'src/app/core/services/ContractHistory/contract-history.service';
 import { DataService } from 'src/app/core/services/data.service';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { createColumnDefs, GENERAL_FORMATTING_EXCEPTIONS, parseFetchedData, saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
 import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/utilities';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
   selector: 'app-contract-history',
@@ -48,7 +50,11 @@ export class ContractHistoryComponent implements OnInit {
     },
     rowData: this.rowData,
     sideBar: true,
-    excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
+    excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+    noRowsOverlayComponent : NoRowsOverlayComponent,
+    noRowsOverlayComponentParams: {
+      noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+    },
   }
 
   adaptableOptions: AdaptableOptions = {
@@ -99,6 +105,7 @@ export class ContractHistoryComponent implements OnInit {
   }
   DATE_COLUMNS: string[]=[];
   AMOUNT_COLUMNS: string[]=[];
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
 
   constructor(
     private contractHistorySvc: ContractHistoryService,
@@ -140,6 +147,9 @@ export class ContractHistoryComponent implements OnInit {
           ]
           ).pipe(first()).subscribe({
           next: data => {
+            if(data[0].length === 0){
+              this.noRowsToDisplayMsg = 'No data found for applied filter.'
+            }
             let contractData = data[0]
             let dynamicColumns = parseFetchedData(data[1])
 

@@ -6,9 +6,11 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { PortfolioManagerService } from 'src/app/core/services/PortfolioManager/portfolio-manager.service';
 import { PortfolioMappingDataService } from 'src/app/core/services/PortfolioManager/portfolio-mapping-data.service';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { BLANK_DATETIME_FORMATTER_CONFIG, dateTimeFormatter, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm } from 'src/app/shared/functions/formatter';
 import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/utilities';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { ApprovalActionCellRendererComponent } from '../approval-action-cell-renderer/approval-action-cell-renderer.component';
 import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, validateAndUpdate } from '../utilities/functions';
 
@@ -42,6 +44,7 @@ export class ApprovalComponent implements OnInit {
   adaptableApi: AdaptableApi;
   context: any;
   rowData: any;
+  noRowsToDisplayMsg: NoRowsCustomMessages='No data found.';
 
   constructor(    
     private portfolioManagerSvc: PortfolioManagerService,
@@ -365,7 +368,11 @@ export class ApprovalComponent implements OnInit {
       singleClickEdit: true,
       rowGroupPanelShow: 'always',
       onCellValueChanged: this.onCellValueChanged.bind(this),
-      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+      noRowsOverlayComponent: NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
 
     this.adaptableOptions = {
@@ -506,7 +513,6 @@ export class ApprovalComponent implements OnInit {
     this.gridOptions?.api.showLoadingOverlay();
     this.subscriptions.push(this.portfolioManagerSvc.getPortfolioMappingStaging().subscribe({
       next: stagingData => {
-
         for(let i: number = 0; i < stagingData.length; i+=1){
           stagingData[i].uniqueRowID = i+1;
         }

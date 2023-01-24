@@ -4,7 +4,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { PositionScreenService } from 'src/app/core/services/PositionsScreen/positions-screen.service';
-import {  AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero,  BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
+import {   BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import {  AMOUNT_COLUMNS_LIST, DATE_COLUMNS_LIST, GRID_OPTIONS, POSITIONS_COLUMN_DEF } from './grid-structure';
 
@@ -25,6 +26,7 @@ export class PositionsScreenComponent implements OnInit {
   adaptableOptions: AdaptableOptions;
   asOfDate
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
+  noRowsDisplayMsg:string = 'Please apply the filter.'
 
 
   constructor(
@@ -38,12 +40,15 @@ export class PositionsScreenComponent implements OnInit {
 
         this.gridApi.showLoadingOverlay();
 
-        this.positionScreenSvc.currentSearchDate.subscribe(asOfDate => {
+        this.subscriptions.push(this.positionScreenSvc.currentSearchDate.subscribe(asOfDate => {
           this.asOfDate = asOfDate
-        })
+        }))
     
-        this.positionScreenSvc.getPositions(this.asOfDate).subscribe({
+        this.subscriptions.push(this.positionScreenSvc.getPositions(this.asOfDate).subscribe({
           next: (data) => {
+            if(data.length === 0){
+              this.noRowsDisplayMsg = 'No data found for applied filter.'
+            }
             this.gridApi?.hideOverlay();
             this.rowData = data;
 
@@ -51,7 +56,7 @@ export class PositionsScreenComponent implements OnInit {
           error: (e) => {
             console.error(`Failed to get the Positions: ${e}`)
           }
-        })
+        }))
     
       }
     }))
@@ -72,10 +77,15 @@ export class PositionsScreenComponent implements OnInit {
       },
       columnDefs: this.columnDefs,
       rowData: this.rowData,
+
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel()
         this.gridApi = params.api;   
       },
+      noRowsOverlayComponent:NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsDisplayMsg,
+      }
 
     }
     

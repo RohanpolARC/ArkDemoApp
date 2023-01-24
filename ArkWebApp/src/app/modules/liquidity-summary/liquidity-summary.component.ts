@@ -19,13 +19,14 @@ import { AttributeEditorComponent } from './attribute-editor/attribute-editor.co
 import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-renderer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
-import { DetailedView } from 'src/app/shared/models/GeneralModel';
+import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
 import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
 import { getMomentDateStr } from 'src/app/shared/functions/utilities';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
 import { UnfundedAssetsEditorComponent } from '../unfunded-assets/unfunded-assets-editor/unfunded-assets-editor.component';
 import { CommonConfig } from 'src/app/configs/common-config';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 
 @Component({
   selector: 'app-liquidity-summary',
@@ -37,6 +38,7 @@ export class LiquiditySummaryComponent implements OnInit {
   subscriptions: Subscription[] = [];
   assetFundingDetails: any[];
   unfundedAssets: any;
+  noRowsDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
   constructor(private liquiditySummarySvc: LiquiditySummaryService,
               private unfundedAssetsSvc: UnfundedAssetsService,
               private dataSvc: DataService,
@@ -322,6 +324,9 @@ export class LiquiditySummaryComponent implements OnInit {
 
     this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryRef().subscribe({
       next: data => {
+        if(data.length === 0){
+          this.noRowsDisplayMsg = 'No data found for applied filter.'
+        }
         this.refData = data;
       },
       error: error => {
@@ -554,7 +559,11 @@ export class LiquiditySummaryComponent implements OnInit {
         addCellRenderer: UpdateCellRendererComponent,
         attributeGroupRenderer: AttributeGroupRendererComponent
       },
-      groupMultiAutoColumn: true
+      groupMultiAutoColumn: true,
+      noRowsOverlayComponent: NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsDisplayMsg,
+      }
     }
 
     this.subscriptions.push(this.liquiditySummarySvc.currentSearchDate.subscribe(asOfDate => {

@@ -12,9 +12,10 @@ import { map } from 'rxjs/operators';
 import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { MsalService } from '@azure/msal-angular';
-import { DetailedView } from 'src/app/shared/models/GeneralModel';
+import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
 import { CommonConfig } from 'src/app/configs/common-config';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 
 
 @Component({
@@ -36,6 +37,7 @@ export class AttributesFixingComponent implements OnInit {
 
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   deleteFixingDetailID: number;
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
 
   
 
@@ -103,7 +105,11 @@ export class AttributesFixingComponent implements OnInit {
         enableValue: true,
         enableRowGroup: true  
       },
-      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+      noRowsOverlayComponent: NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
 
     

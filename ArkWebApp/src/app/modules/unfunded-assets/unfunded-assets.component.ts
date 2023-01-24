@@ -7,8 +7,10 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { UnfundedAssetsEditorComponent } from './unfunded-assets-editor/unfunded-assets-editor.component';
 
 @Component({
@@ -29,6 +31,7 @@ export class UnfundedAssetsComponent implements OnInit {
 
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   adaptableApi: AdaptableApi;
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
 
   constructor(
     public dialog: MatDialog,
@@ -83,7 +86,11 @@ export class UnfundedAssetsComponent implements OnInit {
         enableRowGroup: true  
       },
       onGridReady: this.onGridReady.bind(this),
-      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+      noRowsOverlayComponent: NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
 
     this.adaptableOptions = {

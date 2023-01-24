@@ -17,6 +17,8 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { first, switchMap, takeUntil } from 'rxjs/operators';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { getNodes } from '../../capital-activity/utilities/functions';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`
 
@@ -39,6 +41,7 @@ let adaptable_Api: AdaptableApi
 export class PortfolioModellerComponent implements OnInit {
   closeTimer: Subject<any> = new Subject<any>();
   benchMarkIndexes: string[];
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
   
   constructor(
     private dataSvc: DataService,
@@ -272,6 +275,9 @@ export class PortfolioModellerComponent implements OnInit {
       this.gridOptions?.api?.showLoadingOverlay();
       this.subscriptions.push(this.irrCalcService.getIRRPositions(this.asOfDate, this.selectedModelID).subscribe({
         next: data => {
+          if(data.length === 0){
+            this.noRowsToDisplayMsg = 'No data found for applied filter.'
+          }
           this.gridOptions?.api?.hideOverlay();
           for(let i: number = 0; i < data?.length; i+= 1){
             data[i] = this.getDateFields(data[i], [
@@ -514,7 +520,11 @@ export class PortfolioModellerComponent implements OnInit {
       enableGroupEdit: true,
       autoGroupColumnDef: this.autoGroupColumnDef,
       frameworkComponents: frameworkComponents,
-      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+      noRowsOverlayComponent:NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
 
     this.adaptableOptions = {

@@ -19,6 +19,8 @@ import { ColDef, GridOptions, Module } from '@ag-grid-community/core';
 import { ActionColumnContext} from '@adaptabletools/adaptable-angular-aggrid';
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 let adapTableApi: AdaptableApi;
 
@@ -89,6 +91,7 @@ export class PortfolioHistoryComponent implements OnInit {
   { field:'uniqueID', type:'abColDefNumber'},
   { field: 'pgh_FXRateBaseEffective', headerName: 'Effective Going In Rate', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'}
 ];
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
 
   constructor(
     private portfolioHistoryService: PortfolioHistoryService,
@@ -111,7 +114,11 @@ export class PortfolioHistoryComponent implements OnInit {
       context: {
         adaptableApi: adapTableApi
       },
-      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+      noRowsOverlayComponent : NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
 
     };
 

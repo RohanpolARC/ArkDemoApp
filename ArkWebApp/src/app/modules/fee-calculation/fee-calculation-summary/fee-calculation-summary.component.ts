@@ -4,9 +4,11 @@ import { Component, Input, OnInit, SimpleChange, SimpleChanges } from '@angular/
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import {  BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,   DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
   selector: 'app-fee-calculation-summary',
@@ -129,6 +131,8 @@ NON_AMOUNT_2DEC_COLUMNS=['GrossMOM',
 'HurdleCompoundingYears',
 'FundInvestmentPeriod']
 
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
+
   constructor(private dataSvc: DataService) { }
 
   percentFormatter(params : ValueFormatterParams) {
@@ -145,6 +149,9 @@ NON_AMOUNT_2DEC_COLUMNS=['GrossMOM',
       if(changes?.['status'].currentValue === 'Loading')
         this.gridApi?.showLoadingOverlay();
       else 
+        if(this.feeSmy.length === 0){
+          this.noRowsToDisplayMsg = 'No data found for applied filter.'
+        }
         this.gridApi?.hideOverlay();
     }
   }
@@ -287,7 +294,11 @@ NON_AMOUNT_2DEC_COLUMNS=['GrossMOM',
           this.gridApi.showLoadingOverlay();
         }     
       },
-      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+      noRowsOverlayComponent : NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
 
     this.adaptableOptions = {

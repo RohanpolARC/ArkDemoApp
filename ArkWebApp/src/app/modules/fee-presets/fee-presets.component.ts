@@ -8,8 +8,10 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { FeePresetsService } from 'src/app/core/services/FeePresets/fee-presets.service';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy, formatDate } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { PresetsFormComponent } from './presets-form/presets-form.component';
 
 @Component({
@@ -28,6 +30,7 @@ export class FeePresetsComponent implements OnInit {
   rowData: Observable<any>
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   isWriteAccess: boolean = false;
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
 
   constructor(
     private feePresetsSvc: FeePresetsService,
@@ -63,7 +66,11 @@ export class FeePresetsComponent implements OnInit {
         enableValue: true,
         enableRowGroup: true  
       },
-      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+      noRowsOverlayComponent: NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
 
     this.adaptableOptions = {

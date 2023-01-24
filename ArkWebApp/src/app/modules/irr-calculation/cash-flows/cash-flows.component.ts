@@ -8,8 +8,10 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { CashFlowService } from 'src/app/core/services/CashFlows/cash-flow.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { amountFormatter, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, dateFormatter, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
 
 @Component({
@@ -95,6 +97,7 @@ export class CashFlowsComponent implements OnInit {
 'internalTradeTotal',
 'internalTradeTotalEur'
 ];
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
 
   constructor(
     private cashFlowService:CashFlowService,
@@ -231,7 +234,11 @@ export class CashFlowsComponent implements OnInit {
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel()
         this.gridApi = params.api;   
-      }
+      },
+      noRowsOverlayComponent: NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
 
     this.adaptableOptions = {

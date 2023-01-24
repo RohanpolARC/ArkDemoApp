@@ -8,6 +8,8 @@ import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/u
 import { AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { ColDef, ColumnApi, GridApi, GridOptions, Module } from '@ag-grid-community/core';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
   selector: 'app-cash-balance',
@@ -25,6 +27,7 @@ export class CashBalanceComponent implements OnInit {
   gridApi: GridApi;
   gridColumnApi: ColumnApi;
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
+  noRowsToDisplayMsg:NoRowsCustomMessages = 'Please apply the filter.'
 
 
   AMOUNT_COLUMNS=[
@@ -84,7 +87,12 @@ export class CashBalanceComponent implements OnInit {
       // },
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:true,
-      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+      noRowsOverlayComponent: NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
+
     }
 
     this.adaptableOptions = {
@@ -172,6 +180,9 @@ export class CashBalanceComponent implements OnInit {
         if(this.sDate !== null){
           this.subscriptions.push(this.cashBalanceSvc.getCashBalance(this.sDate).subscribe({
             next: data => {
+              if(data.length === 0){
+                this.noRowsToDisplayMsg = 'No data found for applied filter.'
+              }
               this.rowData = data;
             },
             error: error => {

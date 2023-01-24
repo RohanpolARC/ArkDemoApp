@@ -20,3 +20,5 @@ export interface RefDataProc{
     param4: string,
     param5: string,
 }
+
+export type NoRowsCustomMessages = 'Please apply the filter.'|'No data found for applied filter.'|'No data found.'

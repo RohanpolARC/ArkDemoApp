@@ -8,8 +8,11 @@ import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { PortfolioManagerService } from 'src/app/core/services/PortfolioManager/portfolio-manager.service';
 import { PortfolioMappingDataService } from 'src/app/core/services/PortfolioManager/portfolio-mapping-data.service';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
+import { BLANK_DATETIME_FORMATTER_CONFIG, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-renderer.component';
 import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, isFieldValid, validateAndUpdate } from './utilities/functions';
 
@@ -37,6 +40,7 @@ export class PortfolioManagerComponent implements OnInit {
   actionClickedRowID: number = null;
   context: any;
   adapTableApi: AdaptableApi;
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
 
   constructor(
     private portfolioManagerSvc: PortfolioManagerService,
@@ -211,6 +215,18 @@ export class PortfolioManagerComponent implements OnInit {
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'excludeFxExposure'),
         cellStyle: this.getEditableCellStyle.bind(this)  
       },
+      { field: "modifiedOn",  
+        type:"abColDefDate"
+      },
+      { field: "modifiedBy", 
+        type:"abColDefDate"
+      },
+      { field: "createdOn",  
+        type:"abColDefDate"
+      },
+      { field: "createdBy", 
+        type:"abColDefDate"
+      },
       { field: 'action', 
         cellRenderer: 'updateCellRenderer' 
       }
@@ -241,7 +257,11 @@ export class PortfolioManagerComponent implements OnInit {
       },
       singleClickEdit: true,
       rowGroupPanelShow: 'always',
-      onCellValueChanged: this.onCellValueChanged.bind(this)
+      onCellValueChanged: this.onCellValueChanged.bind(this),
+      noRowsOverlayComponent: NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
 
     this.adaptableOptions = {
@@ -277,7 +297,7 @@ export class PortfolioManagerComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 13,
+          Revision: 14,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -301,6 +321,8 @@ export class PortfolioManagerComponent implements OnInit {
               "lei",
               "isCoinvestment",
               "excludeFxExposure",
+              "modifiedOn",
+              "modifiedBy",
               'action'
       
             ],
@@ -312,6 +334,13 @@ export class PortfolioManagerComponent implements OnInit {
             }
 
           }]
+        },
+        FormatColumn:{
+          Revision :3,
+          FormatColumns:[
+            BLANK_DATETIME_FORMATTER_CONFIG(['modifiedOn','createdOn']),
+            DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn','createdOn'])
+          ]
         }
       }
     }

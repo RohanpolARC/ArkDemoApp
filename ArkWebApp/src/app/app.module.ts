@@ -43,6 +43,7 @@ import { MatTableModule } from '@angular/material/table';
 import { IPublicClientApplication, PublicClientApplication, BrowserCacheLocation, InteractionType, LogLevel } from '@azure/msal-browser';
 import { MsalHttpInterceptor } from './core/interceptors/msal-http.interceptor';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NoRowsOverlayComponent } from './shared/components/no-rows-overlay/no-rows-overlay.component';
 
 export const protectedResourceMap: any =  
   [  
@@ -94,7 +95,7 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
   
 @NgModule({  
   declarations: [  
-    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent
+    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent, NoRowsOverlayComponent
   ],  
   imports: [  
     MsalModule,

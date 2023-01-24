@@ -6,7 +6,8 @@ import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { createColumnDefs, parseFetchedData } from '../../functions/dynamic.parse';
-import { DetailedView } from '../../models/GeneralModel';
+import { DetailedView, NoRowsCustomMessages } from '../../models/GeneralModel';
+import { NoRowsOverlayComponent } from '../no-rows-overlay/no-rows-overlay.component';
 
 @Component({
   selector: 'app-detailed-view',
@@ -26,6 +27,7 @@ export class DetailedViewComponent implements OnInit {
   failureMsg: string = null;
   header: string = 'Detailed View'
   noDataMessage: string = 'No detailed view'
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
 
   constructor(
     public dialogRef: MatDialogRef<DetailedViewComponent>,
@@ -75,7 +77,11 @@ export class DetailedViewComponent implements OnInit {
       this.gridOptions = {
         columnDefs: this.columnDefs,
         defaultColDef: this.defaultColDef,
-        tooltipShowDelay: 0
+        tooltipShowDelay: 0,
+        noRowsOverlayComponent: NoRowsOverlayComponent,
+        noRowsOverlayComponentParams: {
+          noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+        },
       }  
     }
   }

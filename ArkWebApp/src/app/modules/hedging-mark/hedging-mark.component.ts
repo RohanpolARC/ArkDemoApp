@@ -11,6 +11,8 @@ import { AMOUNT_COLUMNS_LIST, DATE_COLUMNS_LIST, GRID_OPTIONS,  POSITIONS_COLUMN
 import { getRowNodes } from 'src/app/shared/functions/utilities';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 interface Override {
   PositionId :number,
@@ -62,6 +64,7 @@ export class HedgingMarkComponent implements OnInit {
     hedgingMark: { local: 'localHedgingMark', global: 'originalHedgingMark' }
   }
   isWriteAccess: boolean;
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
   withZeroAmountFormatter(params){
     if(params.value===0){
       return "0"
@@ -90,6 +93,9 @@ export class HedgingMarkComponent implements OnInit {
     
         this.positionScreenSvc.getPositions(this.asOfDate).subscribe({
           next: (data) => {
+            if(data.length === 0 ){
+              this.noRowsToDisplayMsg = 'No data found for applied filter.'
+            }
             this.gridApi?.hideOverlay();
             for(let i: number = 0; i < data?.length; i+= 1){
               // data[i] = this.getDateFields(data[i], [
@@ -222,6 +228,10 @@ export class HedgingMarkComponent implements OnInit {
         this.gridApi = params.api;   
       },
       enableGroupEdit: true,
+      noRowsOverlayComponent:NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
 
 
     }

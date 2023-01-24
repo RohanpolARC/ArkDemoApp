@@ -4,7 +4,9 @@ import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { MonthlyReturnsService } from 'src/app/core/services/MonthlyReturns/monthly-returns.service';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { amountFormatter } from 'src/app/shared/functions/formatter';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { MonthlyReturnsCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 import { getNodes } from '../../capital-activity/utilities/functions';
 import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
@@ -29,6 +31,7 @@ export class MonthlyReturnsComponent implements OnInit {
   modelName: string
   baseMeasure: string
   asOfDate: string
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
 
   constructor(private monthlyReturnSvc: MonthlyReturnsService,
     private dtPipe: DatePipe,
@@ -129,7 +132,11 @@ export class MonthlyReturnsComponent implements OnInit {
       rowGroupPanelShow: 'always',
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel()
-      }
+      },
+      noRowsOverlayComponent: NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
   }
 

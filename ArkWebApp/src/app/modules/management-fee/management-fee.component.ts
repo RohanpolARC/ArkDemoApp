@@ -10,6 +10,8 @@ import { getNodes } from '../capital-activity/utilities/functions';
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { GridApi, GridOptions, Module, ColDef, IAggFuncParams, GridReadyEvent, ValueGetterParams, ValueParserParams } from '@ag-grid-community/core';
 import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
   selector: 'app-management-fee',
@@ -27,6 +29,7 @@ export class ManagementFeeComponent implements OnInit {
   gridApi: GridApi;
   subscriptions: Subscription[] = [];
   asOfDate: string;
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
 
   constructor(
     private managementFeeSvc: ManagementFeeService,
@@ -59,6 +62,9 @@ export class ManagementFeeComponent implements OnInit {
           }))
         ).subscribe({
           next: (d) => {
+            if(d.length === 0){
+              this.noRowsToDisplayMsg = 'No data found for applied filter.'
+            }
             this.rowData = d
             this.gridApi.hideOverlay();
           },
@@ -164,7 +170,11 @@ export class ManagementFeeComponent implements OnInit {
       suppressAggFuncInHeader: true,
       onGridReady: this.onGridReady.bind(this),
       aggFuncs: aggFuncs,
-      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+      noRowsOverlayComponent : NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
 
     this.adaptableOptions = {
