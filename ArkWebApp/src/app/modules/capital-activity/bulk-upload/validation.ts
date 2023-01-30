@@ -89,7 +89,7 @@ export function validateRowValueRange(row: any): void{
         invalidMsg += ` Fund Currency ${String(row['Fund Currency'])} not in range`
     }
 
-    if(!!row['Position Currency'] && (refOptions.fundCcys.indexOf(String(row['Position Currency']).trim()) === -1)){
+    if(!!row['Position Currency'] && (refOptions.posCcys.indexOf(String(row['Position Currency']).trim()) === -1)){
         invalidMsg += (invalidMsg === '') ? '' : ','
         invalidMsg += ` Position Currency ${String(row['Position Currency'])} not in range`
     }
