@@ -85,7 +85,7 @@ export class CapitalActivityComponent implements OnInit {
   }
 
   columnDefsInvstmnt: ColDef[] = [
-    { field: 'unqiueID', tooltipField: 'unqiueID', type: 'abColDefNumber'},
+    { field: 'uniqueID', tooltipField: 'uniqueID', type: 'abColDefNumber'},
     { field: 'positionID', tooltipField: 'positionID', headerName: 'Position ID', type: 'abColDefNumber'},
     { field: 'cashDate', tooltipField: 'cashDate', headerName: 'Cash Date', type: 'abColDefDate', cellClass: 'dateUK'},
     { field: 'fund', tooltipField: 'fund', headerName: 'Fund', type: 'abColDefString'},

@@ -3,9 +3,9 @@ import { Subscription } from 'rxjs';
 import { CashBalanceService } from 'src/app/core/services/CashBalance/cash-balance.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
-import { dateFormatter, amountFormatter, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy, BLANK_DATETIME_FORMATTER_CONFIG } from 'src/app/shared/functions/formatter';
+import {  CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy, BLANK_DATETIME_FORMATTER_CONFIG } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
-import { AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
+import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { ColDef, ColumnApi, GridApi, GridOptions, Module } from '@ag-grid-community/core';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
@@ -35,15 +35,15 @@ export class CashBalanceComponent implements OnInit {
     'accountBalance',
     'accountBalanceBase',
     'accountBalanceEur',
-    'mvFundHedging',
-    'mvLegalEntity'
+    'mvPortfolio',
+    'mvAccount'
   ]
 
   columnDefs: ColDef[] = [
     { field: 'asofDate', headerName: 'As of Date', type: 'abColDefDate', cellClass: 'dateUK' },
     { field: 'pbName', headerName: 'Fund Accounting', type: 'abColDefString' },
     { field: 'mapName', headerName: 'Map', type: 'abColDefString' },
-    { field: 'account', headerName: 'Account', type:'abColDefNumber' },
+    { field: 'account', headerName: 'Account', type:'abColDefString' },
     { field: 'accountDescription', headerName: 'Account Description', type:'abColDefString' },
     { field: 'currency', headerName: 'Currency', type: 'abColDefString' },
     { field: 'pbClosingBalance', headerName: 'PB Closing Balance', type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
@@ -57,8 +57,8 @@ export class CashBalanceComponent implements OnInit {
     { field: 'fundStrategy', headerName: 'Fund Strategy', type: 'abColDefString' },
     { field: 'marketValueFactor', headerName: 'MV Factor', type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
     { field: 'accountBalanceEur', headerName: 'Account Balance Eur', type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
-    { field: 'mvFundHedging', headerName: 'MV FundHedging', type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
-    { field: 'mvLegalEntity', headerName: 'MV FundLegalEntity', type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
+    { field: 'mvPortfolio', headerName: 'MV Portfolio', type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
+    { field: 'mvAccount', headerName: 'MV Account', type:'abColDefNumber', cellClass: 'ag-right-aligned-cell' },
     { field: 'isSplited', headerName: 'IsSplited', type:'abColDefBoolean' },
   ];
 
@@ -160,7 +160,7 @@ export class CashBalanceComponent implements OnInit {
           }]
         },
         FormatColumn:{
-          Revision:2,
+          Revision:3,
           FormatColumns:[
             CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountFormatter'),
             DATE_FORMATTER_CONFIG_ddMMyyyy(['asofDate']),
