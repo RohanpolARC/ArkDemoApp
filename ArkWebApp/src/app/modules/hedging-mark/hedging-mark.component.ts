@@ -659,14 +659,23 @@ export class HedgingMarkComponent implements OnInit {
       let childNodes = []
       let parentNode: RowNode;
 
+
       if(params.node.group){ 
         parentNode = params.node;
+        childNodes = getNodes(parentNode)
       }
       else{
         parentNode = params.node.parent;
+        childNodes = getNodes(parentNode)
+        let distinctLevels: string[] = [... new Set(childNodes.map(cN => cN?.[colid]))]
+
+        if(distinctLevels.length === 1 && distinctLevels[0] === 'Asset' && lvl === 'Position'){
+        }
+        else {
+          return;
+        }
       }
       
-      childNodes = getNodes(parentNode)
       childNodes = childNodes.map(cNode => { 
         cNode[colid] = lvl
         return cNode;
