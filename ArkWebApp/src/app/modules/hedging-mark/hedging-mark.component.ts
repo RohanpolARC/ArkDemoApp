@@ -6,25 +6,34 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { PositionScreenService } from 'src/app/core/services/PositionsScreen/positions-screen.service';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
-import { amountFormatter, AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG,  DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy, formatDate} from 'src/app/shared/functions/formatter';
+import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG,  DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy, formatDate} from 'src/app/shared/functions/formatter';
 import { AMOUNT_COLUMNS_LIST, DATE_COLUMNS_LIST, GRID_OPTIONS,  POSITIONS_COLUMN_DEF } from '../positions-screen/grid-structure';
-import { getRowNodes } from 'src/app/shared/functions/utilities';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
+import { getNodes } from '../capital-activity/utilities/functions';
+import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 
-interface Override {
-  PositionId :number,
+interface HedgingMarkOverride {
+  Id :number,
+  Level: 'Asset' | 'Position',
   HedgingMark: number,
   LastHedgingMarkDate: string
 }
 
-interface HedgingMarkDetails{
-  ModifiedBy:string,
-  HedgingMarkOverrides:Override[]
+interface MarkOverride {
+  Id: number,
+  Level: 'Asset' | 'Position',
+  MarkOverride: number,
+  LastMarkOverrideDate: string
 }
 
+interface Overrides{
+  ModifiedBy: string,
+  HedgingMarkOverrides: HedgingMarkOverride[],
+  MarkOverrides: MarkOverride[]
+}
 
 @Component({
   selector: 'app-hedging-mark',
@@ -32,7 +41,6 @@ interface HedgingMarkDetails{
   styleUrls: ['../../shared/styles/grid-page.layout.scss','./hedging-mark.component.scss']
 })
 export class HedgingMarkComponent implements OnInit {
-
 
   subscriptions: Subscription[] = []
   gridOptions: GridOptions
@@ -45,35 +53,26 @@ export class HedgingMarkComponent implements OnInit {
   asOfDate: string;
 
   lockEdit: boolean = false;
-
-  overrideMap: {
-    [key:string]:{
-      localHedgingMark:number,
-      globalHedgingMark:number,
-      localHedgingMarkDate:string
-    }
-  } = {}
-
-
   
   overrideColMap: {
     [col: string] : {
-      local: string, global: string
+      type: 'hedgingMark' | 'Mark',
+      original: string
     }
   } = {
-    hedgingMark: { local: 'localHedgingMark', global: 'originalHedgingMark' }
+    hedgingMark: { type: 'hedgingMark' ,original: 'originalHedgingMark' },
+    markOverride: { type: 'Mark' ,original: 'originalMarkOverride' },
+    hedgingMarkLevel: { type: 'hedgingMark' ,original: 'originalHedgingMarkLevel' },
+    markOverrideLevel: {  type: 'Mark' ,original: 'originalMarkOverrideLevel' },
+    lastHedgingMarkDate: { type: 'hedgingMark' ,original: 'originalLastHedgingMarkDate' },
+    lastMarkOverrideDate: { type: 'Mark' ,original: 'originalLastMarkOverrideDate' },
+    isOverriden: { type: 'hedgingMark' ,original: 'originalIsOverriden' },
+    isOvrdMark: { type: 'Mark' ,original: 'originalIsOvrdMark' }
   }
+
+  oCols: string[];
   isWriteAccess: boolean;
   noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
-  withZeroAmountFormatter(params){
-    if(params.value===0){
-      return "0"
-    }else{
-      return amountFormatter(params)
-    }
-  }
-
-
 
   constructor(
     private dataSvc: DataService,
@@ -98,11 +97,30 @@ export class HedgingMarkComponent implements OnInit {
             }
             this.gridApi?.hideOverlay();
             for(let i: number = 0; i < data?.length; i+= 1){
-              // data[i] = this.getDateFields(data[i], [
-              //   'lastHedgingMarkDate','asOfDate'])
-                data[i]['originalHedgingMark'] =  data[i]['isOverriden'] ? data[i]['hedgingMark'] : null
-                data[i]['hedgingMark'] = data[i]['isOverriden']  ? data[i]['hedgingMark']  :  null 
+
+              let oCols: string[] = Object.keys(this.overrideColMap);
+
+              oCols.forEach(col => {
+                if(this.overrideColMap[col].type === 'hedgingMark'){
+                  if(data[i]['isOverriden'])
+                    data[i][this.overrideColMap[col].original] = data[i][col]
+                  else 
+                    data[i][col] = null;
+                }
+              })
+
+              oCols.forEach(col => {
+                if(this.overrideColMap[col].type === 'Mark'){
+                  if(data[i]['isOvrdMark'])
+                    data[i][this.overrideColMap[col].original] = data[i][col]
+                  else 
+                    data[i][col] = null;
+                }
+              })
+
+
             }  
+            
             this.rowData = data;
 
           },
@@ -129,6 +147,12 @@ export class HedgingMarkComponent implements OnInit {
 
   editableCellStyle = (params: CellClassParams) => {
 
+    let value = params.value;
+
+    // Since we are updating all original values to null if not present. undefined can cause mismatch issues.
+    if(value === undefined)
+      value = null;
+
     if(params.node.group){
       if(params.node.groupData?.['state'] === 'edit'){
         return {
@@ -145,32 +169,21 @@ export class HedgingMarkComponent implements OnInit {
       if(params.data?.['state'] === 'edit'){
         style = { 'border-color': '#0590ca' }
       }
-      if(params.value === 0){
-        if(params.node.data?.[this.overrideColMap[colid].global]!==params.value){
+      if(value === 0){
+        if(params.node.data?.[this.overrideColMap[colid].original]!== value){
           style = {...style,'background': '#ffcc00' }
         }else{
           style = { ...style, 'background': '#f79a28' }
         }
       }
-      if(params.value !== params.node.data[this.overrideColMap[colid].global]){
+      if(value != params.node.data[this.overrideColMap[colid].original]){
         style = { ...style, 'background': '#ffcc00' }
       }
-      else if(params.value){
+      else if(value){
         style = { ...style, 'background': '#f79a28' }
       }
       return style;
     }
-  }
-
-
-  getDateFields(row: any, fields: string[]){
-    for(let i = 0; i < fields.length; i+= 1){
-      row[fields[i]] = formatDate(row[fields[i]]);
-      if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(row[fields[i]]))
-        row[fields[i]] = null;
-    }
-
-    return row;
   }
 
   ngOnInit(): void {
@@ -184,17 +197,42 @@ export class HedgingMarkComponent implements OnInit {
       }        
     }
     
-    this.columnDefs = [
+    this.oCols = Object.keys(this.overrideColMap);
+
+    this.columnDefs = <ColDef[]>[
       ...POSITIONS_COLUMN_DEF,
+      { field: 'markOverride', headerName: 'Mark Ovrd', editable: this.isEditable.bind(this), maxWidth: 141, type: 'abColDefNumber',
+      cellStyle:this.editableCellStyle.bind(this), width: 150 },
+      { field: 'markOverrideLevel', headerName: 'Mark Ovrd Lvl', editable: this.isEditable.bind(this), maxWidth: 141, type: 'abColDefString', 
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: (params) => {
+          return {
+            options: params.node.group ? ['Position', 'Asset'] : ['Position'],
+            isStrict: true,
+            oldValRestoreOnStrict: true
+          }
+        }
+      },
+      { field: 'lastMarkOverrideDate', headerName: 'Last Mark Ovrd Date', maxWidth: 141, type: 'abColDefDate'},
       {
-        field:'hedgingMark',headerName:'Hedging Mark',type:'abColDefNumber',editable:this.isEditable.bind(this),valueFormatter:this.withZeroAmountFormatter,
+        field:'hedgingMark',headerName:'Hedging Mark',type:'abColDefNumber',editable:this.isEditable.bind(this),
         cellStyle:this.editableCellStyle.bind(this),width: 150
+      },
+      { field: 'hedgingMarkLevel', headerName: 'Hedging Mark Lvl', editable: this.isEditable.bind(this), maxWidth: 141, type: 'abColDefString',
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: (params) => {
+          return {
+            options: params.node.group ? ['Position', 'Asset'] : ['Position'],
+            isStrict: true,
+            oldValRestoreOnStrict: true
+          } 
+        }
       },
       {field:'lastHedgingMarkDate',headerName:'Last Hedging Mark Date',type:'abColDefDate',
       cellClass:'dateUK',filter:false,sortable:false,width:210
       },
-      {field:'isOverriden',type:'abColDefString',width: 100,filter:false,sortable:false},
-      
+      {field:'isOverriden', headerName: 'Is Ovrd(Hedging Mark)',type:'abColDefBoolean',width: 100,filter:false,sortable:false},
+      {field: 'isOvrdMark', headerName: 'Is Ovrd', tpe: 'abColDefBoolean', maxWidth: 100 },
       {field:'modifiedBy',type:'abColDefString',filter:false,sortable:false},
       {field:'modifiedOn',
       type:'abColDefDate',
@@ -216,6 +254,9 @@ export class HedgingMarkComponent implements OnInit {
       
       ...GRID_OPTIONS,
       
+      components: {
+        autocompleteCellEditor: MatAutocompleteEditorComponent
+      },
       
       context: {
         componentParent: this
@@ -238,8 +279,7 @@ export class HedgingMarkComponent implements OnInit {
 
     this.adaptableOptions = {
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
-      autogeneratePrimaryKey: true,
-      primaryKey: '',
+      primaryKey: 'positionId',
       userName: this.dataSvc.getCurrentUserName(),
       adaptableId: 'HedgingMark',
       adaptableStateKey: 'Hedging Mark Key',
@@ -281,22 +321,29 @@ export class HedgingMarkComponent implements OnInit {
                     else{
                       node.data['state'] = 'edit'
                     }
-                    context.adaptableApi.gridApi.refreshCells([node],['mark_override','hedgingMark','lastHedgingMarkDate'])
 
                     this.gridApi.startEditingCell({
-                      rowIndex:context.rowNode.rowIndex,
+                      rowIndex: node.rowIndex,
                       colKey: "hedgingMark"
                     })
-                    this.lockEdit = true
 
+                    this.gridApi.startEditingCell({
+                      rowIndex: node.rowIndex,
+                      colKey: 'markOverride'
+                    })
+
+                    context.adaptableApi.gridApi.refreshCells([node],['mark_override','hedgingMark','lastHedgingMarkDate', 'markOverride', 'lastMarkOverrideDate', 'hedgingMarkLevel', 'markOverrideLevel'])
+
+                    this.lockEdit = true
                 },
                 hidden:(
                   button: AdaptableButton<ActionColumnContext>,
                   context: ActionColumnContext
                 )=>{
                   if(context.rowNode.group){
-                    return context.rowNode.groupData["state"]==='edit'
-
+                    if(context.rowNode.rowGroupColumn.getColId() === 'asset')
+                      return context.rowNode.groupData["state"]==='edit'
+                    else return true;
                   }
                   return context.rowNode.data['state']==='edit'
                 },
@@ -318,57 +365,94 @@ export class HedgingMarkComponent implements OnInit {
                       this.gridApi.stopEditing();
                       
                       let node :RowNode = context.rowNode
-                      let hedgingMarkOverrides: Override[] = []
-                      if(!context.rowNode.data?.hedgingMark && context.rowNode.data?.hedgingMark !== 0){
-                        this.dataSvc.setWarningMsg(`Empty value can not be provided for hedging mark`, `Dismiss`, `ark-theme-snackbar-warning`);
-                        return 
+
+                      if(!node.data?.['hedgingMark'] && node.data?.['hedgingMark'] !== 0 && !node.data?.['markOverride'] && node.data?.['markOverride'] !== 0){
+                        this.dataSvc.setWarningMsg(`Empty value cannot be provided`, `Dismiss`, `ark-theme-snackbar-warning`);
+                        return
                       }
-                      let childNodes = getRowNodes(node);
-                      childNodes.forEach(childNode=>{
-                        let override:Override ={
-                        PositionId : (childNode.data.positionId as number),
-                        HedgingMark : (childNode.data.hedgingMark as number),
-                        LastHedgingMarkDate : (formatDate(childNode.data.lastHedgingMarkDate) as string)
-                        }
-                        hedgingMarkOverrides.push(override)
 
-                      })
 
-                      let hedgingMarkDetails:HedgingMarkDetails = {
+                      let childNodes = getNodes(node);
+                      let hedgingMarkOverrides: HedgingMarkOverride[] = []
+                      let markOverrides: MarkOverride[] = []
 
+                      if(node.group){
+
+                        childNodes.forEach(cn => {
+
+                          // Hedging Mark
+
+                          let ovrHM: HedgingMarkOverride = {
+                            Id: cn?.['hedgingMarkLevel'] === 'Asset' ?  cn?.['assetId'] : cn['positionId'] as number,
+                            Level: cn?.['hedgingMarkLevel'],
+                            HedgingMark: cn?.['hedgingMark'],
+                            LastHedgingMarkDate: formatDate(cn?.['lastHedgingMarkDate'])
+                          }
+
+                          hedgingMarkOverrides.push(ovrHM);
+
+                          // Mark Override
+
+                          let ovrM: MarkOverride = {
+                            Id: cn?.['markOverrideLevel'] === 'Asset' ?  cn?.['assetId'] : cn['positionId'] as number,
+                            Level: cn?.['markOverrideLevel'],
+                            MarkOverride: cn?.['markOverride'],
+                            LastMarkOverrideDate: formatDate(cn?.['lastMarkOverrideDate'])
+                          }
+
+                          markOverrides.push(ovrM);
+                        })
+                     }
+
+                     let hedgingMarkDetails: Overrides = {
+                        MarkOverrides: markOverrides,
                         HedgingMarkOverrides: hedgingMarkOverrides,
                         ModifiedBy : this.dataSvc.getCurrentUserName()
                       }
+                      
                       this.subscriptions.push(
                         this.positionScreenSvc.updateHedgingMark(hedgingMarkDetails).subscribe({
                           next:data=>{
-                            let nodes = getRowNodes(node)
-                            nodes.forEach(childNode=>{
-                              let row = childNode
-                              row.data['isOverriden'] = true
-                              row.data['originalHedgingMark'] = row.data['hedgingMark']
-                              row.data['modifiedBy'] = this.dataSvc.getCurrentUserName()
-                              row.data['modifiedOn'] = new Date()
-                              
+
+
+                            let oCols: string[] = Object.keys(this.overrideColMap);
+
+
+                            let nodes = getNodes(node)
+                            nodes = nodes.map(n => {
+                              n['isOverriden'] = n['hedgingMark'] ? true : false;
+                              n['isOvrdMark'] = n['markOverride'] ? true : false; 
+                              n['modifiedBy'] = this.dataSvc.getCurrentUserName();
+                              n['modifiedOn'] = new Date();
+
+                              oCols.forEach(col => {
+                                n[this.overrideColMap[col].original] = n[col];
+                              })
+
+                              return n;
                             })
+
                             if(node.group){
-                              context.rowNode.groupData['state'] = ' '
-                              context.rowNode.data['hedgingMark'] = null
-                              context.rowNode.data['lastHedgingMarkDate'] = null
-                              nodes.push(context.rowNode)
-                            }else{
-                            let node = context.rowNode
-                            node.data['state'] = ' '
+                              node.groupData['state'] = ' '
+                              node.data['hedgingMark'] = node.data['lastHedgingMarkDate'] = node.data['lastMarkOverrideDate'] = node.data['markOverride'] = node.data['hedgingMarkLevel'] = node.data['markOverrideLevel'] = null; 
                             }
-                            context.adaptableApi.gridApi.refreshCells(nodes,['mark_override','lastHedgingMarkDate','hedgingMark','modifiedOn','modifiedBy','isOverriden','originalHedgingMark'])
+                            else{
+                              node.data['state'] = ' '
+                            }
+
+                            this.gridApi.applyTransaction({ update: nodes })
+
+                            this.gridApi.refreshCells({
+                              force: true,
+                              // columns: this.oCols
+                            })
                             this.lockEdit = false
 
-                            this.dataSvc.setWarningMsg(`Successfully updated hedging mark overrides`, `Dismiss`, `ark-theme-snackbar-success`)
+                            this.dataSvc.setWarningMsg(`Successfully updated overrides`, `Dismiss`, `ark-theme-snackbar-success`)
                           },
                           error:(error)=>{
-                            this.dataSvc.setWarningMsg(`Failed to update hedging mark`, `Dismiss`, `ark-theme-snackbar-error`)
+                            this.dataSvc.setWarningMsg(`Failed to update overrides`, `Dismiss`, `ark-theme-snackbar-error`)
                             console.error(error)
-                            this.lockEdit = false
 
                           }
                         })
@@ -398,23 +482,33 @@ export class HedgingMarkComponent implements OnInit {
                 onClick:(
                   button: AdaptableButton<ActionColumnContext>, 
                   context:ActionColumnContext)=> {
-                    let rowNodes = getRowNodes(context.rowNode)
-                      rowNodes.forEach(childNode=>{
-                          childNode.data['hedgingMark'] = childNode.data['originalHedgingMark']
-                          childNode.data['lastHedgingMarkDate'] = childNode.data['isOverriden']?this.asOfDate:null
+
+                    let node: RowNode = context.rowNode;
+                    let oCols: string[] = Object.keys(this.overrideColMap);
+                    let childNodes = getNodes(node)
+                    childNodes = childNodes.map(cNode => {
+                      
+
+                      oCols.forEach(col => {
+                        cNode[col] = cNode[this.overrideColMap[col].original];
                       })
-                    if(context.rowNode.group){
-                      context.rowNode.groupData['state'] = ' '
-                      if(context.rowNode.data){
-                        context.rowNode.data['hedgingMark'] = null
-                        context.rowNode.data['lastHedgingMarkDate'] = null
-                      }
-                        rowNodes.push(context.rowNode)
-                      }else{
-                      context.rowNode.data['state'] = ' '
+
+                      return cNode;
+                    })
+
+                    if(node.group){
+                        node.groupData['state'] = ' '
+                        if(node.data){
+                          oCols.forEach(col => { node.data[col] = null })
+                        }
                     }
-                    context.adaptableApi.gridApi.refreshCells(rowNodes,['mark_override','hedgingMark','lastHedgingMarkDate','isOverriden'])
+                    else{
+                      node.data['state'] = ' '
+                    }
+
+                    this.gridApi.applyTransaction({ update: childNodes});
                     this.lockEdit = false
+                    this.gridApi.refreshCells({ force: true})
                 },
                 hidden:(
                   button: AdaptableButton<ActionColumnContext>,
@@ -459,16 +553,21 @@ export class HedgingMarkComponent implements OnInit {
         },
         Layout:{
           CurrentLayout: 'Hedging Mark Override Layout',
-          Revision: 43,
+          Revision: 46,
           Layouts: [{
             Name: 'Hedging Mark Override Layout',
             Columns: this.columnDefs.map(def => def.field),
             PinnedColumnsMap: {
               cost:'right',
               mark:'right',
+              markOverride: 'right',
+              markOverrideLevel: 'right',
+              lastMarkOverrideDate: 'right',
               hedgingMark: 'right',
+              hedgingMarkLevel: 'right',
+              lastHedgingMarkDate: 'right',
               isOverriden:'right',
-              lastHedgingMarkDate:'right',
+              isOvrdMark: 'right',
               mark_override:'right'
 
             },
@@ -490,10 +589,10 @@ export class HedgingMarkComponent implements OnInit {
           
         },
         FormatColumn:{
-          Revision:8,
+          Revision: 9,
           FormatColumns:[
-            BLANK_DATETIME_FORMATTER_CONFIG([...DATE_COLUMNS_LIST,'lastHedgingMarkDate','modifiedOn']),
-            DATE_FORMATTER_CONFIG_ddMMyyyy([...DATE_COLUMNS_LIST,'lastHedgingMarkDate']),
+            BLANK_DATETIME_FORMATTER_CONFIG([...DATE_COLUMNS_LIST,'lastHedgingMarkDate','modifiedOn', 'lastMarkOverrideDate']),
+            DATE_FORMATTER_CONFIG_ddMMyyyy([...DATE_COLUMNS_LIST,'lastHedgingMarkDate','lastMarkOverrideDate']),
             DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn']),
 
             
@@ -508,31 +607,73 @@ export class HedgingMarkComponent implements OnInit {
   }
   onCellValueChanged(params?:CellValueChangedEvent){
 
+    let colid: string = params.column.getColId();
+    let val: string | number = params.value;
     let rows = []
-    if(params.node.group){
-      let childNodes = getRowNodes(params.node)
-      childNodes.forEach(childNode=>{
-        if(params.data?.['hedgingMark'] || params.data?.['hedgingMark']===0){
-          childNode.data['hedgingMark'] = params.data['hedgingMark']
-        }
-          //childNode.data['lastHedgingMarkDate'] =  formatDate(this.asOfDate)
-          childNode.data['lastHedgingMarkDate'] =  this.asOfDate
+    let lvl: string;
 
+    if(colid === 'markOverride' || colid === 'hedgingMark'){
 
-      })
-      params.node.data['lastHedgingMarkDate'] =  this.asOfDate
-      rows = [...childNodes,params.node]
+      if(params.node.group){
+        lvl = 'Asset'
+      }
+      else 
+        lvl = 'Position'
+      
+      let childNodes = getNodes(params.node)
+      if(colid === 'markOverride'){
 
-    }else{
-      let colid = params.column.getColId()
-      if(colid ==='hedgingMark'){
-          params.node.data['lastHedgingMarkDate'] =  this.asOfDate
+        // if(params.node.group){
+        //   params.node.groupData['markOverrideLevel'] = lvl
+        // }
+
+        childNodes = childNodes.map(cNode => { 
+          cNode['markOverride'] = val; 
+          cNode['lastMarkOverrideDate'] = this.asOfDate;
+          cNode['markOverrideLevel'] = lvl
+
+          return cNode;
+        })
+        params.node.data['lastMarkOverrideDate'] = this.asOfDate;
+      }
+      else if(colid === 'hedgingMark'){
+
+        // if(params.node.group){
+        //   params.node.groupData['hedgingMarkLevel'] = lvl
+        // }
+
+        childNodes = childNodes.map(cNode => {
+          cNode['hedgingMark'] = val;
+          cNode['lastHedgingMarkDate'] = this.asOfDate;
+          cNode['hedgingMarkLevel'] = lvl
+
+          return cNode;
+        })
+        params.node.data['lastHedgingMarkDate'] = this.asOfDate;
       }
 
-      rows = [params.node]
+      this.gridApi.applyTransaction({ update:  childNodes})
     }
+    else if(colid === 'markOverrideLevel' || colid === 'hedgingMarkLevel'){
+      lvl = params.newValue;
+      let childNodes = []
+      let parentNode: RowNode;
 
-    this.adaptableApi.gridApi.refreshCells(rows,['mark_override','lastHedgingMarkDate','hedgingMark','isOverriden'])
+      if(params.node.group){ 
+        parentNode = params.node;
+      }
+      else{
+        parentNode = params.node.parent;
+      }
+      
+      childNodes = getNodes(parentNode)
+      childNodes = childNodes.map(cNode => { 
+        cNode[colid] = lvl
+        return cNode;
+      })
+      this.gridApi.applyTransaction({ update:  childNodes})
+
+    }
   }
 
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
@@ -544,5 +685,4 @@ export class HedgingMarkComponent implements OnInit {
   ngOnDestroy(){
     this.subscriptions.forEach(sub=>sub.unsubscribe());
   }
-
 }

@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
-import { getMomentDateStr } from 'src/app/shared/functions/utilities';
 
 @Injectable({
   providedIn: 'root'
