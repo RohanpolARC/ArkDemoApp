@@ -81,6 +81,7 @@ export class HedgingMarkComponent implements OnInit {
   ) { }
 
   getPositionsData(){
+    
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if(isHit){
         this.lockEdit = false
@@ -370,46 +371,101 @@ export class HedgingMarkComponent implements OnInit {
                         this.dataSvc.setWarningMsg(`Empty value cannot be provided`, `Dismiss`, `ark-theme-snackbar-warning`);
                         return
                       }
+                      else{
+                        this.dataSvc.setWarningMsg(`Please wait while we save your changes`, `Dismiss`, `ark-theme-snackbar-normal`)
+                      }
 
-
-                      let childNodes = getNodes(node);
+                      let childNodes;
                       let hedgingMarkOverrides: HedgingMarkOverride[] = []
                       let markOverrides: MarkOverride[] = []
-
+                      let hedgingMarkDetails: Overrides
+                      
                       if(node.group){
 
-                        childNodes.forEach(cn => {
+                            childNodes = getNodes(node);
+                            childNodes.forEach(cn => {
 
-                          // Hedging Mark
+                              // Hedging Mark
+      
+                              let lastHedgingMarkDate: string = formatDate(cn?.['lastHedgingMarkDate']);
+                              let ovrHM: HedgingMarkOverride = {
+                                Id: cn?.['hedgingMarkLevel'] === 'Asset' ?  cn?.['assetId'] : cn['positionId'] as number,
+                                Level: cn?.['hedgingMarkLevel'],
+                                HedgingMark: cn?.['hedgingMark'],
+                                LastHedgingMarkDate: lastHedgingMarkDate === 'NaN/NaN/NaN' ? null : lastHedgingMarkDate
+                              }
+      
+                              hedgingMarkOverrides.push(ovrHM);
+      
+                              // Mark Override
+      
+                              let lastMarkOverrideDate: string = formatDate(cn?.['lastMarkOverrideDate']);
+                              let ovrM: MarkOverride = {
+                                Id: cn?.['markOverrideLevel'] === 'Asset' ?  cn?.['assetId'] : cn['positionId'] as number,
+                                Level: cn?.['markOverrideLevel'],
+                                MarkOverride: cn?.['markOverride'],
+                                LastMarkOverrideDate: lastMarkOverrideDate === 'NaN/NaN/NaN' ? null : lastMarkOverrideDate
+                              }
+      
+                              markOverrides.push(ovrM);
+                            })
+    
+                      }
+                      else {
 
-                          let ovrHM: HedgingMarkOverride = {
-                            Id: cn?.['hedgingMarkLevel'] === 'Asset' ?  cn?.['assetId'] : cn['positionId'] as number,
-                            Level: cn?.['hedgingMarkLevel'],
-                            HedgingMark: cn?.['hedgingMark'],
-                            LastHedgingMarkDate: formatDate(cn?.['lastHedgingMarkDate'])
-                          }
+                        // Hedging Mark
+                        if(node.data?.['hedgingMarkLevel'] === 'Position'){
 
-                          hedgingMarkOverrides.push(ovrHM);
+                          let parent = node.parent;
+                          childNodes = getNodes(parent);
 
-                          // Mark Override
+                          let positionLevelNodes = childNodes.filter(n => n['hedgingMarkLevel'] === 'Position')
 
-                          let ovrM: MarkOverride = {
-                            Id: cn?.['markOverrideLevel'] === 'Asset' ?  cn?.['assetId'] : cn['positionId'] as number,
-                            Level: cn?.['markOverrideLevel'],
-                            MarkOverride: cn?.['markOverride'],
-                            LastMarkOverrideDate: formatDate(cn?.['lastMarkOverrideDate'])
-                          }
+                          positionLevelNodes.forEach(n => {
 
-                          markOverrides.push(ovrM);
-                        })
-                     }
+                            let lastHedgingMarkDate: string = formatDate(n?.['lastHedgingMarkDate']);
+                            let ovrHM: HedgingMarkOverride = {
+                              Id: n['positionId'],
+                              Level: "Position",
+                              HedgingMark: n['hedgingMark'],
+                              LastHedgingMarkDate: lastHedgingMarkDate === 'NaN/NaN/NaN' ? null : lastHedgingMarkDate
+                            }
 
-                     let hedgingMarkDetails: Overrides = {
+                            hedgingMarkOverrides.push(ovrHM);
+                          })
+
+                        }
+                        
+                        // Mark override
+                        if(node.data?.['markOverrideLevel'] === 'Position'){
+
+                          let parent = node.parent;
+                          childNodes = getNodes(parent);
+
+                          let positionLevelNodes = childNodes.filter(n => n['markOverrideLevel'] === 'Position')
+
+                          positionLevelNodes.forEach(n => {
+
+                            let lastMarkOverrideDate: string = formatDate(n?.['lastMarkOverrideDate']);
+                            let ovrM: MarkOverride = {
+                              Id: n['positionId'],
+                              Level: "Position",
+                              MarkOverride: n['markOverride'],
+                              LastMarkOverrideDate: lastMarkOverrideDate === 'NaN/NaN/NaN' ? null : lastMarkOverrideDate
+                            }
+
+                            markOverrides.push(ovrM);
+                          })
+
+                        }
+                      }
+
+                      hedgingMarkDetails = {
                         MarkOverrides: markOverrides,
                         HedgingMarkOverrides: hedgingMarkOverrides,
                         ModifiedBy : this.dataSvc.getCurrentUserName()
                       }
-                      
+
                       this.subscriptions.push(
                         this.positionScreenSvc.updateHedgingMark(hedgingMarkDetails).subscribe({
                           next:data=>{
@@ -485,7 +541,14 @@ export class HedgingMarkComponent implements OnInit {
 
                     let node: RowNode = context.rowNode;
                     let oCols: string[] = Object.keys(this.overrideColMap);
-                    let childNodes = getNodes(node)
+                    let childNodes
+                    if(node.group){
+                      childNodes = getNodes(node);
+                    }
+                    else {
+                      childNodes = getNodes(node.parent);
+                    }
+                    
                     childNodes = childNodes.map(cNode => {
                       
 
@@ -620,36 +683,35 @@ export class HedgingMarkComponent implements OnInit {
       else 
         lvl = 'Position'
       
-      let childNodes = getNodes(params.node)
+      let dateCol: 'lastMarkOverrideDate' | 'lastHedgingMarkDate';
+      let levelCol: 'markOverrideLevel' | 'hedgingMarkLevel';
+
+      
       if(colid === 'markOverride'){
-
-        // if(params.node.group){
-        //   params.node.groupData['markOverrideLevel'] = lvl
-        // }
-
-        childNodes = childNodes.map(cNode => { 
-          cNode['markOverride'] = val; 
-          cNode['lastMarkOverrideDate'] = this.asOfDate;
-          cNode['markOverrideLevel'] = lvl
-
-          return cNode;
-        })
-        params.node.data['lastMarkOverrideDate'] = this.asOfDate;
+        dateCol = 'lastMarkOverrideDate';
+        levelCol = 'markOverrideLevel';
       }
       else if(colid === 'hedgingMark'){
+        dateCol = 'lastHedgingMarkDate';
+        levelCol = 'hedgingMarkLevel';
+      }
 
-        // if(params.node.group){
-        //   params.node.groupData['hedgingMarkLevel'] = lvl
-        // }
+      let childNodes = getNodes(params.node)
 
-        childNodes = childNodes.map(cNode => {
-          cNode['hedgingMark'] = val;
-          cNode['lastHedgingMarkDate'] = this.asOfDate;
-          cNode['hedgingMarkLevel'] = lvl
+      childNodes = childNodes.map(cNode => { 
+        cNode[colid] = val; 
+        cNode[dateCol] = this.asOfDate;
+        cNode[levelCol] = lvl;
 
-          return cNode;
-        })
-        params.node.data['lastHedgingMarkDate'] = this.asOfDate;
+        return cNode;
+      })
+
+      params.node.data[dateCol] = this.asOfDate;
+      params.node.data[levelCol] = lvl;
+
+      // When leaf node is updated, lvl will be updated for corresponding level column. But it won't directly flow to all sibling nodes
+      if(lvl === 'Position'){
+        this.updateAllSiblingsLevelToPosition(params.node, 'markOverrideLevel')
       }
 
       this.gridApi.applyTransaction({ update:  childNodes})
@@ -663,26 +725,65 @@ export class HedgingMarkComponent implements OnInit {
       if(params.node.group){ 
         parentNode = params.node;
         childNodes = getNodes(parentNode)
+
+        childNodes = childNodes.map(cNode => { 
+          cNode[colid] = lvl
+          return cNode;
+        })
+        this.gridApi.applyTransaction({ update:  childNodes})
+
       }
       else{
-        parentNode = params.node.parent;
-        childNodes = getNodes(parentNode)
-        let distinctLevels: string[] = [... new Set(childNodes.map(cN => cN?.[colid]))]
+      //   parentNode = params.node.parent;
+      //   childNodes = getNodes(parentNode)
 
-        if(distinctLevels.length === 1 && distinctLevels[0] === 'Asset' && lvl === 'Position'){
-        }
-        else {
-          return;
-        }
-      }
+      //   let cntAssetLevel: number = childNodes.filter(cn => cn?.[colid] === 'Asset').length;
+      //   let cntPositionLevel: number = childNodes.filter(cn => cn?.[colid] === 'Position').length;
+
+      //   if((cntPositionLevel + cntAssetLevel === childNodes.length) && (cntPositionLevel === 1 && lvl === 'Position')){
+      //   }
+      //   else {
+      //     return;
+      //   }
+      // }
       
-      childNodes = childNodes.map(cNode => { 
-        cNode[colid] = lvl
-        return cNode;
-      })
-      this.gridApi.applyTransaction({ update:  childNodes})
+      // childNodes = childNodes.map(cNode => { 
+      //   cNode[colid] = lvl
+      //   return cNode;
+      // })
+      // this.gridApi.applyTransaction({ update:  childNodes})
 
+      this.updateAllSiblingsLevelToPosition(params.node, colid);
+
+      }
     }
+  }
+
+  updateAllSiblingsLevelToPosition(node: RowNode, colid: 'markOverrideLevel' | 'hedgingMarkLevel'){
+
+    let parentNode: RowNode = node.parent;
+    let childNodes = getNodes(parentNode);
+    let lvl: string;
+    
+    if(node.group)
+      lvl = 'Asset'
+    else lvl = 'Position'
+
+    let cntAssetLevel: number = childNodes.filter(cn => cn?.[colid] === 'Asset').length;
+    let cntPositionLevel: number = childNodes.filter(cn => cn?.[colid] === 'Position').length;
+
+    if((cntPositionLevel + cntAssetLevel === childNodes.length) && (cntPositionLevel === 1 && lvl === 'Position')){
+    }
+    else {
+      return;
+    }
+    
+    childNodes = childNodes.map(cNode => {
+      cNode[colid] = lvl;
+      return cNode;
+    })
+
+    this.gridApi.applyTransaction({ update: childNodes })
   }
 
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
