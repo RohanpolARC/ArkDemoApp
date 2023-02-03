@@ -724,7 +724,6 @@ export class HedgingMarkComponent implements OnInit {
         else if(colid === 'hedgingMark')
           this.updateAllSiblingsLevelToPosition(params.node, 'hedgingMarkLevel')
       }
-      else 
 
       this.gridApi.applyTransaction({ update:  childNodes})
     }
