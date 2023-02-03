@@ -474,7 +474,15 @@ export class HedgingMarkComponent implements OnInit {
                             let oCols: string[] = Object.keys(this.overrideColMap);
 
 
-                            let nodes = getNodes(node)
+                            let parent: RowNode;
+                            if(node.group){
+                              parent = node;
+                            }
+                            else{
+                              parent = node.parent;
+                            }
+
+                            let nodes = getNodes(parent)
                             nodes = nodes.map(n => {
                               n['isOverriden'] = n['hedgingMark'] ? true : false;
                               n['isOvrdMark'] = n['markOverride'] ? true : false; 
