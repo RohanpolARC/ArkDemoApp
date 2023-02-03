@@ -719,8 +719,12 @@ export class HedgingMarkComponent implements OnInit {
 
       // When leaf node is updated, lvl will be updated for corresponding level column. But it won't directly flow to all sibling nodes
       if(lvl === 'Position'){
-        this.updateAllSiblingsLevelToPosition(params.node, 'markOverrideLevel')
+        if(colid === 'markOverride')
+          this.updateAllSiblingsLevelToPosition(params.node, 'markOverrideLevel')
+        else if(colid === 'hedgingMark')
+          this.updateAllSiblingsLevelToPosition(params.node, 'hedgingMarkLevel')
       }
+      else 
 
       this.gridApi.applyTransaction({ update:  childNodes})
     }
@@ -742,25 +746,6 @@ export class HedgingMarkComponent implements OnInit {
 
       }
       else{
-      //   parentNode = params.node.parent;
-      //   childNodes = getNodes(parentNode)
-
-      //   let cntAssetLevel: number = childNodes.filter(cn => cn?.[colid] === 'Asset').length;
-      //   let cntPositionLevel: number = childNodes.filter(cn => cn?.[colid] === 'Position').length;
-
-      //   if((cntPositionLevel + cntAssetLevel === childNodes.length) && (cntPositionLevel === 1 && lvl === 'Position')){
-      //   }
-      //   else {
-      //     return;
-      //   }
-      // }
-      
-      // childNodes = childNodes.map(cNode => { 
-      //   cNode[colid] = lvl
-      //   return cNode;
-      // })
-      // this.gridApi.applyTransaction({ update:  childNodes})
-
       this.updateAllSiblingsLevelToPosition(params.node, colid);
 
       }
