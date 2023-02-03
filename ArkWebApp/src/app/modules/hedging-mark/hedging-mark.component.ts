@@ -16,14 +16,16 @@ import { getNodes } from '../capital-activity/utilities/functions';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 
 interface HedgingMarkOverride {
-  Id :number,
+  AssetId :number,
+  PositionId: number,
   Level: 'Asset' | 'Position',
   HedgingMark: number,
   LastHedgingMarkDate: string
 }
 
 interface MarkOverride {
-  Id: number,
+  AssetId: number,
+  PositionId: number,
   Level: 'Asset' | 'Position',
   MarkOverride: number,
   LastMarkOverrideDate: string
@@ -389,7 +391,8 @@ export class HedgingMarkComponent implements OnInit {
       
                               let lastHedgingMarkDate: string = formatDate(cn?.['lastHedgingMarkDate']);
                               let ovrHM: HedgingMarkOverride = {
-                                Id: cn?.['hedgingMarkLevel'] === 'Asset' ?  cn?.['assetId'] : cn['positionId'] as number,
+                                PositionId: cn['positionId'] as number,
+                                AssetId: cn['assetId'] as number,
                                 Level: cn?.['hedgingMarkLevel'],
                                 HedgingMark: cn?.['hedgingMark'],
                                 LastHedgingMarkDate: lastHedgingMarkDate === 'NaN/NaN/NaN' ? null : lastHedgingMarkDate
@@ -401,7 +404,8 @@ export class HedgingMarkComponent implements OnInit {
       
                               let lastMarkOverrideDate: string = formatDate(cn?.['lastMarkOverrideDate']);
                               let ovrM: MarkOverride = {
-                                Id: cn?.['markOverrideLevel'] === 'Asset' ?  cn?.['assetId'] : cn['positionId'] as number,
+                                PositionId: cn['positionId'] as number,
+                                AssetId: cn['assetId'] as number,
                                 Level: cn?.['markOverrideLevel'],
                                 MarkOverride: cn?.['markOverride'],
                                 LastMarkOverrideDate: lastMarkOverrideDate === 'NaN/NaN/NaN' ? null : lastMarkOverrideDate
@@ -421,13 +425,15 @@ export class HedgingMarkComponent implements OnInit {
 
                           let positionLevelNodes = childNodes.filter(n => n['hedgingMarkLevel'] === 'Position')
 
-                          positionLevelNodes.forEach(n => {
+                          positionLevelNodes.forEach(cn => {
 
-                            let lastHedgingMarkDate: string = formatDate(n?.['lastHedgingMarkDate']);
+                            let lastHedgingMarkDate: string = formatDate(cn?.['lastHedgingMarkDate']);
                             let ovrHM: HedgingMarkOverride = {
-                              Id: n['positionId'],
+                              PositionId: cn['positionId'] as number,
+                              AssetId: cn['assetId'] as number,
+
                               Level: "Position",
-                              HedgingMark: n['hedgingMark'],
+                              HedgingMark: cn['hedgingMark'],
                               LastHedgingMarkDate: lastHedgingMarkDate === 'NaN/NaN/NaN' ? null : lastHedgingMarkDate
                             }
 
@@ -442,15 +448,16 @@ export class HedgingMarkComponent implements OnInit {
                           let parent = node.parent;
                           childNodes = getNodes(parent);
 
-                          let positionLevelNodes = childNodes.filter(n => n['markOverrideLevel'] === 'Position')
+                          let positionLevelNodes = childNodes.filter(cn => cn['markOverrideLevel'] === 'Position')
 
-                          positionLevelNodes.forEach(n => {
+                          positionLevelNodes.forEach(cn => {
 
-                            let lastMarkOverrideDate: string = formatDate(n?.['lastMarkOverrideDate']);
+                            let lastMarkOverrideDate: string = formatDate(cn?.['lastMarkOverrideDate']);
                             let ovrM: MarkOverride = {
-                              Id: n['positionId'],
+                              PositionId: cn['positionId'] as number,
+                              AssetId: cn['assetId'] as number,
                               Level: "Position",
-                              MarkOverride: n['markOverride'],
+                              MarkOverride: cn['markOverride'],
                               LastMarkOverrideDate: lastMarkOverrideDate === 'NaN/NaN/NaN' ? null : lastMarkOverrideDate
                             }
 
