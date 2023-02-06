@@ -1,5 +1,5 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridOptions, GridReadyEvent, Module, GridApi, CellValueChangedEvent, RowNode, CellClassParams } from '@ag-grid-community/core';
+import { ColDef, GridOptions, GridReadyEvent, Module, GridApi, CellValueChangedEvent, RowNode, CellClassParams, CellClickedEvent } from '@ag-grid-community/core';
 import { Component, OnInit} from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -11,9 +11,11 @@ import { AMOUNT_COLUMNS_LIST, DATE_COLUMNS_LIST, GRID_OPTIONS,  POSITIONS_COLUMN
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
-import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
+import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { getNodes } from '../capital-activity/utilities/functions';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
+import { MatDialog } from '@angular/material/dialog';
+import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
 
 interface HedgingMarkOverride {
   AssetId :number,
@@ -79,7 +81,8 @@ export class HedgingMarkComponent implements OnInit {
   constructor(
     private dataSvc: DataService,
     public positionScreenSvc: PositionScreenService,
-    private accessService: AccessService
+    private accessService: AccessService,
+    public dialog: MatDialog
   ) { }
 
   getPositionsData(){
@@ -205,7 +208,7 @@ export class HedgingMarkComponent implements OnInit {
     this.columnDefs = <ColDef[]>[
       ...POSITIONS_COLUMN_DEF,
       { field: 'markOverride', headerName: 'Mark Ovrd', editable: this.isEditable.bind(this), maxWidth: 141, type: 'abColDefNumber',
-      cellStyle:this.editableCellStyle.bind(this), width: 150 },
+      cellStyle:this.editableCellStyle.bind(this), width: 150, onCellClicked: this.onOverrideCellClicked.bind(this) },
       { field: 'markOverrideLevel', headerName: 'Mark Ovrd Lvl', editable: this.isEditable.bind(this), maxWidth: 141, type: 'abColDefString', 
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: (params) => {
@@ -218,8 +221,8 @@ export class HedgingMarkComponent implements OnInit {
       },
       { field: 'lastMarkOverrideDate', headerName: 'Last Mark Ovrd Date', maxWidth: 141, type: 'abColDefDate'},
       {
-        field:'hedgingMark',headerName:'Hedging Mark',type:'abColDefNumber',editable:this.isEditable.bind(this),
-        cellStyle:this.editableCellStyle.bind(this),width: 150
+        field:'hedgingMark', headerName:'Hedging Mark',type:'abColDefNumber',editable:this.isEditable.bind(this),
+        cellStyle:this.editableCellStyle.bind(this), width: 150, onCellClicked: this.onOverrideCellClicked.bind(this)
       },
       { field: 'hedgingMarkLevel', headerName: 'Hedging Mark Lvl', editable: this.isEditable.bind(this), maxWidth: 141, type: 'abColDefString',
         cellEditor: 'autocompleteCellEditor',
@@ -757,6 +760,28 @@ export class HedgingMarkComponent implements OnInit {
       }
     }
   }
+
+  onOverrideCellClicked(p: CellClickedEvent){
+    if(!p.node.group && p.data['state'] !== 'edit'){
+
+      let m = <DetailedView>{};
+      m.screen = 'Valuation/Hedging Mark';
+      m.param1 = String(p.data?.['positionId']) //positionId;
+      m.param2 = this.asOfDate; // AsOfDate
+      m.param3 = p.column.getColId();
+      m.param4 = ' ';
+      m.param5 = ' ';
+
+      this.dialog.open(DetailedViewComponent,{
+        data: {
+          detailedViewRequest: m
+        },
+        width: '90vw',
+        height: '80vh'
+      })
+    } 
+  }
+  
 
   updateAllSiblingsLevelToPosition(node: RowNode, colid: 'markOverrideLevel' | 'hedgingMarkLevel'){
 
