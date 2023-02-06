@@ -1,5 +1,5 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridOptions, GridReadyEvent, Module, GridApi, CellValueChangedEvent, RowNode, CellClassParams, CellClickedEvent } from '@ag-grid-community/core';
+import { ColDef, GridOptions, GridReadyEvent, Module, GridApi, CellValueChangedEvent, RowNode, CellClassParams, CellClickedEvent, ITooltipParams } from '@ag-grid-community/core';
 import { Component, OnInit} from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -208,7 +208,13 @@ export class HedgingMarkComponent implements OnInit {
     this.columnDefs = <ColDef[]>[
       ...POSITIONS_COLUMN_DEF,
       { field: 'markOverride', headerName: 'Mark Ovrd', editable: this.isEditable.bind(this), maxWidth: 141, type: 'abColDefNumber',
-      cellStyle:this.editableCellStyle.bind(this), width: 150, onCellClicked: this.onOverrideCellClicked.bind(this) },
+      cellStyle:this.editableCellStyle.bind(this), width: 150, onCellClicked: this.onOverrideCellClicked.bind(this),
+      tooltipValueGetter: (p: ITooltipParams) => {
+        if(!p.node.group && p.data['state'] !== 'edit')
+          return "Mark Override Audit"
+        else return null;
+      } 
+    },
       { field: 'markOverrideLevel', headerName: 'Mark Ovrd Lvl', editable: this.isEditable.bind(this), maxWidth: 141, type: 'abColDefString', 
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: (params) => {
@@ -222,7 +228,12 @@ export class HedgingMarkComponent implements OnInit {
       { field: 'lastMarkOverrideDate', headerName: 'Last Mark Ovrd Date', maxWidth: 141, type: 'abColDefDate'},
       {
         field:'hedgingMark', headerName:'Hedging Mark',type:'abColDefNumber',editable:this.isEditable.bind(this),
-        cellStyle:this.editableCellStyle.bind(this), width: 150, onCellClicked: this.onOverrideCellClicked.bind(this)
+        cellStyle:this.editableCellStyle.bind(this), width: 150, onCellClicked: this.onOverrideCellClicked.bind(this),
+        tooltipValueGetter: (p: ITooltipParams) => {
+          if(!p.node.group && p.data['state'] !== 'edit')
+            return "Hedging Mark Audit"
+          else return null;
+        } 
       },
       { field: 'hedgingMarkLevel', headerName: 'Hedging Mark Lvl', editable: this.isEditable.bind(this), maxWidth: 141, type: 'abColDefString',
         cellEditor: 'autocompleteCellEditor',
