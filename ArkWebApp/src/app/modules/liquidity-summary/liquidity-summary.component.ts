@@ -149,6 +149,15 @@ export class LiquiditySummaryComponent implements OnInit {
               }
             })
           }
+          else if(params.rowNode.key === 'Delayed Cash'){
+
+            this.gridOptions.api.forEachNode((rowNode, index) => {
+              if(rowNode.data?.['attrType'] === 'Delayed Cash'){
+                sum += Number(rowNode.data?.[colName]);
+              }
+            })
+
+          }
           else if(params.rowNode.key === 'Known Outflows Unsettled'){
   
             this.gridOptions.api.forEachNode((rowNode, index) => {
@@ -176,7 +185,7 @@ export class LiquiditySummaryComponent implements OnInit {
           else if(params.rowNode.key === 'Cash Post Known Outflows'){
   
             this.gridOptions.api.forEachNode((rowNode, index) => {
-              if(['Current Cash', 'Net Cash', 'Liquidity','Known Outflows Unsettled', 'Known Outflows Funding','Known Outflows Pipeline'].includes(rowNode.data?.['attrType'])){
+              if(['Current Cash', 'Net Cash', 'Liquidity','Known Outflows Unsettled', 'Known Outflows Funding','Known Outflows Pipeline','Delayed Cash'].includes(rowNode.data?.['attrType'])){
                 sum += Number(rowNode.data?.[colName]);
               }
             })
