@@ -706,6 +706,58 @@ export class HedgingMarkComponent implements OnInit {
     )
   }
 
+  checkMarkOverride(row: any[], tolerancePercent: number = 5): boolean{
+    
+    const MO: string = 'markOverride';
+
+    let markOverride: number = row[MO] ?? 0, mark: number = row['mark'] ?? 0;
+    let diffRate: number = Math.abs(((markOverride - mark) * 100)/mark);
+    if(diffRate > 5){
+      this.dataSvc.setWarningMsg(`Mark Override varying by 5% as compared to mark`)
+      return true;
+    }
+    return false;
+  }
+
+  checkWarnings(params: CellValueChangedEvent){
+
+    let colid: string = params.column.getColId();
+    let val = params.value;
+
+    let node: RowNode = params.node;
+    let parent: RowNode = node.group ? node : node.parent;
+    
+    let childNodes: any[] = getNodes(parent);
+
+    if(colid === 'markOverride'){
+      if(node.group){
+        for(let i: number = 0; i < childNodes.length; i += 1){
+          if(this.checkMarkOverride(childNodes[i])){
+            break;
+          }
+        }
+      }
+      else{
+        this.checkMarkOverride(params.data);
+      }
+    }
+    else if(colid === 'markOverrideLevel'){
+
+      if(node.group){
+        if(val === 'Position')
+          this.dataSvc.setWarningMsg(`Each position needs to be marked`);
+      }
+      else{
+        let positionCnt: number = childNodes.filter(cN => cN?.['markOverrideLevel'] === 'Position').length;
+    
+        // This check happens after all the row levels has been updated to Position from Asset.
+        if(positionCnt === childNodes.length && params.oldValue === 'Asset'){
+          this.dataSvc.setWarningMsg(`Each position needs to be marked`);
+        }
+      }
+    }
+  }
+
   onCellValueChanged(params?:CellValueChangedEvent){
 
     let colid: string = params.column.getColId();
@@ -714,6 +766,11 @@ export class HedgingMarkComponent implements OnInit {
     let lvl: string;
 
     if(colid === 'markOverride' || colid === 'hedgingMark'){
+
+      setTimeout(() => {
+        this.checkWarnings(params);
+      }, 0)
+
 
       if(params.node.group){
         lvl = 'Asset'
@@ -763,7 +820,13 @@ export class HedgingMarkComponent implements OnInit {
       let parentNode: RowNode;
 
 
+      setTimeout(() => {
+        this.checkWarnings(params);
+      }, 0)
+
       if(params.node.group){ 
+
+
         parentNode = params.node;
         childNodes = getNodes(parentNode)
 
