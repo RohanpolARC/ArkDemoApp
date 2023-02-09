@@ -113,5 +113,12 @@
         (click)="onClose()"
         >Close</button>
 
+        <button type="button" 
+        *ngIf = "data.action==='EDIT'"
+        mat-raised-button
+        color="warn"
+        (click)="onDelete()"
+        >Delete</button>
+
     </div>
 </mat-dialog-actions>
