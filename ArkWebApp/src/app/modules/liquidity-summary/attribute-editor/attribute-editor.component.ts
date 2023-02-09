@@ -236,7 +236,7 @@ export class AttributeEditorComponent implements OnInit {
                 data:  this.submittedData,
                 action: this.data.action
               })
-              this.dataSvc.setWarningMsg("Successfully deleted the Attribute","Dismiss","ark-theme-snackbar-normal")
+              this.dataSvc.setWarningMsg(`Successfully deleted ${model.attribute}`,"Dismiss","ark-theme-snackbar-normal")
             }
 
           },
