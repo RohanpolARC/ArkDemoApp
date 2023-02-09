@@ -61,9 +61,9 @@ export class LiquiditySummaryService {
       )
     }
 
-    public updateLiquiditySummary(id){
+    public updateLiquiditySummary(model: LiquiditySummaryUpdateModel){
 
-      return this.http.post<any>(APIConfig.LIQUIDITY_SUMMARY_PUT_UPDATE_API, id).pipe(
+      return this.http.post<any>(APIConfig.LIQUIDITY_SUMMARY_PUT_UPDATE_API, model).pipe(
         catchError((ex) => throwError(ex))
       )
     }
