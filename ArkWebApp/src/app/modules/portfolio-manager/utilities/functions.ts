@@ -178,10 +178,12 @@ export function getUniqueParamsFromGrid(field: string){
   return {
     options: [...new Set(getGridData(this.portfolioMapDataSvc.mappingsGridApi).map(e => 
       {
-        // Removes all blank spaces from string values
-        if(typeof e[field] === 'string')
-          return String(e[field]).replace(/\s/g,'')
-        else return e[field]
+        // // Removes all blank spaces from string values
+        // if(typeof e[field] === 'string')
+        //   return String(e[field]).replace(/\s/g,'')
+        // else return e[field]
+
+        return e[field]
       }
       ))].filter(e => 
       String(e)?.replace(/\s/g,'').length && (e !== null) && (e !== undefined) && (e !== 0)

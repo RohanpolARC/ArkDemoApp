@@ -57,6 +57,12 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
   onSave(){
     let data = this.params.node.data
 
+
+    // Checks if row being saved is a new/cloned row.
+    if(this.componentParent.maxMappingID + 1 === data?.['mappingID']){
+      data['mappingID'] = null;
+    }
+
     if(!(data.wsoPortfolioID && data.fund && data.fundLegalEntity && data.fundHedging && data.fundStrategy && (data.fundSMA === true || data.fundSMA === false) && 
     data.fundInvestor && data.fundCcy && data.fundAdmin && data.portfolioAUMMethod &&
     (data.isCoinvestment === true || data.isCoinvestment === false) && 
@@ -128,7 +134,7 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
       this.originalRowNodeData = this.originalRowNodeID = null;
       this.componentParent.setSelectedRowID(null);
 
-      this.params.api.recomputeAggregates();  
+      this.params.api.refreshClientSideRowModel('everything');  
     }
     else {
       /** In case of Cloned row editing */
@@ -142,15 +148,19 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
 
     if(this.componentParent.getSelectedRowID() === null){
 
+      let newRowID: number = this.componentParent.maxMappingID + 1;
+
       let nodeData = JSON.parse(JSON.stringify(this.params.node.data));
-      nodeData['mappingID'] = null
+      nodeData['mappingID'] = newRowID;
       nodeData['wsoPortfolioID'] = null
       nodeData['portfolioName'] = null
+      nodeData['modifiedOn'] = null;
+      nodeData['modifiedBy'] = null;
   
       this.componentParent.adapTableApi.gridApi.addGridData([nodeData])
       this.params.api.ensureNodeVisible(nodeData)
   
-      let node: RowNode = this.componentParent.adapTableApi.gridApi.getRowNodeForPrimaryKey(null)
+      let node: RowNode = this.componentParent.adapTableApi.gridApi.getRowNodeForPrimaryKey(newRowID)
       this.componentParent.setSelectedRowID(node.rowIndex)
     }
     else{
