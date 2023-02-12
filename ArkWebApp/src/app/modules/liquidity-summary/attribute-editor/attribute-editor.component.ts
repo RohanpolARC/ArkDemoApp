@@ -1,12 +1,14 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { FormGroup, FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import * as moment from 'moment';
 import { LiquiditySummaryAttributeModel } from '../../../shared/models/LiquiditySummaryModel';
 import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/liquidity-summary.service';
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
+import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
+import { DataService } from 'src/app/core/services/data.service';
 
 @Component({
   selector: 'app-attribute-editor',
@@ -34,7 +36,9 @@ export class AttributeEditorComponent implements OnInit {
     public dialogRef: MatDialogRef<AttributeEditorComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
     private liquiditySummarySvc: LiquiditySummaryService,
-    private msalUserSvc: MsalUserService
+    private dataSvc: DataService,
+    private msalUserSvc: MsalUserService,
+    public dialog: MatDialog
   ) { }
 
   isNewAttribute(refData, attribute: string, level: string): boolean {
@@ -210,4 +214,43 @@ export class AttributeEditorComponent implements OnInit {
       action: this.data.action 
     })
   }
+
+
+  onDelete(){
+    let confirmTextString = 'Are you sure you want to delete this attribute ?'
+    const dialogRef = this.dialog.open(ConfirmationPopupComponent, { 
+      data:{confirmText:confirmTextString},
+      maxHeight: '95vh'
+    })
+    this.subscriptions.push(dialogRef.afterClosed().subscribe((value)=>{
+      if(value.action==='Confirm'){
+        let model: LiquiditySummaryAttributeModel = this.getModel();
+        this.subscriptions.push(this.liquiditySummarySvc.deleteLiquiditySummaryAttribute(model.id).subscribe({
+          next: data => {
+
+            if(data?.isSuccess){
+              this.isSuccess = true;
+              this.isFailure = false;
+              this.dialogRef.close({
+                event:'Close with success' ,
+                data:  this.submittedData,
+                action: this.data.action
+              })
+              this.dataSvc.setWarningMsg(`Successfully deleted ${model.attribute}`,"Dismiss","ark-theme-snackbar-normal")
+            }
+
+          },
+          error: error => {
+            this.updateMsg = 'Failed to Delete';
+            this.isFailure = true;
+            this.isSuccess = false;
+            this.dataSvc.setWarningMsg("Attribute could not be deleted","Dismiss","ark-theme-snackbar-error")
+          }
+          
+        }))
+
+      }
+    }))
+  }
+
 }
