@@ -41,6 +41,7 @@ export class PortfolioManagerComponent implements OnInit {
   context: any;
   adapTableApi: AdaptableApi;
   noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
+  maxMappingID: number  // Remembers the maximum mapping ID available currently in the system
 
   constructor(
     private portfolioManagerSvc: PortfolioManagerService,
@@ -418,6 +419,8 @@ export class PortfolioManagerComponent implements OnInit {
         this.rowData = resp
         this.portfolioMapDataSvc.setMappings(resp);
         this.gridOptions?.api?.hideOverlay();
+
+        this.maxMappingID = Math.max(...resp.map(r => r?.['mappingID']));
       },
       error: error => {
         this.rowData = [];

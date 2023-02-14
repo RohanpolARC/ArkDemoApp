@@ -54,6 +54,13 @@ export class LiquiditySummaryService {
       )
     }
 
+    public deleteLiquiditySummaryAttribute(id:Number){
+
+      return this.http.post<any>(APIConfig.LIQUIDITY_SUMMARY_DELETE_API, id).pipe(
+        catchError((ex) => throwError(ex))
+      )
+    }
+
     public updateLiquiditySummary(model: LiquiditySummaryUpdateModel){
 
       return this.http.post<any>(APIConfig.LIQUIDITY_SUMMARY_PUT_UPDATE_API, model).pipe(
