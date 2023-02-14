@@ -719,7 +719,28 @@ export class HedgingMarkComponent implements OnInit {
     return false;
   }
 
-  checkWarnings(params: CellValueChangedEvent){
+  checkWarningsBefore(params: CellValueChangedEvent){
+
+    let colid: string = params.column.getColId();
+    let val = params.value;
+    let node: RowNode = params.node;
+    let parent: RowNode = node.group ? node : node.parent;
+    
+    let childNodes: any[] = getNodes(parent);
+
+    if(node.group){
+      if((colid === 'markOverrideLevel' && val === 'Asset') || (colid === 'markOverride')){
+
+        let cntPosition: number  = childNodes.filter(cN => cN['markOverrideLevel'] === 'Position').length;
+        if(cntPosition >= 1){
+          this.dataSvc.setWarningMsg(`Warning: Once marked at position level, cannot be changed to asset level`);
+        }
+      }
+    }
+  }
+
+
+  checkWarningsAfter(params: CellValueChangedEvent){
 
     let colid: string = params.column.getColId();
     let val = params.value;
@@ -765,11 +786,14 @@ export class HedgingMarkComponent implements OnInit {
     let rows = []
     let lvl: string;
 
+    this.checkWarningsBefore(params);
+
+
     if(colid === 'markOverride' || colid === 'hedgingMark'){
 
-      setTimeout(() => {
-        this.checkWarnings(params);
-      }, 0)
+      // setTimeout(() => {
+      //   this.checkWarnings(params);
+      // }, 0)
 
 
       if(params.node.group){
@@ -820,9 +844,10 @@ export class HedgingMarkComponent implements OnInit {
       let parentNode: RowNode;
 
 
-      setTimeout(() => {
-        this.checkWarnings(params);
-      }, 0)
+
+      // setTimeout(() => {
+      //   this.checkWarnings(params);
+      // }, 0)
 
       if(params.node.group){ 
 
@@ -842,6 +867,8 @@ export class HedgingMarkComponent implements OnInit {
 
       }
     }
+
+    this.checkWarningsAfter(params)
   }
 
   onOverrideCellClicked(p: CellClickedEvent){
