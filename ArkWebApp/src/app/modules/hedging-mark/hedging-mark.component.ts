@@ -728,10 +728,15 @@ export class HedgingMarkComponent implements OnInit {
     
     let childNodes: any[] = getNodes(parent);
 
+    let asOfDate: string = formatDate(new Date(this.asOfDate));
+
     if(node.group){
       if((colid === 'markOverrideLevel' && val === 'Asset') || (colid === 'markOverride')){
 
-        let cntPosition: number  = childNodes.filter(cN => cN['markOverrideLevel'] === 'Position').length;
+        let cntPosition: number  = childNodes.filter(cN => {
+          return cN['markOverrideLevel'] === 'Position' && formatDate(cN['lastMarkOverrideDate']) === asOfDate
+        }).length;
+        
         if(cntPosition >= 1){
           this.dataSvc.setWarningMsg(`Warning: Once marked at position level, cannot be changed to asset level`);
         }
