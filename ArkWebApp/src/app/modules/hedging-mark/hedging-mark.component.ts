@@ -1,5 +1,5 @@
-import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridOptions, GridReadyEvent, Module, GridApi, CellValueChangedEvent, RowNode, CellClassParams, CellClickedEvent, ITooltipParams } from '@ag-grid-community/core';
+import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableColumn, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColDef, GridOptions, GridReadyEvent, Module, GridApi, CellValueChangedEvent, RowNode, CellClassParams, CellClickedEvent, ITooltipParams, IAggFuncParams } from '@ag-grid-community/core';
 import { Component, OnInit} from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -84,6 +84,21 @@ export class HedgingMarkComponent implements OnInit {
     private accessService: AccessService,
     public dialog: MatDialog
   ) { }
+
+  maxAggFunc(p: IAggFuncParams){
+    if(p.rowNode.field === 'asset'){
+
+      let colid: string = p.column.getColId();
+      if(['cost', 'mark'].includes(colid)){
+
+        let uniqueVals = [...new Set(p.values)]
+
+        if(uniqueVals.length === 1)
+          return uniqueVals[0];
+        else return null;
+      }
+    }
+  }
 
   getPositionsData(){
     
@@ -205,16 +220,24 @@ export class HedgingMarkComponent implements OnInit {
     
     this.oCols = Object.keys(this.overrideColMap);
 
-    this.columnDefs = <ColDef[]>[
-      ...POSITIONS_COLUMN_DEF,
+    let positionColDefs: ColDef[] = POSITIONS_COLUMN_DEF.filter(cd => !['cost', 'mark'].includes(cd.field));
+
+    let customColDefs: ColDef[] = [
+      { field: 'cost', type: 'abColDefNumber', aggFunc: 'Max' },
+      { field: 'mark', type: 'abColDefNumber', aggFunc: 'Max' }
+    ]
+
+    this.columnDefs = <AdaptableColumn[]>[
+      ...positionColDefs,
+      ...customColDefs,
       { field: 'markOverride', headerName: 'Mark Ovrd', editable: this.isEditable.bind(this), maxWidth: 141, type: 'abColDefNumber',
-      cellStyle:this.editableCellStyle.bind(this), width: 150, onCellClicked: this.onOverrideCellClicked.bind(this),
-      tooltipValueGetter: (p: ITooltipParams) => {
-        if(!p.node.group && p.data['state'] !== 'edit')
-          return "Mark Override Audit"
-        else return null;
-      } 
-    },
+        cellStyle:this.editableCellStyle.bind(this), width: 150, onCellClicked: this.onOverrideCellClicked.bind(this),
+        tooltipValueGetter: (p: ITooltipParams) => {
+          if(!p.node.group && p.data['state'] !== 'edit')
+            return "Mark Override Audit"
+          else return null;
+        }
+      },
       { field: 'markOverrideLevel', headerName: 'Mark Ovrd Lvl', editable: this.isEditable.bind(this), maxWidth: 141, type: 'abColDefString', 
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: (params) => {
@@ -291,7 +314,9 @@ export class HedgingMarkComponent implements OnInit {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
       },
 
-
+      aggFuncs:  {
+        'Max': this.maxAggFunc
+      }
     }
 
     this.adaptableOptions = {
@@ -490,7 +515,7 @@ export class HedgingMarkComponent implements OnInit {
         },
         Layout:{
           CurrentLayout: 'Hedging Mark Override Layout',
-          Revision: 46,
+          Revision: 49,
           Layouts: [{
             Name: 'Hedging Mark Override Layout',
             Columns: this.columnDefs.map(def => def.field),
@@ -509,6 +534,10 @@ export class HedgingMarkComponent implements OnInit {
 
             },
             RowGroupedColumns:['issuerShortName','asset'],
+            AggregationColumns: {
+              cost: true, mark: true
+            },
+            SuppressAggFuncInHeader: true,
             ColumnFilters: [{
               ColumnId: 'status',
               Predicate: {
