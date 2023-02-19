@@ -271,7 +271,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
                   context: ActionColumnContext
                 ) => {
                   if (context.rowNode.group) {
-                    if (context.rowNode.rowGroupColumn.getColId() === 'asset')
+                    if (context.rowNode?.rowGroupColumn?.getColId() === 'asset' && context.rowNode?.parent?.rowGroupColumn?.getColId() === 'issuerShortName')
                       return context.rowNode.groupData["state"] === 'edit'
                     else return true;
                   }
