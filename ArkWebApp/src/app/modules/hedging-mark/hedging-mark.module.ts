@@ -6,6 +6,7 @@ import { AgGridModule } from '@ag-grid-community/angular';
 import { MatIconModule } from '@angular/material/icon';
 import { HedgingMarkComponent } from './hedging-mark.component';
 import { HedgingMarkRoutingModule } from './hedging-mark-routing.module';
+import { HedgingMarkService } from './service/hedging-mark.service';
 
 
 
@@ -22,6 +23,9 @@ import { HedgingMarkRoutingModule } from './hedging-mark-routing.module';
     MatIconModule,
 
     MatCardModule
+  ],
+  providers:[
+    HedgingMarkService        // Limiting Hedging Mark service for this module only
   ]
 })
 export class HedgingMarkModule { }
