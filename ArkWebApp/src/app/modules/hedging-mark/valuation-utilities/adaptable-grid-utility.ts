@@ -24,7 +24,7 @@ export class ValutationAdaptableGridUtility {
             },
             Layout: {
               CurrentLayout: 'Hedging Mark Override Layout',
-              Revision: 49,
+              Revision: 55,
               Layouts: [{
                 Name: 'Hedging Mark Override Layout',
                 Columns: columnDefs.map(def => def.field),
@@ -44,7 +44,9 @@ export class ValutationAdaptableGridUtility {
                 },
                 RowGroupedColumns: ['issuerShortName', 'asset'],
                 AggregationColumns: {
-                  cost: true, mark: true
+                  cost: true, mark: true, 
+                  markOverride: true
+                  , markOverrideLevel: true, lastMarkOverrideDate: true, hedgingMark: true, hedgingMarkLevel: true, lastHedgingMarkDate: true
                 },
                 SuppressAggFuncInHeader: true,
                 ColumnFilters: [{

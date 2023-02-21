@@ -33,21 +33,52 @@ export class ValuationUtility {
       }
     }
 
-    maxAggFunc(p: IAggFuncParams){
-      if(p.rowNode.field === 'asset'){
-  
+    maxAggFunc(p: IAggFuncParams){  
+      if(p.rowNode.group && p.rowNode.field === 'asset'){
+        
+        if(p.rowNode?.groupData?.['state'] === 'edit'){
+          return;
+        }
+
         let colid: string = p.column.getColId();
-        if(['cost', 'mark'].includes(colid)){
+        if(['cost', 'mark', 'markOverride', 'markOverrideLevel', 'lastMarkOverrideDate', 'hedgingMark', 'hedgingMarkLevel', 'lastHedgingMarkDate'].includes(colid)){
   
           let uniqueVals = [...new Set(p.values)]
   
           if(uniqueVals.length === 1)
             return uniqueVals[0];
           else return null;
-        }
+        }  
       }
     }
 
+    levelCellStyle = (params: CellClassParams) => {
+      let value = params.value;
+      let colid: string = params.column.getColId();
+      let colidref: string;
+      let style = {};
+
+      if(colid === 'markOverrideLevel')
+        colidref = 'markOverride';
+      else if(colid === 'hedgingMarkLevel')
+        colidref = 'hedgingMark';
+
+      if(value === undefined)
+        value = null;
+
+      if(params.node.group && params.node.field === 'asset'){
+          let nodes = getNodes(params.node);
+          let uniqueVals = [...new Set(nodes.map(n => n[colidref]))].filter(n => n);
+
+          if(uniqueVals.length === 1){
+            style = { ...style, 'background': 'lightgreen' }
+          }
+          else if(uniqueVals.length > 1)
+            style = { ...style, 'background': '#f79a28'}
+      }
+      return style;
+    }
+    
     editableCellStyle = (params: CellClassParams) => {
 
         let value = params.value;
@@ -55,20 +86,20 @@ export class ValuationUtility {
         // Since we are updating all original values to null if not present. undefined can cause mismatch issues.
         if(value === undefined)
           value = null;
-    
+
+        let colid = params.column.getColId();
+        let style = {};
+
         if(params.node.group){
+
           if(params.node.groupData?.['state'] === 'edit'){
-            return {
-              'border-color': '#0590ca'
-            }
+            style = { ...style, 'border-color': '#0590ca' }
           }
-          else return null;
+          
+          return style;
         }
         else {
-    
-          let colid = params.column.getColId();
-          let style = {};
-    
+        
           if(params.data?.['state'] === 'edit'){
             style = { 'border-color': '#0590ca' }
           }

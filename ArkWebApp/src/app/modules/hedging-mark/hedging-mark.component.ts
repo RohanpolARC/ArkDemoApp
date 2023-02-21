@@ -152,27 +152,27 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
       {
         field: 'markOverride', headerName: 'Mark Ovrd', editable: this.isEditable.bind(this), maxWidth: 141, type: 'abColDefNumber',
         cellStyle: this.editableCellStyle.bind(this), width: 150, onCellClicked: this.onOverrideCellClick.bind(this),
-        tooltipValueGetter: this.tooltipValueGetter
+        tooltipValueGetter: this.tooltipValueGetter, aggFunc: 'Max'
       },
       {
         field: 'markOverrideLevel', headerName: 'Mark Ovrd Lvl', editable: this.isEditable.bind(this), maxWidth: 141, type: 'abColDefString',
-        cellEditor: 'autocompleteCellEditor',
-        cellEditorParams: this.cellEditorParams
+        cellEditor: 'autocompleteCellEditor', cellStyle: this.levelCellStyle.bind(this),
+        cellEditorParams: this.cellEditorParams, aggFunc: 'Max'
       },
-      { field: 'lastMarkOverrideDate', headerName: 'Last Mark Ovrd Date', maxWidth: 141, type: 'abColDefDate' },
+      { field: 'lastMarkOverrideDate', headerName: 'Last Mark Ovrd Date', maxWidth: 141, type: 'abColDefDate', aggFunc: 'Max' },
       {
         field: 'hedgingMark', headerName: 'Hedging Mark', type: 'abColDefNumber', editable: this.isEditable.bind(this),
         cellStyle: this.editableCellStyle.bind(this), width: 150, onCellClicked: this.onOverrideCellClick.bind(this),
-        tooltipValueGetter: this.tooltipValueGetter
+        tooltipValueGetter: this.tooltipValueGetter, aggFunc: 'Max'
       },
       {
         field: 'hedgingMarkLevel', headerName: 'Hedging Mark Lvl', editable: this.isEditable.bind(this), maxWidth: 141, type: 'abColDefString',
-        cellEditor: 'autocompleteCellEditor',
-        cellEditorParams: this.cellEditorParams
+        cellEditor: 'autocompleteCellEditor', cellStyle: this.levelCellStyle.bind(this),
+        cellEditorParams: this.cellEditorParams, aggFunc: 'Max'
       },
       {
         field: 'lastHedgingMarkDate', headerName: 'Last Hedging Mark Date', type: 'abColDefDate',
-        cellClass: 'dateUK', filter: false, sortable: false, width: 210
+        cellClass: 'dateUK', filter: false, sortable: false, width: 210, aggFunc: 'Max'
       },
       { field: 'isOverriden', headerName: 'Is Ovrd(Hedging Mark)', type: 'abColDefBoolean', width: 100, filter: false, sortable: false },
       { field: 'isOvrdMark', headerName: 'Is Ovrd', tpe: 'abColDefBoolean', maxWidth: 100 },
@@ -433,7 +433,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
   onCellValueChanged(params?: CellValueChangedEvent) {
 
     let colid: string = params.column.getColId();
-    let val: string | number = params.value;
+    let val: string | number = params.data[colid];
     let rows = []
     let lvl: string;
 
@@ -473,18 +473,18 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
       params.node.data[dateCol] = this.asOfDate;
       params.node.data[levelCol] = lvl;
 
-      // When leaf node is updated, lvl will be updated for corresponding level column. But it won't directly flow to all sibling nodes
-      if (lvl === 'Position') {
-        if (colid === 'markOverride')
-          this.updateAllSiblingsLevelToPosition(params.node, 'markOverrideLevel', this.gridApi)
-        else if (colid === 'hedgingMark')
-          this.updateAllSiblingsLevelToPosition(params.node, 'hedgingMarkLevel', this.gridApi)
-      }
+      // // When leaf node is updated, lvl will be updated for corresponding level column. But it won't directly flow to all sibling nodes
+      // if (lvl === 'Position') {
+      //   if (colid === 'markOverride')
+      //     this.updateAllSiblingsLevelToPosition(params.node, 'markOverrideLevel', this.gridApi)
+      //   else if (colid === 'hedgingMark')
+      //     this.updateAllSiblingsLevelToPosition(params.node, 'hedgingMarkLevel', this.gridApi)
+      // }
 
       this.gridApi.applyTransaction({ update: childNodes })
     }
     else if (colid === 'markOverrideLevel' || colid === 'hedgingMarkLevel') {
-      lvl = params.newValue;
+      lvl = <string>val;
       let childNodes = []
       let parentNode: RowNode;
 
@@ -498,12 +498,13 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
         })
         this.gridApi.applyTransaction({ update: childNodes })
       }
-      else {
-        this.updateAllSiblingsLevelToPosition(params.node, colid, this.gridApi);
-      }
+      // else {
+      //   this.updateAllSiblingsLevelToPosition(params.node, colid, this.gridApi);
+      // }
     }
 
     this.checkWarningsAfter(params, this.asOfDate, this.dataSvc)
+    this.gridApi.refreshClientSideRowModel('aggregate');
   }
 
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
