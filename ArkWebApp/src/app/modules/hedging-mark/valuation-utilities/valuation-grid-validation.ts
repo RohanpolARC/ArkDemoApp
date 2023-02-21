@@ -21,13 +21,18 @@ export class ValuationValidation {
         return false;
     }
     
-    public static checkWarningsBefore(p: CellValueChangedEvent, asOfDate: string, svc: DataService) {
+    public static checkWarningsBefore(p: CellValueChangedEvent, asOfDate: string, svc: DataService): boolean {
         let colid: string = p.column.getColId();
-        let val = p.value;
-        let node: RowNode = p.node;
-        let parent: RowNode = node.group ? node : node.parent;
+        let colidref: string;
+        if(colid === 'hedgingMarkLevel')
+            colidref = 'hedgingMark';
+        else if(colid === 'markOverrideLevel')
+            colidref = 'markOverride';
 
-        let childNodes: any[] = getNodes(parent);
+        let val = p.data[colid];
+        let node: RowNode = p.node;
+
+        let childNodes: any[] = getNodes(node);
         asOfDate = formatDate(new Date(asOfDate));
 
         if (node.group) {
@@ -37,16 +42,32 @@ export class ValuationValidation {
                 }).length;
 
                 if (cntPosition >= 1) {
-                    svc.setWarningMsg(`Warning: Once marked at position level, cannot be changed to asset level`);
+                    svc.setWarningMsg(`Warning: Once marked at position level, cannot be changed to asset level for the same mark date`);
                 }
             }
+
+            // Can update child rows level to asset only if all underlying rows have same value
+            if((['hedgingMarkLevel', 'markOverrideLevel'].includes(colid) && val === 'Asset')){
+                let nonEmptyVals = childNodes.map(n => n[colidref]).filter(n => n);
+                let uniqueVals = [...new Set(nonEmptyVals)];
+
+                if(uniqueVals.length === 1 && nonEmptyVals.length === childNodes.length){
+                    return true;
+                }
+                else{
+                    svc.setWarningMsg(`Warning: All positions for asset mark should have same value`);
+                    return false;
+                }
+
+            }
         }
+        return true;
     }
 
     public static checkWarningsAfter(p: CellValueChangedEvent, asOfDate: string, svc: DataService) {
 
         let colid: string = p.column.getColId();
-        let val = p.value;
+        let val = p.data[colid];
 
         let node: RowNode = p.node;
         let parent: RowNode = node.group ? node : node.parent;

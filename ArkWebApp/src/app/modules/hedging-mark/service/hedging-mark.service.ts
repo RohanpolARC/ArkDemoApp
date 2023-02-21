@@ -74,44 +74,50 @@ export class HedgingMarkService {
     let hedgingMarkDetails: HedgingMarkDetails
 
     let node = context.rowNode;
-    
-    if (node.group) {
 
-      childNodes = getNodes(node);
-      childNodes.forEach(cn => {
-        hedgingMarkOverrides.push(<HedgingMarkOverride>this.getSaveModel(cn, 'Hedging Mark'));
-        markOverrides.push(<MarkOverride>this.getSaveModel(cn, 'Mark Override'));
-      });
+    childNodes = getNodes(node);
+    childNodes.forEach(cn => {
+      hedgingMarkOverrides.push(<HedgingMarkOverride>this.getSaveModel(cn, 'Hedging Mark'));
+      markOverrides.push(<MarkOverride>this.getSaveModel(cn, 'Mark Override'));
+    });
 
-    }
-    else {
+    // if (node.group) {
 
-      // Hedging Mark
-      if (node.data?.['hedgingMarkLevel'] === 'Position') {
+    //   childNodes = getNodes(node);
+    //   childNodes.forEach(cn => {
+    //     hedgingMarkOverrides.push(<HedgingMarkOverride>this.getSaveModel(cn, 'Hedging Mark'));
+    //     markOverrides.push(<MarkOverride>this.getSaveModel(cn, 'Mark Override'));
+    //   });
 
-        let parent = node.parent;
-        childNodes = getNodes(parent);
+    // }
+    // else {
 
-        let positionLevelNodes = childNodes.filter(n => n['hedgingMarkLevel'] === 'Position')
+    //   // Hedging Mark
+    //   if (node.data?.['hedgingMarkLevel'] === 'Position') {
 
-        positionLevelNodes.forEach(cn => {
-          hedgingMarkOverrides.push(<HedgingMarkOverride>this.getSaveModel(cn, 'Hedging Mark', 'Position'));
-        })
-      }
+    //     let parent = node.parent;
+    //     childNodes = getNodes(parent);
 
-      // Mark override
-      if (node.data?.['markOverrideLevel'] === 'Position') {
+    //     let positionLevelNodes = childNodes.filter(n => n['hedgingMarkLevel'] === 'Position')
 
-        let parent = node.parent;
-        childNodes = getNodes(parent);
+    //     positionLevelNodes.forEach(cn => {
+    //       hedgingMarkOverrides.push(<HedgingMarkOverride>this.getSaveModel(cn, 'Hedging Mark', 'Position'));
+    //     })
+    //   }
 
-        let positionLevelNodes = childNodes.filter(cn => cn['markOverrideLevel'] === 'Position')
+    //   // Mark override
+    //   if (node.data?.['markOverrideLevel'] === 'Position') {
 
-        positionLevelNodes.forEach(cn => {
-          markOverrides.push(<MarkOverride>this.getSaveModel(cn, 'Mark Override', 'Position'));
-        })
-      }
-    }
+    //     let parent = node.parent;
+    //     childNodes = getNodes(parent);
+
+    //     let positionLevelNodes = childNodes.filter(cn => cn['markOverrideLevel'] === 'Position')
+
+    //     positionLevelNodes.forEach(cn => {
+    //       markOverrides.push(<MarkOverride>this.getSaveModel(cn, 'Mark Override', 'Position'));
+    //     })
+    //   }
+    // }
 
     hedgingMarkDetails = {
       MarkOverrides: markOverrides,

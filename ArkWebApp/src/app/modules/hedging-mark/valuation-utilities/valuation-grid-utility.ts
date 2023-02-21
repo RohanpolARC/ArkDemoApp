@@ -68,9 +68,10 @@ export class ValuationUtility {
 
       if(params.node.group && params.node.field === 'asset'){
           let nodes = getNodes(params.node);
+          let notEmptyRows = nodes.filter(n => n[colidref]);
           let uniqueVals = [...new Set(nodes.map(n => n[colidref]))].filter(n => n);
 
-          if(uniqueVals.length === 1){
+          if(uniqueVals.length === 1 && notEmptyRows.length === nodes.length){
             style = { ...style, 'background': 'lightgreen' }
           }
           else if(uniqueVals.length > 1)

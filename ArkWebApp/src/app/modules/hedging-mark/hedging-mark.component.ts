@@ -437,7 +437,10 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
     let rows = []
     let lvl: string;
 
-    this.checkWarningsBefore(params, this.asOfDate, this.dataSvc);
+    if(!this.checkWarningsBefore(params, this.asOfDate, this.dataSvc)){
+      // Not allowed to continue.
+      return;
+    };
 
     if (colid === 'markOverride' || colid === 'hedgingMark') {
 
