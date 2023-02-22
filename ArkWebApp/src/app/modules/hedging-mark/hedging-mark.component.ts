@@ -1,5 +1,5 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableColumn, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridOptions, GridReadyEvent, Module, GridApi, CellValueChangedEvent, RowNode, CellClickedEvent } from '@ag-grid-community/core';
+import { ColDef, GridOptions, GridReadyEvent, Module, GridApi, CellValueChangedEvent, RowNode, CellClickedEvent, TabToNextCellParams } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -201,6 +201,10 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
 
       components: {
         autocompleteCellEditor: MatAutocompleteEditorComponent
+      },
+      stopEditingWhenCellsLoseFocus: false,
+      tabToNextCell: (p: TabToNextCellParams) => {
+        return null;
       },
 
       context: {
