@@ -24,7 +24,7 @@ export class ValutationAdaptableGridUtility {
             },
             Layout: {
               CurrentLayout: 'Hedging Mark Override Layout',
-              Revision: 57,
+              Revision: 58,
               Layouts: [{
                 Name: 'Hedging Mark Override Layout',
                 Columns: columnDefs.map(def => def.field),

@@ -6,6 +6,7 @@ let POSITIONS_COLUMN_DEF:ColDef[] = [
   {field:'issuer',type:'abColDefString'}, 
   {field:'issuerShortName',type:'abColDefString'},
   {field:'asset',type:'abColDefString'},
+  {field: 'fund', type: 'abColDefString'},
   {field:'fundLegalEntity',type:'abColDefString'},
   {field:'fundHedging',type:'abColDefString'},
   {field:'fundStrategy',type:'abColDefString'},
