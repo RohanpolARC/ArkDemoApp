@@ -24,7 +24,7 @@ export class ValutationAdaptableGridUtility {
             },
             Layout: {
               CurrentLayout: 'Hedging Mark Override Layout',
-              Revision: 55,
+              Revision: 57,
               Layouts: [{
                 Name: 'Hedging Mark Override Layout',
                 Columns: columnDefs.map(def => def.field),
@@ -42,7 +42,7 @@ export class ValutationAdaptableGridUtility {
                   mark_override: 'right'
     
                 },
-                RowGroupedColumns: ['issuerShortName', 'asset'],
+                RowGroupedColumns: ['valuationMethod', 'issuerShortName', 'asset'],
                 AggregationColumns: {
                   cost: true, mark: true, 
                   markOverride: true

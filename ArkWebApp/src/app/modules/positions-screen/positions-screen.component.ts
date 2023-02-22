@@ -125,7 +125,7 @@ export class PositionsScreenComponent implements OnInit {
         },
         Layout:{
           CurrentLayout: 'Basic Positions Layout',
-          Revision: 6,
+          Revision: 9,
           Layouts: [{
             Name: 'Basic Positions Layout',
             Columns: this.columnDefs.map(def => def.field)

@@ -10,6 +10,7 @@ let POSITIONS_COLUMN_DEF:ColDef[] = [
   {field:'fundHedging',type:'abColDefString'},
   {field:'fundStrategy',type:'abColDefString'},
   {field:'portfolioName',type:'abColDefString'},
+  {field: 'valuationMethod', type: 'abColDefString'},
   {field:'ccyName',type:'abColDefString'},
   {field:'faceValue',type:'abColDefNumber' },
   {field:'faceValueFunded',type:'abColDefNumber' },
