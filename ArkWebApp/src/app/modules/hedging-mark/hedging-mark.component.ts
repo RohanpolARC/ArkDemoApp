@@ -100,10 +100,67 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
     this.rowData = data;
   }
 
+  clearEditingState(hideWarnings: boolean = false) {
+    let rowNode: RowNode[] = this.adaptableApi.gridApi.getAllRowNodes({ 
+      includeGroupRows: true, filterFn: (rowNode: RowNode) => {
+        if(rowNode.group){
+          return rowNode.groupData['state'] === 'edit'
+        }
+        else  return rowNode.data['state'] === 'edit'
+      }
+    });
+
+    if(rowNode.length > 1){
+      this.dataSvc.setWarningMsg(`Error clearing editing state. Please reload.`, 'Dismiss', 'ark-theme-snackbar-error')
+    }
+    else if(rowNode.length === 1){
+      this.clearRoworRowGroup(rowNode[0]);
+    }
+    else {
+      if(!hideWarnings)
+      this.dataSvc.setWarningMsg(`Editing state already cleared`, 'Dismiss', 'ark-theme-snackbar-normal');
+    }
+  }
+
+  clearRoworRowGroup(node: RowNode){
+    let childNodes = []
+    let oCols: string[] = Object.keys(this.overrideColMap);
+
+    if (node.group) {
+      childNodes = getNodes(node);
+    }
+    else {
+      childNodes = getNodes(node.parent);
+    }
+
+    childNodes = childNodes.map(cNode => {
+      oCols.forEach(col => {
+        cNode[col] = cNode[this.overrideColMap[col].original];
+      })
+      return cNode;
+    })
+
+    if (node.group) {
+      node.groupData['state'] = ' '
+      if (node.data) {
+        oCols.forEach(col => { node.data[col] = null })
+      }
+    }
+    else {
+      node.data['state'] = ' '
+    }
+
+    this.gridApi.applyTransaction({ update: childNodes });
+    this.lockEdit = false
+    this.gridApi.refreshCells({ force: true })
+  }
+
   getPositionsData() {
 
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if (isHit) {
+        this.clearEditingState(true);
+        this.gridApi.stopEditing();
         this.lockEdit = false
         this.gridApi.showLoadingOverlay();
 
@@ -142,8 +199,8 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
     let positionColDefs: ColDef[] = POSITIONS_COLUMN_DEF.filter(cd => !['cost', 'mark'].includes(cd.field));
 
     let customColDefs: ColDef[] = [
-      { field: 'cost', type: 'abColDefNumber', aggFunc: 'Max' },
-      { field: 'mark', type: 'abColDefNumber', aggFunc: 'Max' }
+      { field: 'cost', type: 'abColDefNumber', aggFunc: 'Max', maxWidth: 90 },
+      { field: 'mark', type: 'abColDefNumber', aggFunc: 'Max', maxWidth: 90 }
     ]
 
     this.columnDefs = <AdaptableColumn[]>[
@@ -174,8 +231,8 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
         field: 'lastHedgingMarkDate', headerName: 'Last Hedging Mark Date', type: 'abColDefDate',
         cellClass: 'dateUK', filter: false, sortable: false, width: 210, aggFunc: 'Max'
       },
+      { field: 'isOvrdMark', headerName: 'Is Ovrd', type: 'abColDefBoolean', maxWidth: 100 },
       { field: 'isOverriden', headerName: 'Is Ovrd(Hedging Mark)', type: 'abColDefBoolean', width: 100, filter: false, sortable: false },
-      { field: 'isOvrdMark', headerName: 'Is Ovrd', tpe: 'abColDefBoolean', maxWidth: 100 },
       { field: 'modifiedBy', type: 'abColDefString', filter: false, sortable: false },
       {
         field: 'modifiedOn',
@@ -275,8 +332,20 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
                   context: ActionColumnContext
                 ) => {
                   if (context.rowNode.group) {
-                    if (context.rowNode?.rowGroupColumn?.getColId() === 'asset' && context.rowNode?.parent?.rowGroupColumn?.getColId() === 'issuerShortName')
+
+                    let parentGroups: string[] = [];
+                    let node: RowNode = context.rowNode;
+                    while(node){
+                      parentGroups.push(node?.rowGroupColumn?.getColId());
+                      node = node.parent
+                    }
+
+                    let assetIdx: number = parentGroups.indexOf('asset');
+                    let issuerShortNameIdx: number = parentGroups.indexOf('issuerShortName');
+
+                    if(assetIdx >= 0 && issuerShortNameIdx >= 0 && assetIdx < issuerShortNameIdx){
                       return context.rowNode.groupData["state"] === 'edit'
+                    }
                     else return true;
                   }
                   return context.rowNode.data['state'] === 'edit'
@@ -353,38 +422,8 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
                   context: ActionColumnContext) => {
 
                   let node: RowNode = context.rowNode;
-                  let oCols: string[] = Object.keys(this.overrideColMap);
-                  let childNodes
-                  if (node.group) {
-                    childNodes = getNodes(node);
-                  }
-                  else {
-                    childNodes = getNodes(node.parent);
-                  }
+                  this.clearRoworRowGroup(node);
 
-                  childNodes = childNodes.map(cNode => {
-
-
-                    oCols.forEach(col => {
-                      cNode[col] = cNode[this.overrideColMap[col].original];
-                    })
-
-                    return cNode;
-                  })
-
-                  if (node.group) {
-                    node.groupData['state'] = ' '
-                    if (node.data) {
-                      oCols.forEach(col => { node.data[col] = null })
-                    }
-                  }
-                  else {
-                    node.data['state'] = ' '
-                  }
-
-                  this.gridApi.applyTransaction({ update: childNodes });
-                  this.lockEdit = false
-                  this.gridApi.refreshCells({ force: true })
                 },
                 hidden: (
                   button: AdaptableButton<ActionColumnContext>,

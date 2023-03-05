@@ -7,6 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { HedgingMarkComponent } from './hedging-mark.component';
 import { HedgingMarkRoutingModule } from './hedging-mark-routing.module';
 import { HedgingMarkService } from './service/hedging-mark.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 
@@ -22,6 +24,9 @@ import { HedgingMarkService } from './service/hedging-mark.service';
     AgGridModule,
     MatIconModule,
 
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
     MatCardModule
   ],
   providers:[

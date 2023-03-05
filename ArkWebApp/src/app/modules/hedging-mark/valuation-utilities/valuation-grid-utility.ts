@@ -34,21 +34,30 @@ export class ValuationUtility {
     }
 
     maxAggFunc(p: IAggFuncParams){  
-      if(p.rowNode.group && p.rowNode.field === 'asset'){
+      if(p.rowNode.group){
         
-        if(p.rowNode?.groupData?.['state'] === 'edit'){
-          return;
+        let parentGroups: string[] = [];
+        let node: RowNode = p.rowNode;
+        while(node){
+          parentGroups.push(node?.rowGroupColumn?.getColId());
+          node = node.parent
         }
-
-        let colid: string = p.column.getColId();
-        if(['cost', 'mark', 'markOverride', 'markOverrideLevel', 'lastMarkOverrideDate', 'hedgingMark', 'hedgingMarkLevel', 'lastHedgingMarkDate'].includes(colid)){
+        if(parentGroups.includes('asset')){
+          
+          if(p.rowNode?.groupData?.['state'] === 'edit'){
+            return;
+          }
   
-          let uniqueVals = [...new Set(p.values)]
-  
-          if(uniqueVals.length === 1)
-            return uniqueVals[0];
-          else return null;
-        }  
+          let colid: string = p.column.getColId();
+          if(['cost', 'mark', 'markOverride', 'markOverrideLevel', 'lastMarkOverrideDate', 'hedgingMark', 'hedgingMarkLevel', 'lastHedgingMarkDate'].includes(colid)){
+    
+            let uniqueVals = [...new Set(p.values)]
+    
+            if(uniqueVals.length === 1)
+              return uniqueVals[0];
+            else return null;
+          }    
+        }
       }
     }
 
@@ -66,16 +75,29 @@ export class ValuationUtility {
       if(value === undefined)
         value = null;
 
-      if(params.node.group && params.node.field === 'asset'){
+
+
+      if(params.node.group){
+
+        let parentGroups: string[] = [];
+        let node: RowNode = params.node;
+        while(node){
+          parentGroups.push(node?.rowGroupColumn?.getColId());
+          node = node.parent
+        }
+
+        if(parentGroups.includes('asset')){
           let nodes = getNodes(params.node);
           let notEmptyRows = nodes.filter(n => n[colidref]);
+          let notEmptyLevelRows = nodes.filter(n => n[colid])
           let uniqueVals = [...new Set(nodes.map(n => n[colidref]))].filter(n => n);
 
-          if(uniqueVals.length === 1 && notEmptyRows.length === nodes.length){
+          if(uniqueVals.length === 1 && notEmptyRows.length === nodes.length && nodes.length === notEmptyLevelRows.length){
             style = { ...style, 'background': 'lightgreen' }
           }
-          else if(uniqueVals.length > 1)
+          else if(uniqueVals.length > 1 && nodes.length === notEmptyLevelRows.length)
             style = { ...style, 'background': '#f79a28'}
+        }
       }
       return style;
     }
