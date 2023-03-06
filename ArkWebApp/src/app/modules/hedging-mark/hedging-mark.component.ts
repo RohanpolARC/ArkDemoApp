@@ -123,6 +123,8 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
   }
 
   clearRoworRowGroup(node: RowNode){
+    this.gridApi.stopEditing(true);
+
     let childNodes = []
     let oCols: string[] = Object.keys(this.overrideColMap);
 
@@ -160,7 +162,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if (isHit) {
         this.clearEditingState(true);
-        this.gridApi.stopEditing();
+        this.gridApi.stopEditing(true);
         this.lockEdit = false
         this.gridApi.showLoadingOverlay();
 
