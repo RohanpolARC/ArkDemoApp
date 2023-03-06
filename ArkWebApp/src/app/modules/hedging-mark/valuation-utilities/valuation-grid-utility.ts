@@ -20,8 +20,14 @@ export class ValuationUtility {
     }
 
     tooltipValueGetter = (p: ITooltipParams) => {
-      if (!p.node.group && p.data['state'] !== 'edit')
-        return "Mark Override Audit"
+      let col: string = p.column.getDefinition().headerName;
+      if (!p.node.group && p.data['state'] !== 'edit'){
+        if(col === 'Mark Ovrd')
+          return "Mark Override Audit"
+        else if(col === 'Hedging Mark')
+          return "Hedging Mark Audit"
+        else return null;
+      }
       else return null;
     }
     
