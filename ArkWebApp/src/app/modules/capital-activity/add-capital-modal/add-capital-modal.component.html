@@ -63,24 +63,24 @@
           </button>
         </mat-form-field>
   
-        <mat-form-field appearance="outline" class="edit">
-          <mat-label>Issuer</mat-label>
-          <input type="text" matInput formControlName="issuerShortName" [matAutocomplete]="autoissuer" matAutocompletePosition="below">
-          <mat-error *ngIf="capitalActivityForm.get('issuerShortName').invalid">Please select issuer from the list</mat-error>
-          <mat-autocomplete #autoissuer="matAutocomplete" (optionSelected)='issuerSelect($event)'  panelWidth="auto" class="capital-autocomplete-panel" classList="capital-autocomplete-panel">
-            <mat-option
-              *ngFor="let ISS of issuerFilteredOptions | async"
-              [value]="ISS[1]"
-              (click)="setIssuerID(ISS)"
-            >
-              {{ISS[0]}}
-            </mat-option>
-          </mat-autocomplete>
-          <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('issuerShortName').reset();
-          selectedIssuerID = null">
-              <mat-icon>close</mat-icon>
-          </button>
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="edit" [ngStyle]="{'visibility': hideNonNAVFields ? 'hidden' : ''}">
+            <mat-label>Issuer</mat-label>
+            <input type="text" matInput formControlName="issuerShortName" [matAutocomplete]="autoissuer" matAutocompletePosition="below">
+            <mat-error *ngIf="capitalActivityForm.get('issuerShortName').invalid">Please select issuer from the list</mat-error>
+            <mat-autocomplete #autoissuer="matAutocomplete" (optionSelected)='issuerSelect($event)'  panelWidth="auto" class="capital-autocomplete-panel" classList="capital-autocomplete-panel">
+              <mat-option
+                *ngFor="let ISS of issuerFilteredOptions | async"
+                [value]="ISS[1]"
+                (click)="setIssuerID(ISS)"
+              >
+                {{ISS[0]}}
+              </mat-option>
+            </mat-autocomplete>
+            <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="capitalActivityForm.get('issuerShortName').reset();
+            selectedIssuerID = null">
+                <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
   
       </div>
   
@@ -132,7 +132,7 @@
           </button>
         </mat-form-field>
   
-        <mat-form-field appearance="outline" class="edit">
+        <mat-form-field appearance="outline" class="edit" [ngStyle]="{'visibility': hideNonNAVFields ? 'hidden' : ''}">
           <mat-label>Asset</mat-label>
           <input type="text" matInput formControlName="asset" [matAutocomplete]="autoAsset" matAutocompletePosition="below">
           <mat-error *ngIf="capitalActivityForm.get('asset').invalid">Please select asset from the list</mat-error>
@@ -168,7 +168,7 @@
   
         <ng-container *ngIf="data.actionType !== 'LINK-ADD'">
   
-          <mat-form-field appearance="outline" class="edit">
+          <mat-form-field appearance="outline" class="edit" [ngStyle]="{'visibility': hideNonNAVFields ? 'hidden' : ''}">
             <mat-label>
               Position Currency
             </mat-label>
@@ -190,23 +190,25 @@
   
         </ng-container>
   
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <mat-form-field appearance="outline" style="width: calc(60%);">
-            <mat-label>FX Rate  
-              <ng-container *ngIf="placeHolderGIR"> ({{ placeHolderGIR }})</ng-container>            
-            </mat-label>
-            <input type="number" (blur)=onBlurForLink() matInput formControlName="fxRate" />
-            <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('fxRate').reset()">
-                <mat-icon>close</mat-icon>
-            </button>
-          </mat-form-field>   
+        <div [ngStyle]="{'visibility': hideNonNAVFields ? 'hidden' : ''}">
+          <div style="display: flex; justify-content: space-between; align-items: center;" >
+            <mat-form-field appearance="outline" style="width: calc(60%);">
+              <mat-label>FX Rate
+                <ng-container *ngIf="placeHolderGIR"> ({{ placeHolderGIR }})</ng-container>
+              </mat-label>
+              <input type="number" (blur)=onBlurForLink() matInput formControlName="fxRate" />
+              <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('fxRate').reset()">
+                  <mat-icon>close</mat-icon>
+              </button>
+            </mat-form-field>
           
           
-            <div style="display: flex; flex-direction: column; font-size: 11px; margin-bottom: 1.25em;">
-              <mat-checkbox formControlName="fxRateOverride" [color]="'primary'" [labelPosition]="'after'">Override GIR</mat-checkbox>
-              
-              <div *ngIf="fxRateSource && capitalActivityForm.get('fxRateOverride').value">&nbsp;Source: {{ fxRateSource }}</div>
-            </div>
+              <div style="display: flex; flex-direction: column; font-size: 11px; margin-bottom: 1.25em;">
+                <mat-checkbox formControlName="fxRateOverride" [color]="'primary'" [labelPosition]="'after'">Override GIR</mat-checkbox>
+          
+                <div *ngIf="fxRateSource && capitalActivityForm.get('fxRateOverride').value">&nbsp;Source: {{ fxRateSource }}</div>
+              </div>
+          </div>
         </div>
   
         <mat-form-field appearance="outline" class="edit">

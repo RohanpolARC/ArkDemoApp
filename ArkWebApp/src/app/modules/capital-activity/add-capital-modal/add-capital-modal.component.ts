@@ -8,7 +8,7 @@ import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import * as moment from 'moment';
 import { UpdateConfirmComponent } from '../update-confirm/update-confirm.component';
 import { Observable } from 'rxjs';
-import { startWith, map, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { startWith, map, debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { ColDef, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 
@@ -77,6 +77,7 @@ export class AddCapitalModalComponent implements OnInit{
   linkStatus
   fxRateSource: string;
   posCcyChangeMsg: string = 'Rate will flow to Asset GIR only if position currency matches that on investment side'
+  hideNonNAVFields: boolean;
 
   validateField(options: string[], control: AbstractControl, field: string): string | null{
       //  Validates individual fields and returns fetched value if it's an allowed value.
@@ -137,19 +138,22 @@ export class AddCapitalModalComponent implements OnInit{
     let FX: boolean = (fxRate !== null)
     let LA: boolean = (localAmount !== null)
 
+    if(capitalType === 'NAV'){
+      return (CD && VD && FH && CT && CST && CCY && TA) ? { validated: true} : { validated: false }
+    }
+    
     if(this.data.actionType === 'LINK-ADD')
       return ((CD && VD && FH && CT && CST && CCY && TA && (((ISN && AS)|| NR || ISN) && ISN_AS_NR) && FX && LA)) ? { 
         validated : true 
       }: { 
         validated : false
-      };
+    };
     else if(this.data.actionType === 'ADD' || this.data.actionType === 'EDIT')
       return (CD && VD && FH && CT && CST && CCY && TA && POSCcy && (((ISN && AS)|| NR || ISN) && ISN_AS_NR)) ? { 
         validated : true 
       }: { 
         validated : false
-      };
-
+    };
     return {
       validated: false
     }
@@ -404,6 +408,23 @@ export class AddCapitalModalComponent implements OnInit{
   }
 
   changeListeners(): void{
+
+    this.subscriptions.push(this.capitalActivityForm.get('capitalType').valueChanges.pipe(
+      debounceTime(300), distinctUntilChanged(), 
+      tap((capitalType: any) => {
+        if(capitalType === 'NAV'){
+          this.capitalActivityForm.get('issuerShortName').reset();
+          this.capitalActivityForm.get('asset').reset();
+          this.capitalActivityForm.get('posCcy').reset();
+          this.capitalActivityForm.get('fxRate').reset();
+          this.capitalActivityForm.get('fxRateOverride').reset();
+
+          this.hideNonNAVFields = true;
+        }
+        else 
+          this.hideNonNAVFields = false;
+      })
+    ).subscribe())
 
     this.subscriptions.push(this.capitalActivityForm.get('fxRate').valueChanges.pipe(
       debounceTime(300),
