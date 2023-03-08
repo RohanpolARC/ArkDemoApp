@@ -32,19 +32,19 @@
 
                 <mat-form-field class="form-field" appearance="outline">
                     <mat-label>Commitment Amount</mat-label>
-                    <input matInput type="text" formControlName="commitmentAmount" readonly="readonly">
+                    <input matInput type="text" InputAmountNumber formControlName="commitmentAmount" readonly="readonly">
                     <div matPrefix *ngIf="form.get('commitmentAmount').value">&euro;</div>
                 </mat-form-field>
 
                 <mat-form-field class="form-field" appearance="outline">
                     <mat-label>Funded Amount</mat-label>
-                    <input matInput type="text" formControlName="fundedAmount" readonly="readonly">
+                    <input matInput type="text" InputAmountNumber formControlName="fundedAmount" readonly="readonly">
                     <div matPrefix *ngIf="form.get('commitmentAmount').value">&euro;</div>
                 </mat-form-field>
 
                 <mat-form-field class="form-field" appearance="outline">
                     <mat-label>Unfunded Amount</mat-label>
-                    <input matInput type="text" 
+                    <input matInput type="text" InputAmountNumber
                     formControlName="unfundedAmount" readonly="readonly">
                     <div matPrefix *ngIf="form.get('commitmentAmount').value">&euro;</div>
 
@@ -84,7 +84,7 @@
 
                 <mat-form-field class="form-field" appearance="outline">
                     <mat-label>To be funded amount</mat-label>
-                    <input matInput type="text" formControlName="tobeFundedAmount">
+                    <input matInput type="text" InputAmountNumber formControlName="tobeFundedAmount">
                 </mat-form-field>
 
                 <mat-form-field class="form-field" appearance="outline">
