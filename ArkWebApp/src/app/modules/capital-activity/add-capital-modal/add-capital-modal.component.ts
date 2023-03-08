@@ -16,6 +16,7 @@ import { dateFormatter, amountFormatter } from 'src/app/shared/functions/formatt
 import { LinkInvestorModalComponent } from '../link-investor-modal/link-investor-modal.component';
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { DataService } from 'src/app/core/services/data.service';
+import { getAmountNumber } from 'src/app/shared/functions/utilities';
 
 @Component({
   selector: 'app-add-capital-modal',
@@ -111,12 +112,12 @@ export class AddCapitalModalComponent implements OnInit{
     let currency: string = this.validateField(this.fundCcyOptions, control, 'fundCcy');
     let posCcy: string = this.validateField(this.positionCcyOptions, control, 'posCcy');
 
-    let totalAmount: number = control.get('totalAmount').value;
+    let totalAmount: number = getAmountNumber(control.get('totalAmount').value);
     let fxRate: number  = control.get('fxRate').value;
     
     // fxRateOverride will be always valid since it can be either true/false (checked/unchecked). So, not considering it here.
 
-    let localAmount: number = control.get('localAmount').value;
+    let localAmount: number = getAmountNumber(control.get('localAmount').value);
 
     let CD: boolean = (callDate !== null && callDate !== 'Invalid date')
     let VD: boolean = (valueDate !== null && valueDate !== 'Invalid date')
@@ -438,7 +439,7 @@ export class AddCapitalModalComponent implements OnInit{
 
       if(this.data.actionType === 'LINK-ADD'){
         this.capitalActivityForm.patchValue({
-          totalAmount: GIR * this.capitalActivityForm.get('localAmount').value
+          totalAmount: GIR * getAmountNumber(this.capitalActivityForm.get('localAmount').value)
         })
       }
     }))
@@ -467,6 +468,7 @@ export class AddCapitalModalComponent implements OnInit{
       }))
       
       this.subscriptions.push(this.capitalActivityForm.get('localAmount').valueChanges.subscribe(LA => {
+        LA = getAmountNumber(LA);
         this.capitalActivityForm.patchValue({
           totalAmount: LA * this.capitalActivityForm.get('fxRate').value
         })
@@ -696,7 +698,7 @@ export class AddCapitalModalComponent implements OnInit{
     this.capitalAct.capitalType = this.capitalActivityForm.get('capitalType').value;
     this.capitalAct.capitalSubType = this.capitalActivityForm.get('capitalSubType').value;
     this.capitalAct.fundCcy = this.capitalActivityForm.get('fundCcy').value;
-    this.capitalAct.totalAmount = this.capitalActivityForm.get('totalAmount').value;
+    this.capitalAct.totalAmount = getAmountNumber(this.capitalActivityForm.get('totalAmount').value);
     this.capitalAct.fundHedging = this.capitalActivityForm.get('fundHedging').value;
     this.capitalAct.issuerShortName = this.capitalActivityForm.get('issuerShortName').value;
     this.capitalAct.asset = this.capitalActivityForm.get('asset').value;
@@ -704,7 +706,7 @@ export class AddCapitalModalComponent implements OnInit{
     this.capitalAct.valueDate = new Date(moment(this.capitalAct.valueDate).format('YYYY-MM-DD'));
     this.capitalAct.callDate = new Date(moment(this.capitalAct.callDate).format('YYYY-MM-DD'));
 
-    this.capitalAct.localAmount = this.capitalActivityForm.get('localAmount').value;
+    this.capitalAct.localAmount = getAmountNumber(this.capitalActivityForm.get('localAmount').value);
     this.capitalAct.fxRate = this.capitalActivityForm.get('fxRate').value;
     this.capitalAct.fxRateOverride = this.capitalActivityForm.get('fxRateOverride').value;
     this.capitalAct.fxRateSource = this.fxRateSource;

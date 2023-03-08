@@ -63,7 +63,7 @@
           </button>
         </mat-form-field>
   
-          <mat-form-field appearance="outline" class="edit" [ngStyle]="{'visibility': hideNonNAVFields ? 'hidden' : ''}">
+          <mat-form-field appearance="outline" class="edit" [ngStyle]="{'display': hideNonNAVFields ? 'none' : ''}">
             <mat-label>Issuer</mat-label>
             <input type="text" matInput formControlName="issuerShortName" [matAutocomplete]="autoissuer" matAutocompletePosition="below">
             <mat-error *ngIf="capitalActivityForm.get('issuerShortName').invalid">Please select issuer from the list</mat-error>
@@ -118,7 +118,7 @@
           </mat-label>
   
           <input type="text" matInput required formControlName="fundCcy" [matAutocomplete]="autoFundCcy" matAutocompletePosition="below" [readonly]="capitalActivityForm.get('asset').value">
-          <mat-error *ngIf="capitalActivityForm.get('fundCcy').invalid">Please select fund hedging</mat-error>
+          <mat-error *ngIf="capitalActivityForm.get('fundCcy').invalid">Please select fund currency from the list</mat-error>
           <mat-autocomplete autoActiveFirstOption #autoFundCcy="matAutocomplete" panelWidth="auto">
             <mat-option
               *ngFor="let ccy of fundCcyFilteredOptions | async"
@@ -132,7 +132,7 @@
           </button>
         </mat-form-field>
   
-        <mat-form-field appearance="outline" class="edit" [ngStyle]="{'visibility': hideNonNAVFields ? 'hidden' : ''}">
+        <mat-form-field appearance="outline" class="edit" [ngStyle]="{'display': hideNonNAVFields ? 'none' : ''}">
           <mat-label>Asset</mat-label>
           <input type="text" matInput formControlName="asset" [matAutocomplete]="autoAsset" matAutocompletePosition="below">
           <mat-error *ngIf="capitalActivityForm.get('asset').invalid">Please select asset from the list</mat-error>
@@ -158,7 +158,7 @@
   
           <mat-form-field appearance="outline" class="edit">
             <mat-label>Local Amount </mat-label>
-            <input type="number" required matInput formControlName="localAmount" />
+            <input type="number" required matInput InputAmountNumber formControlName="localAmount" />
             <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('localAmount').reset()">
                 <mat-icon>close</mat-icon>
             </button>
@@ -174,7 +174,7 @@
             </mat-label>
   
             <input type="text" matInput required formControlName="posCcy" [matAutocomplete]="autoPosCcy" matAutocompletePosition="below" [readonly]="capitalActivityForm.get('asset').value">
-            <mat-error *ngIf="capitalActivityForm.get('posCcy').invalid">Please select fund hedging, issuer and asset</mat-error>
+            <mat-error *ngIf="capitalActivityForm.get('posCcy').invalid">Please select position currency from the list</mat-error>
             <mat-autocomplete autoActiveFirstOption #autoPosCcy="matAutocomplete" panelWidth="auto" (optionSelected)='positionCcySelect($event)'>
               <mat-option
                 *ngFor="let ccy of posCcyFilteredOptions | async"
@@ -190,7 +190,7 @@
   
         </ng-container>
   
-        <div [ngStyle]="{'visibility': hideNonNAVFields ? 'hidden' : ''}">
+        <div [ngStyle]="{'display': hideNonNAVFields ? 'none' : ''}">
           <div style="display: flex; justify-content: space-between; align-items: center;" >
             <mat-form-field appearance="outline" style="width: calc(60%);">
               <mat-label>FX Rate
@@ -204,7 +204,7 @@
           
           
               <div style="display: flex; flex-direction: column; font-size: 11px; margin-bottom: 1.25em;">
-                <mat-checkbox formControlName="fxRateOverride" [color]="'primary'" [labelPosition]="'after'">Override GIR</mat-checkbox>
+                <mat-checkbox formControlName="fxRateOverride"  [color]="'primary'" [labelPosition]="'after'">Override GIR</mat-checkbox>
           
                 <div *ngIf="fxRateSource && capitalActivityForm.get('fxRateOverride').value">&nbsp;Source: {{ fxRateSource }}</div>
               </div>
@@ -213,7 +213,7 @@
   
         <mat-form-field appearance="outline" class="edit">
           <mat-label> Total Amount (Fund Ccy) </mat-label>
-          <input type="number" required matInput formControlName="totalAmount" />
+          <input type="text" required matInput InputAmountNumber formControlName="totalAmount" />
           <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="capitalActivityForm.get('totalAmount').reset()">
               <mat-icon>close</mat-icon>
           </button>

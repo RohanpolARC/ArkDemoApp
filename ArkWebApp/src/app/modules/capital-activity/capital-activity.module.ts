@@ -24,6 +24,7 @@ import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
 import { DropzoneDirective } from './bulk-upload/dropzone.directive';
 import { CapitalActivityRoutingModule } from './capital-activity-routing.module';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { InputAmountNumberModule } from 'src/app/shared/modules/input-amount-number/input-amount-number.module';
 
 @NgModule({
   declarations: [
@@ -55,7 +56,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatAutocompleteModule,
     MatExpansionModule,
     MatTooltipModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+
+    InputAmountNumberModule
   ],
   exports:[CapitalActivityComponent]
 })

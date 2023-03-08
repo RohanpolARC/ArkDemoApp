@@ -95,7 +95,7 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
   
 @NgModule({  
   declarations: [  
-    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent, NoRowsOverlayComponent
+    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent, NoRowsOverlayComponent,
   ],  
   imports: [  
     MsalModule,
