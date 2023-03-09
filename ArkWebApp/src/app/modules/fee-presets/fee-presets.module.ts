@@ -22,6 +22,7 @@ import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Platform } from '@angular/cdk/platform';
 import { InputDateAdapter } from 'src/app/shared/providers/date-adapter';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { InputAmountNumberModule } from 'src/app/shared/modules/input-amount-number/input-amount-number.module';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatDialogModule,
     MatDatepickerModule,
     MatSelectModule,
-    MatTooltipModule
+    MatTooltipModule,
+    InputAmountNumberModule
   ],
   providers: [
     {

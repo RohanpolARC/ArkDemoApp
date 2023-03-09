@@ -153,7 +153,7 @@ export class FeePresetsComponent implements OnInit {
           }]
         },
         FormatColumn:{
-          Revision:13,
+          Revision:14,
           FormatColumns:[
 
 

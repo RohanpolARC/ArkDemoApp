@@ -59,7 +59,7 @@ export function getAmountStr(transformer: DecimalPipe, amount: number | string):
  */
 export function getAmountNumber(amount: string | number): number {
   
-  return Number(String(amount).replace(/,/g,''));
+  return Number(String(amount).replace(/[^0-9.-]/g, ''));
 }
 
 /**

@@ -20,6 +20,7 @@ export class FeePresetsService {
   AMOUNT_COLUMNS = [
     'commitment',
     'currentCapitalCalled',
+    'financingCommitment',
     'otherExpensesFixed',
     'maxCapitalDeploymentPerMonth',
     'financingMaxCapitalDeploymentPerMonth'
@@ -31,7 +32,6 @@ export class FeePresetsService {
   ]
 
   NON_AMOUNT_2DEC_COLUMNS= [
-    'financingCommitment',
     'financingStage1Ratio',
     'financingStage2Ratio',
     'financingStage3Ratio',

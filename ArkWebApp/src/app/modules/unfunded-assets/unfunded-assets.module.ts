@@ -16,6 +16,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MatCardModule } from '@angular/material/card';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
+import { InputAmountNumberModule } from 'src/app/shared/modules/input-amount-number/input-amount-number.module';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    InputAmountNumberModule
   ],
   providers:[
     UnfundedAssetsService,
