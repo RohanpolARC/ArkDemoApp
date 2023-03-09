@@ -20,6 +20,7 @@ import { HedgingMarkDetails } from './valuation-utilities/valuation-model';
 import { ValuationValidation } from './valuation-utilities/valuation-grid-validation';
 import { ValutationAdaptableGridUtility } from './valuation-utilities/adaptable-grid-utility';
 import { HedgingMarkService } from './service/hedging-mark.service';
+import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 
 let overrideColMap: {
   [col: string] : {
@@ -368,35 +369,52 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
 
                   let node: RowNode = context.rowNode
 
-                  if (!node.data?.['hedgingMark'] && node.data?.['hedgingMark'] !== 0 && !node.data?.['markOverride'] && node.data?.['markOverride'] !== 0) {
-                    if(node.data?.['hedgingMarkLevel'] === 'Position' || node.data?.['markOverrideLevel'] === 'Position'){
+                  if(node.data?.['hedgingMark'] === "" || node.data?.['markOverride'] === ""){
 
-                      let childNodes = getNodes(node);
-                      let nonEmptyHMVals = childNodes.map(n => n['hedgingMark']).filter(n => n);
-                      let nonEmptyMVals = childNodes.map(n => n['markOverride']).filter(n => n);
-                      if(nonEmptyHMVals.length + nonEmptyMVals.length < 1){
-                        this.dataSvc.setWarningMsg(`Empty value cannot be provided`, `Dismiss`, `ark-theme-snackbar-warning`);
-                        return;  
+                    const dialogRef = this.dialog.open(ConfirmationPopupComponent, {
+                      data: { confirmText: `Are you sure you want to clear override for this date ?` }
+                    })
+
+                    this.subscriptions.push(dialogRef.afterClosed().subscribe((val) => {
+                      if(val?.['action'] === 'Confirm'){
+
+                      // if (!node.data?.['hedgingMark'] && node.data?.['hedgingMark'] !== 0 && !node.data?.['markOverride'] && node.data?.['markOverride'] !== 0) {
+                      //   if(node.data?.['hedgingMarkLevel'] === 'Position' || node.data?.['markOverrideLevel'] === 'Position'){
+
+                      //     let childNodes = getNodes(node);
+                      //     let nonEmptyHMVals = childNodes.map(n => n['hedgingMark']).filter(n => n);
+                      //     let nonEmptyMVals = childNodes.map(n => n['markOverride']).filter(n => n);
+                      //     if(nonEmptyHMVals.length + nonEmptyMVals.length < 1){
+                      //       this.dataSvc.setWarningMsg(`Empty value cannot be provided`, `Dismiss`, `ark-theme-snackbar-warning`);
+                      //       return;  
+                      //     }
+                      //   }
+                      //   else{
+                      //     this.dataSvc.setWarningMsg(`Empty value cannot be provided`, `Dismiss`, `ark-theme-snackbar-warning`);
+                      //     return  
+                      //   }
+                      // }
+                      // else {
+                      //   this.dataSvc.setWarningMsg(`Please wait while we save your changes`, `Dismiss`, `ark-theme-snackbar-normal`)
+                      // }
+                    
+                      // Applies the cell editor value to the grid if user hasn't come out of editing state before hitting save
+                      this.gridApi.stopEditing();
+                      setTimeout(() => {
+                        this.saveOverrides(context)
+                      }, 200)
+                      //We are wrapping entire logic to save overrides into setTimeout because the onCellValueChangeEvent sometime gets delayed 
+                      //which causes empty values to get passed in put request 
+
                       }
-                    }
-                    else{
-                      this.dataSvc.setWarningMsg(`Empty value cannot be provided`, `Dismiss`, `ark-theme-snackbar-warning`);
-                      return  
-                    }
+                    }))
                   }
                   else {
-                    this.dataSvc.setWarningMsg(`Please wait while we save your changes`, `Dismiss`, `ark-theme-snackbar-normal`)
+                    this.gridApi.stopEditing();
+                    setTimeout(() => {
+                      this.saveOverrides(context)
+                    }, 200)
                   }
-                
-                  // Applies the cell editor value to the grid if user hasn't come out of editing state before hitting save
-                  this.gridApi.stopEditing();
-                  setTimeout(() => {
-                    this.saveOverrides(context)
-                  }, 200)
-                  //We are wrapping entire logic to save overrides into setTimeout because the onCellValueChangeEvent sometime gets delayed 
-                  //which causes empty values to get passed in put request 
-
-
                 },
                 hidden: (
                   button: AdaptableButton<ActionColumnContext>,
@@ -499,17 +517,15 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
       return;
     };
 
-    if (colid === 'markOverride' || colid === 'hedgingMark') {
+    if(params.node.group){
+      lvl = 'Asset'
+    }
+    else lvl = 'Position'
 
-      if (params.node.group) {
-        lvl = 'Asset'
-      }
-      else
-        lvl = 'Position'
+    if (colid === 'markOverride' || colid === 'hedgingMark') {
 
       let dateCol: 'lastMarkOverrideDate' | 'lastHedgingMarkDate';
       let levelCol: 'markOverrideLevel' | 'hedgingMarkLevel';
-
 
       if (colid === 'markOverride') {
         dateCol = 'lastMarkOverrideDate';
@@ -524,22 +540,29 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
 
       childNodes = childNodes.map(cNode => {
         cNode[colid] = val;
-        cNode[dateCol] = this.asOfDate;
-        cNode[levelCol] = lvl;
 
+        // Only update level if it is not set already.
+        if(!cNode[levelCol])
+          cNode[levelCol] = lvl;
+  
+        // Don't set asOfDate to lastDate if value is cleared. Clear the level when clearing the value. 
+        if(val === ""){
+          cNode[levelCol] = null;
+        }
+        else{
+          cNode[dateCol] = this.asOfDate;
+        }
         return cNode;
       })
 
-      params.node.data[dateCol] = this.asOfDate;
-      params.node.data[levelCol] = lvl;
-
-      // // When leaf node is updated, lvl will be updated for corresponding level column. But it won't directly flow to all sibling nodes
-      // if (lvl === 'Position') {
-      //   if (colid === 'markOverride')
-      //     this.updateAllSiblingsLevelToPosition(params.node, 'markOverrideLevel', this.gridApi)
-      //   else if (colid === 'hedgingMark')
-      //     this.updateAllSiblingsLevelToPosition(params.node, 'hedgingMarkLevel', this.gridApi)
-      // }
+      if(params.node.group){
+        params.node.data[dateCol] = this.asOfDate;
+        if(val === ""){
+          params.node.data[levelCol] = null;
+        }
+        else if(!params.node.data[levelCol])
+          params.node.data[levelCol] = lvl;  
+      }
 
       this.gridApi.applyTransaction({ update: childNodes })
     }
@@ -558,9 +581,6 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
         })
         this.gridApi.applyTransaction({ update: childNodes })
       }
-      // else {
-      //   this.updateAllSiblingsLevelToPosition(params.node, colid, this.gridApi);
-      // }
     }
 
     this.checkWarningsAfter(params, this.asOfDate, this.dataSvc)

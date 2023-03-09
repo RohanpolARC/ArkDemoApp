@@ -46,20 +46,20 @@ export class ValuationValidation {
                 }
             }
 
-            // Can update child rows level to asset only if all underlying rows have same value
-            if((['hedgingMarkLevel', 'markOverrideLevel'].includes(colid) && val === 'Asset')){
-                let nonEmptyVals = childNodes.map(n => n[colidref]).filter(n => n);
-                let uniqueVals = [...new Set(nonEmptyVals)];
+            // // Can update child rows level to asset only if all underlying rows have same value
+            // if((['hedgingMarkLevel', 'markOverrideLevel'].includes(colid) && val === 'Asset')){
+            //     let nonEmptyVals = childNodes.map(n => n[colidref]).filter(n => n);
+            //     let uniqueVals = [...new Set(nonEmptyVals)];
 
-                if(uniqueVals.length === 1 && nonEmptyVals.length === childNodes.length){
-                    return true;
-                }
-                else{
-                    svc.setWarningMsg(`Warning: All positions for asset mark should have same value`);
-                    return false;
-                }
+            //     if(uniqueVals.length === 1 && nonEmptyVals.length === childNodes.length){
+            //         return true;
+            //     }
+            //     else{
+            //         svc.setWarningMsg(`Warning: All positions for asset mark should have same value`);
+            //         return false;
+            //     }
 
-            }
+            // }
         }
         return true;
     }

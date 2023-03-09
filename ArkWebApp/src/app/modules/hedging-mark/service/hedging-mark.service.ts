@@ -3,9 +3,7 @@ import { GridApi, RowNode } from '@ag-grid-community/core';
 import { Injectable } from '@angular/core';
 import { formatDate } from 'src/app/shared/functions/formatter';
 import { getNodes } from '../../capital-activity/utilities/functions';
-import { HedgingMarkModule } from '../hedging-mark.module';
 import { HedgingMarkDetails, HedgingMarkOverride, MarkOverride } from '../valuation-utilities/valuation-model';
-
 
 type SAVE_TYPE = 'Hedging Mark' | 'Mark Override';
 type LEVEL_TYPE = 'Position' | 'Asset';
@@ -26,7 +24,7 @@ export class HedgingMarkService {
         PositionId: cn['positionId'] as number,
         AssetId: cn['assetId'] as number,
         Level: level ?? cn?.['hedgingMarkLevel'],
-        HedgingMark: cn?.['hedgingMark'],
+        HedgingMark: cn?.['hedgingMark'] === "" ? null : cn?.['hedgingMark'],
         LastHedgingMarkDate: lastHedgingMarkDate === 'NaN/NaN/NaN' ? null : lastHedgingMarkDate
       }
       return ovrHM;
@@ -38,7 +36,7 @@ export class HedgingMarkService {
         PositionId: cn['positionId'] as number,
         AssetId: cn['assetId'] as number,
         Level: level ?? cn?.['markOverrideLevel'],
-        MarkOverride: cn?.['markOverride'],
+        MarkOverride: cn?.['markOverride'] === "" ? null : cn?.['markOverride'],
         LastMarkOverrideDate: lastMarkOverrideDate === 'NaN/NaN/NaN' ? null : lastMarkOverrideDate
       }
       return ovrM;
