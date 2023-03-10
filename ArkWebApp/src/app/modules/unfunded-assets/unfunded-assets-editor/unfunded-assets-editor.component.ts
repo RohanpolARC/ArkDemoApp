@@ -8,7 +8,7 @@ import { Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
-import { getAmountNumber, getAmountStr, getMomentDate, _filter } from 'src/app/shared/functions/utilities';
+import { getAmountNumber, getMomentDate, _filter } from 'src/app/shared/functions/utilities';
 import { UnfundedAsset } from 'src/app/shared/models/UnfundedAssetModel';
 
 @Component({
@@ -67,7 +67,7 @@ export class UnfundedAssetsEditorComponent implements OnInit {
     }
 
     isCcyValid = this.ccyOptions.includes(model.ccy)
-    istobefundedAmountValid = !isNaN(getAmountNumber(model.tobefundedAmount));
+    istobefundedAmountValid = !isNaN(model.tobefundedAmount);
     isfundingDateValid = !!model.fundingDate && (String(model.fundingDate) !== 'Invalid Date')
 
     return isAssetValid && isIssuerValid && isCcyValid && istobefundedAmountValid && isfundingDateValid ? { isValid: true } : { isValid: false};
@@ -102,11 +102,11 @@ export class UnfundedAssetsEditorComponent implements OnInit {
       this.form.patchValue({
         asset: asset,
         issuerShortName: issuerShortName,
-        commitmentAmount: getAmountStr(this.decimalPipe, commitmentAmount),
+        commitmentAmount: commitmentAmount,
         ccy: ccy,
-        fundedAmount: getAmountStr(this.decimalPipe, fundedAmount),
-        unfundedAmount: getAmountStr(this.decimalPipe, unfundedAmount),
-        tobeFundedAmount: getAmountStr(this.decimalPipe, tobefundedAmount),
+        fundedAmount: fundedAmount,
+        unfundedAmount: unfundedAmount,
+        tobeFundedAmount: tobefundedAmount,
         fundingDate: fundingDate
       }, {
         emitEvent: true
@@ -181,9 +181,9 @@ export class UnfundedAssetsEditorComponent implements OnInit {
 
         this.form.patchValue({
           asset: this.assetRef[idx]['asset'],
-          commitmentAmount: getAmountStr(this.decimalPipe, this.assetRef[idx]['commitmentAmount']),
-          fundedAmount: getAmountStr(this.decimalPipe, this.assetRef[idx]['fundedAmount']),
-          unfundedAmount: getAmountStr(this.decimalPipe, this.assetRef[idx]['unfundedAmount']),
+          commitmentAmount: this.assetRef[idx]['commitmentAmount'],
+          fundedAmount: this.assetRef[idx]['fundedAmount'],
+          unfundedAmount: this.assetRef[idx]['unfundedAmount'],
           tobeFundedAmount: null,
           fundingDate: null,
           ccy: this.assetRef[idx]['ccy']

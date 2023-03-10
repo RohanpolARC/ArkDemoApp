@@ -1,6 +1,6 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
-import { throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
 import { IRRCalcParams, PortfolioModellerCalcParams, VPortfolioModel } from 'src/app/shared/models/IRRCalculationsModel';
@@ -41,7 +41,7 @@ export class IRRCalcService {
 
   constructor(private http: HttpClient) { }
 
-  public getIRRPositions(requestedDate: string, modelID?: number){
+  public getIRRPositions(requestedDate: string, modelID?: number): Observable<any[]>{
     return this.http.get<any[]>(`${APIConfig.IRR_POSITIONS_GET_API}/?searchDate=${requestedDate}&modelId=${modelID}`).pipe(
       catchError((ex) => throwError(ex)));
   }

@@ -186,6 +186,11 @@ export class PortfolioManagerComponent implements OnInit {
         }},
         cellStyle: this.getEditableCellStyle.bind(this)      
       },
+      {
+        field: 'valuationMethod',
+        editable: this.isEditable.bind(this), cellEditor: 'autocompleteCellEditor', 
+        cellEditorParams: () => { return { ...this.getUniqueParamsFromGrid('valuationMethod'), isStrict: true } }, cellStyle: this.getEditableCellStyle.bind(this)
+      },
       { field: "fundRecon", 
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
@@ -298,7 +303,7 @@ export class PortfolioManagerComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 14,
+          Revision: 15,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -317,6 +322,7 @@ export class PortfolioManagerComponent implements OnInit {
               "fundCcy",
               "fundAdmin",
               "portfolioAUMMethod",
+              'valuationMethod',
               "fundRecon",
               "legalEntityName",
               "lei",

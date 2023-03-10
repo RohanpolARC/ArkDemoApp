@@ -6,7 +6,7 @@ import { catchError, tap } from 'rxjs/operators';
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import { FeePresetsService } from 'src/app/core/services/FeePresets/fee-presets.service';
 import { formatDate } from 'src/app/shared/functions/formatter';
-import { getMomentDate } from 'src/app/shared/functions/utilities';
+import { getAmountNumber, getMomentDate } from 'src/app/shared/functions/utilities';
 import { FeedataFormComponent } from '../feedata-form/feedata-form.component';
 import { InvestmentdataFormComponent } from '../investmentdata-form/investmentdata-form.component';
 
@@ -64,6 +64,18 @@ export class PresetsFormComponent implements OnInit, AfterViewInit {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
+  getAmountFields(){
+    let feeData = this.feeForm.form.value;
+    return {
+      commitment: getAmountNumber(feeData?.['general']?.['commitment']),
+      currentCapitalCalled: getAmountNumber(feeData?.['general']?.['currentCapitalCalled']),
+      financingCommitment: getAmountNumber(feeData?.['financing']?.['financingCommitment']),
+      financingMaxCapitalDeploymentPerMonth: getAmountNumber(feeData?.['financing']?.['financingMaxCapitalDeploymentPerMonth']),
+      maxCapitalDeploymentPerMonth: getAmountNumber(feeData?.['capitalDeployment']?.['maxCapitalDeploymentPerMonth']),
+      otherExpensesFixed: getAmountNumber(feeData?.['other']?.['otherExpensesFixed'])
+    }
+  }
+
   onSubmit(){
 
     let feeData = this.feeForm.form.value;
@@ -81,7 +93,8 @@ export class PresetsFormComponent implements OnInit, AfterViewInit {
       },
       ...{
         entity: this.fundName
-      }
+      }, 
+      ...this.getAmountFields()
     }
 
     let dateFields: string[] = ['financingEndDate', 'financingStartDate', 'holdingDate', 'investmentDate', 'startDate', 'financingStage1EndDate', 'financingStage2EndDate', 'modifiedOn', 'createdOn'];

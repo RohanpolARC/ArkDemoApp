@@ -1,12 +1,15 @@
 <div class="parent">
     <div class="header">
         <div class="title">
-            Hedging Mark 
+            Valuation/Hedging Mark 
             <span *ngIf = "asOfDate" style="font-size: 1rem; font-weight: normal;">
                 ({{asOfDate | date:"dd/MM/yyyy" }})
             </span>
         </div>
 
+        <div class="action">
+            <button mat-icon-button matTooltip="Clear editing state" matTooltipClass="tooltip-style" (click)="clearEditingState()"><mat-icon class="material-icons-outlined">clear</mat-icon></button>
+        </div>
 
 
     </div>

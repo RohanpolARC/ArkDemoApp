@@ -15,6 +15,7 @@ export interface PortfolioMapping {
     fundCcy: string,
     fundAdmin: string,
     portfolioAUMMethod: string,
+    valuationMethod: string,
     fundRecon: string,
     legalEntityName: string,
     lei: string,

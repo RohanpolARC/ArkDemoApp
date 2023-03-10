@@ -1222,7 +1222,7 @@ export class PortfolioModellerComponent implements OnInit {
       this.asOfDate = asOfDate;
     }));
 
-    this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
+    this.subscriptions.push(this.dataSvc.filterApplyBtnState.pipe(first()).subscribe(isHit => {
       if(isHit){
         this.onReset()
         this.fetchIRRPostions();

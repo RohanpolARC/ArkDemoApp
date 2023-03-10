@@ -305,6 +305,15 @@ export class ApprovalComponent implements OnInit {
           isStrict: true
         }}
       },
+      { field: "valuationMethod",  type: 'abColDefString',
+        cellStyle: this.getCellStyle.bind(this, 'valuationMethod'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams:() => { return {
+          ...this.getUniqueParamsFromGrid('valuationMethod'),
+          isStrict: true
+        }}
+      },
       { field: "fundRecon",  type: 'abColDefString',
         cellStyle: this.getCellStyle.bind(this, 'fundRecon'),
         editable: this.isEditable.bind(this),
@@ -414,7 +423,7 @@ export class ApprovalComponent implements OnInit {
         },
         
         Layout: {
-          Revision: 19,
+          Revision: 20,
           CurrentLayout: 'Default Approval Layout',
           Layouts: [{
             Name: 'Default Approval Layout',
@@ -434,6 +443,7 @@ export class ApprovalComponent implements OnInit {
               "fundCcy",
               "fundAdmin",
               "portfolioAUMMethod",
+              'valuationMethod',
               "fundRecon",
               "legalEntityName",
               "lei",

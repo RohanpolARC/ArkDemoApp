@@ -64,7 +64,7 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
     }
 
     if(!(data.wsoPortfolioID && data.fund && data.fundLegalEntity && data.fundHedging && data.fundStrategy && (data.fundSMA === true || data.fundSMA === false) && 
-    data.fundInvestor && data.fundCcy && data.fundAdmin && data.portfolioAUMMethod &&
+    data.fundInvestor && data.fundCcy && data.fundAdmin && data.portfolioAUMMethod && data.valuationMethod &&
     (data.isCoinvestment === true || data.isCoinvestment === false) && 
     (data.excludeFxExposure === true || data.excludeFxExposure === false))){
       this.dataSvc.setWarningMsg('Please finish editing the mapping first', 'Dismiss', 'ark-theme-snackbar-warning')
@@ -75,31 +75,32 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
       this.dataSvc.setWarningMsg('No change in mapping', 'Dismiss', 'ark-theme-snackbar-warning')
       return
     }
-    let model: PortfolioMapping = <PortfolioMapping>{};
+    let m: PortfolioMapping = <PortfolioMapping>{};
 
-    model.mappingID = data.mappingID
-    model.fund = data.fund
-    model.fundLegalEntity = data.fundLegalEntity
-    model.fundHedging = data.fundHedging
-    model.fundStrategy = data.fundStrategy
-    model.fundPipeline2 = data.fundPipeline2
-    model.fundSMA = data.fundSMA
-    model.fundInvestor = data.fundInvestor
-    model.wsoPortfolioID = data.wsoPortfolioID
-    model.fundPipeline = data.fundPipeline
-    model.fundCcy = data.fundCcy
-    model.fundAdmin = data.fundAdmin
-    model.portfolioAUMMethod = data.portfolioAUMMethod
-    model.fundRecon = data.fundRecon
-    model.legalEntityName = data.legalEntityName
-    model.lei = data.lei
-    model.isCoinvestment = data.isCoinvestment
-    model.excludeFxExposure = data.excludeFxExposure
-    model.portfolioName = data.portfolioName
-    model.solvencyPortfolioName = data.solvencyPortfolioName
-    model.userName = this.dataSvc.getCurrentUserName()
+    m.mappingID = data.mappingID
+    m.fund = data.fund
+    m.fundLegalEntity = data.fundLegalEntity
+    m.fundHedging = data.fundHedging
+    m.fundStrategy = data.fundStrategy
+    m.fundPipeline2 = data.fundPipeline2
+    m.fundSMA = data.fundSMA
+    m.fundInvestor = data.fundInvestor
+    m.wsoPortfolioID = data.wsoPortfolioID
+    m.fundPipeline = data.fundPipeline
+    m.fundCcy = data.fundCcy
+    m.fundAdmin = data.fundAdmin
+    m.portfolioAUMMethod = data.portfolioAUMMethod
+    m.valuationMethod = data.valuationMethod
+    m.fundRecon = data.fundRecon
+    m.legalEntityName = data.legalEntityName
+    m.lei = data.lei
+    m.isCoinvestment = data.isCoinvestment
+    m.excludeFxExposure = data.excludeFxExposure
+    m.portfolioName = data.portfolioName
+    m.solvencyPortfolioName = data.solvencyPortfolioName
+    m.userName = this.dataSvc.getCurrentUserName()
 
-    this.subscriptions.push(this.portfolioManagerSvc.putPortfolioMapping(model).pipe(
+    this.subscriptions.push(this.portfolioManagerSvc.putPortfolioMapping(m).pipe(
     ).subscribe({
       next: resp => {
         if(resp.isSuccess){
