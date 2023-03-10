@@ -45,21 +45,6 @@ export class ValuationValidation {
                     svc.setWarningMsg(`Warning: Once marked at position level, cannot be changed to asset level for the same mark date`);
                 }
             }
-
-            // // Can update child rows level to asset only if all underlying rows have same value
-            // if((['hedgingMarkLevel', 'markOverrideLevel'].includes(colid) && val === 'Asset')){
-            //     let nonEmptyVals = childNodes.map(n => n[colidref]).filter(n => n);
-            //     let uniqueVals = [...new Set(nonEmptyVals)];
-
-            //     if(uniqueVals.length === 1 && nonEmptyVals.length === childNodes.length){
-            //         return true;
-            //     }
-            //     else{
-            //         svc.setWarningMsg(`Warning: All positions for asset mark should have same value`);
-            //         return false;
-            //     }
-
-            // }
         }
         return true;
     }

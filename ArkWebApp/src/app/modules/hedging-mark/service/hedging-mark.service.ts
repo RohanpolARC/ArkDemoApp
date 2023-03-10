@@ -79,44 +79,6 @@ export class HedgingMarkService {
       markOverrides.push(<MarkOverride>this.getSaveModel(cn, 'Mark Override'));
     });
 
-    // if (node.group) {
-
-    //   childNodes = getNodes(node);
-    //   childNodes.forEach(cn => {
-    //     hedgingMarkOverrides.push(<HedgingMarkOverride>this.getSaveModel(cn, 'Hedging Mark'));
-    //     markOverrides.push(<MarkOverride>this.getSaveModel(cn, 'Mark Override'));
-    //   });
-
-    // }
-    // else {
-
-    //   // Hedging Mark
-    //   if (node.data?.['hedgingMarkLevel'] === 'Position') {
-
-    //     let parent = node.parent;
-    //     childNodes = getNodes(parent);
-
-    //     let positionLevelNodes = childNodes.filter(n => n['hedgingMarkLevel'] === 'Position')
-
-    //     positionLevelNodes.forEach(cn => {
-    //       hedgingMarkOverrides.push(<HedgingMarkOverride>this.getSaveModel(cn, 'Hedging Mark', 'Position'));
-    //     })
-    //   }
-
-    //   // Mark override
-    //   if (node.data?.['markOverrideLevel'] === 'Position') {
-
-    //     let parent = node.parent;
-    //     childNodes = getNodes(parent);
-
-    //     let positionLevelNodes = childNodes.filter(cn => cn['markOverrideLevel'] === 'Position')
-
-    //     positionLevelNodes.forEach(cn => {
-    //       markOverrides.push(<MarkOverride>this.getSaveModel(cn, 'Mark Override', 'Position'));
-    //     })
-    //   }
-    // }
-
     hedgingMarkDetails = {
       MarkOverrides: markOverrides,
       HedgingMarkOverrides: hedgingMarkOverrides,

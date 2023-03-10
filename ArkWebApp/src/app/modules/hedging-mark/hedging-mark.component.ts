@@ -378,27 +378,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
                     this.subscriptions.push(dialogRef.afterClosed().subscribe((val) => {
                       if(val?.['action'] === 'Confirm'){
 
-                      // if (!node.data?.['hedgingMark'] && node.data?.['hedgingMark'] !== 0 && !node.data?.['markOverride'] && node.data?.['markOverride'] !== 0) {
-                      //   if(node.data?.['hedgingMarkLevel'] === 'Position' || node.data?.['markOverrideLevel'] === 'Position'){
-
-                      //     let childNodes = getNodes(node);
-                      //     let nonEmptyHMVals = childNodes.map(n => n['hedgingMark']).filter(n => n);
-                      //     let nonEmptyMVals = childNodes.map(n => n['markOverride']).filter(n => n);
-                      //     if(nonEmptyHMVals.length + nonEmptyMVals.length < 1){
-                      //       this.dataSvc.setWarningMsg(`Empty value cannot be provided`, `Dismiss`, `ark-theme-snackbar-warning`);
-                      //       return;  
-                      //     }
-                      //   }
-                      //   else{
-                      //     this.dataSvc.setWarningMsg(`Empty value cannot be provided`, `Dismiss`, `ark-theme-snackbar-warning`);
-                      //     return  
-                      //   }
-                      // }
-                      // else {
-                      //   this.dataSvc.setWarningMsg(`Please wait while we save your changes`, `Dismiss`, `ark-theme-snackbar-normal`)
-                      // }
-                    
-                      // Applies the cell editor value to the grid if user hasn't come out of editing state before hitting save
+                     // Applies the cell editor value to the grid if user hasn't come out of editing state before hitting save
                       this.gridApi.stopEditing();
                       setTimeout(() => {
                         this.saveOverrides(context)
