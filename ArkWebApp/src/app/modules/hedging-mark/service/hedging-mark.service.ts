@@ -118,6 +118,7 @@ export class HedgingMarkService {
 
     if (node.group) {
       node.groupData['state'] = ' '
+      node.data = node.data ?? {} // When empty values saved, there is no node.data object
       node.data['hedgingMark'] = node.data['lastHedgingMarkDate'] = node.data['lastMarkOverrideDate'] = node.data['markOverride'] = node.data['hedgingMarkLevel'] = node.data['markOverrideLevel'] = null;
     }
     else {

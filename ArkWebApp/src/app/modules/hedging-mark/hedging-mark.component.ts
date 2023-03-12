@@ -369,7 +369,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
 
                   let node: RowNode = context.rowNode
 
-                  if(node.data?.['hedgingMark'] === "" || node.data?.['markOverride'] === ""){
+                  if(node.data?.['hedgingMark'] === ""){
 
                     const dialogRef = this.dialog.open(ConfirmationPopupComponent, {
                       data: { confirmText: `Are you sure you want to clear override for this date ?` }
@@ -389,7 +389,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
                       }
                     }))
                   }
-                  else {
+                  else if(!node.data?.['hedgingMark'] || !node.data?.['markOverride']){
                     this.gridApi.stopEditing();
                     setTimeout(() => {
                       this.saveOverrides(context)
