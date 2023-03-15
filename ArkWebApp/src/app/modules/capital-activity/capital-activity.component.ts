@@ -98,7 +98,8 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'fundCcy', tooltipField: 'fundCcy', headerName: 'Fund Ccy', type: 'abColDefString'},
     { field: 'positionCcy', tooltipField: 'positionCcy', headerName: 'Position Ccy', type: 'abColDefString'},
     { field: 'amount', tooltipField: 'amount', headerName: 'Total', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-    { field: 'linkedAmount', tooltipField: 'linkedAmount', headerName: 'Linked Amount Base', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+    { field: 'linkedAmount', tooltipField: 'linkedAmount', headerName: 'Linked Amount', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+    { field: 'linkedAmountBase', tooltipField: 'linkedAmountBase', headerName: 'Linked Amount Base', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
     { field: 'totalBase', tooltipValueGetter: (params) => { return "Detailed View" }, headerName: 'Total Base', cellClass: 'ag-right-aligned-cell', onCellClicked: this.onTotalBaseClick.bind(this), 
       cellStyle: (params) => {
         if(params.node.group)
@@ -106,6 +107,8 @@ export class CapitalActivityComponent implements OnInit {
         return null;
       }, type: 'abColDefNumber'},
     { field: 'totalEur', headerName: 'Total Eur', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+    { field: 'break', headerName: 'Break',  cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
+    { field: 'breakBase', headerName: 'BreakBase', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
     { field: 'type', type: 'abColDefString'}
   ]
 
@@ -420,7 +423,7 @@ export class CapitalActivityComponent implements OnInit {
   
       userInterfaceOptions:{
         customDisplayFormatters:[
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['amount','linkedAmount','totalBase','totalEur'])
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['amount','linkedAmount','totalBase','totalEur', 'linkedAmountBase', 'break', 'breakBase'])
 
         ]
       },
@@ -438,7 +441,7 @@ export class CapitalActivityComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 11,
+          Revision: 13,
           Layouts:[{
             Name: 'Basic Investment Cashflow',
             Columns: [
@@ -454,8 +457,11 @@ export class CapitalActivityComponent implements OnInit {
               'positionCcy',
               'amount',
               'linkedAmount',
+              'linkedAmountBase',
               'totalBase',
               'totalEur',
+              'break',
+              'breakBase',
               'ActionLink'
             ],
             ColumnWidthMap:{
@@ -466,19 +472,21 @@ export class CapitalActivityComponent implements OnInit {
               'ActionLink': 'right'
             },
             AggregationColumns: {
+              total: 'sum',
               totalBase: 'sum',
               totalEur: 'sum',
               linkedAmount: 'sum',
+              linkedAmountBase: 'sum',
             }
           }]
         },
         FormatColumn:{
-          Revision:6,
+          Revision: 7,
           FormatColumns:[
             DATE_FORMATTER_CONFIG_ddMMyyyy(['cashDate']),
 
-            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['amount','linkedAmount','totalBase','totalEur'],2,['amountZeroFormat']),
-            AMOUNT_FORMATTER_CONFIG_Zero(['amount','linkedAmount','totalBase','totalEur'],2,['amountZeroFormat'])
+            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['amount','linkedAmount','totalBase','totalEur', 'linkedAmountBase', 'break', 'breakBase'],2,['amountZeroFormat']),
+            AMOUNT_FORMATTER_CONFIG_Zero(['amount','linkedAmount','totalBase','totalEur', 'linkedAmountBase', 'break', 'breakBase'],2,['amountZeroFormat'])
           ]
         }  
       }
