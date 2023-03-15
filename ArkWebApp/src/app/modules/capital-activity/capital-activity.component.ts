@@ -441,7 +441,7 @@ export class CapitalActivityComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 12,
+          Revision: 13,
           Layouts:[{
             Name: 'Basic Investment Cashflow',
             Columns: [
@@ -472,12 +472,11 @@ export class CapitalActivityComponent implements OnInit {
               'ActionLink': 'right'
             },
             AggregationColumns: {
+              total: 'sum',
               totalBase: 'sum',
               totalEur: 'sum',
               linkedAmount: 'sum',
               linkedAmountBase: 'sum',
-              break: 'sum',
-              breakBase: 'sum'
             }
           }]
         },
