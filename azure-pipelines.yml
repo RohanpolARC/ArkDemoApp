@@ -1,0 +1,29 @@
+pool:  
+  name: Azure Pipelines
+  demands: npm
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '14.x'
+  displayName: 'Install Node.js'
+
+- task: Npm@1
+  displayName: 'npm install'  
+  inputs:    
+    workingDir: ArkWebApp
+    verbose: false
+- task: Npm@1
+  displayName: 'Angular APP Run build'  
+  inputs:    
+    command: custom
+    workingDir: ArkWebApp
+    verbose: false    
+    customCommand: 'run ng build -- --configuration=uat'
+- task: ArchiveFiles@2
+  displayName: 'Archive files'  
+  inputs:    
+    rootFolderOrFile: 'ArkWebApp/dist/ArkWebApp'    
+    includeRootFolder: false
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish artifacts: drop'
