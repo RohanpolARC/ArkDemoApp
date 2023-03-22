@@ -69,6 +69,7 @@ export class PortfolioHistoryComponent implements OnInit {
   { headerName: "CostAmountLocal",field : 'costAmountLocal', type:'abColDefNumber'},
   { headerName: "FundedCostAmountLocal",field : 'fundedCostAmountLocal', type:'abColDefNumber'},
   { headerName: "Edited Going In Rate",field: 'fxRateBaseEffective', type:'abColDefNumber'},
+  { headerName: 'Edited Going In Rate Method', field:'fxRateEffectiveMethod',type:'abColDefString'},
   { headerName: "Modified By",  field: 'modifiedBy', type:'abColDefString'},
   { headerName: "Modified On",  
     field: "modifiedOn", 
@@ -88,6 +89,8 @@ export class PortfolioHistoryComponent implements OnInit {
   { headerName: 'GIR Override', field: 'isOverride', type: 'abColDefString' },
   { headerName: 'GIR Source', field: 'girSource', type: 'abColDfString' },
   { headerName: 'GIR SourceID', field: 'girSourceID', type: 'abColDefNumber' },
+  { headerName: 'GIR Date', field:'girDate',type:'abColDefDate'},
+  { headerName: 'GIR Editable', field:'isEditable',type:'abColDefBoolean'},
   { field:'uniqueID', type:'abColDefNumber'},
   { field: 'pgh_FXRateBaseEffective', headerName: 'Effective Going In Rate', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'}
 ];
@@ -265,7 +268,7 @@ export class PortfolioHistoryComponent implements OnInit {
       },
 
       Layout:{
-        Revision: 5,
+        Revision: 6,
         CurrentLayout: 'Basic Portfolio History',
         Layouts: [{
           Name: 'Basic Portfolio History',
@@ -279,6 +282,7 @@ export class PortfolioHistoryComponent implements OnInit {
             'positionCcy',
             'fundCcy',
             'fxRateBaseEffective',
+            'fxRateEffectiveMethod',
             'pgh_FXRateBaseEffective',
             'amount',
             'parAmount',
@@ -293,6 +297,7 @@ export class PortfolioHistoryComponent implements OnInit {
             'isOverride',
             'girSource',
             'girSourceID',
+            'girDate',
             'actionNew',
             'ActionDelete',
           ],
@@ -321,11 +326,11 @@ export class PortfolioHistoryComponent implements OnInit {
       },
 
       FormatColumn: {
-        Revision: 22,
+        Revision: 23,
         FormatColumns: [
           
-          BLANK_DATETIME_FORMATTER_CONFIG(['asOfDate', 'tradeDate', 'settleDate', 'modifiedOn']),
-          DATE_FORMATTER_CONFIG_ddMMyyyy(['asOfDate', 'tradeDate', 'settleDate']),
+          BLANK_DATETIME_FORMATTER_CONFIG(['asOfDate', 'tradeDate', 'settleDate', 'modifiedOn','girDate']),
+          DATE_FORMATTER_CONFIG_ddMMyyyy(['asOfDate', 'tradeDate', 'settleDate','girDate']),
           DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn']),
           AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['fxRateBaseEffective', 'pgh_FXRateBaseEffective'], 8),
           AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['amount','parAmount', 'parAmountLocal', 'fundedParAmountLocal', 'costAmountLocal', 'fundedCostAmountLocal'] ),
