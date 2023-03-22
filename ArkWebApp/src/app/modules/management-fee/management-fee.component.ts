@@ -4,7 +4,7 @@ import { map } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { ManagementFeeService } from 'src/app/core/services/ManagementFee/management-fee.service';
-import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,  DATE_FORMATTER_CONFIG_ddMMyyyy, formatDate } from 'src/app/shared/functions/formatter';
+import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,  DATE_FORMATTER_CONFIG_ddMMyyyy, formatDate } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { getNodes } from '../capital-activity/utilities/functions';
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
@@ -30,12 +30,14 @@ export class ManagementFeeComponent implements OnInit {
   subscriptions: Subscription[] = [];
   asOfDate: string;
   noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
-
+  
   constructor(
     private managementFeeSvc: ManagementFeeService,
     private dataSvc: DataService
-  ) { }
-
+    ) { }
+    
+  AMOUNT_COLUMNS= ['feeRate']
+  
   NO_DEC_AMOUNT_COLUMNS = [
     'aumBase',
     'calculatedITDFee',
@@ -43,11 +45,18 @@ export class ManagementFeeComponent implements OnInit {
     'adjustment',
     'adjustedITDFee',
     'aggregatedAdjustment',
-    'aumPosition']
+    'aumLocal',
+    'runningAUMBase',
+    'deltaCommitted',
+    'unfunded',
+    'deltaFunded',
+    'funded'
+  ]
 
   DATE_COLUMNS = [
       'fixingDate',
-      'managementDate'
+      'managementDate',
+      'girTimestamp'
   ]
 
   fetchManagementFee(){
@@ -92,6 +101,7 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'fundHedging', type: 'abColDefString' },
       { field: 'issuerShortName', type: 'abColDefString' },
       { field: 'issuer', type: 'abColDefString' },
+      {field: 'transaction',type:'abColDefString'},
       { field: 'asset', type: 'abColDefString' },
       { field: 'managementDate', type: 'abColDefDate',  cellClass: 'dateUK', headerName: 'Trade Date' },
       { field: 'aumBase',headerName:'AUM Base', type: 'abColDefNumber', aggFunc: 'sum' },
@@ -107,8 +117,18 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'adjustedITDFee', type: 'abColDefNumber', allowedAggFuncs: ['Sum'], aggFunc: 'Sum' },
       { field: 'noOfMgmtDays',headerName: 'No of Management Days', type: 'abColDefNumber'},
       { field: 'positionCCY',headerName:'Position Ccy',type: 'abColDefString'},
-      { field: 'aumPosition', headerName:'AUM Position',type: 'abColDefNumber'},
-      { field: 'aggregatedAdjustment', type: 'abColDefNumber' }
+      { field: 'aumLocal', headerName:'AUM Local',type: 'abColDefNumber'},
+      { field: 'aggregatedAdjustment', type: 'abColDefNumber' },
+      {field:'runningAUMBase',headerName:'GPS Basis',type:'abColDefNumber'},
+      {field: 'gir',headerName:'GIR',type:'abColDefNumber'},
+      {field: 'girSource',headerName:'GIR Source',type:'abColDefString'},
+      {field: 'girTimestamp',headerName:'GIR Timestamp',type:'abColDefDate'},
+      {field: 'deltaCommitted',headerName:'Delta in Commitment',type:'abColDefNumber'},
+      {field: 'unfunded',type:'abColDefNumber'},
+      {field: 'deltaFunded',headerName:'Delta in Funded',type:'abColDefNumber'},
+      {field: 'funded',type:'abColDefNumber'},
+      {field: 'wtAvgGIRMethod',type:'abColDefString'},
+      {field: 'wtAvgGIR',type:'abColDefNumber'}
 
 
 
@@ -191,7 +211,7 @@ export class ManagementFeeComponent implements OnInit {
       },
       userInterfaceOptions:{
         customDisplayFormatters:[
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',['feeRate']),
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',this.AMOUNT_COLUMNS),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('noDecimalAmountFormatter',this.NO_DEC_AMOUNT_COLUMNS)
         ]
       },
@@ -229,12 +249,13 @@ export class ManagementFeeComponent implements OnInit {
           }]
         },
         FormatColumn:{
-          Revision:3,
+          Revision:7,
           FormatColumns:[
             BLANK_DATETIME_FORMATTER_CONFIG(this.DATE_COLUMNS),
             DATE_FORMATTER_CONFIG_ddMMyyyy(this.DATE_COLUMNS),
             CUSTOM_FORMATTER(this.NO_DEC_AMOUNT_COLUMNS,['noDecimalAmountFormatter']),
-            CUSTOM_FORMATTER(['feeRate'],['amountFormatter'])
+            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['wtAvgGIR','gir'], 8),
+            CUSTOM_FORMATTER([...this.AMOUNT_COLUMNS,'wtAvgGIR','gir'],['amountFormatter'])
           ]
         }
       }
