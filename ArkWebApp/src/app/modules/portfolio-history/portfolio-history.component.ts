@@ -87,7 +87,7 @@ export class PortfolioHistoryComponent implements OnInit {
   },
   { headerName: "GIR Edited", field:'isEdited', type:'abColDefString'},
   { headerName: 'GIR Override', field: 'isOverride', type: 'abColDefString' },
-  { headerName: 'GIR Source', field: 'girSource', type: 'abColDfString' },
+  { headerName: 'GIR Source', field: 'girSource', type: 'abColDefString' },
   { headerName: 'GIR SourceID', field: 'girSourceID', type: 'abColDefNumber' },
   { headerName: 'GIR Date', field:'girDate',type:'abColDefDate'},
   { headerName: 'GIR Editable', field:'isEditable',type:'abColDefBoolean'},
