@@ -1,7 +1,10 @@
 pool:  
   name: Azure Pipelines
   demands: npm
-
+trigger:
+  branches:
+    include:
+    - main
 steps:
 - task: NodeTool@0
   inputs:
