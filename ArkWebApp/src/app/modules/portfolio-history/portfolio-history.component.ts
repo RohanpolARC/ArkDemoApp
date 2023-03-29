@@ -12,15 +12,16 @@ import {PortfolioHistoryService} from '../../core/services/PortfolioHistory/port
 import {MatDialog } from '@angular/material/dialog';
 import {DialogDeleteComponent} from './dialog-delete/dialog-delete.component';
 
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { getRowNodes, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { map } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
-import { ColDef, GridOptions, Module } from '@ag-grid-community/core';
-import { ActionColumnContext} from '@adaptabletools/adaptable-angular-aggrid';
+import { ColDef, GridOptions, Module, ValueGetterParams } from '@ag-grid-community/core';
+import { ActionColumnContext, FormatColumn} from '@adaptabletools/adaptable-angular-aggrid';
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
+import { CheckboxEditorComponent } from 'src/app/shared/components/checkbox-editor/checkbox-editor.component';
 
 let adapTableApi: AdaptableApi;
 
@@ -86,13 +87,40 @@ export class PortfolioHistoryComponent implements OnInit {
     type:'abColDefObject'
   },
   { headerName: "GIR Edited", field:'isEdited', type:'abColDefString'},
+  // { headerName: "Reviewed", 
+  // cellRenderer: 'agGridCheckboxRenderer',
+  //   cellRendererParams:()=>{
+  //     return{
+  //       screen:'gir editor'       
+  //     }
+  //   },
+  //   field:'isEdited', type:'abColDefBoolean',
+  //   valueGetter:(params:ValueGetterParams)=>{
+      
+  //     if(params.node.group){
+  //       //console.log("group")
+  //       let childNodes= getRowNodes(params.node)
+  //       if(!childNodes.find(child=>child.data['isEdited']==='No')){
+  //         return true
+  //       }else return false
+  //     }else{
+  //       if(params.node.data["isEdited"]==='Yes'){
+  //         return true
+  //       }else return false
+  //     }
+  //   }
+  // },
   { headerName: 'GIR Override', field: 'isOverride', type: 'abColDefString' },
   { headerName: 'GIR Source', field: 'girSource', type: 'abColDefString' },
   { headerName: 'GIR SourceID', field: 'girSourceID', type: 'abColDefNumber' },
   { headerName: 'GIR Date', field:'girDate',type:'abColDefDate'},
   { headerName: 'GIR Editable', field:'isEditable',type:'abColDefBoolean'},
   { field:'uniqueID', type:'abColDefNumber'},
-  { field: 'pgh_FXRateBaseEffective', headerName: 'Effective Going In Rate', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'}
+  { field: 'pgh_FXRateBaseEffective', headerName: 'Effective Going In Rate', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
+  { field: 'colour', type: 'abColDefString' },
+  { field: 'reason', type: 'abColDefString' },
+
+
 ];
   noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
 
@@ -131,7 +159,8 @@ export class PortfolioHistoryComponent implements OnInit {
       enableRowGroup: true,
       enablePivot: true,
       sortable: true,
-      filter: true
+      filter: true,
+      tooltipField:'reason'
     };
 
     this.autoGroupColumnDef = {
@@ -141,12 +170,15 @@ export class PortfolioHistoryComponent implements OnInit {
 
     this.sideBar = 'columns';
     this.frameworkComponents = {
-      btnCellRenderer: BtnCellRenderer
+      btnCellRenderer: BtnCellRenderer,
+      agGridCheckboxRenderer: CheckboxEditorComponent,
+
     }
     this.rowGroupPanelShow = 'always';
 
 
   }
+
 
 
   ngOnInit(): void {
@@ -326,8 +358,45 @@ export class PortfolioHistoryComponent implements OnInit {
       },
 
       FormatColumn: {
-        Revision: 23,
+        Revision: 28,
         FormatColumns: [
+          {
+            Scope: { All: true },
+            Style: {
+              BackColor: '#FFDBA4', FontWeight: 'Bold'
+            },
+            Rule: {
+              BooleanExpression: `[colour] = "Orange"`
+            }
+          },
+          {
+            Scope: { All: true },
+            Style: {
+              BackColor: '#FFB3B3', FontWeight: 'Bold'
+            },
+            Rule: {
+              BooleanExpression: `[colour] = "Red"`
+            }
+          },
+          {
+            Scope: { All: true },
+            Style: {
+              BackColor: '#9BCB3C', FontWeight: 'Bold'
+            },
+            Rule: {
+              BooleanExpression: `[colour] = "Green"`
+            }
+          },
+          {
+            Scope: { All: true },
+            Style: {
+              BackColor: '#C1EFFF', FontWeight: 'Bold'
+            },
+            Rule: {
+              BooleanExpression: `[colour] = "Blue"`
+            }
+          },
+          
           
           BLANK_DATETIME_FORMATTER_CONFIG(['asOfDate', 'tradeDate', 'settleDate', 'modifiedOn','girDate']),
           DATE_FORMATTER_CONFIG_ddMMyyyy(['asOfDate', 'tradeDate', 'settleDate','girDate']),

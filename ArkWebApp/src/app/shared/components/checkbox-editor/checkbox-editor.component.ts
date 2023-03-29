@@ -13,6 +13,7 @@ export class CheckboxEditorComponent implements ICellRendererAngularComp, OnInit
   params: ICellRendererParams
   editableRowID: number
   onModelChangeCallback: (params: ICellRendererParams) => {}
+  isVisible: boolean=true;
   constructor() { }
 
   agInit(params: ICellRendererParams): void {
@@ -20,6 +21,13 @@ export class CheckboxEditorComponent implements ICellRendererAngularComp, OnInit
     this.params = params
     this.checked = params.value;
     this.editableRowID = params?.['editableRowID'];
+    if(params?.['screen']==='gir editor'){
+      if(params.node.group===true){
+        this.isVisible = false
+      }else if(params.data['isEditable']===false){
+        this.isVisible = false
+      }
+    }
 
     this.onModelChangeCallback = params?.['onCheckboxcolChanged']
   }
