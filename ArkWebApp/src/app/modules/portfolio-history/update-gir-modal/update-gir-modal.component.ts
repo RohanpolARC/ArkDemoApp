@@ -176,6 +176,9 @@ export class UpdateGirModalComponent implements OnInit {
         model.ModifiedOn = new Date();
         model.TradeDate = this.allLeafChildrenData[i].tradeDate;
         model.FundHedging = this.allLeafChildrenData[i].fundHedging;
+        model.isReviewed = true;    
+        model.ReviewedBy = this.currentUserName;
+        model.ReviewedOn =    new Date(); 
 
         this.allLeafChildrenData[i].goingInRate = this.goingInRate;
 
@@ -193,8 +196,14 @@ export class UpdateGirModalComponent implements OnInit {
             nodeData['fxRateBaseEffective'] = this.goingInRate,
             nodeData['modifiedOn'] = new Date();
             nodeData['modifiedBy'] = this.currentUserName;
-            nodeData['isEdited'] = 'Yes'
-            nodeData['isOverride'] = 'Yes'
+            nodeData['isEdited'] = 'Yes',
+            nodeData['isOverride'] = 'Yes',
+            nodeData['colour'] = ' '
+            
+            nodeData['reviewedOn']= new Date(),
+            nodeData['reviewedBy']= this.currentUserName,
+            nodeData['isReviewed'] = true
+
 
             return nodeData
           })
@@ -220,6 +229,11 @@ export class UpdateGirModalComponent implements OnInit {
     this.assetGIR.Ccy = 0;
     this.assetGIR.Rate = this.rowData.fxRateBaseEffective;
     this.assetGIR.fxRateOverride = true;            // GIR is always overriden if update happens from GIREditor.
+    
+    this.assetGIR.isReviewed = true;    
+    this.assetGIR.ReviewedBy = this.currentUserName;
+    this.assetGIR.ReviewedOn =    new Date(); 
+
     this.assetGIR.last_update = new Date();
     this.assetGIR.CcyName = this.rowData.fundCcy;   // Changed from positionCcy based on request.
     this.assetGIR.Text = this.rowData.asset;
@@ -242,8 +256,12 @@ export class UpdateGirModalComponent implements OnInit {
               'fxRateBaseEffective': this.goingInRate,
               'modifiedOn': new Date(),
               'modifiedBy': this.currentUserName,
+              'reviewedOn': new Date(),
+              'reviewedBy': this.currentUserName,
               'isEdited': 'Yes',
-              'isOverride': 'Yes'
+              'isOverride': 'Yes',
+              'isReviewed':true,
+              'colour': ' '
             }}]
 
             this.data.gridApi.applyTransaction({

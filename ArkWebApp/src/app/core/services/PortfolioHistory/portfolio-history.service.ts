@@ -5,13 +5,14 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import {AssetGIRModel} from '../../../shared/models/AssetGIRModel'
 import { MsalUserService } from '../Auth/msaluser.service';  
+import { DataService } from '../data.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PortfolioHistoryService {
 
-  constructor(private http: HttpClient,private msalService: MsalUserService) { }
+  constructor(private http: HttpClient,private msalService: MsalUserService,private dataService:DataService) { }
 
   public getPortfolioHistory(){
     return this.http.get<any[]>(APIConfig.PORTFOLIO_HISTORY_GET_API).pipe(
@@ -30,4 +31,28 @@ export class PortfolioHistoryService {
   public putBulkAssetGIR(bulkAssetGIRModel: AssetGIRModel []){
     return this.http.post<any>(APIConfig.PORTFOLIO_HISTORY_BULK_PUT_API, bulkAssetGIRModel).pipe(catchError((ex) => throwError(ex)));
   }
+
+  public getModel(data:any){
+      // `this.data.rowData` holds the data of the selected row.
+
+      let AssetGIR: AssetGIRModel = new AssetGIRModel();
+      AssetGIR.WSOAssetid = data.assetId;
+      AssetGIR.AsOfDate = data.asOfDate;
+      AssetGIR.Ccy = 0;    // ?
+      AssetGIR.Rate = data.fxRateBaseEffective;       // Updated GIR.
+      AssetGIR.last_update = new Date();
+      AssetGIR.CcyName = data.fundCcy;
+      AssetGIR.Text = data.asset;
+      AssetGIR.ModifiedBy = this.dataService.getCurrentUserInfo().name;
+      AssetGIR.TradeDate = data.tradeDate;
+      AssetGIR.FundHedging = data.fundHedging;
+      
+      AssetGIR.ModifiedOn = new Date();
+      AssetGIR.CreatedBy = this.dataService.getCurrentUserInfo().name;
+      AssetGIR.CreatedOn = new Date(); 
+      AssetGIR.isReviewed = data.isReviewed
+
+    return AssetGIR
+  }
+
 }

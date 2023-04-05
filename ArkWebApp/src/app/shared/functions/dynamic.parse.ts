@@ -7,7 +7,7 @@ const GENERAL_FORMATTING_EXCEPTIONS = ['account', 'accountid', 'account id', 'is
 'AttributeValue'    //Added for Fixing Details - Attribute name detailed view
 ];
 
-const GENERAL_DATETIME_FORMATTING_COLUMNS = ['createdon','created on','modified on', 'modifiedon']
+const GENERAL_DATETIME_FORMATTING_COLUMNS = ['createdon','created on','modified on', 'modifiedon','reviewedon']
 
 export { GENERAL_FORMATTING_EXCEPTIONS } 
 
@@ -79,7 +79,7 @@ for(let i:number = 0; i < row.length; i+= 1){
       return String(params.value)
     }
   }
-  if(col.toLowerCase().includes('date') || col.toLowerCase()==='createdon'|| col.toLowerCase()==='modifiedon'){
+  if(col.toLowerCase().includes('date') || col.toLowerCase()==='createdon'|| col.toLowerCase()==='modifiedon' || col.toLowerCase()==='reviewedon'){
     colDef.valueFormatter = skipAgGridValueFormatter?null: dateFormatter;
     colDef.type = 'abColDefDate'
     colDef.cellClass = 'dateUK'

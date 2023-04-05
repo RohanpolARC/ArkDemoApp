@@ -15,13 +15,16 @@ import {DialogDeleteComponent} from './dialog-delete/dialog-delete.component';
 import { getRowNodes, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { map } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
-import { ColDef, GridOptions, Module, ValueGetterParams } from '@ag-grid-community/core';
+import { CellClickedEvent, ColDef, GridOptions, ICellRendererParams, Module, ValueGetterParams } from '@ag-grid-community/core';
 import { ActionColumnContext, FormatColumn} from '@adaptabletools/adaptable-angular-aggrid';
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
-import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
+import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { CheckboxEditorComponent } from 'src/app/shared/components/checkbox-editor/checkbox-editor.component';
+import { AssetGIRModel } from 'src/app/shared/models/AssetGIRModel';
+import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
+import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
 
 let adapTableApi: AdaptableApi;
 
@@ -78,6 +81,10 @@ export class PortfolioHistoryComponent implements OnInit {
     cellClass: 'dateUK',
     valueGetter:dateNullValueGetter
   },
+  { headerName: "Reviewed By",  field: 'reviewedBy', type:'abColDefString'},
+  {field : "reviewedOn", type:'abColDefDate', cellClass:'dateUk', valueGetter:(params:ValueGetterParams)=>{
+    return dateNullValueGetter(params,'reviewedOn')
+  }},
   {
     headerName:"",
     field: 'actionNew',
@@ -87,29 +94,7 @@ export class PortfolioHistoryComponent implements OnInit {
     type:'abColDefObject'
   },
   { headerName: "GIR Edited", field:'isEdited', type:'abColDefString'},
-  // { headerName: "Reviewed", 
-  // cellRenderer: 'agGridCheckboxRenderer',
-  //   cellRendererParams:()=>{
-  //     return{
-  //       screen:'gir editor'       
-  //     }
-  //   },
-  //   field:'isEdited', type:'abColDefBoolean',
-  //   valueGetter:(params:ValueGetterParams)=>{
-      
-  //     if(params.node.group){
-  //       //console.log("group")
-  //       let childNodes= getRowNodes(params.node)
-  //       if(!childNodes.find(child=>child.data['isEdited']==='No')){
-  //         return true
-  //       }else return false
-  //     }else{
-  //       if(params.node.data["isEdited"]==='Yes'){
-  //         return true
-  //       }else return false
-  //     }
-  //   }
-  // },
+
   { headerName: 'GIR Override', field: 'isOverride', type: 'abColDefString' },
   { headerName: 'GIR Source', field: 'girSource', type: 'abColDefString' },
   { headerName: 'GIR SourceID', field: 'girSourceID', type: 'abColDefNumber' },
@@ -119,10 +104,34 @@ export class PortfolioHistoryComponent implements OnInit {
   { field: 'pgh_FXRateBaseEffective', headerName: 'Effective Going In Rate', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
   { field: 'colour', type: 'abColDefString' },
   { field: 'reason', type: 'abColDefString' },
+  { headerName: "isReviewed", 
+    cellRenderer: 'agGridCheckboxRenderer',
+      cellRendererParams:()=>{
+        return{
+          screen:'gir editor',
+          onCheckboxcolChanged: this.onCheckboxChange,
+          dataSvc:this.dataSvc,
+          subscriptions:this.subscriptions,
+          portfolioHistoryService:this.portfolioHistoryService,
+          adaptableApi: this.adaptableApi,
+          dialog : this.dialog,
+          updateCheckboxSelection:this.updateCheckboxSelection,
+          deleteUnreviewed:this.deleteUnreviewed,
+          gridOptions: this.gridOptions
+
+        }
+      },
+      field:'isReviewed', type:'abColDefBoolean',width:30
+    },
 
 
 ];
   noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
+  assetGIR: any;
+  isSuccess: boolean;
+  isFailure: boolean;
+  updateMsg: string;
+  adaptableApi: AdaptableApi;
 
   constructor(
     private portfolioHistoryService: PortfolioHistoryService,
@@ -130,8 +139,9 @@ export class PortfolioHistoryComponent implements OnInit {
     private dataSvc: DataService) {
 
     this.gridOptions = {
+
       enableRangeSelection: true,
-      sideBar: true,
+      sideBar:  ['columns','adaptable','filters'],
       suppressMenuHide: true,
       singleClickEdit: true,
       statusBar: {
@@ -143,7 +153,9 @@ export class PortfolioHistoryComponent implements OnInit {
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey: true,
       context: {
-        adaptableApi: adapTableApi
+        adaptableApi: adapTableApi,
+        component: this
+
       },
       excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
       noRowsOverlayComponent : NoRowsOverlayComponent,
@@ -168,7 +180,7 @@ export class PortfolioHistoryComponent implements OnInit {
       sortable: true,
     };
 
-    this.sideBar = 'columns';
+    //this.sideBar = ['columns','adaptable','filters'];
     this.frameworkComponents = {
       btnCellRenderer: BtnCellRenderer,
       agGridCheckboxRenderer: CheckboxEditorComponent,
@@ -178,6 +190,133 @@ export class PortfolioHistoryComponent implements OnInit {
 
 
   }
+
+  onCheckboxChange(params: ICellRendererParams){
+    const confirmdialogRef = params.context.component.dialog.open(ConfirmationPopupComponent, {
+      data: { confirmText: `Are you sure you want to mark GIR as  ${params.value?'reviewed':'unreviewed'}?` }
+    })
+    params.context.component.subscriptions.push(
+      confirmdialogRef
+      .afterClosed()
+      .subscribe((val)=>{
+        if(val?.['action']==='Confirm'){
+           if(params.data?.['isOverride']==='No' && !params.value){
+              params.context.component.deleteUnreviewed(params)
+              //params?.['portfolioHistoryService'].performDelete(params.data)
+            }else{
+              params.context.component.updateCheckboxSelection(params)
+            }
+        }else{
+          let updatedData = [{...params.data, ...{
+            'isReviewed':!params.value //to reset the original checkbox value on cancel
+          }}]
+          params.api.applyTransaction({
+            update: updatedData
+          }) 
+        }
+      })
+      
+      )
+
+    
+    
+  }
+
+  deleteUnreviewed(params){
+
+    let AssetGIR: AssetGIRModel = this.portfolioHistoryService.getModel(params.data)
+
+
+      this.subscriptions.push(
+        this.portfolioHistoryService.deleteAssetGIR(AssetGIR).subscribe({
+          next: message => {
+            this.isSuccess = true;
+            this.isFailure = false;
+            this.updateMsg = "GIR review status updated";
+            
+            params.data.isEdited = 'No';
+            params.data.isOverride = 'No';
+            params.data.isReviewed = false;
+
+
+            params.data.girSource = null;
+            params.data.girSourceID = null;
+            params.data.fxRateBaseEffective = 0;
+            params.data.modifiedBy = ' ';
+            params.data.modifiedOn = null;
+            params.data.reviewedBy = ' ';
+            params.data.reviewedOn = null;
+            params?.adaptableApi.gridApi.refreshRowNode(params.node)
+            this.dataSvc.setWarningMsg(this.updateMsg,'dismiss','ark-theme-snackbar-success')
+
+          },
+          error: error => {
+            this.isFailure = true;
+            this.isSuccess = false;
+            this.updateMsg = "failed to updated the review status";
+            this.dataSvc.setWarningMsg(this.updateMsg,'dismiss','ark-theme-snackbar-error')
+
+            console.error("Error deleting row." + error);
+          }
+        }));
+  
+  }
+
+  updateCheckboxSelection(params){
+    
+    this.assetGIR=new AssetGIRModel()
+
+    this.assetGIR = params.context.component.portfolioHistoryService.getModel(params.data)
+    
+    this.assetGIR.isReviewed = params.value;           
+    this.assetGIR.id = 0;
+    this.assetGIR.fxRateOverride =  (params.data.isOverride==='Yes')?true:false;            // GIR is always overriden if update happens from GIREditor.
+    
+    //this.assetGIR.ModifiedOn = params.data.modifiedOn
+    this.assetGIR.ModifiedOn = params.data.modifiedOn??new Date(null)
+
+    this.assetGIR.CreatedBy = params.data.createdBy
+    this.assetGIR.CreatedOn = params.data.createdOn
+
+    this.assetGIR.ReviewedOn =    new Date(); 
+
+
+    params.context.component.subscriptions.push(params.context.component.portfolioHistoryService.putAssetGIR([this.assetGIR]).subscribe({
+          next: data => {     
+            
+            this.isSuccess = true;
+            this.isFailure = false;            
+            this.updateMsg = "GIR review status updated";
+            
+            if(params.value){
+              params.node.data['reviewedBy'] =  params.context.component.dataSvc.getCurrentUserInfo().name;
+              params.node.data['reviewedOn'] =  new Date()
+
+            }else{
+              params.node.data['reviewedBy'] =  ' '
+              params.node.data['reviewedOn'] =  null
+              
+            }
+            params.node.data['colour'] = ' '
+            params.node.data['isReviewed'] =  params.value
+
+            params.context.component.gridOptions.api?.refreshCells({ force: true, rowNodes: [params.node], columns: ['reviewedBy','reviewedOn','isReviewed','modifiedOn'] })
+
+            params?.adaptableApi.gridApi.refreshRowNode(params.node)
+            this.dataSvc.setWarningMsg(this.updateMsg,'dismiss','ark-theme-snackbar-success')
+          },
+          error: error => {
+              console.error('There was an error!', error);
+              this.isFailure = true;
+              this.isSuccess = false;
+              this.updateMsg = "failed to updated the review status";
+              this.dataSvc.setWarningMsg(this.updateMsg,'dismiss','ark-theme-snackbar-error')
+
+          }
+    
+      }));
+  }
+
 
 
 
@@ -235,7 +374,7 @@ export class PortfolioHistoryComponent implements OnInit {
                 }});
               this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
                 if(dialogRef.componentInstance.isSuccess)
-                  this.gridOptions.api?.refreshCells({ force: true, rowNodes: [context.rowNode], columns: ['fxRateBaseEffective', 'isEdited', 'modifiedOn', 'modifiedBy', 'isOverride', 'girSource', 'girSourceID'] })
+                  this.gridOptions.api?.refreshCells({ force: true, rowNodes: [context.rowNode], columns: ['fxRateBaseEffective', 'isEdited', 'modifiedOn', 'modifiedBy','reviewedBy','reviewedOn', 'isOverride', 'isReviewed','girSource', 'girSourceID'] })
               }));
             },
             icon:{
@@ -244,8 +383,28 @@ export class PortfolioHistoryComponent implements OnInit {
                 height: 25, width: 25
               }
             }
-          },
+          }
         },
+        {
+          columnId: 'ActionInfo',
+          friendlyName: 'Info',
+          actionColumnButton: {
+            onClick: (
+              button: AdaptableButton<ActionColumnContext>,
+              context: ActionColumnContext
+            ) => {
+
+              this.onOverrideCellClicked(context, this.dialog)
+
+            },
+            icon:{
+              src: '../assets/img/info.svg',
+              style: {
+                height: 25, width: 25
+              }
+            }
+          }
+        }
       ]
     },
     generalOptions: {
@@ -300,7 +459,7 @@ export class PortfolioHistoryComponent implements OnInit {
       },
 
       Layout:{
-        Revision: 6,
+        Revision: 8,
         CurrentLayout: 'Basic Portfolio History',
         Layouts: [{
           Name: 'Basic Portfolio History',
@@ -331,15 +490,20 @@ export class PortfolioHistoryComponent implements OnInit {
             'girSourceID',
             'girDate',
             'actionNew',
+            'isReviewed',
             'ActionDelete',
+            'ActionInfo'
           ],
           PinnedColumnsMap: {
             actionNew: 'right',
             ActionDelete: 'right',
+            isReviewed:'right',
+            ActionInfo:'right'
           },
           RowGroupedColumns: ['tradeDate', 'fundCcy', 'positionCcy'],
           ColumnWidthMap:{
             ActionDelete: 50,
+            ActionInfo:50,
           },
           ColumnFilters: [{
             ColumnId: 'typeDesc',
@@ -358,10 +522,13 @@ export class PortfolioHistoryComponent implements OnInit {
       },
 
       FormatColumn: {
-        Revision: 28,
+        Revision: 30,
         FormatColumns: [
           {
-            Scope: { All: true },
+            Scope: { ColumnIds:this.columnDefs.filter(def=>![            'actionNew',
+            'isReviewed',
+            'ActionDelete',
+          'ActionInfo'].includes(def.field)).map(def=>def.field)},
             Style: {
               BackColor: '#FFDBA4', FontWeight: 'Bold'
             },
@@ -370,7 +537,10 @@ export class PortfolioHistoryComponent implements OnInit {
             }
           },
           {
-            Scope: { All: true },
+            Scope:  { ColumnIds:this.columnDefs.filter(def=>![            'actionNew',
+            'isReviewed',
+            'ActionDelete',
+          'ActionInfo'].includes(def.field)).map(def=>def.field)},
             Style: {
               BackColor: '#FFB3B3', FontWeight: 'Bold'
             },
@@ -379,7 +549,10 @@ export class PortfolioHistoryComponent implements OnInit {
             }
           },
           {
-            Scope: { All: true },
+            Scope:  { ColumnIds:this.columnDefs.filter(def=>![            'actionNew',
+            'isReviewed',
+            'ActionDelete',
+          'ActionInfo'].includes(def.field)).map(def=>def.field)},
             Style: {
               BackColor: '#9BCB3C', FontWeight: 'Bold'
             },
@@ -388,7 +561,10 @@ export class PortfolioHistoryComponent implements OnInit {
             }
           },
           {
-            Scope: { All: true },
+            Scope:  { ColumnIds:this.columnDefs.filter(def=>![            'actionNew',
+            'isReviewed',
+            'ActionDelete',
+          'ActionInfo'].includes(def.field)).map(def=>def.field)},
             Style: {
               BackColor: '#C1EFFF', FontWeight: 'Bold'
             },
@@ -398,9 +574,9 @@ export class PortfolioHistoryComponent implements OnInit {
           },
           
           
-          BLANK_DATETIME_FORMATTER_CONFIG(['asOfDate', 'tradeDate', 'settleDate', 'modifiedOn','girDate']),
+          BLANK_DATETIME_FORMATTER_CONFIG(['asOfDate', 'tradeDate', 'settleDate', 'modifiedOn','reviewedOn','girDate']),
           DATE_FORMATTER_CONFIG_ddMMyyyy(['asOfDate', 'tradeDate', 'settleDate','girDate']),
-          DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn']),
+          DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn','reviewedOn']),
           AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['fxRateBaseEffective', 'pgh_FXRateBaseEffective'], 8),
           AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['amount','parAmount', 'parAmountLocal', 'fundedParAmountLocal', 'costAmountLocal', 'fundedCostAmountLocal'] ),
           AMOUNT_FORMATTER_CONFIG_Zero(['amount','parAmount', 'parAmountLocal', 'fundedParAmountLocal', 'costAmountLocal', 'fundedCostAmountLocal','fxRateBaseEffective', 'pgh_FXRateBaseEffective'],2,['amountZeroFormat'])
@@ -409,9 +585,29 @@ export class PortfolioHistoryComponent implements OnInit {
     }
   }
 
+  onOverrideCellClicked(p: ActionColumnContext, dialog: MatDialog) {
+
+      let m = <DetailedView>{};
+      m.screen = 'GIR Editor';
+      m.param1 = p.data?.['fundHedging']; // AsOfDate
+      m.param2 =  p.data?.['fundCcy'];
+      m.param3 = p.data?.['tradeDate'] //asofdate;
+      m.param4 = String(p.data?.['assetId']);
+      m.param5 = ' ';
+
+      dialog.open(DetailedViewComponent, {
+        data: {
+          detailedViewRequest: m
+        },
+        width: '90vw',
+        height: '80vh'
+      })
+  }
+
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     adapTableApi = adaptableApi;
     adaptableApi.toolPanelApi.closeAdapTableToolPanel();
+    this.adaptableApi = adapTableApi
     // use AdaptableApi for runtime access to Adaptable
   };
 

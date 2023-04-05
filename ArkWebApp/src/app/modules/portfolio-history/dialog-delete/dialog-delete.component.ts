@@ -32,20 +32,7 @@ export class DialogDeleteComponent{
         // `this.data.rowData` holds the data of the selected row.
 
       if(confirmation){
-        let AssetGIR: AssetGIRModel = new AssetGIRModel();
-        AssetGIR.WSOAssetid = this.data.rowData.assetId;
-        AssetGIR.AsOfDate = this.data.rowData.asOfDate;
-        AssetGIR.Ccy = 0;    // ?
-        AssetGIR.Rate = this.data.rowData.fxRateBaseEffective;       // Updated GIR.
-        AssetGIR.last_update = new Date();
-        AssetGIR.CcyName = this.data.rowData.fundCcy;
-        AssetGIR.Text = this.data.rowData.asset;
-        AssetGIR.CreatedBy = this.dataService.getCurrentUserInfo().name;
-        AssetGIR.ModifiedBy = this.dataService.getCurrentUserInfo().name;
-        AssetGIR.CreatedOn = new Date(); 
-        AssetGIR.ModifiedOn = new Date();
-        AssetGIR.TradeDate = this.data.rowData.tradeDate;
-        AssetGIR.FundHedging = this.data.rowData.fundHedging;
+        let AssetGIR: AssetGIRModel = this.portfolioHistoryService.getModel(this.data.rowData)
   
         this.subscriptions.push(
           this.portfolioHistoryService.deleteAssetGIR(AssetGIR).subscribe({
@@ -56,12 +43,16 @@ export class DialogDeleteComponent{
               
               this.data.rowData.isEdited = 'No';
               this.data.rowData.isOverride = 'No';
+              this.data.rowData.isReviewed = false;
+
 
               this.data.rowData.girSource = null;
               this.data.rowData.girSourceID = null;
               this.data.rowData.fxRateBaseEffective = 0;
               this.data.rowData.modifiedBy = ' ';
               this.data.rowData.modifiedOn = null;
+              this.data.rowData.reviewedBy = ' ';
+              this.data.rowData.reviewedOn = null;
             },
             error: error => {
               this.isFailure = true;

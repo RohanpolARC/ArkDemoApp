@@ -12,7 +12,7 @@ import { getRowNodes } from 'src/app/shared/functions/utilities';
   template: `
  
  <span *ngIf="isEditable===true" (click)="openUpdateGirModal()">
-  <mat-icon [ngStyle]="{color:'#285170','cursor':'pointer'}" >edit</mat-icon>
+  <mat-icon [ngStyle]="{color:'#285170','cursor':'pointer','padding-top':'7px'}" >edit</mat-icon>
   </span>
   `,
 })
