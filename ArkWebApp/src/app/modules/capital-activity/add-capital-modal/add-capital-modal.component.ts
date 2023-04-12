@@ -226,7 +226,11 @@ export class AddCapitalModalComponent implements OnInit{
   }
 
   setSubtypeOptions(capitalType?: string){
-    this.netCapitalSubtypes = this.data.capitalTypeSubtypeAssociation?.filter(r => r?.['CapitalType'] == capitalType).map(r => r?.['CapitalSubtype'])
+    if(!capitalType){
+      this.netCapitalSubtypes = [... new Set<string>(this.data.capitalTypeSubtypeAssociation.map(r => r?.['CapitalSubtype']))]
+    }else{
+      this.netCapitalSubtypes = this.data.capitalTypeSubtypeAssociation?.filter(r => r?.['CapitalType'] == capitalType).map(r => r?.['CapitalSubtype'])
+    }
   }
 
   setDynamicOptions(FH?: string, IssuerSN?: string, Asset?: string): void {
@@ -427,7 +431,9 @@ export class AddCapitalModalComponent implements OnInit{
       tap((capitalType: any) => {
 
         this.setSubtypeOptions(capitalType);
-        this.capitalActivityForm.get('capitalSubType').reset();
+        if(!this.netCapitalSubtypes.includes(this.capitalActivityForm.get('capitalSubType').value)){
+          this.capitalActivityForm.get('capitalSubType').reset();
+        }
 
         if(capitalType === 'NAV'){
           this.capitalActivityForm.get('issuerShortName').reset();
