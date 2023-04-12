@@ -1,0 +1,14 @@
+<ng-container *ngIf="filterApply$ | async"></ng-container>
+
+<ag-grid-angular
+    [gridOptions] = "gridOptions"
+    [modules] = "agGridModules"
+    [rowData] = "smy"
+    class="ag-theme-alpine ag-grid"
+    [adaptableOptions] = "adaptableOptions"
+    (adaptableReady)="onAdaptableReady($event)"
+    (cellValueChanged)="onCellValueChanged($event)"
+    (gridReady)="onGridReady($event)"
+    class="ag-theme-alpine ag-grid"
+>
+</ag-grid-angular>

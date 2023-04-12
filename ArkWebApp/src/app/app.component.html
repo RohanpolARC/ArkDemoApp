@@ -71,6 +71,9 @@
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Portfolio Modeller')" [ngStyle]="PortfolioModellerStyle">
           <div class="list-item-text">Portfolio Modeller</div>
         </mat-list-item>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Net Returns')" [ngStyle]="NetReturnsStyle">
+          <div class="list-item-text">Net Returns</div>
+        </mat-list-item>
       </mat-list>
 
     </mat-expansion-panel>
@@ -182,7 +185,7 @@
       <button mat-raised-button id="apply-button"  
         *ngIf="[
         '/facility-detail', '/liquidity-summary', '/fee-calculation', '/management-fee',
-        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/hedging-mark','/aum-delta'].includes(location.path())" 
+        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/hedging-mark','/aum-delta', '/net-returns'].includes(location.path())" 
         (click)="filterApply()">Apply</button>
     </div>
 
@@ -228,6 +231,10 @@
 
     <div *ngIf="location.path() === '/aum-delta'" class="filter-element">
       <app-aum-delta-filter></app-aum-delta-filter>
+    </div>
+
+    <div *ngIf="location.path() === '/net-returns'" class="filter-element">
+      <app-net-returns-filter [fundHedgings] = "fundHedgings" [calcMethods] = "calcMethods" [cashflowTypes]="cashflowTypes"></app-net-returns-filter>
     </div>
 
   </mat-sidenav>

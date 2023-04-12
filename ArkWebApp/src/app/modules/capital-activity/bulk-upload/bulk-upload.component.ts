@@ -11,12 +11,6 @@ import {
   GridOptions,
   Module,
 } from '@ag-grid-community/core';
-import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
-import { MenuModule } from '@ag-grid-enterprise/menu';
-import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
-import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
-import { ExcelExportModule } from '@ag-grid-enterprise/excel-export';
 import {
   AdaptableOptions,
   AdaptableApi
@@ -34,10 +28,8 @@ import { CommonConfig } from 'src/app/configs/common-config';
 })
 export class BulkUploadComponent implements OnInit {
 
-  isHovering: boolean;
+  hideDropzone: boolean;
   selectedFile: File = null;
-
-  files: File[] = []; /** Can Read multiple files at once */
 
   adapTableApi: AdaptableApi;
   gridApi;
@@ -316,6 +308,11 @@ export class BulkUploadComponent implements OnInit {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
+  onFileReceived(file: File){
+    this.readFile(file)
+    this.hideDropzone = true;
+  }
+
   readFile(file: File){
     if(file.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'){
       this.bulkRowData = this.invalidRowData = [];
@@ -415,33 +412,6 @@ export class BulkUploadComponent implements OnInit {
         this.disableSubmit = true;
       }
     }
-  }
-
-  toggleHover(event: boolean) {
-    this.isHovering = event;
-  }
-
-  onDrop(files: FileList) {
-
-    for (let i = 0; i < files.length; i++) {
-      this.files.push(files.item(i));
-    }
-    this.selectedFile = this.files.length >= 1 ? this.files[this.files.length - 1] : null;  /** Read only one file at a time */
-
-    if(this.selectedFile){
-      this.readFile(this.selectedFile);
-    }
-  }
-
-  fileUpload(event){
-    this.isValid = false
-    this.disableSubmit = true
-    this.bulkRowData = this.invalidRowData = [];
-    this.selectedFile = event.target.files[0];
-
-    if(this.selectedFile){
-      this.readFile(this.selectedFile);
-    }      
   }
 
   closeDialog(): any{

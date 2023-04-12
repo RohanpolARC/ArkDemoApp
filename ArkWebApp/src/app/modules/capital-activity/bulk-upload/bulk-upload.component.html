@@ -1,8 +1,10 @@
-<div class="bulk-update">
-    <div class="header">
-        <h2 mat-dialog-title>
-            Capital Activity Bulk Upload
-        </h2>
+<app-file-dropzone 
+    [header]="'Capital Activity Bulk Upload'"
+    [hideDropzone]="hideDropzone"
+    (fileEmitter)="onFileReceived($event)"
+>
+
+    <ng-template #fileTemplate>
         <div>
             <a style="width: 100px; font-size: 2.4rem;"
             class="ag-grid"
@@ -11,49 +13,27 @@
                 <mat-icon class="icon-color">download</mat-icon>
             </a>
         </div>
-    </div>
+    </ng-template>
 
-    <div *ngIf="isSuccess"
-    class="update-msg success"
-    >
-        {{ updateMsg }}
-    </div>
-    <div *ngIf="isFailure"
-    class="update-msg failure"
-    >
-        {{ updateMsg }}
-    </div>
-    <div *ngIf="!isValid"
-    class="update-msg failure"
-    >
-        {{validationErrorMsg}}
-    </div>
-
-    <mat-dialog-content>
-
-        <div class="action-header" *ngIf="(invalidRowData.length + bulkRowData.length) === 0">
-            <div 
-            class="dropzone zone-w"
-            appDropzone
-                (hovered)="toggleHover($event)"
-                (dropped)="onDrop($event)"
-                [class.hovering]="isHovering">
-                <div>
-                    <button mat-icon-button (click)="fileInput.click()">
-                        <mat-icon class="icon-color">attach_file</mat-icon>
-                    </button>
-                </div>
-                <input type="file"
-                #fileInput
-                matTooltip="Upload excel"
-                accept=".xlsx,.xls,.csv"
-                (change)="fileUpload($event)"
-                style="display: none;">
-                <p>Click Here or Drop a File</p>
-            </div>
-    
+    <ng-template #message>
+        <div *ngIf="isSuccess"
+        class="update-msg success"
+        >
+            {{ updateMsg }}
         </div>
+        <div *ngIf="isFailure"
+        class="update-msg failure"
+        >
+            {{ updateMsg }}
+        </div>
+        <div *ngIf="!isValid"
+        class="update-msg failure"
+        >
+            {{validationErrorMsg}}
+        </div>    
+    </ng-template>
 
+    <ng-template #grid>
         <ng-container *ngIf="(invalidRowData.length + bulkRowData.length) > 0">
             <ag-grid-angular class="ag-grid ag-theme-alpine"
                 [adaptableOptions]="adaptableOptions"
@@ -67,14 +47,16 @@
                 (adaptableReady)="onAdaptableReady($event)"
             >
             </ag-grid-angular>
-        </ng-container>
-    </mat-dialog-content>
-    
-    <mat-dialog-actions align="end">
+        </ng-container>    
+    </ng-template>
+
+    <ng-template #submit>
         <button mat-raised-button color="primary"
-        [disabled]="disableSubmit"
-        (click)="onSave()">Submit</button>
+            [disabled]="disableSubmit"
+            (click)="onSave()">Submit
+        </button>
     
         <button mat-raised-button (click)="closeDialog()">Close</button>
-    </mat-dialog-actions>
-</div>
+    </ng-template>
+
+</app-file-dropzone>

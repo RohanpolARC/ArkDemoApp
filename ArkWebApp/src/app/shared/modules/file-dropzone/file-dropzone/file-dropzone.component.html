@@ -1,0 +1,49 @@
+<div class="bulk-update">
+    <div class="header">
+        <h2 mat-dialog-title>
+            {{ header }}
+        </h2>
+        <div>
+            <ng-container *ngTemplateOutlet="fileTemplate"></ng-container>
+        </div>
+    </div>
+
+
+    <ng-container *ngTemplateOutlet="message;"></ng-container>
+
+    <mat-dialog-content>
+
+        <!-- <ng-container *ngTemplateOutlet="dropzone"></ng-container> -->
+
+            <div class="action-header" *ngIf="!hideDropzone">
+                <div
+                class="dropzone zone-w"
+                appDropzone
+                    (hovered)="toggleHover($event)"
+                    (dropped)="onDrop($event)"
+                    [class.hovering]="isHovering">
+                    <div>
+                        <button mat-icon-button (click)="fileInput.click()">
+                            <mat-icon class="icon-color">attach_file</mat-icon>
+                        </button>
+                    </div>
+                    <input type="file"
+                    #fileInput
+                    matTooltip="Upload excel"
+                    accept=".xlsx,.xls,.csv"
+                    (change)="fileUpload($event)"
+                    style="display: none;">
+                    <p>Click Here or Drop a File</p>
+                </div>
+            </div>
+    
+        <ng-container *ngTemplateOutlet="grid;"></ng-container>
+
+    </mat-dialog-content>
+    
+    <mat-dialog-actions align="end">
+
+        <ng-container *ngTemplateOutlet="submit;"></ng-container>
+
+    </mat-dialog-actions>
+</div>

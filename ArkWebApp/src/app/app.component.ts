@@ -62,12 +62,16 @@ export class AppComponent {
   ManagementFeeStyle: any = {};
   PositionsScreenStyle: any = {};
   HedgingMarkStyle:any = {};
+  NetReturnsStyle: any = {};
+  AUMDeltaStyle: any = {};
 
   funds
   fundHedgings
   entities
+  calcMethods
+  cashflowTypes
+
   refDataFilter: string[];
-  AUMDeltaStyle: any = {};
 
   constructor(private http: HttpClient,
     private dataService: DataService,
@@ -99,8 +103,6 @@ export class AppComponent {
       }))  
     }    
   }
-
-
 
   filterApply(){
 
@@ -137,7 +139,6 @@ export class AppComponent {
 
 
     this.subscriptions.push(this.msalBroadcastSvc.msalSubject$
-    // .pipe(filter((msg: EventMessage) => msg.eventType === EventType.LOGIN_SUCCESS || msg.eventType === EventType.SSO_SILENT_SUCCESS))
     .subscribe((result: EventMessage) => {
       if(result.eventType === EventType.LOGIN_SUCCESS || result.eventType === EventType.SSO_SILENT_SUCCESS){
 
@@ -212,6 +213,9 @@ export class AppComponent {
     else if(this.location.path() === '/aum-delta'){
       this.updateSelection('AUM Delta')
     }
+    else if(this.location.path() === '/net-returns'){
+      this.updateSelection('Net Returns')
+    }
     else this.updateSelection('')
   }
 
@@ -227,7 +231,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle=this.HedgingMarkStyle=this.AUMDeltaStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle=this.HedgingMarkStyle=this.AUMDeltaStyle = this.NetReturnsStyle = this.notSelectedElement;
 
     if(screen === 'GIREditor'){
       this.GIREditorStyle = this.selectedElement;
@@ -275,6 +279,27 @@ export class AppComponent {
       }}))
 
       this.router.navigate(['/liquidity-summary'])
+    }
+    else if(screen === 'Net Returns'){
+      this.NetReturnsStyle = this.selectedElement;
+
+      this.calcMethods = [
+        { id: 1, calcMethod: 'IRR' },
+        { id: 2, calcMethod: 'Dietz' }
+      ]
+
+      this.cashflowTypes = [
+        { id: 1, cashflowType: 'Actual' },
+        { id: 2, cashflowType: 'Expected' }
+      ]
+
+      this.subscriptions.push(this.dataService.getUniqueValuesForField('fundHedging').subscribe({
+        next: (d: any[]) => {
+          this.fundHedgings = d.map(i => { return { fundHedging: i.value, id: i.id } })
+        // Don't have to apply filter automatically here
+        // setTimeout(() => { this.filterApply() }, 250)    
+      }}))
+      this.router.navigate(['/net-returns'])
     }
     else if(screen === 'Performance Fees'){
       this.PerformanceFeesStyle = this.selectedElement;

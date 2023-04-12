@@ -9,12 +9,6 @@ import {
   ColDef,
   CellClickedEvent
 } from '@ag-grid-community/core';
-import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
-import { MenuModule } from '@ag-grid-enterprise/menu';
-import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
-import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
-import { ExcelExportModule } from '@ag-grid-enterprise/excel-export';
 import {
   AdaptableOptions,
   AdaptableApi,
@@ -25,7 +19,7 @@ import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/C
 
 import { Subscription } from 'rxjs';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
-import { dateFormatter, dateTimeFormatter, amountFormatter, nullOrZeroFormatter, formatDate, nonAmountNumberFormatter, BLANK_DATETIME_FORMATTER_CONFIG, DATE_FORMATTER_CONFIG_ddMMyyyy, AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, AMOUNT_FORMATTER_CONFIG_Zero, CUSTOM_DISPLAY_FORMATTERS_CONFIG } from 'src/app/shared/functions/formatter';
+import { nullOrZeroFormatter, formatDate, nonAmountNumberFormatter, BLANK_DATETIME_FORMATTER_CONFIG, DATE_FORMATTER_CONFIG_ddMMyyyy, AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, AMOUNT_FORMATTER_CONFIG_Zero, CUSTOM_DISPLAY_FORMATTERS_CONFIG } from 'src/app/shared/functions/formatter';
 
 import { getNodes, validateLinkSelect }from './utilities/functions';
 import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
@@ -165,6 +159,7 @@ export class CapitalActivityComponent implements OnInit {
 
   capitalTypeOptions: string[] = [];
   capitalSubTypeOptions: string[] = [];
+  capitalTypeSubtypeAssociation = [];
   refData = [];
 
   invstmntPanelOpenState = false;
@@ -214,6 +209,19 @@ export class CapitalActivityComponent implements OnInit {
         console.error("Couldn't fetch refData. Form dropdown fields not available");
       }
     }));
+  }
+  
+  fetchCapitalTypeSubtypeAssociation(): void {
+    this.subscriptions.push(this.dataSvc.getRefDatatable('[ArkUI].[CapitalTypeSubtypeAssociation]').subscribe({
+      next: data => {
+        if(typeof data === 'string')
+            data = JSON.parse(data)
+        this.capitalTypeSubtypeAssociation = data
+      },
+      error: error => {
+        console.error("Couldn't fetch capitaltype-subtype association")
+      }
+    }))
   }
 
   ngOnInit(): void {
@@ -495,6 +503,7 @@ export class CapitalActivityComponent implements OnInit {
     this.fetchCapitalActivityData();
     this.fetchInvestmentData();
     this.fetchCapitalRefData();
+    this.fetchCapitalTypeSubtypeAssociation();
   }
 
   ngOnDestroy(): void{
@@ -532,6 +541,7 @@ export class CapitalActivityComponent implements OnInit {
         actionType: actionType,
         capitalTypes: this.capitalTypeOptions,
         capitalSubTypes: this.capitalSubTypeOptions,
+        capitalTypeSubtypeAssociation: this.capitalTypeSubtypeAssociation,
         refData: this.refData,
         gridData: gridData
       },

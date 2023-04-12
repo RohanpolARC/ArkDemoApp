@@ -1,0 +1,16 @@
+/*
+    To remove extra bottom space from mat-form-field. By default, Ng material form fields puts some margin in the bottom for "consistent spacing". In order to remove this forced margin,
+    we supply -ve margin-bottom(i.e. -1.25em).
+
+    Reference: 
+          https://github.com/angular/components/issues/7975#issuecomment-359803149
+          https://stackoverflow.com/a/56514903/17121446
+*/
+mat-form-field{
+    width: 100%;
+    margin-bottom: -1.75em;
+}
+  
+.element{
+    margin-bottom: 0.5em
+}

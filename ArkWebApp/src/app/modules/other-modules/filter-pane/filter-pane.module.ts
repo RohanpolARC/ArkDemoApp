@@ -17,6 +17,7 @@ import { RefDataManagerFilterComponent } from './ref-data-manager-filter/ref-dat
 import { ManagementFeeFilterComponent } from './management-fee-filter/management-fee-filter.component';
 import { PositionScreenFilterComponent } from './position-screen-filter/position-screen-filter.component';
 import { AumDeltaFilterComponent } from './aum-delta-filter/aum-delta-filter.component';
+import { NetReturnsFilterComponent } from './modules/other-modules/filter-pane/net-returns-filter/net-returns-filter.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { AumDeltaFilterComponent } from './aum-delta-filter/aum-delta-filter.com
     RefDataManagerFilterComponent,
     ManagementFeeFilterComponent,
     PositionScreenFilterComponent,
-    AumDeltaFilterComponent
+    AumDeltaFilterComponent,
+    NetReturnsFilterComponent
   ],
   imports: [
     CommonModule,
@@ -52,8 +54,8 @@ import { AumDeltaFilterComponent } from './aum-delta-filter/aum-delta-filter.com
     RefDataManagerFilterComponent,
     ManagementFeeFilterComponent,
     PositionScreenFilterComponent,
-    AumDeltaFilterComponent
-
+    AumDeltaFilterComponent,
+    NetReturnsFilterComponent
   ]
 })
 export class FilterPaneModule { }

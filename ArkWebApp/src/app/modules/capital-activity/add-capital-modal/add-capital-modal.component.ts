@@ -11,7 +11,6 @@ import { Observable } from 'rxjs';
 import { startWith, map, debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { ColDef, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
-
 import { dateFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
 import { LinkInvestorModalComponent } from '../link-investor-modal/link-investor-modal.component';
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
@@ -60,6 +59,7 @@ export class AddCapitalModalComponent implements OnInit{
   fundCcyFilteredOptions: Observable<string[]>;
   posCcyFilteredOptions: Observable<string[]>;
 
+  netCapitalSubtypes: string[] = []
   netISS: [string, string, number][] = []; // [ issuer, issuerShortName, wsoIssuerID] []
   netAssets: [string, number][] = [] // [asset, assetID] []
   selectedIssuerID: number = null;
@@ -190,6 +190,7 @@ export class AddCapitalModalComponent implements OnInit{
       actionType: string,
       capitalTypes: string[],
       capitalSubTypes: string[],
+      capitalTypeSubtypeAssociation: any,
       refData: any,
       gridData: any
     },
@@ -222,6 +223,10 @@ export class AddCapitalModalComponent implements OnInit{
         }  
       }
     }    
+  }
+
+  setSubtypeOptions(capitalType?: string){
+    this.netCapitalSubtypes = this.data.capitalTypeSubtypeAssociation?.filter(r => r?.['CapitalType'] == capitalType).map(r => r?.['CapitalSubtype'])
   }
 
   setDynamicOptions(FH?: string, IssuerSN?: string, Asset?: string): void {
@@ -330,6 +335,13 @@ export class AddCapitalModalComponent implements OnInit{
     }
   }
 
+  _filterCapitalSubtype(value?: string): string[]{
+    if(!value)
+      return this.netCapitalSubtypes;
+    const filterValue = value.toLowerCase();
+    return this.netCapitalSubtypes.filter(op => op.toLowerCase().includes(filterValue))
+  }
+
   _filterIS(value?: string): [string, string, number][]{
     if(value === null)
       return this.netISS; 
@@ -413,6 +425,10 @@ export class AddCapitalModalComponent implements OnInit{
     this.subscriptions.push(this.capitalActivityForm.get('capitalType').valueChanges.pipe(
       debounceTime(300), distinctUntilChanged(), 
       tap((capitalType: any) => {
+
+        this.setSubtypeOptions(capitalType);
+        this.capitalActivityForm.get('capitalSubType').reset();
+
         if(capitalType === 'NAV'){
           this.capitalActivityForm.get('issuerShortName').reset();
           this.capitalActivityForm.get('asset').reset();
@@ -535,7 +551,7 @@ export class AddCapitalModalComponent implements OnInit{
     )
 
     this.capitalSubTypeFilteredOptions = this.capitalActivityForm.get('capitalSubType').valueChanges.pipe(startWith(''), 
-      map(value => this._filter(this.capitalSubTypeOptions, value))
+      map(value => this._filterCapitalSubtype(value))
     )
   }
 
@@ -578,6 +594,7 @@ export class AddCapitalModalComponent implements OnInit{
   }
 
   ngOnInit(): void {
+    this.setSubtypeOptions();
     this.setDynamicOptions();
 
     this.isSuccess = this.isFailure = false;

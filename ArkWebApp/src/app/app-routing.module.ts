@@ -68,6 +68,7 @@ const routes: Routes = [
   { path: 'positions-screen', loadChildren: () => import('./modules/positions-screen/positions-screen.module').then(m => m.PositionsScreenModule) },
   { path: 'hedging-mark', loadChildren: () => import('./modules/hedging-mark/hedging-mark.module').then(m => m.HedgingMarkModule) },
   { path: 'aum-delta', loadChildren: () => import('./modules/aum-delta/aum-delta.module').then(m => m.AumDeltaModule) },
+  { path: 'net-returns', loadChildren: () => import('./modules/net-returns/net-returns.module').then(m => m.NetReturnsModule) },
 
 ];
 

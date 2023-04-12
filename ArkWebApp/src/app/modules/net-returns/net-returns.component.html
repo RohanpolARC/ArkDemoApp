@@ -1,0 +1,30 @@
+<div class="parent">
+    <div class="header">
+        <div class="title">
+            Net Returns
+            <span *ngIf = "asOfDate$ | async as dt" style="font-size: 1rem; font-weight: normal;">
+                ({{dt | date:"dd/MM/yyyy" }})
+            </span>
+            <ng-container *ngIf="calcMethod$ | async"></ng-container>
+            <ng-container *ngIf="fundHedging$ | async"></ng-container>
+            <ng-container *ngIf="cashflowType$ | async"></ng-container>
+        </div>
+
+        <div class="action">
+        </div>
+    </div>
+
+    <div class="content">
+        <mat-card class="mat-content">
+
+            <!-- https://stackoverflow.com/a/67306987. Used to evaluate this ngIf as true always, so that the grids are always visible -->
+            <ng-container *ngIf="{value1: rowData$ | async} as rd">
+
+                <app-net-returns-summary style="height: 120px" [smy]="rd.value1?.summary" [runid]="rd.value1?.RunID"></app-net-returns-summary>
+                <app-net-returns-cashflows style="height: calc(100vh - 64px - 40px - 120px - 87px)" [cashflows]="rd.value1?.cashflows" [cashflowCount]="rd.value1?.cashflowCount"></app-net-returns-cashflows>
+
+            </ng-container>
+        </mat-card>
+    </div>
+
+</div>
