@@ -706,6 +706,8 @@ export class AddCapitalModalComponent implements OnInit{
 
         /* totalAmount wasn't getting set from the above patch statement. Hence, manually setting it up */
       this.capitalActivityForm.patchValue({totalAmount: this.data.rowData.totalAmount})
+      this.setSubtypeOptions(this.data.rowData.capitalType);
+      
     }
     else{
       this.header = 'Add Capital';
