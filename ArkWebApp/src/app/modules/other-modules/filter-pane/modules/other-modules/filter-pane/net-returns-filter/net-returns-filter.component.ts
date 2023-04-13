@@ -43,7 +43,7 @@ export class NetReturnsFilterComponent implements OnInit {
   // ngOnChanges getting called before OnInit
   ngOnChanges(changes: SimpleChanges){
     if(changes?.['fundHedgings']?.currentValue){
-      this.preselectedFundhedgings = [changes['fundHedgings'].currentValue?.[0]]
+      this.preselectedFundhedgings = this.fundHedgings.filter(x=> x['fundHedging'] === 'SL2FEUR')
     }
     if(changes?.['calcMethods']?.currentValue){
       this.preselectedCalcmethods = [changes['calcMethods'].currentValue?.[0]]
