@@ -102,8 +102,11 @@ export class CapitalActivityComponent implements OnInit {
       }, type: 'abColDefNumber'},
     { field: 'totalEur', headerName: 'Total Eur', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
     { field: 'break', headerName: 'Break',  cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
-    { field: 'breakBase', headerName: 'BreakBase', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
-    { field: 'type', type: 'abColDefString'}
+    { field: 'breakBase', headerName: 'Break Base', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
+    { field: 'groupBreak', headerName: 'Group Break', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
+    { field: 'groupBreakBase', headerName: 'Group Break Base', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
+    { field: 'type', type: 'abColDefString'},
+    { field: 'groupID', type: 'abColDefNumber' }
   ]
 
   columnDefs: ColDef[] = [
@@ -431,7 +434,7 @@ export class CapitalActivityComponent implements OnInit {
   
       userInterfaceOptions:{
         customDisplayFormatters:[
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['amount','linkedAmount','totalBase','totalEur', 'linkedAmountBase', 'break', 'breakBase'])
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['amount','linkedAmount','totalBase','totalEur', 'linkedAmountBase', 'break', 'breakBase', 'groupBreak', 'groupBreakBase'])
 
         ]
       },
@@ -470,6 +473,7 @@ export class CapitalActivityComponent implements OnInit {
               'totalEur',
               'break',
               'breakBase',
+              'groupBreak','groupBreakBase','groupID',
               'ActionLink'
             ],
             ColumnWidthMap:{
@@ -489,12 +493,12 @@ export class CapitalActivityComponent implements OnInit {
           }]
         },
         FormatColumn:{
-          Revision: 7,
+          Revision: 8,
           FormatColumns:[
             DATE_FORMATTER_CONFIG_ddMMyyyy(['cashDate']),
 
-            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['amount','linkedAmount','totalBase','totalEur', 'linkedAmountBase', 'break', 'breakBase'],2,['amountZeroFormat']),
-            AMOUNT_FORMATTER_CONFIG_Zero(['amount','linkedAmount','totalBase','totalEur', 'linkedAmountBase', 'break', 'breakBase'],2,['amountZeroFormat'])
+            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['amount','linkedAmount','totalBase','totalEur', 'linkedAmountBase', 'break', 'breakBase', 'groupBreak', 'groupBreakBase'],2,['amountZeroFormat']),
+            AMOUNT_FORMATTER_CONFIG_Zero(['amount','linkedAmount','totalBase','totalEur', 'linkedAmountBase', 'break', 'breakBase', 'groupBreak', 'groupBreakBase'],2,['amountZeroFormat'])
           ]
         }  
       }

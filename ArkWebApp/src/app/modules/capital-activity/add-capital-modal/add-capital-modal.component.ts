@@ -571,10 +571,13 @@ export class AddCapitalModalComponent implements OnInit{
     {field: 'linkedAmountBase', headerName: 'Linked Amount Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'linkedAmountBase'},
     {field: 'break', headerName: 'Break', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'break' },
     {field: 'breakBase', headerName: 'Break Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'breakBase' },
+    {field: 'groupBreak', headerName: 'Group Break', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'groupBreak'  },
+    {field: 'groupBreakBase', headerName: 'Group Break Base', valueFormatter: amountFormatter, cellClass: 'ag-right-aligned-cell', tooltipField: 'groupBreakBase'  },
     {field: 'positionCcy', headerName: 'Position Ccy', tooltipField: 'positionCcy'},
     {field: 'portfolio', headerName: 'Portfolio', tooltipField: 'portfolio'},
     {field: 'issuerShortName', headerName: 'Issuer', tooltipField: 'issuerShortName'},
     {field: 'asset', headerName: 'Asset', tooltipField: 'asset'},
+    {field: 'groupID', headerName: 'Group ID', tooltipField: 'groupID'}
   ]
 
   defaultColDef = {
