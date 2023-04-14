@@ -73,7 +73,6 @@ export class PortfolioHistoryComponent implements OnInit {
   { headerName: "CostAmountLocal",field : 'costAmountLocal', type:'abColDefNumber'},
   { headerName: "FundedCostAmountLocal",field : 'fundedCostAmountLocal', type:'abColDefNumber'},
   { headerName: "Edited Going In Rate",field: 'fxRateBaseEffective', type:'abColDefNumber'},
-  { headerName: 'Edited Going In Rate Method', field:'fxRateEffectiveMethod',type:'abColDefString'},
   { headerName: "Modified By",  field: 'modifiedBy', type:'abColDefString'},
   { headerName: "Modified On",  
     field: "modifiedOn", 
@@ -93,7 +92,6 @@ export class PortfolioHistoryComponent implements OnInit {
     width: 40,
     type:'abColDefObject'
   },
-  { headerName: "GIR Edited", field:'isEdited', type:'abColDefString'},
 
   { headerName: 'GIR Override', field: 'isOverride', type: 'abColDefString' },
   { headerName: 'GIR Source', field: 'girSource', type: 'abColDefString' },
@@ -103,7 +101,7 @@ export class PortfolioHistoryComponent implements OnInit {
   { field:'uniqueID', type:'abColDefNumber'},
   { field: 'pgh_FXRateBaseEffective', headerName: 'Effective Going In Rate', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
   { field: 'colour', type: 'abColDefString' },
-  { field: 'reason', type: 'abColDefString' },
+  { field: 'reason', type: 'abColDefString',width:400 },
   { headerName: "isReviewed", 
     cellRenderer: 'agGridCheckboxRenderer',
       cellRendererParams:()=>{
@@ -234,7 +232,6 @@ export class PortfolioHistoryComponent implements OnInit {
             this.isFailure = false;
             this.updateMsg = "GIR review status updated";
             
-            params.data.isEdited = 'No';
             params.data.isOverride = 'No';
             params.data.isReviewed = false;
 
@@ -324,7 +321,7 @@ export class PortfolioHistoryComponent implements OnInit {
     this.rowData = this.portfolioHistoryService.getPortfolioHistory()
       .pipe(
         map((historyData: any[]) => historyData.map(row => {
-          row['isEdited'] = row['isEdited'] ? 'Yes' : 'No';
+          //row['isEdited'] = row['isEdited'] ? 'Yes' : 'No';
           row['isOverride'] = row['isOverride'] ? 'Yes' : 'No';
           return row;
         }))
@@ -374,7 +371,7 @@ export class PortfolioHistoryComponent implements OnInit {
                 }});
               this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
                 if(dialogRef.componentInstance.isSuccess)
-                  this.gridOptions.api?.refreshCells({ force: true, rowNodes: [context.rowNode], columns: ['fxRateBaseEffective', 'isEdited', 'modifiedOn', 'modifiedBy','reviewedBy','reviewedOn', 'isOverride', 'isReviewed','girSource', 'girSourceID'] })
+                  this.gridOptions.api?.refreshCells({ force: true, rowNodes: [context.rowNode], columns: ['fxRateBaseEffective',  'modifiedOn', 'modifiedBy','reviewedBy','reviewedOn', 'isOverride', 'isReviewed','girSource', 'girSourceID'] })
               }));
             },
             icon:{
@@ -459,7 +456,7 @@ export class PortfolioHistoryComponent implements OnInit {
       },
 
       Layout:{
-        Revision: 8,
+        Revision: 10,
         CurrentLayout: 'Basic Portfolio History',
         Layouts: [{
           Name: 'Basic Portfolio History',
@@ -473,8 +470,10 @@ export class PortfolioHistoryComponent implements OnInit {
             'positionCcy',
             'fundCcy',
             'fxRateBaseEffective',
-            'fxRateEffectiveMethod',
             'pgh_FXRateBaseEffective',
+            'girSource',
+            'girDate',
+            'reason',
             'amount',
             'parAmount',
             'parAmountLocal',
@@ -484,11 +483,7 @@ export class PortfolioHistoryComponent implements OnInit {
             'assetId',
             'modifiedBy',
             'modifiedOn',
-            'isEdited',
             'isOverride',
-            'girSource',
-            'girSourceID',
-            'girDate',
             'actionNew',
             'isReviewed',
             'ActionDelete',
@@ -500,7 +495,6 @@ export class PortfolioHistoryComponent implements OnInit {
             isReviewed:'right',
             ActionInfo:'right'
           },
-          RowGroupedColumns: ['tradeDate', 'fundCcy', 'positionCcy'],
           ColumnWidthMap:{
             ActionDelete: 50,
             ActionInfo:50,

@@ -41,7 +41,6 @@ export class DialogDeleteComponent{
               this.isFailure = false;
               this.updateMsg = "GIR successfully deleted";
               
-              this.data.rowData.isEdited = 'No';
               this.data.rowData.isOverride = 'No';
               this.data.rowData.isReviewed = false;
 
@@ -65,7 +64,8 @@ export class DialogDeleteComponent{
     }
   
     ngOnInit(): void{
-      this.isDeletable = this.data.rowData.isEdited === 'Yes';  
+      //this.isDeletable = this.data.rowData.isEdited === 'Yes';  
+      this.isDeletable = this.data.rowData.isOverride === 'Yes';  
 
       this.isSuccess = false;
       this.isFailure = false;

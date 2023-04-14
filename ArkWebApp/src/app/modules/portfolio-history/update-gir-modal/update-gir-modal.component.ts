@@ -196,7 +196,6 @@ export class UpdateGirModalComponent implements OnInit {
             nodeData['fxRateBaseEffective'] = this.goingInRate,
             nodeData['modifiedOn'] = new Date();
             nodeData['modifiedBy'] = this.currentUserName;
-            nodeData['isEdited'] = 'Yes',
             nodeData['isOverride'] = 'Yes',
             nodeData['colour'] = ' '
             
@@ -258,7 +257,6 @@ export class UpdateGirModalComponent implements OnInit {
               'modifiedBy': this.currentUserName,
               'reviewedOn': new Date(),
               'reviewedBy': this.currentUserName,
-              'isEdited': 'Yes',
               'isOverride': 'Yes',
               'isReviewed':true,
               'colour': ' '
