@@ -389,11 +389,14 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
                       }
                     }))
                   }
-                  else if(!node.data?.['hedgingMark'] || !node.data?.['markOverride']){
+                  else if(node.data?.['hedgingMark'] || node.data?.['markOverride']){
                     this.gridApi.stopEditing();
                     setTimeout(() => {
                       this.saveOverrides(context)
                     }, 200)
+                  }
+                  else if(!node.data?.['hedgingMark'] && !node.data?.['markOverride']){
+                    this.dataSvc.setWarningMsg('Cannot save empty values')
                   }
                 },
                 hidden: (
