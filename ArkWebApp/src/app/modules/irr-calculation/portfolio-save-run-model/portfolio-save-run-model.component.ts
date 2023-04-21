@@ -10,9 +10,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { VPortfolioModel } from 'src/app/shared/models/IRRCalculationsModel';
 
-//type Proceed = "Save" | "SaveRunIRR" | "SaveRunMReturns" | "SaveRunPFees"
 type Proceed = "Save" | "SaveRun"
-
 
 @Component({
   selector: 'app-portfolio-save-run-model',
@@ -52,6 +50,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   baseMeasures: { baseMeasure: string, id: number }[]
   feePresets: { feePreset: string, id: number }[]
   calculationTypes: string[]= ['Monthly Returns','Fee Model','IRR']
+  curveRates: { curveRateName: string, rate: number }[]
   readMore: boolean = false;
   isIRRDisabled: boolean = true;
   isFeePresetDisabled: boolean = true;
@@ -78,12 +77,14 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       forkJoin([
         this.dataService.getUniqueValuesForField('Returns-Base-Measures'),
         this.dataService.getUniqueValuesForField('PortfolioModeller-Fee-Calculation-Entities'),
-        this.dataService.getRefDatatable('[ArkUI].[IRRAggregationLevelRef]')
+        this.dataService.getRefDatatable('[ArkUI].[IRRAggregationLevelRef]'),
+        this.dataService.getUniqueValuesForField('BaseCurve-Rates')
       ]).subscribe({
         next: (d: any[]) => {
           let bm = d[0]
           let fp = d[1]
           let aggrRefDt = d[2]
+          let bcr = d[3]
 
           if(typeof aggrRefDt === 'string')
             aggrRefDt = JSON.parse(aggrRefDt)
@@ -92,6 +93,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
           this.feePresets = fp.map(item => { return { feePreset: item.value, id: item.id } })
           this.allAggrCols = aggrRefDt.map(x => x?.['Fields'])
           this.mapGroupCols = aggrRefDt.filter(x => x?.['IsResultColumn']).map(x => x?.['Fields'])
+          this.curveRates = bcr.map(item => { return { curveRateName: item.value, rate: item.id } })
 
           this.Init();
           this.changeListeners();
@@ -165,6 +167,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       baseMeasure: new FormControl(this.baseMeasures[0]?.baseMeasure, Validators.required),
       feePreset: new FormControl(this.feePresets[0]?.feePreset, Validators.required),
       calculationType: new FormControl([], Validators.required),
+      curveRateName: new FormControl(this.curveRates.filter(cr => cr.rate === 0)[0].curveRateName, Validators.required),
       aggrStr: new FormControl('')
     })
 
@@ -261,6 +264,9 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     model.isManual = !this.isAutomatic;
     model.irrAggrType = this.modelForm.get('aggregationType').value;
 
+    let curveRateName = this.modelForm.get('curveRateName').value;
+    model.curveRateDelta = this.curveRates.filter(cr => cr.curveRateName === curveRateName)?.['0']?.['rate']
+
     if(this.isAutomatic){
       /** Convert rules object into rules string separated by delimeter that is to be sent to ArkWebApi */
       this.rulesSTR = ''
@@ -313,7 +319,8 @@ export class PortfolioSaveRunModelComponent implements OnInit {
               baseMeasure: this.isMonthlyReturnsDisabled ? null : this.modelForm.get('baseMeasure').value,
               feePreset: this.isFeePresetDisabled ? null :  this.modelForm.get('feePreset').value,
               irrAggrType: this.isIRRDisabled ? null : this.modelForm.get('aggregationType').value,
-              
+              curveRateDelta: this.isIRRDisabled ? null : model.curveRateDelta,
+
               // Setting dynamically set aggregation order.
               aggrStr: this.aggrCols,
               mapGroupCols: this.mapGroupCols

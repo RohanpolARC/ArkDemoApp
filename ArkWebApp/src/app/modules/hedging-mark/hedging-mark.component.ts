@@ -256,7 +256,6 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
 
 
     this.gridOptions = {
-
       ...GRID_OPTIONS,
 
       components: {
@@ -543,8 +542,11 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
         if(val === ""){
           params.node.data[levelCol] = null;
         }
-        else if(!params.node.data[levelCol])
-          params.node.data[levelCol] = lvl;  
+
+        // Not setting the level now on the group directly, as it gets cleared when editing and the below line used to set it to asset even if all underlying positions were set to position.
+
+        // else if(!params.node.data[levelCol])
+        //   params.node.data[levelCol] = lvl;  
       }
 
       this.gridApi.applyTransaction({ update: childNodes })

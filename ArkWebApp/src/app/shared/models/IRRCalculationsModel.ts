@@ -9,7 +9,8 @@ export interface VPortfolioModel{
     isManual: boolean,
     isShared: boolean,
     localOverrides: VPortfolioLocalOverrideModel[],
-    irrAggrType: string // `type1 > type2 > type3`
+    irrAggrType: string // `type1 > type2 > type3`,
+    curveRateDelta: number   // percentage with direction (+/-)
 }
 
 export interface VPortfolioLocalOverrideModel{
@@ -27,6 +28,7 @@ export interface IRRCalcParams{
     modelName: string,
     // Optional since can be used to fetch PositionCashflows for the model
     irrAggrType?: string // single type,
+    curveRateDelta?: number,
     
     // Dynamically created aggregations order
     aggrStr?: string[]
@@ -66,5 +68,6 @@ export interface PortfolioModellerCalcParams {
     asOfDate: string,
     feePreset: string,
     irrAggrType: string,
+    curveRateDelta: number,
     runBy: string
 }

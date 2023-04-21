@@ -318,6 +318,7 @@ export class PortfolioModellerComponent implements OnInit {
     baseMeasure?: string,
     feePreset?: string,
     irrAggrType?: string,
+    curveRateDelta?: number,
     aggrStr?: string[],
     mapGroupCols?: string[]
   }){
@@ -334,7 +335,7 @@ export class PortfolioModellerComponent implements OnInit {
             calcParamsData.push({ runID: runID, type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
             break;  
           case 'SaveRunIRR':
-            calcParamsData.push({ runID: runID, type: 'IRR', aggrStr: contextData?.aggrStr, mapGroupCols: contextData?.mapGroupCols})
+            calcParamsData.push({ runID: runID, type: 'IRR', aggrStr: contextData?.aggrStr, mapGroupCols: contextData?.mapGroupCols, curveRateDelta: contextData.curveRateDelta})
             break;
           default:
             break;
@@ -349,6 +350,7 @@ export class PortfolioModellerComponent implements OnInit {
     baseMeasure?: string,
     feePreset?: string,
     irrAggrType?: string,
+    curveRateDelta?: number,
     aggrStr?: string[],
     mapGroupCols?: string[]
   } = null){
@@ -362,7 +364,8 @@ export class PortfolioModellerComponent implements OnInit {
     m.positionIDs = this.selectedPositionIDs;
     m.asOfDate = this.asOfDate;
     m.feePreset = contextData.feePreset;
-    m.irrAggrType = contextData.irrAggrType
+    m.irrAggrType = contextData.irrAggrType;
+    m.curveRateDelta = contextData.curveRateDelta;
     m.runBy = this.dataSvc.getCurrentUserName();
 
     // Load cashflows only if running IRR/Performance fees
@@ -425,6 +428,7 @@ export class PortfolioModellerComponent implements OnInit {
     baseMeasure?: string,
     feePreset?: string,
     irrAggrType?: string,
+    curveRateDelta?: number,
     aggrStr?: string[],
     mapGroupCols?: string[]
   } = null){
@@ -968,6 +972,7 @@ export class PortfolioModellerComponent implements OnInit {
               baseMeasure: res?.['baseMeasure'],
               feePreset: res?.['feePreset'],
               irrAggrType: res?.['irrAggrType'],
+              curveRateDelta: res?.['curveRateDelta'],
               aggrStr: res?.['aggrStr'],
               mapGroupCols: res?.['mapGroupCols']
             }
@@ -984,7 +989,8 @@ export class PortfolioModellerComponent implements OnInit {
     baseMeasure?: string,
     feePreset?: string,
     aggrStr?: string[],
-    mapGroupCols?: string[]
+    mapGroupCols?: string[],
+    curveRateDelta: number
   }[]) {
     let calcParamsEmitterData = []
     
@@ -1005,7 +1011,8 @@ export class PortfolioModellerComponent implements OnInit {
     baseMeasure?: string,
     feePreset?: string,
     aggrStr?: string[],
-    mapGroupCols?: string[]
+    mapGroupCols?: string[],
+    curveRateDelta?: number
   }){
 
     let calcParams
@@ -1038,6 +1045,7 @@ export class PortfolioModellerComponent implements OnInit {
       cp.modelID = this.isLocal.value ? this.selectedModelID : null,
       cp.aggrStr = p.aggrStr;
       cp.mapGroupCols = p.mapGroupCols;
+      cp.curveRateDelta = p.curveRateDelta;
 
       calcParams = cp as IRRCalcParams
     }

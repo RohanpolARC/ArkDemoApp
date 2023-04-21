@@ -112,6 +112,15 @@
                         </mat-select>
                     </mat-form-field>
 
+                    <mat-form-field class="col-3" appearance="outline">
+                        <mat-label>Base Curve Rate</mat-label>
+                        <mat-select formControlName="curveRateName" required disableOptionCentering [disabled]="isIRRDisabled">
+                          <mat-option *ngFor="let c of curveRates" [value]="c.curveRateName">
+                            {{c.curveRateName}}
+                          </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
                     <mat-form-field class="col-12" appearance="outline">
                         <mat-label>Aggregation Order</mat-label>
                         <mat-chip-list #aggrColList aria-label="Aggregation column selection">
