@@ -9,6 +9,7 @@ import { HedgingMarkRoutingModule } from './hedging-mark-routing.module';
 import { HedgingMarkService } from './service/hedging-mark.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
 
 
 
@@ -27,7 +28,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    MatCardModule
+    MatCardModule,
+
+    DetailedViewModule
   ],
   providers:[
     HedgingMarkService        // Limiting Hedging Mark service for this module only

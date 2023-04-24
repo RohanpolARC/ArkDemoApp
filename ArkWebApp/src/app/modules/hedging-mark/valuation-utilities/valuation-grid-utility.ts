@@ -3,6 +3,8 @@ import { MatDialog } from "@angular/material/dialog"
 import { DetailedViewComponent } from "src/app/shared/components/detailed-view/detailed-view.component"
 import { DetailedView } from "src/app/shared/models/GeneralModel"
 import { getNodes } from "../../capital-activity/utilities/functions"
+import { DefaultDetailedViewComponent } from "src/app/shared/modules/detailed-view/default-detailed-view/default-detailed-view.component"
+import { DefaultDetailedViewPopupComponent } from "src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component"
 
 export class ValuationUtility {
 
@@ -160,7 +162,8 @@ export class ValuationUtility {
         m.param4 = ' ';
         m.param5 = ' ';
   
-        dialog.open(DetailedViewComponent, {
+        dialog.open(DefaultDetailedViewPopupComponent, {
+        //dialog.open(DetailedViewComponent, {
           data: {
             detailedViewRequest: m
           },
