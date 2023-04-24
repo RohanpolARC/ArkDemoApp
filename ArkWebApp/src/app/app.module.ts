@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';  
-import { NgModule } from '@angular/core';  
+import {  NgModule } from '@angular/core';  
   
 import { AppRoutingModule } from './app-routing.module';  
 import { AppComponent } from './app.component';  
@@ -44,6 +44,7 @@ import { IPublicClientApplication, PublicClientApplication, BrowserCacheLocation
 import { MsalHttpInterceptor } from './core/interceptors/msal-http.interceptor';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NoRowsOverlayComponent } from './shared/components/no-rows-overlay/no-rows-overlay.component';
+
 
 export const protectedResourceMap: any =  
   [  
@@ -102,7 +103,6 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
     BrowserModule,  
     AppRoutingModule,  
     HttpClientModule,
-
 
     AdaptableAngularAgGridModule, 
     AgGridModule,

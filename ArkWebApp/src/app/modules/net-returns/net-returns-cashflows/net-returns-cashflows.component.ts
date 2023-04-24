@@ -5,8 +5,10 @@ import { Observable, Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
   selector: 'app-net-returns-cashflows',
@@ -21,6 +23,7 @@ export class NetReturnsCashflowsComponent implements OnInit {
   filterApply$: Observable<boolean> = this.dataSvc.filterApplyBtnState.pipe(
     tap((isHit: boolean) => {
       if(isHit){
+        this.noRowsToDisplayMsg='No data found for applied filter.'
         this.gridApi.showLoadingOverlay();
       }
     })
@@ -35,6 +38,8 @@ export class NetReturnsCashflowsComponent implements OnInit {
   adaptableOptions: AdaptableOptions
 
   subscriptions: Subscription[] = []
+  noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
+
   constructor(private dataSvc: DataService) { }
 
   ngOnInit(): void {
@@ -63,7 +68,11 @@ export class NetReturnsCashflowsComponent implements OnInit {
       },
       headerHeight: 30,
       rowHeight: 30,
-      groupHeaderHeight: 30
+      groupHeaderHeight: 30,
+      noRowsOverlayComponent : NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
 
     this.adaptableOptions = {
@@ -121,7 +130,7 @@ export class NetReturnsCashflowsComponent implements OnInit {
   onCellValueChanged(params: CellValueChangedEvent){}
 
   onGridReady(params: GridReadyEvent){
-    params.api.hideOverlay()
+    params.api.showNoRowsOverlay()
     params.api.closeToolPanel()
 
     this.gridApi = params.api;

@@ -10,7 +10,10 @@
             <ng-container *ngIf="cashflowType$ | async"></ng-container>
         </div>
 
-        <div class="action">
+        <div class="action" style="margin-right: 2.5em;">
+            <button mat-raised-button (click)="onRunReport()">
+                Run Report
+            </button>
         </div>
     </div>
 

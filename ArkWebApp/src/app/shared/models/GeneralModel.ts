@@ -21,4 +21,13 @@ export interface RefDataProc{
     param5: string,
 }
 
+export type ReportServerParams={
+    reportServer: string 
+    reportUrl: string 
+    showParameters: string 
+    language: string 
+    toolbar: string 
+    parameters: any
+  }
+
 export type NoRowsCustomMessages = 'Please apply the filter.'|'No data found for applied filter.'|'No data found.'

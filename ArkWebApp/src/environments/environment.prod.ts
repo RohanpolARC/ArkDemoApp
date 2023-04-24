@@ -9,6 +9,8 @@ export const environment = {
   arkFunctionScopeUri: ['api://036238e9-d968-4450-8831-bd0d4db803d4/ark-irr-func'],
 
   feeCalcFunctionUrl: 'https://feecalcfunc.azurewebsites.net',
-  feeCalcFunctionScopeUri: ['api://8784c404-ffb6-4110-8c5a-a67c473b9a23/ark-fee-func']
+  feeCalcFunctionScopeUri: ['api://8784c404-ffb6-4110-8c5a-a67c473b9a23/ark-fee-func'],
  
+  ssrsUrl: 'https://vmuksouthapp03/ReportServer/Pages/ReportViewer.aspx'
+
 };

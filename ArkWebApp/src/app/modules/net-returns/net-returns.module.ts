@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { NetReturnsRoutingModule } from './net-returns-routing.module';
@@ -8,13 +8,18 @@ import { NetReturnsCashflowsComponent } from './net-returns-cashflows/net-return
 import { MatCardModule } from '@angular/material/card';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
 import { AgGridModule } from '@ag-grid-community/angular';
+import { MatButtonModule } from '@angular/material/button';
+import { ReportWrapperComponent } from './report-wrapper/report-wrapper.component';
+import { SsrsReportViewerModule } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-viewer.module';
+
 
 
 @NgModule({
   declarations: [
     NetReturnsComponent,
     NetReturnsSummaryComponent,
-    NetReturnsCashflowsComponent
+    NetReturnsCashflowsComponent,
+    ReportWrapperComponent
   ],
   imports: [
     CommonModule,
@@ -22,6 +27,13 @@ import { AgGridModule } from '@ag-grid-community/angular';
     MatCardModule,
     AdaptableAngularAgGridModule,
     AgGridModule,
-  ]
+
+    MatButtonModule,
+
+    SsrsReportViewerModule
+
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+
 })
 export class NetReturnsModule { }

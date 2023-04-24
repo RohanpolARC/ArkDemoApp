@@ -21,7 +21,11 @@ export const environment = {
 
   // feeCalcFunctionUrl: 'http://localhost:7049',
   feeCalcFunctionUrl: 'https://feecalcfuncuat.azurewebsites.net',
-  feeCalcFunctionScopeUri: ['api://57d373b0-5305-4b6b-a3f7-ccdc0a4560ca/ark-fee-func']
+  feeCalcFunctionScopeUri: ['api://57d373b0-5305-4b6b-a3f7-ccdc0a4560ca/ark-fee-func'],
+
+
+  //Production Report Server URL
+  ssrsUrl: 'https://vmuksouthapp03/ReportServer/Pages/ReportViewer.aspx'
 };
 
 /*
