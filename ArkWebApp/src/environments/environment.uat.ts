@@ -12,7 +12,7 @@ export const environment = {
   feeCalcFunctionUrl: 'https://feecalcfuncuat.azurewebsites.net',
   feeCalcFunctionScopeUri: ['api://57d373b0-5305-4b6b-a3f7-ccdc0a4560ca/ark-fee-func'],
 
-  ssrsUrl: 'https://vmuksouthapp03/ReportServer/Pages/ReportViewer.aspx'
+  ssrsUrl: 'https://vmuksouthapp03.arcmont-am.com/ReportServer/Pages/ReportViewer.aspx'
 
  
 };
