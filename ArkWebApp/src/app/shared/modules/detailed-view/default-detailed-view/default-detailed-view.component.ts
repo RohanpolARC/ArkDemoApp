@@ -86,4 +86,8 @@ export class DefaultDetailedViewComponent implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
 }
