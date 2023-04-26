@@ -4,10 +4,12 @@ import {
   CellClickedEvent,
   ColDef,
   EditableCallbackParams,
+  GetMainMenuItemsParams,
   GridOptions,
   IAggFuncParams,
   IsGroupOpenByDefaultParams,
   ITooltipParams,
+  MenuItemDef,
   Module
 } from '@ag-grid-community/core';
 import { dateFormatter, noDecimalAmountFormatter } from 'src/app/shared/functions/formatter';
@@ -27,6 +29,8 @@ import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfu
 import { UnfundedAssetsEditorComponent } from '../unfunded-assets/unfunded-assets-editor/unfunded-assets-editor.component';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
+import { ConfirmationComponent } from 'src/app/shared/modules/confirmation/confirmation/confirmation.component';
+import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
 
 @Component({
   selector: 'app-liquidity-summary',
@@ -604,4 +608,35 @@ export class LiquiditySummaryComponent implements OnInit {
       panelClass: [type]
     });
   }
+
+
+  getMainMenuItems(params: GetMainMenuItemsParams): (string | MenuItemDef)[] {
+
+    //here attrType and attr are grouped thus their names have ag-Grid-AutoColumn prefix with them
+    if(['date','ag-Grid-AutoColumn-attrType','ag-Grid-AutoColumn-attr','subAttr','action'].includes(params.column.getId())){
+      return params.defaultItems;
+    }else{
+      const fundHedgingMenuItems: (
+        | MenuItemDef
+        | string
+      )[] = params.defaultItems.slice(0);
+      fundHedgingMenuItems.push({
+        name: 'Add Comment',
+        action: () => {
+          // this.dialog.open(ConfirmationComponent)
+          params.context.componentParent.dialog.open(ConfirmPopupComponent,{
+            data:{
+              fundHedging:params.column.getColId()
+            },
+            height:'15vh',
+            width:'15vw'
+          })
+        },
+        cssClasses:['bold']//not working yet
+      });
+      return fundHedgingMenuItems;
+    }
+
+  }
+
 }
