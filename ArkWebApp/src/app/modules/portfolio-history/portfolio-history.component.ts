@@ -25,6 +25,7 @@ import { CheckboxEditorComponent } from 'src/app/shared/components/checkbox-edit
 import { AssetGIRModel } from 'src/app/shared/models/AssetGIRModel';
 import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
+import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
 
 let adapTableApi: AdaptableApi;
 
@@ -588,10 +589,13 @@ export class PortfolioHistoryComponent implements OnInit {
       m.param3 = p.data?.['tradeDate'] //asofdate;
       m.param4 = String(p.data?.['assetId']);
       m.param5 = ' ';
+      m.strParam1 = []
 
-      dialog.open(DetailedViewComponent, {
+      dialog.open(DefaultDetailedViewPopupComponent, {
         data: {
-          detailedViewRequest: m
+          detailedViewRequest: m,
+          noFilterSpace: true,
+          grid: 'GIR Editor'
         },
         width: '90vw',
         height: '80vh'

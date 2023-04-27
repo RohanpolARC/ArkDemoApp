@@ -14,6 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { PortfolioHistoryRoutingModule } from './portfolio-history-routing.module';
+import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,9 @@ import { PortfolioHistoryRoutingModule } from './portfolio-history-routing.modul
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    FormsModule
+    FormsModule,
+
+    DetailedViewModule
   ],
   exports:[
     PortfolioHistoryComponent

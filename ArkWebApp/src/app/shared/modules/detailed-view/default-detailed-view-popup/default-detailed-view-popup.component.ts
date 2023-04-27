@@ -30,9 +30,15 @@ export class DefaultDetailedViewPopupComponent implements OnInit {
       header: string,
       noDataMessage: string,
       grid?: string,      // To load grid config name from the DB.
-      filterTemplateRef: TemplateRef<any>
+      filterTemplateRef: TemplateRef<any>,
+
+      noFilterSpace: boolean
     }
   ) { }
+
+  public get noFilterSpace(): boolean {
+    return this.params.noFilterSpace;
+  }
 
   public get gridOptions(): GridOptions {
     return this.detailedVwSvc.gridOptions;

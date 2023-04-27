@@ -3,7 +3,7 @@ import { CellClickedEvent, ColDef, GridApi, GridOptions, GridReadyEvent, Module,
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { Observable, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { dateTimeFormatter,dateFormatter, formatDate, CUSTOM_FORMATTER, BLANK_DATETIME_FORMATTER_CONFIG, DATE_FORMATTER_CONFIG_ddMMyyyy, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm } from 'src/app/shared/functions/formatter';
+import { formatDate, BLANK_DATETIME_FORMATTER_CONFIG, DATE_FORMATTER_CONFIG_ddMMyyyy, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm } from 'src/app/shared/functions/formatter';
 import { AttributesFixingService } from 'src/app/core/services/AttributesFixing/attributes-fixing.service';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { DataService } from 'src/app/core/services/data.service';
@@ -16,6 +16,7 @@ import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/Genera
 import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
+import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
 
 
 @Component({
@@ -233,10 +234,13 @@ export class AttributesFixingComponent implements OnInit {
       model.param3 = formatDate(event.data.asOfDate,true);
       model.param4 = ''
       model.param5 = ''
+      model.strParam1 = []
 
-      const dialogRef = this.dialog.open(DetailedViewComponent,{
+      const dialogRef = this.dialog.open(DefaultDetailedViewPopupComponent,{
         data: {
-          detailedViewRequest: model
+          detailedViewRequest: model,
+          noFilterSpace: true,
+          grid: 'Fixing Attributes'
         },
         width: '90vw',
         height: '80vh'

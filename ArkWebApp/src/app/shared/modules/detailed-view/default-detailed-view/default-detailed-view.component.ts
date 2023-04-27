@@ -1,5 +1,5 @@
 import { ColDef, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
-import { Component, OnInit,  Input, TemplateRef } from '@angular/core';
+import { Component, OnInit,  Input, TemplateRef, SimpleChanges } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DetailedView, NoRowsCustomMessages } from '../../../models/GeneralModel';
@@ -12,7 +12,6 @@ import { DetailedViewService } from '../detailed-view.service';
 })
 export class DefaultDetailedViewComponent implements OnInit {
 
-  @Input() detailedViewRequest    : any
   @Input() failureMsg             : string = null
   @Input() header                 : string = 'Detailed View'
   @Input() noDataMessage          : string = 'No detailed view'
@@ -21,13 +20,15 @@ export class DefaultDetailedViewComponent implements OnInit {
   @Input() columnDefs             : ColDef[]
   @Input() rowData                : any[]
 
-
+  @Input() noFilterSpace          : boolean = false;
   // Search space template passed as Input()
 
   @Input() filterspace            : TemplateRef<any>
 
+  // Required when not using any filter space. request sent here would be directly accepted.
+  @Input() requestIfNoFilter      : DetailedView;
+
   subscriptions                   : Subscription[] = [];
-  request                         : DetailedView;
   defaultColDef                   : ColDef;
   agGridModules                   : Module[] = CommonConfig.AG_GRID_MODULES;
 
@@ -40,8 +41,16 @@ export class DefaultDetailedViewComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  ngOnChanges(changes: SimpleChanges){
+    
+    // If no filter is applicable, then we automatically update the request listener for it to make a request directly since there is no Apply button to listen from.
+
+    if(changes?.['noFilterSpace'].currentValue === true){
+      this.detailedVwSvc.updateRequest(this.requestIfNoFilter);
+    }
+  }
+
   onApply(){ 
-    // this.applyHit.emit(true)
     this.detailedVwSvc.hitApply(true)
   }
 
