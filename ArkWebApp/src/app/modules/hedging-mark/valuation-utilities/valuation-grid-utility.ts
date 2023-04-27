@@ -153,34 +153,6 @@ export class ValuationUtility {
         }
     }
     
-    onOverrideCellClicked(p: CellClickedEvent, asOfDate: string, dialog: MatDialog, filterTemplate: TemplateRef<AuditFilterComponent>, svc: HedgingMarkService) {
-      if (!p.node.group && p.data['state'] !== 'edit') {
-  
-        let pid = p.data?.['positionId']
-
-        svc.updateAuditPositions([pid]);
-
-        let m = <DetailedView>{};
-        m.screen = 'Valuation/Hedging Mark';
-        m.param1 = String(pid) //positionId;
-        m.param2 = asOfDate; // AsOfDate
-        m.param3 = p.column.getColId();
-        m.param4 = ' ';
-        m.param5 = ' ';
-  
-        dialog.open(DefaultDetailedViewPopupComponent, {
-          data: {
-            detailedViewRequest: m,
-            grid: 'Audit - Valuation',
-
-            filterTemplateRef: filterTemplate
-          },
-          width: '90vw',
-          height: '80vh'
-        })
-      }
-    }
-
     updateAllSiblingsLevelToPosition(node: RowNode, colid: 'markOverrideLevel' | 'hedgingMarkLevel', gridApi: GridApi) {
 
       let parentNode: RowNode = node.parent;

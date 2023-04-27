@@ -14,8 +14,6 @@ import { HedgingMarkService } from '../service/hedging-mark.service';
   styleUrls: []
 })
 export class AuditFilterComponent implements OnInit {
-  columnDefs: ColDef[];
-  gridOptions: GridOptions;
 
   markType = new FormControl('Mark Override');
 
@@ -56,30 +54,17 @@ export class AuditFilterComponent implements OnInit {
 
     this.detailedVwSvc.applyBtnHitState.subscribe((isHit) => {
       // Listen to the filter and do your job
-      console.log(isHit)
 
       this.detailedVwSvc.rowData = null;
       // // Generate the request object
       let request: DetailedView = <DetailedView>{}
 
-      if(this.markType.value === 'Mark Override'){
-        request.strParam1 = this.selectedpositions?.map(r => <string>r?.['value'])
-        request.param1 = ''
-        request.param2 = '2023-01-11',
-        request.param3 = 'markOverride',
-        request.param4 = request.param5 =  ' '
-        request.screen = 'Valuation/Hedging Mark'
-      }
-
-      if(this.markType.value === 'Hedging Mark'){
-        request.strParam1 = this.selectedpositions?.map(r => <string>r?.['value'])
-        request.param1 = ''
-        request.param2 = '2023-01-11',
-        request.param3 = 'hedgingMark',
-        request.param4 = request.param5 =  ' '
-        request.screen = 'Valuation/Hedging Mark'
-      }
-
+      request.strParam1 = this.selectedpositions?.map(r => <string>r?.['value'])
+      request.param1 = ''
+      request.param2 = '',
+      request.param3 = this.markType.value,
+      request.param4 = request.param5 =  ' '
+      request.screen = 'Valuation/Hedging Mark'
 
       this.detailedVwSvc.updateRequest(request);
       

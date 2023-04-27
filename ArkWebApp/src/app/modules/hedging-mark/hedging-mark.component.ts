@@ -197,10 +197,6 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
     }))
   }
 
-  onOverrideCellClick(p: CellClickedEvent){
-    this.onOverrideCellClicked(p, this.asOfDate, this.dialog, this.filterspace, this.hedgingMarkSvc)
-  }
-
   ngOnInit(): void {
 
     this.isWriteAccess = false;
@@ -332,7 +328,10 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
                   context: ActionColumnContext) => {
 
                     let pids: number[] = [];
-                    pids = [context.data?.['positionId']]
+
+                    let nodes = getNodes(context.rowNode);
+                    pids = nodes.map(n => n['positionId'])
+
                     this.hedgingMarkSvc.updateAuditPositions(pids);
 
                     let m = <DetailedView>{};
@@ -359,15 +358,6 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
                     style: {
                       height: 25, width: 25
                     }
-                },
-                hidden: (
-                      button: AdaptableButton<ActionColumnContext>,
-                      context: ActionColumnContext
-                    ) => {
-                      if (context.rowNode.group) {
-                        return true;
-                      }
-                      else return false;
                 },
               },
               {
