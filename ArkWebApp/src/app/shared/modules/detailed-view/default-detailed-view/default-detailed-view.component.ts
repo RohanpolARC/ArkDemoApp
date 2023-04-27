@@ -1,5 +1,5 @@
 import { ColDef, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
-import { Component, OnInit,  Input, TemplateRef, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit,  Input, TemplateRef } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DetailedView, NoRowsCustomMessages } from '../../../models/GeneralModel';
@@ -20,6 +20,9 @@ export class DefaultDetailedViewComponent implements OnInit {
   @Input() gridOptions            : GridOptions
   @Input() columnDefs             : ColDef[]
   @Input() rowData                : any[]
+
+
+  // Search space template passed as Input()
 
   @Input() filterspace            : TemplateRef<any>
 

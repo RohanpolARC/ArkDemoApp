@@ -15,16 +15,19 @@ import { HedgingMarkService } from '../service/hedging-mark.service';
 })
 export class AuditFilterComponent implements OnInit {
 
-  markType = new FormControl('Mark Override');
-
-  positionsDropdown = []
-  selectedpositions = []
-
   constructor(
     private dataSvc: DataService,
     private detailedVwSvc: DetailedViewService,
     private hedgingMarkSvc: HedgingMarkService
   ) { }
+
+  /** Filter template specific for this search criterion */
+
+  markType = new FormControl('Mark Override');
+
+  positionsDropdown = []
+  selectedpositions = []
+
 
 
   settings: IDropdownSettings = {
@@ -34,13 +37,29 @@ export class AuditFilterComponent implements OnInit {
     allowSearchFilter: true    
   }
 
+
+  onSelectedPositionsChange(event){
+    this.selectedpositions = event
+  }
+
+  /** */
+
+
   ngOnInit(){
+
+
+    // Filter component taking input for initial parameter load.
+
+    // Here we need the positions for which have to show the audit trail.
 
     this.hedgingMarkSvc.auditingPositionsState.pipe(take(1)).subscribe((pids: number[]) => {
       this.selectedpositions = pids.map(p => {
         return { value: String(p), id: String(p) }
       })
     })
+
+
+    // Loads dropdown information.
 
     this.dataSvc.getUniqueValuesForField('PositionID').pipe(take(1)).subscribe({
       next: (data) => {
@@ -52,11 +71,12 @@ export class AuditFilterComponent implements OnInit {
       }
     })
 
+
+    // Listening to the applied to create the appropriate request object.  This needs to be defined in every appropriate filter template component.
+
     this.detailedVwSvc.applyBtnHitState.subscribe((isHit) => {
-      // Listen to the filter and do your job
 
       this.detailedVwSvc.rowData = null;
-      // // Generate the request object
       let request: DetailedView = <DetailedView>{}
 
       request.strParam1 = this.selectedpositions?.map(r => <string>r?.['value'])
@@ -71,7 +91,4 @@ export class AuditFilterComponent implements OnInit {
     })
   }
 
-  onSelectedPositionsChange(event){
-    this.selectedpositions = event
-  }
 }

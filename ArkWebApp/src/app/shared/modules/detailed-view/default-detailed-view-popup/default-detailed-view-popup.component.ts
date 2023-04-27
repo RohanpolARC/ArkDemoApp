@@ -80,6 +80,7 @@ export class DefaultDetailedViewPopupComponent implements OnInit {
       this.requestListener$ = this.detailedVwSvc.onRequestUpdate();
     }
 
+    // *** Clearing the grid when dialog box is closed.
     this.dialogRef.beforeClosed().pipe(take(1)).subscribe(() => {
       this.detailedVwSvc.rowData = null;
     })

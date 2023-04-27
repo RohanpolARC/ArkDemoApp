@@ -34,6 +34,7 @@ export class DetailedViewService {
 
   constructor(private dataSvc: DataService) { }
 
+  // Needs to be used in the component consuming default-detailed-view, just like its pop up component.
   onRequestUpdate(): Observable<any[]> {
 
     return this.detailedVwReqState.pipe(
@@ -46,7 +47,7 @@ export class DetailedViewService {
     )
   }
 
-  
+  // Needs to be used in the component consuming default-detailed-view, just like its pop up component.
   loadingGridConfig(gridName: string) {
 
     return this.dataSvc.getRefDatatable(gridName).pipe(
@@ -57,27 +58,6 @@ export class DetailedViewService {
       })
     )
   }
-
-  // onApplyBtnHit(grid: string): Observable<any>{
-
-  //   return this.applyBtnHitState.pipe(
-  //     filter((isHit: boolean) => isHit),
-  //     switchMap((isHit) => {
-  //       return this.dataSvc.getRefDatatable(grid).pipe(
-  //         map((config) =>  JSON.parse(<string><unknown>config)),
-  //         tap((config: GridColumnConfig[]) => {
-  //           this.columnDefs = createColumnDefs2(config);
-  //           this.gridOptions = this.getGridOptions();
-  //         }),
-  //         switchMap(() => this.dataSvc.getDetailedView(this.detailedView).pipe(
-  //           tap((data) => {
-  //             this.rowData = parseFetchedData(data);
-  //           }
-  //         ))
-  //       ))
-  //     })
-  //   )
-  // }
 
   getGridOptions(): GridOptions {
     
