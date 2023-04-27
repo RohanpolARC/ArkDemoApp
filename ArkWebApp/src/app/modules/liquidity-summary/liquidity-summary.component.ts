@@ -5,14 +5,16 @@ import {
   ColDef,
   EditableCallbackParams,
   GetMainMenuItemsParams,
+  GridApi,
   GridOptions,
   IAggFuncParams,
   IsGroupOpenByDefaultParams,
   ITooltipParams,
   MenuItemDef,
-  Module
+  Module,
+  ValueGetterParams
 } from '@ag-grid-community/core';
-import { dateFormatter, noDecimalAmountFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, customliquiditySummaryFormatter } from 'src/app/shared/functions/formatter';
 import { Subscription } from 'rxjs';
 import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/liquidity-summary.service';
 import { DataService } from 'src/app/core/services/data.service';
@@ -21,7 +23,7 @@ import { AttributeEditorComponent } from './attribute-editor/attribute-editor.co
 import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-renderer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
-import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
+import { ConfirmComponentConfigure, DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
 import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
 import { getMomentDateStr } from 'src/app/shared/functions/utilities';
@@ -29,8 +31,7 @@ import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfu
 import { UnfundedAssetsEditorComponent } from '../unfunded-assets/unfunded-assets-editor/unfunded-assets-editor.component';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
-import { ConfirmationComponent } from 'src/app/shared/modules/confirmation/confirmation/confirmation.component';
-import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
+import { AddCommentComponent } from './add-comment/add-comment.component';
 
 @Component({
   selector: 'app-liquidity-summary',
@@ -43,6 +44,8 @@ export class LiquiditySummaryComponent implements OnInit {
   assetFundingDetails: any[];
   unfundedAssets: any;
   noRowsDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
+  gridApi: GridApi;
+  fundHedgingsComments: any;
   constructor(private liquiditySummarySvc: LiquiditySummaryService,
               private unfundedAssetsSvc: UnfundedAssetsService,
               private dataSvc: DataService,
@@ -113,7 +116,6 @@ export class LiquiditySummaryComponent implements OnInit {
       }
       parsedData.push(row);
     }
-
     return parsedData;
   }
 
@@ -148,7 +150,10 @@ export class LiquiditySummaryComponent implements OnInit {
           else if(params.rowNode.key === 'Liquidity'){
   
             this.gridOptions.api.forEachNode((rowNode, index) => {
-              if(['Current Cash', 'Net Cash', 'Liquidity'].includes(rowNode.data?.['attrType'])){
+              if(
+                ['Current Cash', 'Net Cash', 'Liquidity'].includes(rowNode.data?.['attrType'])
+                && !['RCF Drawn'].includes(rowNode.data?.['attr'])
+              ){
                 sum += Number(rowNode.data?.[colName]);
               }
             })
@@ -189,7 +194,8 @@ export class LiquiditySummaryComponent implements OnInit {
           else if(params.rowNode.key === 'Cash Post Known Outflows'){
   
             this.gridOptions.api.forEachNode((rowNode, index) => {
-              if(['Current Cash', 'Net Cash', 'Liquidity','Known Outflows Unsettled', 'Known Outflows Funding','Known Outflows Pipeline','Delayed Cash'].includes(rowNode.data?.['attrType'])){
+              if(['Current Cash', 'Net Cash', 'Liquidity','Known Outflows Unsettled', 'Known Outflows Funding','Known Outflows Pipeline','Delayed Cash'].includes(rowNode.data?.['attrType'])
+              && !['RCF Drawn'].includes(rowNode.data?.['attr'])){
                 sum += Number(rowNode.data?.[colName]);
               }
             })
@@ -276,7 +282,7 @@ export class LiquiditySummaryComponent implements OnInit {
       let colDef: ColDef = {
         field: FH,
         headerName: FH,
-        valueFormatter: noDecimalAmountFormatter,
+        valueFormatter: customliquiditySummaryFormatter,
         width: 133,
         cellStyle: params => {
 
@@ -395,6 +401,25 @@ export class LiquiditySummaryComponent implements OnInit {
       console.warn("Component loaded without setting date in filter pane");
   }
 
+
+  setCommentRow() {
+    let commentRow={};
+    commentRow['attr'] = ''
+    commentRow['date'] = ''
+    commentRow['attrType'] = 'Notes'
+    commentRow['subAttr'] =''
+    commentRow['isManual'] = 0
+    this.fundHedgings.forEach(fh=>{
+      this.fundHedgingsComments.forEach(element => {
+        if(fh===element.fundHedging){
+          commentRow[fh] = element.comment
+        }
+      });
+    })
+    this.gridApi.setPinnedBottomRowData([commentRow]);
+
+  }
+
   fetchAssetFundingDetails(){
 
     this.subscriptions.push(this.unfundedAssetsSvc.getAssetFundingDetails().subscribe({
@@ -409,6 +434,7 @@ export class LiquiditySummaryComponent implements OnInit {
 
   onGridReady(params: any){
     params.api.closeToolPanel();
+    this.gridApi = params.api
   }
 
   getAssetId(subAttr: string): number {
@@ -532,8 +558,8 @@ export class LiquiditySummaryComponent implements OnInit {
         break;
       }        
     }
-
     this.fetchLiquiditySummaryRef();
+    this.getLiquiditySummaryComments()
     this.fetchAssetFundingDetails();
 
     /** Making this component available to child components in Ag-grid */
@@ -564,8 +590,17 @@ export class LiquiditySummaryComponent implements OnInit {
       },
       autoGroupColumnDef: {
         pinned: 'left',
+        valueGetter:(params:ValueGetterParams)=>{
+          if(!params.node.group && params.column.getColId()==="ag-Grid-AutoColumn-attrType" && params.data?.['attrType']==='Notes'){
+            console.log(params)
+            
+            return 'Notes'
+          }
+
+          return ''
+        },
         cellRendererParams: {
-          suppressCount: true     // Disable row count on group
+          suppressCount: true    // Disable row count on group
         }
       },
       frameworkComponents:{
@@ -597,9 +632,16 @@ export class LiquiditySummaryComponent implements OnInit {
           /** Removes previous column order state, else new order of columnDefs is not persisted. (e.g. Sorting of FH columns))  */
         this.gridOptions.api?.setColumnDefs(null)
         this.fetchLiquiditySummary();
+        this.getLiquiditySummaryComments()
       }
     }))
 
+  }
+  getLiquiditySummaryComments() {
+    this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryComments().subscribe(data=>{
+      this.fundHedgingsComments = data
+      this.setCommentRow()
+    }))
   }
 
   setWarningMsg(message: string, action: string, type: string = 'ark-theme-snackbar-normal'){
@@ -609,6 +651,7 @@ export class LiquiditySummaryComponent implements OnInit {
     });
   }
 
+  
 
   getMainMenuItems(params: GetMainMenuItemsParams): (string | MenuItemDef)[] {
 
@@ -619,22 +662,37 @@ export class LiquiditySummaryComponent implements OnInit {
       const fundHedgingMenuItems: (
         | MenuItemDef
         | string
-      )[] = params.defaultItems.slice(0);
+      )[] = []
+      //params.defaultItems.slice(0); //to get list of all default menu items
       fundHedgingMenuItems.push({
         name: 'Add Comment',
         action: () => {
-          // this.dialog.open(ConfirmationComponent)
-          params.context.componentParent.dialog.open(ConfirmPopupComponent,{
-            data:{
-              fundHedging:params.column.getColId()
-            },
-            height:'15vh',
-            width:'15vw'
+          let textFieldValue
+          params.context.componentParent.fundHedgingsComments.forEach(ele=>{
+            if(ele.fundHedging===params.column.getColId()){
+              textFieldValue = ele.comment
+            }
           })
+          let configData:ConfirmComponentConfigure ={
+            headerText:'Add Comment',
+            textFieldValue:textFieldValue,
+            showTextField:true,
+            data:{
+              fundHedging:params.column.getColId(),
+            }
+          }
+          let dialogRef = params.context.componentParent.dialog.open(AddCommentComponent,{
+            data:configData,
+            height:'30vh',
+            width:'30vw'
+          })
+          params.context.componentParent.subscriptions.push(dialogRef.afterClosed().subscribe((data)=>{
+            params.context.componentParent.getLiquiditySummaryComments()
+          }))
         },
-        cssClasses:['bold']//not working yet
+        cssClasses:['ag-column-menu-text-bold-custom']
       });
-      return fundHedgingMenuItems;
+      return ['pinSubMenu','separator','autoSizeThis','autoSizeAll','separator',...fundHedgingMenuItems];//remove aggsubmenu and bring back autosize row and col
     }
 
   }

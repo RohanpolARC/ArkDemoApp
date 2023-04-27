@@ -67,4 +67,18 @@ export class LiquiditySummaryService {
         catchError((ex) => throwError(ex))
       )
     }
+
+    public getLiquiditySummaryComments(){
+
+      return this.http.get<any[]>(APIConfig.LIQUIDITY_SUMMARY_COMMENTS_GET_API).pipe(
+        catchError((ex) => throwError(ex))
+      )
+    }
+
+    public putLiquiditySummaryComments(model){
+
+      return this.http.post<any>(APIConfig.LIQUIDITY_SUMMARY_COMMENTS_POST_API,model).pipe(
+        catchError((ex) => throwError(ex))
+      )
+    }
 }

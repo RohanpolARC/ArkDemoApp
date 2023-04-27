@@ -1,6 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ConfirmationComponent } from '../confirmation/confirmation.component';
 
 @Component({
   selector: 'app-confirm-popup',
@@ -10,7 +9,7 @@ import { ConfirmationComponent } from '../confirmation/confirmation.component';
 export class ConfirmPopupComponent implements OnInit {
 
   constructor(    
-    public dialogRef:MatDialogRef<ConfirmationComponent>,
+    public dialogRef:MatDialogRef<ConfirmPopupComponent>,
     @Inject(MAT_DIALOG_DATA) public data:{
       fundHedging:string
     }) { }
