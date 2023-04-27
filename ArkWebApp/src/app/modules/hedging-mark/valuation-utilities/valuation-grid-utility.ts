@@ -3,8 +3,10 @@ import { MatDialog } from "@angular/material/dialog"
 import { DetailedViewComponent } from "src/app/shared/components/detailed-view/detailed-view.component"
 import { DetailedView } from "src/app/shared/models/GeneralModel"
 import { getNodes } from "../../capital-activity/utilities/functions"
-import { DefaultDetailedViewComponent } from "src/app/shared/modules/detailed-view/default-detailed-view/default-detailed-view.component"
 import { DefaultDetailedViewPopupComponent } from "src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component"
+import { TemplateRef } from "@angular/core"
+import { AuditFilterComponent } from "../audit-filter/audit-filter.component"
+import { HedgingMarkService } from "../service/hedging-mark.service"
 
 export class ValuationUtility {
 
@@ -151,21 +153,27 @@ export class ValuationUtility {
         }
     }
     
-    onOverrideCellClicked(p: CellClickedEvent, asOfDate: string, dialog: MatDialog) {
+    onOverrideCellClicked(p: CellClickedEvent, asOfDate: string, dialog: MatDialog, filterTemplate: TemplateRef<AuditFilterComponent>, svc: HedgingMarkService) {
       if (!p.node.group && p.data['state'] !== 'edit') {
   
+        let pid = p.data?.['positionId']
+
+        svc.updateAuditPositions([pid]);
+
         let m = <DetailedView>{};
         m.screen = 'Valuation/Hedging Mark';
-        m.param1 = String(p.data?.['positionId']) //positionId;
+        m.param1 = String(pid) //positionId;
         m.param2 = asOfDate; // AsOfDate
         m.param3 = p.column.getColId();
         m.param4 = ' ';
         m.param5 = ' ';
   
         dialog.open(DefaultDetailedViewPopupComponent, {
-        //dialog.open(DetailedViewComponent, {
           data: {
-            detailedViewRequest: m
+            detailedViewRequest: m,
+            grid: 'Audit - Valuation',
+
+            filterTemplateRef: filterTemplate
           },
           width: '90vw',
           height: '80vh'
