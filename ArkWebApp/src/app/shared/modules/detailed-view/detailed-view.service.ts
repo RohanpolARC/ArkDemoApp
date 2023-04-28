@@ -70,7 +70,11 @@ export class DetailedViewService {
         sortable: true,
         filter: true,
       },
+      headerHeight: 30,
+      rowHeight: 30,
+      groupHeaderHeight: 30,
       tooltipShowDelay: 0,
+      enableRangeSelection: true,
       noRowsOverlayComponent: NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => `Please apply filter`,

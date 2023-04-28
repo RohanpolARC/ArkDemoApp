@@ -1,12 +1,5 @@
-import { CellClassParams, CellClickedEvent, GridApi, IAggFuncParams, ITooltipParams, RowNode } from "@ag-grid-community/core"
-import { MatDialog } from "@angular/material/dialog"
-import { DetailedViewComponent } from "src/app/shared/components/detailed-view/detailed-view.component"
-import { DetailedView } from "src/app/shared/models/GeneralModel"
+import { CellClassParams, GridApi, IAggFuncParams, ITooltipParams, RowNode } from "@ag-grid-community/core"
 import { getNodes } from "../../capital-activity/utilities/functions"
-import { DefaultDetailedViewPopupComponent } from "src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component"
-import { TemplateRef } from "@angular/core"
-import { AuditFilterComponent } from "../audit-filter/audit-filter.component"
-import { HedgingMarkService } from "../service/hedging-mark.service"
 
 export class ValuationUtility {
 

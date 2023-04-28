@@ -20,13 +20,13 @@ import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
-import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
 import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
 import { getMomentDateStr } from 'src/app/shared/functions/utilities';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
 import { UnfundedAssetsEditorComponent } from '../unfunded-assets/unfunded-assets-editor/unfunded-assets-editor.component';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
+import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
 
 @Component({
   selector: 'app-liquidity-summary',
@@ -506,11 +506,28 @@ export class LiquiditySummaryComponent implements OnInit {
       model.param3 = (event.node.parent.field === 'attrType') ? event.node.parent.key : null  //level
       model.param4 = event.column.getColId();   //fund Hedging
       model.param5 = String(this.days);   //days
+      model.strParam1 = []
 
+      // Exception: For `Known Outflows Unsetteled` the attribute is the issue name which cannot be configured as a grid, hence we configure on the parent key (i.e. Known Outflows Unsettled)
+
+      let gridName: string = event.node.key; 
+      if(event.node.parent.key === 'Known Outflows Unsettled'){
+        if(event.node.key === 'FX PnL')
+          gridName = 'Known Outflows Unsettled FX PnL'
+        else 
+          gridName = 'Known Outflows Unsettled <> FX PnL'
+      }
+      else if(event.node.parent.key === 'Known Outflows Pipeline' || event.node.parent.key === 'Known Outflows Funding'){
+        gridName = event.node.parent.key;
+      }
+
+      
       if(event.node.field === 'attr' && event.node.parent.field === 'attrType' && !event.node.allLeafChildren[0].data?.['isManual']){
-        const dialogRef = this.dialog.open(DetailedViewComponent,{
+        const dialogRef = this.dialog.open(DefaultDetailedViewPopupComponent,{
           data: {
-            detailedViewRequest: model
+            detailedViewRequest: model,
+            grid: gridName,      // Attribute to identify RCF Balance, capital activity etc
+            noFilterSpace: true
           },
           width: '90vw',
           height: '80vh'

@@ -13,7 +13,6 @@ import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmati
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { MsalService } from '@azure/msal-angular';
 import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
-import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';

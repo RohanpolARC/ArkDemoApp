@@ -32,7 +32,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized.component';
 import { HomeComponent } from '../app/home-component/home.component'
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
-import { DetailedViewComponent } from './shared/components/detailed-view/detailed-view.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AccessControlComponent } from './shared/components/access-control/access-control.component';
 import { MatSelectModule } from '@angular/material/select';
@@ -96,7 +95,7 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
   
 @NgModule({  
   declarations: [  
-    AppComponent, UnauthorizedComponent, HomeComponent, DetailedViewComponent, AccessControlComponent, NoRowsOverlayComponent,
+    AppComponent, UnauthorizedComponent, HomeComponent, AccessControlComponent, NoRowsOverlayComponent,
   ],  
   imports: [  
     MsalModule,
