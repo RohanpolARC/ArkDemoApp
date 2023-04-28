@@ -100,3 +100,45 @@ for(let i:number = 0; i < row.length; i+= 1){
 }
 return columnDefs;
 }
+
+export type GridColumnConfig = {
+  Grid: string,
+  Column: string,
+  Order: number,
+  IsDefault: number | boolean,
+  EscapeGridFormat: number | boolean,
+  DataType: string
+}
+
+export function createColumnDefs2(config: GridColumnConfig[]): ColDef[]{
+
+  // Load column config from DB
+  let coldefs: ColDef[] = [];
+
+  for(let i: number = 0; i < config.length; i+= 1){
+    
+    let def: ColDef = <ColDef>{};
+
+    if(config[i].DataType === 'Number'){
+      def.type = 'abColDefNumber';
+    }
+    else if(config[i].DataType === 'Date' || config[i].DataType === 'DateTime'){
+      def.type = 'abColDefDate';
+    }
+    else if(config[i].DataType === 'String'){
+      def.type = 'abColDefString'
+    }
+    else{
+      def.type = 'abColDefSpecial'
+    }
+
+    def.field = config[i].Column;
+    def.headerName = config[i].Column;
+    def.hide = !config[i].IsDefault;
+    def.headerTooltip = config[i].Column;
+
+    coldefs.push(def);
+  }
+
+  return coldefs;
+}

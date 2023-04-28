@@ -5,6 +5,7 @@ export interface DetailedView{
     param3: string,
     param4: string,
     param5: string,
+    strParam1?: string[]         // Can be used to pass a list of ids.
 }
 
 export interface PutAccessModel{

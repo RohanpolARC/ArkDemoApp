@@ -1,8 +1,10 @@
 import { ActionColumnContext } from '@adaptabletools/adaptable-angular-aggrid';
 import { GridApi, RowNode } from '@ag-grid-community/core';
-import { Injectable } from '@angular/core';
+import { Injectable, TemplateRef } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { formatDate } from 'src/app/shared/functions/formatter';
 import { getNodes } from '../../capital-activity/utilities/functions';
+import { AuditFilterComponent } from '../audit-filter/audit-filter.component';
 import { HedgingMarkDetails, HedgingMarkOverride, MarkOverride } from '../valuation-utilities/valuation-model';
 
 type SAVE_TYPE = 'Hedging Mark' | 'Mark Override';
@@ -12,6 +14,14 @@ type LEVEL_TYPE = 'Position' | 'Asset';
   providedIn: null
 })
 export class HedgingMarkService {
+
+  filterspace: TemplateRef<AuditFilterComponent>
+
+  private auditingPositions = new BehaviorSubject<number[] | null>(null);
+  auditingPositionsState = this.auditingPositions.asObservable();
+  updateAuditPositions(ids: number[]){
+    this.auditingPositions.next(ids);
+  }
 
   constructor() { }
 

@@ -9,12 +9,19 @@ import { HedgingMarkRoutingModule } from './hedging-mark-routing.module';
 import { HedgingMarkService } from './service/hedging-mark.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
+import { AuditFilterComponent } from './audit-filter/audit-filter.component';
+import { MatSelectModule } from '@angular/material/select';
+import { MultiSelectModule } from 'src/app/shared/components/multi-select/multi-select.module';
+import { MatInputModule } from '@angular/material/input';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 
 @NgModule({
   declarations: [
-    HedgingMarkComponent
+    HedgingMarkComponent,
+    AuditFilterComponent
   ],
   imports: [
     CommonModule,
@@ -27,7 +34,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    MatCardModule
+    MatCardModule,
+    ReactiveFormsModule,
+    
+
+    DetailedViewModule,
+
+    MatSelectModule,
+    MultiSelectModule
   ],
   providers:[
     HedgingMarkService        // Limiting Hedging Mark service for this module only

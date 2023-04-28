@@ -1,7 +1,4 @@
-import { CellClassParams, CellClickedEvent, GridApi, IAggFuncParams, ITooltipParams, RowNode } from "@ag-grid-community/core"
-import { MatDialog } from "@angular/material/dialog"
-import { DetailedViewComponent } from "src/app/shared/components/detailed-view/detailed-view.component"
-import { DetailedView } from "src/app/shared/models/GeneralModel"
+import { CellClassParams, GridApi, IAggFuncParams, ITooltipParams, RowNode } from "@ag-grid-community/core"
 import { getNodes } from "../../capital-activity/utilities/functions"
 
 export class ValuationUtility {
@@ -149,27 +146,6 @@ export class ValuationUtility {
         }
     }
     
-    onOverrideCellClicked(p: CellClickedEvent, asOfDate: string, dialog: MatDialog) {
-      if (!p.node.group && p.data['state'] !== 'edit') {
-  
-        let m = <DetailedView>{};
-        m.screen = 'Valuation/Hedging Mark';
-        m.param1 = String(p.data?.['positionId']) //positionId;
-        m.param2 = asOfDate; // AsOfDate
-        m.param3 = p.column.getColId();
-        m.param4 = ' ';
-        m.param5 = ' ';
-  
-        dialog.open(DetailedViewComponent, {
-          data: {
-            detailedViewRequest: m
-          },
-          width: '90vw',
-          height: '80vh'
-        })
-      }
-    }
-
     updateAllSiblingsLevelToPosition(node: RowNode, colid: 'markOverrideLevel' | 'hedgingMarkLevel', gridApi: GridApi) {
 
       let parentNode: RowNode = node.parent;
