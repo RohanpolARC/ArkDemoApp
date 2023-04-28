@@ -24,7 +24,6 @@ import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { ConfirmComponentConfigure, DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
-import { DetailedViewComponent } from 'src/app/shared/components/detailed-view/detailed-view.component';
 import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
 import { getMomentDateStr } from 'src/app/shared/functions/utilities';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
