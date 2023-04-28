@@ -66,7 +66,7 @@
                                 [disabled]="modelForm?.invalid ? true : isSuccess" type="button" class="w-10"
                                 color="primary" (click)="onProceed('Save')">Save</button>
 
-                                <button mat-raised-button [disabled]="(modelForm?.invalid || (isFeePresetDisabled && isMonthlyReturnsDisabled && isIRRDisabled) || !aggrCols?.length) ? true : isSuccess " type="button"
+                                <button mat-raised-button [disabled]="disableSaveAndRun" type="button"
                                 color="primary" (click)="onProceed('SaveRun')" class="w-18">Save & Run</button>
 
                                 <div class="w-10"></div>
@@ -134,6 +134,7 @@
                             </button>
                           </mat-chip>
                           <input
+                            [disabled]="isIRRDisabled"
                             placeholder="New aggregation..."
                             #aggrColInput
                             formControlName="aggrStr"

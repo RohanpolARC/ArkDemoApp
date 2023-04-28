@@ -364,8 +364,8 @@ export class PortfolioModellerComponent implements OnInit {
     m.positionIDs = this.selectedPositionIDs;
     m.asOfDate = this.asOfDate;
     m.feePreset = contextData.feePreset;
-    m.irrAggrType = contextData.irrAggrType;
-    m.curveRateDelta = contextData.curveRateDelta;
+    m.irrAggrType = contextData?.aggrStr?.join(' > ') ?? '';
+    m.curveRateDelta = contextData.curveRateDelta ?? 0.0;
     m.runBy = this.dataSvc.getCurrentUserName();
 
     // Load cashflows only if running IRR/Performance fees
@@ -419,6 +419,9 @@ export class PortfolioModellerComponent implements OnInit {
         } 
       })
 
+    }
+    else if(context?.length === 1 && context.includes("SaveRunMReturns")){
+      this.createNewTabGroup(null, context, contextData)
     }
 
 
