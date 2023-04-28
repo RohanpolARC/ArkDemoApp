@@ -45,7 +45,7 @@ export class DefaultDetailedViewComponent implements OnInit {
     
     // If no filter is applicable, then we automatically update the request listener for it to make a request directly since there is no Apply button to listen from.
 
-    if(changes?.['noFilterSpace'].currentValue === true){
+    if(changes?.['noFilterSpace']?.currentValue === true){
       this.detailedVwSvc.updateRequest(this.requestIfNoFilter);
     }
   }
