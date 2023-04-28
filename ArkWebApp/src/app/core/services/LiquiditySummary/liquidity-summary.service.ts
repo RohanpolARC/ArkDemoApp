@@ -30,12 +30,18 @@ export class LiquiditySummaryService {
       this.noofdaysMessage.next(value);
   }
 
+  private includeCoinvestMessage = new BehaviorSubject<any>(null)
+  currentincludeCoinvestValue = this.includeCoinvestMessage.asObservable();
+  changeincludeCoinvestValue(checked: boolean){
+    this.includeCoinvestMessage.next(checked);
+  }
+
   constructor(private http: HttpClient,
               private msalService: MsalUserService) { }
 
-    public getLiquiditySummaryPivoted(requestedDate: string, fundHedgings: string[], days: number){
+    public getLiquiditySummaryPivoted(requestedDate: string, fundHedgings: string[], days: number, includeCoinvest:boolean){
 
-      return this.http.get<any[]>(`${APIConfig.LIQUIDITY_SUMMARY_PIVOTED_GET_API}/?searchDate=${requestedDate}&fundHedgings=${fundHedgings}&days=${days}`).pipe(
+      return this.http.get<any[]>(`${APIConfig.LIQUIDITY_SUMMARY_PIVOTED_GET_API}/?searchDate=${requestedDate}&fundHedgings=${fundHedgings}&days=${days}&includeCoinvest=${includeCoinvest}`).pipe(
         catchError((ex) => throwError(ex))
       )
     }

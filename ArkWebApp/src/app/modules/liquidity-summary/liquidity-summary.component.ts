@@ -63,6 +63,7 @@ export class LiquiditySummaryComponent implements OnInit {
 
   rowData = [];
   refData = null;
+  includeCoinvest:boolean = false
 
   columnDefs: ColDef[]
   context
@@ -360,7 +361,7 @@ export class LiquiditySummaryComponent implements OnInit {
     if(this.asOfDate !== null && this.fundHedgings !== null && this.days !== null){
 
       this.gridOptions.api?.showLoadingOverlay();
-      this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryPivoted(this.asOfDate, this.fundHedgings, this.days).subscribe({
+      this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryPivoted(this.asOfDate, this.fundHedgings, this.days,this.includeCoinvest).subscribe({
         next: summary => {
   
           setTimeout(() => {
@@ -624,6 +625,10 @@ export class LiquiditySummaryComponent implements OnInit {
 
     this.subscriptions.push(this.liquiditySummarySvc.currentnoofdaysValues.subscribe(days => {
       this.days = days;
+    }))
+
+    this.subscriptions.push(this.liquiditySummarySvc.currentincludeCoinvestValue.subscribe(includeCoinvest => {
+      this.includeCoinvest = includeCoinvest;
     }))
 
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {

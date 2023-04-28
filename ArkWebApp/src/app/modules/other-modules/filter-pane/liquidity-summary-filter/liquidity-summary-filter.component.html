@@ -25,3 +25,13 @@
       <input type="number" autocomplete="off" matInput [(ngModel)]="days" (ngModelChange) = "onDaysChange($event)">
     </mat-form-field>
 </div>
+
+<div class="element">
+  Include Co-Invest 
+  <mat-slide-toggle
+      [color] = "'primary'"
+      [(ngModel)] = "includeCoinvest"
+      (ngModelChange) = "onIncludeCoinvestToggle($event)"
+  >
+  </mat-slide-toggle>
+</div>

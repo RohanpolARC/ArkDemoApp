@@ -24,6 +24,7 @@ export class LiquiditySummaryFilterComponent implements OnInit {
     allowSearchFilter: true
   };
   preSelectedFundHedgings
+  includeCoinvest: any;
 
   constructor(private liquiditySmySvc: LiquiditySummaryService) { }
 
@@ -33,6 +34,7 @@ export class LiquiditySummaryFilterComponent implements OnInit {
     this.onAsOfDateChange(this.asOfDate)
     this.days = 10
     this.onDaysChange(this.days)
+    this.onIncludeCoinvestToggle(this.includeCoinvest)
   }
 
   // ngOnChanges getting called before OnInit
@@ -52,5 +54,9 @@ export class LiquiditySummaryFilterComponent implements OnInit {
 
   onDaysChange(days){
     this.liquiditySmySvc.changenoofdaysValues(days);
+  }
+
+  onIncludeCoinvestToggle(includeCoinvest){
+    this.liquiditySmySvc.changeincludeCoinvestValue(includeCoinvest)
   }
 }
