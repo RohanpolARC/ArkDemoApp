@@ -29,7 +29,6 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   disableUpdate: boolean
   disableSubmit: boolean
   disableSave: boolean
-  disableSaveRun: boolean
   asOfDate: string
   positionIDs: number[] 
   positionIDsSTR: string
@@ -115,7 +114,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     this.isAutomatic = this.data.isAutomatic
     this.isLocal = this.data.isLocal
     this.disableSubmit = false;
-    this.disableSave = this.disableSaveRun = true;
+    this.disableSave = true;
     this.isSuccess = this.isFailure = false;
     this.adaptableApi = this.data.adaptableApi;
     this.selectedModelName = this.data.model?.modelName;
@@ -172,6 +171,21 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     })
 
     this.updateAggregationOrder(aggrStr);
+  }
+
+
+  public get disableSaveAndRun(): boolean {
+
+    if(this.isSuccess)
+      return true;
+      
+    let disable: boolean = true;
+    disable = this.modelForm.invalid;
+
+    if(!this.isIRRDisabled)
+      disable = disable || !this.aggrCols?.length;
+
+    return disable;
   }
 
   changeListeners(){
@@ -296,7 +310,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       model.localOverrides = null;
     }
     this.disableSubmit = true
-    this.disableSave = this.disableSaveRun = true
+    this.disableSave = true
     this.subscriptions.push(this.irrCalcService.putPortfolioModels(model).subscribe({
       next: result => {
         if(result.isSuccess){
@@ -305,7 +319,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
           this.isFailure = false
           this.updateMsg = 'Successfully updated model';
           this.disableSubmit = true
-          this.disableSave = this.disableSaveRun = true
+          this.disableSave = true
           /*Updating modelID for inserted rule*/
           if(!this.modelForm.get('isUpdate').value){
             // 0th result has inserted key, 1st result has updated key, if any, else they are 0
