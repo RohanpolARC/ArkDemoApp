@@ -286,7 +286,7 @@ export class LiquiditySummaryComponent implements OnInit {
         width: 133,
         cellStyle: params => {
 
-          if(params.node.group && params.node.field === 'attr' && !params.node.allLeafChildren[0].data?.['isManual'] && !(params.node.key === 'Cash Post Known Outflows')){
+          if(params.node.group && params.node.field === 'attr' && !params.node.allLeafChildren[0].data?.['isManual'] && !(params.node.key === 'RCF Drawn')){
             return {
               color: '#0590ca'
             }
@@ -308,7 +308,7 @@ export class LiquiditySummaryComponent implements OnInit {
          */
         onCellClicked: this.onLiquidityCellClicked.bind(this),
         tooltipValueGetter: (params: ITooltipParams) => {
-          if(params.node.group && params.node.field === 'attr' && !params.node.allLeafChildren[0].data?.['isManual']){
+          if(params.node.group && params.node.field === 'attr' && !params.node.allLeafChildren[0].data?.['isManual'] && !(params.node.key === 'RCF Drawn')){
             return "Detailed view";
           }
           else return null;
@@ -525,7 +525,7 @@ export class LiquiditySummaryComponent implements OnInit {
   }
 
   onLiquidityCellClicked(event: CellClickedEvent){
-    if(!['ag-Grid-AutoColumn', 'date', 'attr', 'action', 'attrType' ,'isManual'].includes(event.column.getColId()) && event.node.group && !(event.node.key === 'Cash Post Known Outflows')){
+    if(!['ag-Grid-AutoColumn', 'date', 'attr', 'action', 'attrType' ,'isManual'].includes(event.column.getColId()) && event.node.group && !(event.node.key === 'Cash Post Known Outflows') && !(event.node.key === 'RCF Drawn')){
       // Open detailed view.
 
       let model: DetailedView = <DetailedView>{};

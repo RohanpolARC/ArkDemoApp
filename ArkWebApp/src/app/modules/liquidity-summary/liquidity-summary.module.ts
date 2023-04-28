@@ -21,6 +21,7 @@ import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfu
 import { LiquiditySummaryRoutingModule } from './liquidity-summary-routing.module';
 import { ConfirmationModule } from 'src/app/shared/modules/confirmation/confirmation.module';
 import { AddCommentComponent } from './add-comment/add-comment.component';
+import { SsrsReportViewerModule } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-viewer.module';
 
 @NgModule({
   declarations: [
@@ -48,7 +49,8 @@ import { AddCommentComponent } from './add-comment/add-comment.component';
     MatSlideToggleModule,
     MatSnackBarModule,
 
-    ConfirmationModule
+    ConfirmationModule,
+    SsrsReportViewerModule
   ],
   providers: [
     DecimalPipe,
