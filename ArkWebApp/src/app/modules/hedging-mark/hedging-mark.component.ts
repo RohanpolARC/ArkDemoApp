@@ -1,6 +1,6 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableColumn, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { ColDef, GridOptions, GridReadyEvent, Module, GridApi, CellValueChangedEvent, RowNode, CellClickedEvent, TabToNextCellParams } from '@ag-grid-community/core';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
@@ -11,7 +11,7 @@ import { AMOUNT_COLUMNS_LIST, GRID_OPTIONS, POSITIONS_COLUMN_DEF } from '../posi
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
-import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
+import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { getNodes } from '../capital-activity/utilities/functions';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,6 +21,11 @@ import { ValuationValidation } from './valuation-utilities/valuation-grid-valida
 import { ValutationAdaptableGridUtility } from './valuation-utilities/adaptable-grid-utility';
 import { HedgingMarkService } from './service/hedging-mark.service';
 import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
+import { AuditFilterComponent } from './audit-filter/audit-filter.component';
+import { AfterViewInit } from '@angular/core';
+import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
+import { take } from 'rxjs/operators';
+import { DetailedViewService } from 'src/app/shared/modules/detailed-view/detailed-view.service';
 
 let overrideColMap: {
   [col: string] : {
@@ -43,7 +48,13 @@ let overrideColMap: {
   templateUrl: './hedging-mark.component.html',
   styleUrls: ['../../shared/styles/grid-page.layout.scss', './hedging-mark.component.scss']
 })
-export class HedgingMarkComponent extends ValuationUtility implements OnInit {
+export class HedgingMarkComponent extends ValuationUtility implements OnInit, AfterViewInit {
+
+  @ViewChild('filterspace') filterspace: TemplateRef<AuditFilterComponent>
+
+  ngAfterViewInit(){
+    this.hedgingMarkSvc.filterspace = this.filterspace
+  }
 
   subscriptions: Subscription[] = []
   gridOptions: GridOptions
@@ -59,6 +70,8 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
   isWriteAccess: boolean;
   noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
 
+  auditingPositions: number[];
+
   checkMarkOverride = ValuationValidation.checkMarkOverride
   checkWarningsBefore = ValuationValidation.checkWarningsBefore
   checkWarningsAfter = ValuationValidation.checkWarningsAfter
@@ -68,6 +81,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
     public positionScreenSvc: PositionScreenService,
     private accessService: AccessService,
     private hedgingMarkSvc: HedgingMarkService,
+    private detailedVwSvc: DetailedViewService,
     public dialog: MatDialog
   ) { super(overrideColMap) }
 
@@ -183,10 +197,6 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
     }))
   }
 
-  onOverrideCellClick(p: CellClickedEvent){
-    this.onOverrideCellClicked(p, this.asOfDate, this.dialog)
-  }
-
   ngOnInit(): void {
 
     this.isWriteAccess = false;
@@ -211,7 +221,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
       ...customColDefs,
       {
         field: 'markOverride', headerName: 'Mark Ovrd', editable: this.isEditable.bind(this), maxWidth: 141, type: 'abColDefNumber',
-        cellStyle: this.editableCellStyle.bind(this), width: 150, onCellClicked: this.onOverrideCellClick.bind(this),
+        cellStyle: this.editableCellStyle.bind(this), width: 150,
         tooltipValueGetter: this.tooltipValueGetter, aggFunc: 'Max'
       },
       {
@@ -222,7 +232,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
       { field: 'lastMarkOverrideDate', headerName: 'Last Mark Ovrd Date', maxWidth: 141, type: 'abColDefDate', aggFunc: 'Max' },
       {
         field: 'hedgingMark', headerName: 'Hedging Mark', type: 'abColDefNumber', editable: this.isEditable.bind(this),
-        cellStyle: this.editableCellStyle.bind(this), width: 150, onCellClicked: this.onOverrideCellClick.bind(this),
+        cellStyle: this.editableCellStyle.bind(this), width: 150,
         tooltipValueGetter: this.tooltipValueGetter, aggFunc: 'Max'
       },
       {
@@ -312,6 +322,44 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit {
               resizable: true
             },
             actionColumnButton: [
+              {
+                onClick: (
+                  button: AdaptableButton<ActionColumnContext>,
+                  context: ActionColumnContext) => {
+
+                    let pids: number[] = [];
+
+                    let nodes = getNodes(context.rowNode);
+                    pids = nodes.map(n => n['positionId'])
+
+                    this.hedgingMarkSvc.updateAuditPositions(pids);
+
+                    let m = <DetailedView>{};
+                    m.screen = 'Valuation/Hedging Mark';
+                      m.param1 = '' //positionId;
+                      m.param2 = this.asOfDate; // AsOfDate
+                      m.param3 = '';
+                      m.param4 = ' ';
+                      m.param5 = ' ';
+                
+                      const dialogRef = this.dialog.open(DefaultDetailedViewPopupComponent, {
+                        data: {
+                          detailedViewRequest: m,
+                          grid: 'Audit - Valuation',
+
+                          filterTemplateRef: this.filterspace
+                        },
+                        width: '90vw',
+                        height: '80vh'
+                      })
+                  },
+                icon:{
+                    src: '../assets/img/info.svg',
+                    style: {
+                      height: 25, width: 25
+                    }
+                },
+              },
               {
                 onClick: (
                   button: AdaptableButton<ActionColumnContext>,

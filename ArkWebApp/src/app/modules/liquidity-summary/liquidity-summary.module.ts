@@ -19,6 +19,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
 import { LiquiditySummaryRoutingModule } from './liquidity-summary-routing.module';
+import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,9 @@ import { LiquiditySummaryRoutingModule } from './liquidity-summary-routing.modul
     MatDatepickerModule,
     MatAutocompleteModule,
     MatSlideToggleModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+
+    DetailedViewModule
   ],
   providers: [
     DecimalPipe,

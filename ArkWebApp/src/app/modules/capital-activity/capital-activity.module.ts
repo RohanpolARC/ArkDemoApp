@@ -25,6 +25,7 @@ import { CapitalActivityRoutingModule } from './capital-activity-routing.module'
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { InputAmountNumberModule } from 'src/app/shared/modules/input-amount-number/input-amount-number.module';
 import { FileDropzoneModule } from 'src/app/shared/modules/file-dropzone/file-dropzone.module';
+import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
 
 @NgModule({
   declarations: [
@@ -58,7 +59,9 @@ import { FileDropzoneModule } from 'src/app/shared/modules/file-dropzone/file-dr
     MatCheckboxModule,
 
     InputAmountNumberModule,
-    FileDropzoneModule
+    FileDropzoneModule,
+
+    DetailedViewModule
   ],
   exports:[CapitalActivityComponent]
 })

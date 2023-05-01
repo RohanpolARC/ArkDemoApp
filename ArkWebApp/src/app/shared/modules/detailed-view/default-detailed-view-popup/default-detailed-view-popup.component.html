@@ -1,0 +1,37 @@
+<!-- *** These async loaders would be required to be defined inside the using component template along with the .ts file inclusion -->
+
+<ng-container *ngIf="requestListener$ | async"></ng-container>
+<ng-container *ngIf="configLoader$ | async">
+
+<!-- *** -->
+
+
+
+
+
+
+    <app-default-detailed-view
+        [requestIfNoFilter]   =     "detailedViewRequest"
+        [failureMsg]          =     "failureMsg"
+        [header]              =     "header"
+        [noDataMessage]       =     "noDataMessage"     
+        [gridOptions]         =     "gridOptions"
+        [columnDefs]          =     "gridColumnDefs"
+        [rowData]             =     "gridData"      
+        [noFilterSpace]       =     "noFilterSpace"
+        [filterspace]         =     "filterspace"
+
+    ></app-default-detailed-view>
+
+</ng-container>
+
+
+<mat-dialog-actions align="end">
+    <button type="button" mat-raised-button (click)="onClose()">Close</button>
+</mat-dialog-actions>
+
+<!-- The filter template would be passed here to the pop up component which can be then sent to default-detailed-view componenet as input -->
+
+<ng-template #filterspace>
+    <ng-container *ngTemplateOutlet="filterTemplateRef"></ng-container>
+</ng-template>

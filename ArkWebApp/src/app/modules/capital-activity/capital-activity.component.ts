@@ -23,13 +23,13 @@ import { nullOrZeroFormatter, formatDate, nonAmountNumberFormatter, BLANK_DATETI
 
 import { getNodes, validateLinkSelect }from './utilities/functions';
 import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
-import { DetailedViewComponent } from '../../shared/components/detailed-view/detailed-view.component';
 import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
 import { DataService } from 'src/app/core/services/data.service';
 import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
+import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
 
 @Component({
   selector: 'app-capital-activity',
@@ -62,14 +62,17 @@ export class CapitalActivityComponent implements OnInit {
         pIDcashDtTypeStr = pIDcashDtTypeStr.slice(0, -1);
   
       let model: DetailedView = <DetailedView> {};
-      model.screen = 'Capital Activity';
+      model.screen = 'Investment Cashflows';
       model.param1 = pIDcashDtTypeStr;
       model.param2 = model.param3 = model.param4 = model.param5 = '';
+      model.strParam1 = [];
 
-      const dialogRef = this.dialog.open(DetailedViewComponent, {
+      const dialogRef = this.dialog.open(DefaultDetailedViewPopupComponent, {
         data: {
           detailedViewRequest: model,
-          failureMsg: leafNodes.length > 50 ? `Please select group having lesser child rows (Max 50)` : null
+          failureMsg: leafNodes.length > 50 ? `Please select group having lesser child rows (Max 50)` : null,
+          noFilterSpace: true,
+          grid: 'Investment Cashflows'
         },
         width: '90vw',
         height: '80vh'
