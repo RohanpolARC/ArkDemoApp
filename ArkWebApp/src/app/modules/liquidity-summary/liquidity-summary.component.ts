@@ -297,6 +297,7 @@ export class LiquiditySummaryComponent implements OnInit {
         cellClass: 'ag-right-aligned-cell',
         allowedAggFuncs: ['Sum', 'min', 'max'],
         aggFunc: 'Sum',
+        wrapText: true,
         editable: (params: EditableCallbackParams) => {
           return params.node.rowIndex === this.actionClickedRowID;
         },
@@ -577,7 +578,6 @@ export class LiquiditySummaryComponent implements OnInit {
       }        
     }
     this.fetchLiquiditySummaryRef();
-    this.getLiquiditySummaryComments()
     this.fetchAssetFundingDetails();
 
     /** Making this component available to child components in Ag-grid */
@@ -597,6 +597,7 @@ export class LiquiditySummaryComponent implements OnInit {
       defaultColDef: this.defaultColDef,
       aggFuncs: this.aggFuncs,
       excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+      
 
             // Expand groups
       isGroupOpenByDefault: (params: IsGroupOpenByDefaultParams) => {
@@ -610,7 +611,6 @@ export class LiquiditySummaryComponent implements OnInit {
         pinned: 'left',
         valueGetter:(params:ValueGetterParams)=>{
           if(!params.node.group && params.column.getColId()==="ag-Grid-AutoColumn-attrType" && params.data?.['attrType']==='Notes'){
-            console.log(params)
             
             return 'Notes'
           }
@@ -629,7 +629,8 @@ export class LiquiditySummaryComponent implements OnInit {
       noRowsOverlayComponent: NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsDisplayMsg,
-      }
+      },
+      getRowHeight: this.getRowHeight
     }
 
     this.subscriptions.push(this.liquiditySummarySvc.currentSearchDate.subscribe(asOfDate => {
@@ -659,6 +660,17 @@ export class LiquiditySummaryComponent implements OnInit {
     }))
 
   }
+
+  getRowHeight(params){
+    if(params?.data?.['attrType']==='Notes'){
+      console.log(params)      
+      return 120
+
+    }
+
+    return 40
+  }
+
   getLiquiditySummaryComments() {
     this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryComments().subscribe(data=>{
       this.fundHedgingsComments = data
