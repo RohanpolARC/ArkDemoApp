@@ -51,6 +51,8 @@ import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detaile
 
     ConfirmationModule,
 
+    DetailedViewModule,
+
     DetailedViewModule
   ],
   providers: [
