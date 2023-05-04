@@ -13,3 +13,8 @@
     (click)="undoEdit()">
     <mat-icon [ngStyle]="{'margin-left':'15px',color:'#102439','cursor':'pointer'}">cancel</mat-icon>
 </span>
+
+<span *ngIf="(params.node.parent?.key==='To be funded asset')"
+    (click)="openReport()">
+    <mat-icon [ngStyle]="{'margin-left':'15px',color:'#102439','cursor':'pointer'}">library_books</mat-icon>
+</span>

@@ -22,6 +22,7 @@ import { LiquiditySummaryRoutingModule } from './liquidity-summary-routing.modul
 import { ConfirmationModule } from 'src/app/shared/modules/confirmation/confirmation.module';
 import { AddCommentComponent } from './add-comment/add-comment.component';
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
+import { SsrsReportViewerModule } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-viewer.module';
 
 @NgModule({
   declarations: [
@@ -53,7 +54,8 @@ import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detaile
 
     DetailedViewModule,
 
-    DetailedViewModule
+    DetailedViewModule,
+    SsrsReportViewerModule
   ],
   providers: [
     DecimalPipe,
