@@ -161,15 +161,22 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
   }
 
   openReport(){
+    let fundHedgingString = ''
+    this.params.context.componentParent.fundHedgings.forEach(element => {
+      fundHedgingString =fundHedgingString+element+','
+    });
     this.dialog.open(SsrsReportPopupComponent,{ 
       data: {
-        reportName:"UnfundedAssets"
+        reportName:"UnfundedAssets",
+        asOfDate:this.params.context.componentParent.asOfDate,
+        fundHedgings:fundHedgingString,
+        assetId:this.params.context.componentParent.getAssetId(this.params.data['subAttr']),
+
         },
         width: '95vw',
         height: '95vh',
         maxWidth:'100vw'
       })
-    console.log("report")
   }
 
   ngOnInit(): void {
