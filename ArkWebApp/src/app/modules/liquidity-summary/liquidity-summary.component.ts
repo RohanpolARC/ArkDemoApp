@@ -663,8 +663,8 @@ export class LiquiditySummaryComponent implements OnInit {
 
   getRowHeight(params){
     if(params?.data?.['attrType']==='Notes'){
-      console.log(params)      
-      return 120
+    
+      return 120 // this will increase the height of Notes column
 
     }
 
