@@ -312,6 +312,8 @@ export class LiquiditySummaryComponent implements OnInit {
         tooltipValueGetter: (params: ITooltipParams) => {
           if(params.node.group && params.node.field === 'attr' && !params.node.allLeafChildren[0].data?.['isManual'] && !(params.node.key === 'RCF Drawn')){
             return "Detailed view";
+          }else if(params.node.data?.['attrType'] === 'Notes'){
+            return params.value
           }
           else return null;
         }
@@ -664,7 +666,7 @@ export class LiquiditySummaryComponent implements OnInit {
   getRowHeight(params){
     if(params?.data?.['attrType']==='Notes'){
     
-      return 120 // this will increase the height of Notes column
+      return 95 // this will increase the height of Notes column
 
     }
 
