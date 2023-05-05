@@ -165,13 +165,15 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
     this.params.context.componentParent.fundHedgings.forEach(element => {
       fundHedgingString =fundHedgingString+element+','
     });
+    let ReportParams:any={
+      asOfDate:this.params.context.componentParent.asOfDate,
+      fundHedgings:fundHedgingString,
+      assetId:this.params.context.componentParent.getAssetId(this.params.data['subAttr']),
+    }
     this.dialog.open(SsrsReportPopupComponent,{ 
       data: {
         reportName:"UnfundedAssets",
-        asOfDate:this.params.context.componentParent.asOfDate,
-        fundHedgings:fundHedgingString,
-        assetId:this.params.context.componentParent.getAssetId(this.params.data['subAttr']),
-
+        ReportParams:ReportParams
         },
         width: '95vw',
         height: '95vh',
