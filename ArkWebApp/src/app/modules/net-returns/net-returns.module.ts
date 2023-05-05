@@ -9,7 +9,6 @@ import { MatCardModule } from '@angular/material/card';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MatButtonModule } from '@angular/material/button';
-import { ReportWrapperComponent } from './report-wrapper/report-wrapper.component';
 import { SsrsReportViewerModule } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-viewer.module';
 
 
@@ -18,8 +17,7 @@ import { SsrsReportViewerModule } from 'src/app/shared/modules/ssrs-report-viewe
   declarations: [
     NetReturnsComponent,
     NetReturnsSummaryComponent,
-    NetReturnsCashflowsComponent,
-    ReportWrapperComponent
+    NetReturnsCashflowsComponent
   ],
   imports: [
     CommonModule,

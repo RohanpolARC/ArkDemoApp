@@ -4,7 +4,7 @@ import { interval, Observable, Subject, Subscription } from 'rxjs';
 import { filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
 import { NetReturnsService } from 'src/app/core/services/NetReturns/net-returns.service';
-import { ReportWrapperComponent } from './report-wrapper/report-wrapper.component';
+import { SsrsReportPopupComponent } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-popup/ssrs-report-popup.component';
 
 @Component({
   selector: 'app-net-returns',
@@ -53,17 +53,21 @@ export class NetReturnsComponent implements OnInit {
   rowData$: Observable<any>//: Observable<{cashflowCount: number, RunID: string, smry: any[], cashflows: any[]}>
 
   onRunReport(){
-  const dialogRef = this.dialog.open(ReportWrapperComponent, { 
-  data: {
+    let ReportParams:any  ={
       asOfDate:this.asOfDate,
       fundHedging:this.fundHedging,
       cashflowType:this.cashflowType,
       calculationType:this.calcMethod
-    },
-    width: '95vw',
-    height: '95vh',
-    maxWidth:'100vw'
-  })
+    }
+    const dialogRef = this.dialog.open(SsrsReportPopupComponent,{ 
+      data: {
+        reportName:"NetReturns",
+        ReportParams:ReportParams
+        },
+        width: '95vw',
+        height: '95vh',
+        maxWidth:'100vw'
+      })
   }
 
 

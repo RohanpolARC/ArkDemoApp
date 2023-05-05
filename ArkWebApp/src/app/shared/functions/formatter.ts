@@ -67,6 +67,35 @@ export function noDecimalAmountFormatter(params){
     }
 }
 
+export function customliquiditySummaryFormatter(params:ValueFormatterParams){
+    if(!params.node.group){
+        if(params.node.data['attr']==='RCF Drawn'){
+            return percentFormatter(params)
+        }
+    }
+    if(params.node.group && params.node.key==='RCF Drawn'){
+        if(!params.value || params.value ===0 ){
+            return "-"
+        }
+        return `${Number(params.value * 100).toFixed(2)}%`
+    }
+    if(typeof(params.value)==='string'){
+        return params.value
+    }
+    if(params.value!=undefined && Number(Number(params.value).toFixed(0))!=0){
+        
+        return Number(params.value).toLocaleString(undefined,{
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        })
+    }
+    else if(Number(Number(params.value).toFixed(0))==0) {
+        return "-"
+    } else{
+        return ""
+    }
+}
+
 /**
  * 
  * Returns only upto 3 decimals. Eg: 0.971242427825928 -> 0.971

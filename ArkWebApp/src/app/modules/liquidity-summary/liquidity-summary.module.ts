@@ -19,14 +19,18 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
 import { LiquiditySummaryRoutingModule } from './liquidity-summary-routing.module';
+import { ConfirmationModule } from 'src/app/shared/modules/confirmation/confirmation.module';
+import { AddCommentComponent } from './add-comment/add-comment.component';
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
+import { SsrsReportViewerModule } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-viewer.module';
 
 @NgModule({
   declarations: [
     LiquiditySummaryComponent,
     AttributeEditorComponent,
     UpdateCellRendererComponent,
-    AttributeGroupRendererComponent
+    AttributeGroupRendererComponent,
+    AddCommentComponent
   ],
   imports: [
     CommonModule,
@@ -46,7 +50,12 @@ import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detaile
     MatSlideToggleModule,
     MatSnackBarModule,
 
-    DetailedViewModule
+    ConfirmationModule,
+
+    DetailedViewModule,
+
+    DetailedViewModule,
+    SsrsReportViewerModule
   ],
   providers: [
     DecimalPipe,

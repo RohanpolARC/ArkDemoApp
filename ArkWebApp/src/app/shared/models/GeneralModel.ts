@@ -31,4 +31,12 @@ export type ReportServerParams={
     parameters: any
   }
 
+  export type ConfirmComponentConfigure={
+    headerText?:string
+    showTextField?:boolean,
+    textFieldValue?:string,
+    showCustomForm?:boolean
+    data:any
+  }
+
 export type NoRowsCustomMessages = 'Please apply the filter.'|'No data found for applied filter.'|'No data found.'

@@ -46,6 +46,8 @@ export class APIConfig {
     public static LIQUIDITY_SUMMARY_DELETE_API: string = APIConfig.BASEURL + "/api/LiquiditySummary/Delete";
     public static LIQUIDITY_SUMMARY_REF_GET_API: string = APIConfig.BASEURL + "/api/LiquiditySummary/GetRef";
     public static LIQUIDITY_SUMMARY_PUT_UPDATE_API: string = APIConfig.BASEURL + "/api/LiquiditySummary/Update";
+    public static LIQUIDITY_SUMMARY_COMMENTS_GET_API: string = APIConfig.BASEURL + "/api/LiquiditySummary/GetLiquiditySummaryComments";
+    public static LIQUIDITY_SUMMARY_COMMENTS_POST_API: string = APIConfig.BASEURL + "/api/LiquiditySummary/PutLiquiditySummaryComments";
 
     public static REFDATA_GET_DATATABLE: string = APIConfig.BASEURL + "/api/GetRef/GetRefDatatable";
     public static REFDATA_GET_UNIQUE_VALUES_API: string = APIConfig.BASEURL + "/api/GetRef/GetUnqiueValuesForField";
