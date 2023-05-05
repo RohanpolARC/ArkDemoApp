@@ -31,7 +31,7 @@ export class SsrsReportPopupComponent implements OnInit {
   ngOnInit(): void {
     this.reportServer = environment.ssrsUrl
     this.reportUrl = `Reports/${this.data.reportName}`;
-    this.showParameters = "true"; 
+    this.showParameters = "false"; 
     this.language = "en-us";
     this.toolbar = "true";
     this.params = {
