@@ -1,13 +1,13 @@
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { PortfolioManagerService } from 'src/app/core/services/PortfolioManager/portfolio-manager.service';
 import { PortfolioMapping, PortfolioMappingApproval } from 'src/app/shared/models/PortfolioManagerModel';
 import { ApprovalComponent } from '../approval/approval.component';
-import { ReviewerConfirmComponent } from '../reviewer-confirm/reviewer-confirm.component';
+import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
 
 @Component({
   selector: 'app-approval-action-cell-renderer',
@@ -77,16 +77,19 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
 
   onAction(action: 'approve' | 'reject'): void {
 
-    const dialogRef = this.dialog.open(ReviewerConfirmComponent, {
+    const dialogRef = this.dialog.open(ConfirmPopupComponent, {
       data: {
-        confirmText: `Are you sure you want to ${action} the request?`
-      }
+        headerText: `Are you sure you want to ${action} the request?`,
+        showTextField:true,
+        textFieldLabelValue:'Remark'
+      },
+      width:'35vw'
     })
 
-    this.subscriptions.push(dialogRef.afterClosed().subscribe((result?: { action: string, remark: string }) => {
+    this.subscriptions.push(dialogRef.afterClosed().subscribe((result?: { action: string, textFieldValue: string }) => {
       if(result?.action === 'Confirm'){
 
-        this.onConfirm(action, result.remark);
+        this.onConfirm(action, result.textFieldValue);
       }
     }))
 

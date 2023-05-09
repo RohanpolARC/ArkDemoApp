@@ -21,8 +21,8 @@ import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overla
 import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { CheckboxEditorComponent } from 'src/app/shared/components/checkbox-editor/checkbox-editor.component';
 import { AssetGIRModel } from 'src/app/shared/models/AssetGIRModel';
-import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
+import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
 
 let adapTableApi: AdaptableApi;
 
@@ -188,8 +188,10 @@ export class PortfolioHistoryComponent implements OnInit {
   }
 
   onCheckboxChange(params: ICellRendererParams){
-    const confirmdialogRef = params.context.component.dialog.open(ConfirmationPopupComponent, {
-      data: { confirmText: `Are you sure you want to mark GIR as  ${params.value?'reviewed':'unreviewed'}?` }
+    const confirmdialogRef = params.context.component.dialog.open(ConfirmPopupComponent, {
+      data:{
+        headerText:`Are you sure you want to mark GIR as  ${params.value?'reviewed':'unreviewed'}?`,
+      },
     })
     params.context.component.subscriptions.push(
       confirmdialogRef

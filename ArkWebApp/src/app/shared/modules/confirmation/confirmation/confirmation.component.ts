@@ -19,7 +19,8 @@ export class ConfirmationComponent implements OnInit {
   @ContentChild('action') action: TemplateRef<any> | undefined;
 
   textField = new FormControl('');
-  headerText:string = 'Confirmation'
+  headerText:string = 'Confirmation';
+  textFieldLabelValue:string
 
   data:any
 
@@ -32,6 +33,7 @@ export class ConfirmationComponent implements OnInit {
     }
     if(this.configData.showTextField){
       this.textField.setValue(this.configData.textFieldValue) 
+      this.textFieldLabelValue = this.configData.textFieldLabelValue ?? 'Comment'
     }
 
   }

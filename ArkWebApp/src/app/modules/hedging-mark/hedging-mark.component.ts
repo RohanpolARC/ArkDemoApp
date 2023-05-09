@@ -20,12 +20,11 @@ import { HedgingMarkDetails } from './valuation-utilities/valuation-model';
 import { ValuationValidation } from './valuation-utilities/valuation-grid-validation';
 import { ValutationAdaptableGridUtility } from './valuation-utilities/adaptable-grid-utility';
 import { HedgingMarkService } from './service/hedging-mark.service';
-import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 import { AuditFilterComponent } from './audit-filter/audit-filter.component';
 import { AfterViewInit } from '@angular/core';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
-import { take } from 'rxjs/operators';
 import { DetailedViewService } from 'src/app/shared/modules/detailed-view/detailed-view.service';
+import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
 
 let overrideColMap: {
   [col: string] : {
@@ -418,8 +417,10 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
 
                   if(node.data?.['hedgingMark'] === ""){
 
-                    const dialogRef = this.dialog.open(ConfirmationPopupComponent, {
-                      data: { confirmText: `Are you sure you want to clear override for this date ?` }
+                    const dialogRef = this.dialog.open(ConfirmPopupComponent, {
+                      data:{
+                        headerText:'Are you sure you want to clear override for this date ?',
+                      },
                     })
 
                     this.subscriptions.push(dialogRef.afterClosed().subscribe((val) => {
