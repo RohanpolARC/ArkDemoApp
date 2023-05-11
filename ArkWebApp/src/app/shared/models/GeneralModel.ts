@@ -32,7 +32,8 @@ export type ReportServerParams={
   }
 
   export type ConfirmComponentConfigure={
-    headerText?:string
+    headerText?:string,
+    displayConfirmButton?:boolean,
     showTextField?:boolean,
     textFieldValue?:string,
     textFieldLabelValue?:string,

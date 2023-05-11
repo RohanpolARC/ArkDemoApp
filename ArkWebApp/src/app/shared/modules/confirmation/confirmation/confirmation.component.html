@@ -21,7 +21,7 @@
     <mat-dialog-actions align="end">
         <div>
 
-            <button mat-raised-button (click)="close('Confirm')" color="primary">
+            <button *ngIf="displayConfirmButton" mat-raised-button (click)="close('Confirm')" color="primary">
                 Confirm
             </button>
             

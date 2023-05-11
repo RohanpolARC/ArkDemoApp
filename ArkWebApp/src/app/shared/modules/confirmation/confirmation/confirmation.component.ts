@@ -20,7 +20,9 @@ export class ConfirmationComponent implements OnInit {
 
   textField = new FormControl('');
   headerText:string = 'Confirmation';
-  textFieldLabelValue:string
+  textFieldLabelValue:string;
+  displayConfirmButton:boolean;
+  
 
   data:any
 
@@ -28,6 +30,7 @@ export class ConfirmationComponent implements OnInit {
 
   ngOnInit(): void {
     this.data = this.configData.data
+    this.displayConfirmButton = this.configData.displayConfirmButton??true
     if(this.configData.headerText){
       this.headerText = this.configData.headerText
     }
