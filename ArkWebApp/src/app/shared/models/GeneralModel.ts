@@ -1,3 +1,9 @@
+export interface APIReponse {
+    isSuccess: boolean,
+    returnMessage: string,
+    data: any
+}
+
 export interface DetailedView{
     screen: string,
     param1: string,

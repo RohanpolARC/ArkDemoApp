@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { PresetGridAction } from '../fee-presets.component';
 
 @Component({
   selector: 'app-investmentdata-form',
@@ -10,7 +11,7 @@ export class InvestmentdataFormComponent implements OnInit {
 
   @Input() fundName: string;
   @Input() feeInvestment;
-  @Input() action: 'ADD' | 'EDIT' = 'ADD';
+  @Input() action: PresetGridAction = PresetGridAction.ADD;
 
   form: FormGroup
   constructor() { }
@@ -55,5 +56,4 @@ export class InvestmentdataFormComponent implements OnInit {
       financingRatio: new FormControl('', Validators.required)
     })
   }
-
 }

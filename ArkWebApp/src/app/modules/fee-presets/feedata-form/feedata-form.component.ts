@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { PresetGridAction } from '../fee-presets.component';
 
 @Component({
   selector: 'app-feedata-form',
@@ -11,7 +12,7 @@ import { debounceTime } from 'rxjs/operators';
 export class FeedataFormComponent implements OnInit {
 
   @Input() feeData;
-  @Input() action: 'ADD' | 'EDIT' = 'ADD';
+  @Input() action: PresetGridAction = PresetGridAction.ADD;
 
   @Output() fundNameEmitter = new EventEmitter<string>();
 
@@ -25,7 +26,7 @@ export class FeedataFormComponent implements OnInit {
       this.initForm();
     }
 
-    if(changes?.feeData?.currentValue && this.action === 'EDIT'){
+    if(changes?.feeData?.currentValue && (this.action === PresetGridAction.EDIT || this.action === PresetGridAction.CLONE)){
 
       (<FormGroup>this.form.controls['general']).patchValue({
         commitment: this.feeData.commitment,
