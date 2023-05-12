@@ -1,16 +1,16 @@
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
-import { AfterViewInit, Component, ElementRef, Inject, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { forkJoin, Subscription, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { Subscription, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import { FeePresetsService } from 'src/app/core/services/FeePresets/fee-presets.service';
 import { formatDate } from 'src/app/shared/functions/formatter';
 import { getAmountNumber, getMomentDate } from 'src/app/shared/functions/utilities';
+import { APIReponse } from 'src/app/shared/models/GeneralModel';
+import { PresetGridAction } from '../fee-presets.component';
 import { FeedataFormComponent } from '../feedata-form/feedata-form.component';
 import { InvestmentdataFormComponent } from '../investmentdata-form/investmentdata-form.component';
-
-type ACTION_TYPE = 'ADD' | 'EDIT';
 
 @Component({
   selector: 'app-presets-form',
@@ -28,7 +28,7 @@ export class PresetsFormComponent implements OnInit, AfterViewInit {
   updateMsg: string
   subscriptions: Subscription[] = []
 
-  action: ACTION_TYPE = null
+  action: PresetGridAction = null
   feeData: any = null
   feeInvestment: any = null
   adaptableApi: AdaptableApi
@@ -37,7 +37,8 @@ export class PresetsFormComponent implements OnInit, AfterViewInit {
     private feePresetsSvc: FeePresetsService,
     public dialogRef: MatDialogRef<PresetsFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
-      action: ACTION_TYPE,
+      action: PresetGridAction,
+      presetID?: number,
       fundFee: any,
       fundInvestment: any,
       adaptableApi: AdaptableApi
@@ -81,7 +82,17 @@ export class PresetsFormComponent implements OnInit, AfterViewInit {
     let feeData = this.feeForm.form.value;
     let investmentData = this.investmentForm.form.value;
 
+    investmentData = {
+      ...{ 
+        presetID: this.data.presetID
+       },
+      ...investmentData
+    }
+
     feeData = {
+      ...{ 
+        presetID: this.data.presetID
+       },
       ...feeData?.['general'],
       ...feeData?.['financing'],
       ...feeData?.['financingAdvanced'],
@@ -128,42 +139,49 @@ export class PresetsFormComponent implements OnInit, AfterViewInit {
       }
     }
 
-    this.subscriptions.push(forkJoin([      
-      this.feePresetsSvc.putFundFeeData(feeDataModel),
-      this.feePresetsSvc.putFundInvestmentData(investmentData)
-    ]).pipe(
-      catchError((ex) => throwError(ex))
-    ).subscribe({
-      next: (result: any) => {
+    this.subscriptions.push(    
+      this.feePresetsSvc.putFeePresets({
+        feeData: feeDataModel,
+        investmentData: investmentData
+      })
+      .pipe(
+        catchError((ex) => throwError(ex))
+      ).subscribe({
+        next: (result: APIReponse) => {
 
-        if(result[0].isSuccess && result[1].isSuccess){
-          this.updateMsg = 'Successfully updated fee data and investments';
-          this.isSuccess = true
-          this.isFailure = false  
-  
-          feeData = {
-            ...feeData,
-            modifiedOn: new Date(),
-            createdOn: (this.action === 'ADD') ? new Date() : this.feeData.createdOn,
-            createdBy: (this.action === 'ADD') ? feeData.modifiedBy : this.feeData.createdBy
+          if(result.isSuccess){
+
+            this.updateMsg = 'Successfully updated fee data and investments';
+            this.isSuccess = true
+            this.isFailure = false  
+
+            let presetID: number = result.data;
+
+            feeData = {
+              ...feeData,
+              ...{ presetID: presetID },
+              modifiedOn: new Date(),
+              createdOn: (this.action === PresetGridAction.ADD) ? new Date() : this.feeData.createdOn,
+              createdBy: (this.action === PresetGridAction.ADD) ? feeData.modifiedBy : this.feeData.createdBy
+            }
+            if(this.action === PresetGridAction.ADD || this.action === PresetGridAction.CLONE)
+              this.adaptableApi.gridApi.addGridData([feeData])
+            else if(this.action === PresetGridAction.EDIT)
+              this.adaptableApi.gridApi.updateGridData([feeData])
+
           }
-          if(this.action === 'ADD')
-            this.adaptableApi.gridApi.addGridData([feeData])
-          else if(this.action === 'EDIT')
-            this.adaptableApi.gridApi.updateGridData([feeData])
-        }
-        else{
-          this.updateMsg = 'Failed to update fee data and investments'
+          else{
+            this.updateMsg = 'Failed to update fee data and investments'
+            this.isFailure = true
+            this.isSuccess = false
+          }
+        },
+        error: (error) => {
+          this.updateMsg = 'Failed to update fee data and investments'        
           this.isFailure = true
           this.isSuccess = false
+          console.error(`Failed to put fee and investment data: ${error}`)
         }
-      },
-      error: (error) => {
-        this.updateMsg = 'Failed to update fee data and investments'        
-        this.isFailure = true
-        this.isSuccess = false
-        console.error(`Failed to put fee and investment data: ${error}`)
-      }
     }))
   }
 

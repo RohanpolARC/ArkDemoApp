@@ -14,6 +14,10 @@ import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/u
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { PresetsFormComponent } from './presets-form/presets-form.component';
 
+export enum PresetGridAction {
+  ADD, EDIT, CLONE
+}
+
 @Component({
   selector: 'app-fee-presets',
   templateUrl: './fee-presets.component.html',
@@ -75,7 +79,7 @@ export class FeePresetsComponent implements OnInit {
 
     this.adaptableOptions = {
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
-      primaryKey: 'fundName',
+      primaryKey: 'presetID',
       adaptableId: 'Fee Presets ID',
       adaptableStateKey: 'Fee Presets Key',
       // toolPanelOptions: {
@@ -91,32 +95,59 @@ export class FeePresetsComponent implements OnInit {
       actionOptions: {
         actionColumns: [
           {
-            columnId: 'ActionEdit',
-            friendlyName: 'Edit',
-            actionColumnButton: {
-              onClick: (
-                button: AdaptableButton<ActionColumnContext>,
-                context: ActionColumnContext
-              ) => {
+            columnId: 'Action',
+            friendlyName: ' ',
+            actionColumnButton: [
+              {
+                onClick: (
+                  button: AdaptableButton<ActionColumnContext>,
+                  context: ActionColumnContext
+                ) => {
 
-                if(!this.isWriteAccess){
-                  this.dataSvc.setWarningMsg('No Access', 'Dismiss', 'ark-theme-snackbar-warning')
-                  return;
-                }
+                  if(!this.isWriteAccess){
+                    this.dataSvc.setWarningMsg('No Access', 'Dismiss', 'ark-theme-snackbar-warning')
+                    return;
+                  }
 
-                let rowData = context.rowNode.data;
-                let fundName: string = rowData?.['fundName'];
+                  let rowData = context.rowNode.data;
+                  let fundName: string = rowData?.['fundName'];
 
-                // To open dialog after successfull fetch
-                this.fetchFundInvestmentData(fundName, true, {
-                  fundFee: rowData
-                });       
+                  // To open dialog after successfull fetch
+                  this.fetchFundInvestmentData(fundName, true, PresetGridAction.EDIT, {
+                    fundFee: rowData,
+                    presetID: rowData?.['presetID']
+                  });       
+                },
+                icon: {
+                  src: '../assets/img/edit.svg',
+                  style: {height: 25, width: 25}
+                },
+                tooltip: 'Edit'
               },
-              icon: {
-                src: '../assets/img/edit.svg',
-                style: {height: 25, width: 25}
+              {
+                onClick: ( button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext ) => {
+                  if(!this.isWriteAccess){
+                    this.dataSvc.setWarningMsg('No Access', 'Dismiss', 'ark-theme-snackbar-warning');
+                    return;
+                  }
+
+                  let rowData = JSON.parse(JSON.stringify(context.rowNode.data));
+                  let fundName: string = rowData?.['fundName'];   // This fundname is used to fetch the investment data from the DB.
+                  rowData['fundName'] = null;             // For cloned rows, fundName is set as empty
+
+                  // To open dialog after successfull fetch
+                  this.fetchFundInvestmentData(fundName, true, PresetGridAction.CLONE, {
+                    fundFee: rowData,
+                    presetID: null
+                  })
+                },
+                icon: {
+                  src: '../assets/img/copy.png',
+                  style: { height: 25, width: 25 }
+                },
+                tooltip: 'Clone'
               }
-            }
+            ]
           }
         ]
       },
@@ -139,16 +170,16 @@ export class FeePresetsComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 8,
+          Revision: 10,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
-            Columns: [ ...this.columnDefs.map(colDef => colDef.field), 'ActionEdit'],
+            Columns: [ ...this.columnDefs.map(colDef => colDef.field), 'Action'],
             PinnedColumnsMap: { 
-              ActionEdit: 'right' 
+              Action: 'right' 
             },
             ColumnWidthMap: {
-              ActionEdit: 18
+              Action: 15
             }
           }]
         },
@@ -183,14 +214,16 @@ export class FeePresetsComponent implements OnInit {
 
   fetchFundInvestmentData(fundName: string, 
     openDialogAfter: boolean = false, 
+    action: PresetGridAction,
     ref: {
       fundFee: any,
+      presetID: number
       // fundInvestment: any
     }){
     this.subscriptions.push(this.feePresetsSvc.getFundInvestmentData(fundName).subscribe({
       next: (fundInvestment: any[]) => {
         if(openDialogAfter){
-          this.openDialog('EDIT', ref.fundFee, fundInvestment[0])       // For a fundName, only one investment data should come.
+          this.openDialog(action, ref.presetID, ref.fundFee, fundInvestment[0])       // For a fundName, only one investment data should come.
         }
       },
       error: (error) => {
@@ -229,7 +262,7 @@ export class FeePresetsComponent implements OnInit {
 
   }
 
-  openDialog(action: 'ADD' | 'EDIT' = 'ADD', fundFee = [], fundInvestment = []) { 
+  openDialog(action: PresetGridAction = PresetGridAction.ADD, presetID: number = -1, fundFee = [], fundInvestment = []) { 
     
     if(!this.isWriteAccess){
       this.dataSvc.setWarningMsg('No Access', 'Dismiss', 'ark-theme-snackbar-warning')
@@ -239,6 +272,7 @@ export class FeePresetsComponent implements OnInit {
     const dialogRef = this.dialog.open(PresetsFormComponent, {
       data: { 
         action: action,
+        presetID: presetID,
         fundFee: fundFee,
         fundInvestment: fundInvestment,
         adaptableApi: this.adaptableApi,

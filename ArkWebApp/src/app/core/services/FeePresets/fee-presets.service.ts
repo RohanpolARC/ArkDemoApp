@@ -1,8 +1,10 @@
 import { ColDef } from '@ag-grid-community/core';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { APIConfig } from 'src/app/configs/api-config';
 import { amountFormatter, dateFormatter, dateTimeFormatter } from 'src/app/shared/functions/formatter';
+import { APIReponse } from 'src/app/shared/models/GeneralModel';
 
 @Injectable({
   providedIn: 'root'
@@ -45,6 +47,7 @@ export class FeePresetsService {
   ]
 
   columnDefs: ColDef[] = [
+    { field: 'presetID', headerName: 'Preset ID' },
     { field: 'fundName', headerName: 'Fee Preset' },
     { field: 'commitment' ,type:'abColDefNumber', valueFormatter:amountFormatter},
     { field: 'currentCapitalCalled' ,type:'abColDefNumber', valueFormatter:amountFormatter},
@@ -133,5 +136,9 @@ export class FeePresetsService {
 
   public putFundFeeData(model){
     return this.http.post(APIConfig.FEE_PRESET_DATA_PUT_API, model)
+  }
+
+  public putFeePresets(presets): Observable<APIReponse>{
+    return this.http.post<APIReponse>(APIConfig.FEE_PRESETS_PUT_API, presets)
   }
 }
