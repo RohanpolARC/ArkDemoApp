@@ -106,6 +106,12 @@
         </mat-list-item>
       </mat-list>
 
+      <mat-list>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Mark Changes')" [ngStyle]="MarkChangeStyle">
+          <div class="list-item-text">Mark Changes</div>
+        </mat-list-item>
+      </mat-list>
+
     </mat-expansion-panel>
   </mat-accordion>
 
@@ -185,7 +191,7 @@
       <button mat-raised-button id="apply-button"  
         *ngIf="[
         '/facility-detail', '/liquidity-summary', '/fee-calculation', '/management-fee',
-        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/hedging-mark','/aum-delta', '/net-returns'].includes(location.path())" 
+        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/hedging-mark','/aum-delta', '/net-returns','/mark-changes'].includes(location.path())" 
         (click)="filterApply()">Apply</button>
     </div>
 
@@ -235,6 +241,10 @@
 
     <div *ngIf="location.path() === '/net-returns'" class="filter-element">
       <app-net-returns-filter [fundHedgings] = "fundHedgings" [calcMethods] = "calcMethods" [cashflowTypes]="cashflowTypes"></app-net-returns-filter>
+    </div>
+
+    <div *ngIf="location.path() === '/mark-changes'" class="filter-element">
+      <app-mark-changes-filter></app-mark-changes-filter>
     </div>
 
   </mat-sidenav>
