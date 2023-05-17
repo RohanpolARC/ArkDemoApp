@@ -18,6 +18,7 @@ import { ManagementFeeFilterComponent } from './management-fee-filter/management
 import { PositionScreenFilterComponent } from './position-screen-filter/position-screen-filter.component';
 import { AumDeltaFilterComponent } from './aum-delta-filter/aum-delta-filter.component';
 import { NetReturnsFilterComponent } from './modules/other-modules/filter-pane/net-returns-filter/net-returns-filter.component';
+import { MarkChangesFilterComponent } from './mark-changes-filter/mark-changes-filter.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { NetReturnsFilterComponent } from './modules/other-modules/filter-pane/n
     ManagementFeeFilterComponent,
     PositionScreenFilterComponent,
     AumDeltaFilterComponent,
-    NetReturnsFilterComponent
+    NetReturnsFilterComponent,
+    MarkChangesFilterComponent
   ],
   imports: [
     CommonModule,
@@ -55,7 +57,8 @@ import { NetReturnsFilterComponent } from './modules/other-modules/filter-pane/n
     ManagementFeeFilterComponent,
     PositionScreenFilterComponent,
     AumDeltaFilterComponent,
-    NetReturnsFilterComponent
+    NetReturnsFilterComponent,
+    MarkChangesFilterComponent
   ]
 })
 export class FilterPaneModule { }

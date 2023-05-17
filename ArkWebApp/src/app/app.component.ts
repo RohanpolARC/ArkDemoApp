@@ -64,6 +64,7 @@ export class AppComponent {
   HedgingMarkStyle:any = {};
   NetReturnsStyle: any = {};
   AUMDeltaStyle: any = {};
+  MarkChangeStyle:any = {};
 
   funds
   fundHedgings
@@ -216,6 +217,9 @@ export class AppComponent {
     else if(this.location.path() === '/net-returns'){
       this.updateSelection('Net Returns')
     }
+    else if(this.location.path() === '/mark-changes'){
+      this.updateSelection('Mark Changes')
+    }
     else this.updateSelection('')
   }
 
@@ -231,7 +235,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle=this.HedgingMarkStyle=this.AUMDeltaStyle = this.NetReturnsStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle=this.HedgingMarkStyle=this.AUMDeltaStyle = this.NetReturnsStyle = this.MarkChangeStyle = this.notSelectedElement;
 
     if(screen === 'GIREditor'){
       this.GIREditorStyle = this.selectedElement;
@@ -357,6 +361,10 @@ export class AppComponent {
     else if(screen === 'AUM Delta'){
       this.AUMDeltaStyle = this.selectedElement;
       this.router.navigate(['/aum-delta'])
+    }
+    else if(screen === 'Mark Changes'){
+      this.MarkChangeStyle = this.selectedElement;
+      this.router.navigate(['/mark-changes'])
     }
   }
 }

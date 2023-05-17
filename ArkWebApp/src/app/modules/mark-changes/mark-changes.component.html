@@ -1,0 +1,28 @@
+<div class="parent">
+    <div class="header">
+        <div class="title">
+            Mark Changes
+        </div>
+        <div class="action">
+            <div class="date-cont">
+                <mat-icon class="date-range">date_range</mat-icon>
+                <mat-label matTooltip="Please visit Filter Pane to change As Of Date" matTooltipClass="date-tooltip">From: {{sDate?.start | date:"dd/MM/yyyy"}}  - To: {{sDate?.end | date:"dd/MM/yyyy"}}</mat-label>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <mat-card class="mat-content">
+            <ag-grid-angular
+            [gridOptions] = "gridOptions"
+            [modules] = "agGridModules"
+            [rowData] = "rowData"
+            class="ag-theme-alpine ag-grid"
+            [adaptableOptions] = "adaptableOptions"
+            (adaptableReady)="onAdaptableReady($event)"
+            >
+            </ag-grid-angular>
+        </mat-card>
+    </div>
+
+</div>
