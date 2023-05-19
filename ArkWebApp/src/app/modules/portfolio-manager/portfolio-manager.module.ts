@@ -17,7 +17,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
-import { ReviewerConfirmComponent } from './reviewer-confirm/reviewer-confirm.component';
 import { PortfolioMappingRoutingModule } from './portfolio-mapping-routing.module';
 
 @NgModule({
@@ -26,8 +25,7 @@ import { PortfolioMappingRoutingModule } from './portfolio-mapping-routing.modul
     UpdateCellRendererComponent,
     ApprovalComponent,
     ApprovalActionCellRendererComponent,
-    MatAutocompleteEditorComponent,
-    ReviewerConfirmComponent
+    MatAutocompleteEditorComponent
   ],
   imports: [
     CommonModule,

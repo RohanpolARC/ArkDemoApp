@@ -9,13 +9,13 @@ import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/u
 import { DataService } from 'src/app/core/services/data.service';
 import { FixingDetailsFormComponent } from './fixing-details-form/fixing-details-form.component';
 import { map } from 'rxjs/operators';
-import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { MsalService } from '@azure/msal-angular';
 import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
+import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
 
 
 @Component({
@@ -290,8 +290,11 @@ export class AttributesFixingComponent implements OnInit {
     if(action === 'DELETE'){
       this.deleteFixingDetailID = fixingDetails.fixingID
       let confirmTextString = 'Are you sure you want to delete this attribute ?'
-      const dialogRef = this.dialog.open(ConfirmationPopupComponent, { 
-        data:{confirmText:confirmTextString},
+      const dialogRef = this.dialog.open(ConfirmPopupComponent, { 
+        data:{
+          headerText:confirmTextString,
+          showTextField:false,
+        },
         maxHeight: '95vh'
       })
       this.subscriptions.push(dialogRef.afterClosed().subscribe((value)=>{

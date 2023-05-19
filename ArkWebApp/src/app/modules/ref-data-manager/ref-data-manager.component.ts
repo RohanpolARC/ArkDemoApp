@@ -7,13 +7,13 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { RefDataManagerService } from 'src/app/core/services/RefDataManager/ref-data-manager.service';
-import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
-import { createColumnDefs, GENERAL_FORMATTING_EXCEPTIONS, parseFetchedData, saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
-import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
+import { createColumnDefs, GENERAL_FORMATTING_EXCEPTIONS, parseFetchedData } from 'src/app/shared/functions/dynamic.parse';
+import { BLANK_DATETIME_FORMATTER_CONFIG,  DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages, RefDataProc } from 'src/app/shared/models/GeneralModel';
 import { AddRefDataFormComponent } from './add-ref-data-form/add-ref-data-form.component';
+import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
 
 
 @Component({
@@ -281,8 +281,9 @@ export class RefDataManagerComponent implements OnInit {
     if(action ==='DELETE'){
       this.deleteRefDataID = rowData.AttributeId
       let confirmTextString = 'Are you sure you want to delete this attribute ?'
-      const dialogRef = this.dialog.open(ConfirmationPopupComponent, { 
-        data:{confirmText:confirmTextString},
+
+      const dialogRef = this.dialog.open(ConfirmPopupComponent, { 
+        data:{headerText:confirmTextString},
         maxHeight: '95vh'
       })
       this.subscriptions.push(dialogRef.afterClosed().subscribe((value)=>{

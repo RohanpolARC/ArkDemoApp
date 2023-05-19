@@ -1,13 +1,13 @@
 <div class="confirmation">
     <div class="header">
-        <h2 mat-dialog-title>
+        <h4 mat-dialog-title>
             {{headerText}}
-        </h2>
+        </h4>
     </div>
     <div class="form">
         <div *ngIf="configData.showTextField;">
             <mat-form-field appearance="outline" class="input-field w-100">
-                <mat-label> Comment </mat-label>
+                <mat-label> {{textFieldLabelValue}} </mat-label>
                 <input type="text" autocomplete="off" matInput [formControl] = "textField" />
                 <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="textField.reset()">
                     <mat-icon>close</mat-icon>
@@ -21,7 +21,7 @@
     <mat-dialog-actions align="end">
         <div>
 
-            <button mat-raised-button (click)="close('Confirm')" color="primary">
+            <button *ngIf="displayConfirmButton" mat-raised-button (click)="close('Confirm')" color="primary">
                 Confirm
             </button>
             

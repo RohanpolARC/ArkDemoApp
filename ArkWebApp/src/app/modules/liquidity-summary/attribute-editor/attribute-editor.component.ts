@@ -7,8 +7,8 @@ import * as moment from 'moment';
 import { LiquiditySummaryAttributeModel } from '../../../shared/models/LiquiditySummaryModel';
 import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/liquidity-summary.service';
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
-import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 import { DataService } from 'src/app/core/services/data.service';
+import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
 
 @Component({
   selector: 'app-attribute-editor',
@@ -218,8 +218,8 @@ export class AttributeEditorComponent implements OnInit {
 
   onDelete(){
     let confirmTextString = 'Are you sure you want to delete this attribute ?'
-    const dialogRef = this.dialog.open(ConfirmationPopupComponent, { 
-      data:{confirmText:confirmTextString},
+    const dialogRef = this.dialog.open(ConfirmPopupComponent, { 
+      data:{headerText:confirmTextString},
       maxHeight: '95vh'
     })
     this.subscriptions.push(dialogRef.afterClosed().subscribe((value)=>{

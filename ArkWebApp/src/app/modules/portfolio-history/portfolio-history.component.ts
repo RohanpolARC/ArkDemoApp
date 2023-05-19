@@ -9,7 +9,6 @@ import {DataService} from '../../core/services/data.service'
 import {BtnCellRenderer} from './btn-cell-renderer.component'
 import {PortfolioHistoryService} from '../../core/services/PortfolioHistory/portfolio-history.service'
 import {MatDialog } from '@angular/material/dialog';
-import {DialogDeleteComponent} from './dialog-delete/dialog-delete.component';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { map } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -21,8 +20,8 @@ import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overla
 import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { CheckboxEditorComponent } from 'src/app/shared/components/checkbox-editor/checkbox-editor.component';
 import { AssetGIRModel } from 'src/app/shared/models/AssetGIRModel';
-import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
+import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
 
 let adapTableApi: AdaptableApi;
 
@@ -106,15 +105,7 @@ export class PortfolioHistoryComponent implements OnInit {
         return{
           screen:'gir editor',
           onCheckboxcolChanged: this.onCheckboxChange,
-          dataSvc:this.dataSvc,
-          subscriptions:this.subscriptions,
-          portfolioHistoryService:this.portfolioHistoryService,
-          adaptableApi: this.adaptableApi,
-          dialog : this.dialog,
-          updateCheckboxSelection:this.updateCheckboxSelection,
-          deleteUnreviewed:this.deleteUnreviewed,
-          gridOptions: this.gridOptions
-
+          adaptableApi: this.adaptableApi
         }
       },
       field:'isReviewed', type:'abColDefBoolean',width:30
@@ -124,8 +115,6 @@ export class PortfolioHistoryComponent implements OnInit {
 ];
   noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
   assetGIR: any;
-  isSuccess: boolean;
-  isFailure: boolean;
   updateMsg: string;
   adaptableApi: AdaptableApi;
 
@@ -188,27 +177,27 @@ export class PortfolioHistoryComponent implements OnInit {
   }
 
   onCheckboxChange(params: ICellRendererParams){
-    const confirmdialogRef = params.context.component.dialog.open(ConfirmationPopupComponent, {
-      data: { confirmText: `Are you sure you want to mark GIR as  ${params.value?'reviewed':'unreviewed'}?` }
+    const confirmdialogRef = params.context.component.dialog.open(ConfirmPopupComponent, {
+      data:{
+        headerText:`Are you sure you want to mark GIR as  ${params.value?'reviewed':'unreviewed'}?`,
+      },
     })
     params.context.component.subscriptions.push(
       confirmdialogRef
       .afterClosed()
       .subscribe((val)=>{
+        let updatedData = [{...params.data, ...{
+          'isReviewed':!params.value //to reset the original checkbox value on cancel
+        }}]
+        params.api.applyTransaction({
+          update: updatedData
+        }) 
         if(val?.['action']==='Confirm'){
            if(params.data?.['isOverride']==='No' && !params.value){
-              params.context.component.deleteUnreviewed(params)
-              //params?.['portfolioHistoryService'].performDelete(params.data)
+              params.context.component.performDelete(params,true)
             }else{
               params.context.component.updateCheckboxSelection(params)
             }
-        }else{
-          let updatedData = [{...params.data, ...{
-            'isReviewed':!params.value //to reset the original checkbox value on cancel
-          }}]
-          params.api.applyTransaction({
-            update: updatedData
-          }) 
         }
       })
       
@@ -218,7 +207,7 @@ export class PortfolioHistoryComponent implements OnInit {
     
   }
 
-  deleteUnreviewed(params){
+  performDelete(params,markUnreviewed:boolean=false){
 
     let AssetGIR: AssetGIRModel = this.portfolioHistoryService.getModel(params.data)
 
@@ -226,29 +215,27 @@ export class PortfolioHistoryComponent implements OnInit {
       this.subscriptions.push(
         this.portfolioHistoryService.deleteAssetGIR(AssetGIR).subscribe({
           next: message => {
-            this.isSuccess = true;
-            this.isFailure = false;
-            this.updateMsg = "GIR review status updated";
+
+            this.updateMsg = markUnreviewed   ? "GIR review status updated" : "GIR successfully deleted";
             
-            params.data.isOverride = 'No';
-            params.data.isReviewed = false;
+            params.node.data.isOverride = 'No';
+            params.node.data.isReviewed = params.value;
 
 
-            params.data.girSource = null;
-            params.data.girSourceID = null;
-            params.data.fxRateBaseEffective = 0;
-            params.data.modifiedBy = ' ';
-            params.data.modifiedOn = null;
-            params.data.reviewedBy = ' ';
-            params.data.reviewedOn = null;
+            params.node.data.girSource = null;
+            params.node.data.girSourceID = null;
+            params.node.data.fxRateBaseEffective = 0;
+            params.node.data.modifiedBy = ' ';
+            params.node.data.modifiedOn = null;
+            params.node.data.reviewedBy = ' ';
+            params.node.data.reviewedOn = null;
             params?.adaptableApi.gridApi.refreshRowNode(params.node)
             this.dataSvc.setWarningMsg(this.updateMsg,'dismiss','ark-theme-snackbar-success')
 
           },
           error: error => {
-            this.isFailure = true;
-            this.isSuccess = false;
-            this.updateMsg = "failed to updated the review status";
+
+            this.updateMsg = markUnreviewed   ? "failed to updated the review status" : "GIR Delete Failed";
             this.dataSvc.setWarningMsg(this.updateMsg,'dismiss','ark-theme-snackbar-error')
 
             console.error("Error deleting row." + error);
@@ -266,8 +253,7 @@ export class PortfolioHistoryComponent implements OnInit {
     this.assetGIR.isReviewed = params.value;           
     this.assetGIR.id = 0;
     this.assetGIR.fxRateOverride =  (params.data.isOverride==='Yes')?true:false;            // GIR is always overriden if update happens from GIREditor.
-    
-    //this.assetGIR.ModifiedOn = params.data.modifiedOn
+
     this.assetGIR.ModifiedOn = params.data.modifiedOn??new Date(null)
 
     this.assetGIR.CreatedBy = params.data.createdBy
@@ -279,8 +265,7 @@ export class PortfolioHistoryComponent implements OnInit {
     params.context.component.subscriptions.push(params.context.component.portfolioHistoryService.putAssetGIR([this.assetGIR]).subscribe({
           next: data => {     
             
-            this.isSuccess = true;
-            this.isFailure = false;            
+         
             this.updateMsg = "GIR review status updated";
             
             if(params.value){
@@ -302,8 +287,7 @@ export class PortfolioHistoryComponent implements OnInit {
           },
           error: error => {
               console.error('There was an error!', error);
-              this.isFailure = true;
-              this.isSuccess = false;
+
               this.updateMsg = "failed to updated the review status";
               this.dataSvc.setWarningMsg(this.updateMsg,'dismiss','ark-theme-snackbar-error')
 
@@ -362,14 +346,20 @@ export class PortfolioHistoryComponent implements OnInit {
               context: ActionColumnContext
             ) => {
 
-              let dialogRef = this.dialog.open(DialogDeleteComponent,{
+              let dialogRef = this.dialog.open(ConfirmPopupComponent,{
                 data: {
-                  rowData: context.rowNode?.data,
-                  adapTableApi: adapTableApi
+                  headerText: context.rowNode.data?.isOverride === 'Yes'  ? 'Are you sure to delete this GIR?'  : 'There is no GIR to delete.',
+                  displayConfirmButton:context.rowNode.data?.isOverride === 'Yes'
                 }});
               this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
-                if(dialogRef.componentInstance.isSuccess)
+                if(result.action==='Confirm'){
+                  this.performDelete({
+                    data:context.rowNode.data,
+                    adaptableApi:context.adaptableApi,
+                    node:context.rowNode
+                  })
                   this.gridOptions.api?.refreshCells({ force: true, rowNodes: [context.rowNode], columns: ['fxRateBaseEffective',  'modifiedOn', 'modifiedBy','reviewedBy','reviewedOn', 'isOverride', 'isReviewed','girSource', 'girSourceID'] })
+                }
               }));
             },
             icon:{

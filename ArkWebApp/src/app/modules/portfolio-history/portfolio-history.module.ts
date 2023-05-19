@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PortfolioHistoryComponent } from './portfolio-history.component';
-import { DialogDeleteComponent } from './dialog-delete/dialog-delete.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
@@ -18,7 +17,7 @@ import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detaile
 
 @NgModule({
   declarations: [
-    PortfolioHistoryComponent,BtnCellRenderer, UpdateGirModalComponent, DialogDeleteComponent
+    PortfolioHistoryComponent,BtnCellRenderer, UpdateGirModalComponent
   ],
   imports: [
     CommonModule,
