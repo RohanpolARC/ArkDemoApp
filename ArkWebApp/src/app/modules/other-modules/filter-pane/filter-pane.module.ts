@@ -19,6 +19,7 @@ import { PositionScreenFilterComponent } from './position-screen-filter/position
 import { AumDeltaFilterComponent } from './aum-delta-filter/aum-delta-filter.component';
 import { NetReturnsFilterComponent } from './modules/other-modules/filter-pane/net-returns-filter/net-returns-filter.component';
 import { MarkChangesFilterComponent } from './mark-changes-filter/mark-changes-filter.component';
+import { ValuationFilterComponent } from './valuation-filter/valuation-filter.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { MarkChangesFilterComponent } from './mark-changes-filter/mark-changes-f
     PositionScreenFilterComponent,
     AumDeltaFilterComponent,
     NetReturnsFilterComponent,
-    MarkChangesFilterComponent
+    MarkChangesFilterComponent,
+    ValuationFilterComponent
   ],
   imports: [
     CommonModule,
@@ -58,7 +60,8 @@ import { MarkChangesFilterComponent } from './mark-changes-filter/mark-changes-f
     PositionScreenFilterComponent,
     AumDeltaFilterComponent,
     NetReturnsFilterComponent,
-    MarkChangesFilterComponent
+    MarkChangesFilterComponent,
+    ValuationFilterComponent
   ]
 })
 export class FilterPaneModule { }

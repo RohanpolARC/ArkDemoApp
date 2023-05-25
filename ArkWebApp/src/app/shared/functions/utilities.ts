@@ -97,6 +97,15 @@ export function getMomentDate(date: Date): Date{
 export function getMomentDateStr(date: Date): string{
   return moment(date).format('YYYY-MM-DD');
 }
+
+export function getFinalDate(date: Date): Date | null{
+  let dt: Date = getMomentDate(date);
+
+  if(dt.getFullYear() <= 1970)
+    return null;
+  return dt;
+}
+
 /**
  * 
  * @returns Returns last business date from today
@@ -123,5 +132,3 @@ export function getRowNodes(node: RowNode, rowNodes: any[] = []){
   }
   return rowNodes;
 }
-
-

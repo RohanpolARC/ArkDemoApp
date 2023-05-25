@@ -1,3 +1,7 @@
+export interface IPropertyReader {
+    readProperty<T>(prop: string): T
+}
+
 export interface APIReponse {
     isSuccess: boolean,
     returnMessage: string,

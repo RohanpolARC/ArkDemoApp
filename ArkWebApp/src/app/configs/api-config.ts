@@ -101,4 +101,6 @@ export class APIConfig {
 
     public static MARK_CHANGES_GET_API: string = APIConfig.BASEURL + "/api/MarkChanges/GetMarkChanges";
 
+    public static VALUATION_DATA_GET_API: string = APIConfig.BASEURL + "/api/Valuation/Data";
+    public static VALUATION_DATA_PUT_API: string = APIConfig.BASEURL + "/api/Valuation/PutData";
 }

@@ -1,0 +1,20 @@
+<div class="element">
+  Funds
+  <app-multi-select
+      [placeholder] = "'Select Fund(s)'"
+      [settings] = "fundSettings"
+      [dropdownData] = "funds"
+      [selectedDropdownData] = "preSelectedFunds"
+      (onNgModelChangeCallback) = "onFundChange($event)"
+      >
+  </app-multi-select>
+</div>
+
+<div class="element">
+    <mat-form-field appearance="outline">
+      <mat-label>As Of Date</mat-label>
+      <input autocomplete="off"  matInput [matDatepicker]="Datepicker" [(ngModel)]="asOfDate" (ngModelChange) = "onAsOfDateChange($event)">
+      <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+      <mat-datepicker #Datepicker></mat-datepicker>
+    </mat-form-field>
+</div>
