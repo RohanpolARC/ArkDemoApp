@@ -30,8 +30,8 @@ import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfu
 import { UnfundedAssetsEditorComponent } from '../unfunded-assets/unfunded-assets-editor/unfunded-assets-editor.component';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
-import { AddCommentComponent } from './add-comment/add-comment.component';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
+import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
 
 @Component({
   selector: 'app-liquidity-summary',
@@ -700,30 +700,47 @@ export class LiquiditySummaryComponent implements OnInit {
         | string
       )[] = []
       //params.defaultItems.slice(0); //to get list of all default menu items
+      let hasComment:boolean = false
+      let textFieldValue:string
+      params.context.componentParent.fundHedgingsComments.forEach(ele=>{
+        if(ele.fundHedging===params.column.getColId()){
+          hasComment = true
+          textFieldValue = ele.comment
+        }
+      })
+      let name =  hasComment ? 'Edit Comment' : 'Add Comment'
       fundHedgingMenuItems.push({
-        name: 'Add Comment',
+        name: name,
         action: () => {
-          let textFieldValue
-          params.context.componentParent.fundHedgingsComments.forEach(ele=>{
-            if(ele.fundHedging===params.column.getColId()){
-              textFieldValue = ele.comment
-            }
-          })
           let configData:ConfirmComponentConfigure ={
-            headerText:'Add Comment',
+            headerText:'Comment',
             textFieldValue:textFieldValue,
             showTextField:true,
             data:{
               fundHedging:params.column.getColId(),
             }
           }
-          let dialogRef = params.context.componentParent.dialog.open(AddCommentComponent,{
+          let dialogRef = params.context.componentParent.dialog.open(ConfirmPopupComponent,{
             data:configData,
             height:'30vh',
             width:'30vw'
           })
-          params.context.componentParent.subscriptions.push(dialogRef.afterClosed().subscribe((data)=>{
-            params.context.componentParent.getLiquiditySummaryComments()
+          params.context.componentParent.subscriptions.push(dialogRef.afterClosed().subscribe((event)=>{
+            if(event.action==='Confirm'){
+              let commentModel = {
+                fundHedging:event.configData.data.fundHedging,
+                comment:event.textFieldValue ? event.textFieldValue : '',
+                modifiedBy:params.context.componentParent.dataSvc.getCurrentUserName()
+              }
+              params.context.componentParent.subscriptions.push(params.context.componentParent.liquiditySummarySvc.putLiquiditySummaryComments(commentModel).subscribe((data)=>{
+                if(data==='Success'){
+                  params.context.componentParent.dataSvc.setWarningMsg("Successfully modified the comment","dismiss",'ark-theme-snackbar-success')
+                }else{
+                  params.context.componentParent.dataSvc.setWarningMsg("Failed to modify the comment","dismiss",'ark-theme-snackbar-error')
+                }
+              }))
+              params.context.componentParent.getLiquiditySummaryComments()
+            }
           }))
         },
         cssClasses:['ag-column-menu-text-bold-custom']
