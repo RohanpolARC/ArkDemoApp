@@ -20,7 +20,6 @@ import { AttributeGroupRendererComponent } from './attribute-group-renderer/attr
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
 import { LiquiditySummaryRoutingModule } from './liquidity-summary-routing.module';
 import { ConfirmationModule } from 'src/app/shared/modules/confirmation/confirmation.module';
-import { AddCommentComponent } from './add-comment/add-comment.component';
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
 import { SsrsReportViewerModule } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-viewer.module';
 
@@ -29,8 +28,7 @@ import { SsrsReportViewerModule } from 'src/app/shared/modules/ssrs-report-viewe
     LiquiditySummaryComponent,
     AttributeEditorComponent,
     UpdateCellRendererComponent,
-    AttributeGroupRendererComponent,
-    AddCommentComponent
+    AttributeGroupRendererComponent
   ],
   imports: [
     CommonModule,

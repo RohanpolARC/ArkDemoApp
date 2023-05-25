@@ -105,15 +105,7 @@ export class PortfolioHistoryComponent implements OnInit {
         return{
           screen:'gir editor',
           onCheckboxcolChanged: this.onCheckboxChange,
-          dataSvc:this.dataSvc,
-          subscriptions:this.subscriptions,
-          portfolioHistoryService:this.portfolioHistoryService,
-          adaptableApi: this.adaptableApi,
-          dialog : this.dialog,
-          updateCheckboxSelection:this.updateCheckboxSelection,
-          performDelete:this.performDelete,
-          gridOptions: this.gridOptions
-
+          adaptableApi: this.adaptableApi
         }
       },
       field:'isReviewed', type:'abColDefBoolean',width:30
@@ -194,19 +186,18 @@ export class PortfolioHistoryComponent implements OnInit {
       confirmdialogRef
       .afterClosed()
       .subscribe((val)=>{
+        let updatedData = [{...params.data, ...{
+          'isReviewed':!params.value //to reset the original checkbox value on cancel
+        }}]
+        params.api.applyTransaction({
+          update: updatedData
+        }) 
         if(val?.['action']==='Confirm'){
            if(params.data?.['isOverride']==='No' && !params.value){
               params.context.component.performDelete(params,true)
             }else{
               params.context.component.updateCheckboxSelection(params)
             }
-        }else{
-          let updatedData = [{...params.data, ...{
-            'isReviewed':!params.value //to reset the original checkbox value on cancel
-          }}]
-          params.api.applyTransaction({
-            update: updatedData
-          }) 
         }
       })
       
@@ -225,30 +216,26 @@ export class PortfolioHistoryComponent implements OnInit {
         this.portfolioHistoryService.deleteAssetGIR(AssetGIR).subscribe({
           next: message => {
 
-            this.updateMsg = markUnreviewed? "GIR review status updated":"GIR successfully deleted";
+            this.updateMsg = markUnreviewed   ? "GIR review status updated" : "GIR successfully deleted";
             
-            params.data.isOverride = 'No';
-            params.data.isReviewed = false; //we have to set this to false explicitly when we perform delete action
+            params.node.data.isOverride = 'No';
+            params.node.data.isReviewed = params.value;
 
 
-            params.data.girSource = null;
-            params.data.girSourceID = null;
-            params.data.fxRateBaseEffective = 0;
-            params.data.modifiedBy = ' ';
-            params.data.modifiedOn = null;
-            params.data.reviewedBy = ' ';
-            params.data.reviewedOn = null;
+            params.node.data.girSource = null;
+            params.node.data.girSourceID = null;
+            params.node.data.fxRateBaseEffective = 0;
+            params.node.data.modifiedBy = ' ';
+            params.node.data.modifiedOn = null;
+            params.node.data.reviewedBy = ' ';
+            params.node.data.reviewedOn = null;
             params?.adaptableApi.gridApi.refreshRowNode(params.node)
             this.dataSvc.setWarningMsg(this.updateMsg,'dismiss','ark-theme-snackbar-success')
 
           },
           error: error => {
 
-
-            params.data.isReviewed = true; // we have to set this explicitly to true and refresh the row because flag has been set to false from UI
-            params?.adaptableApi.gridApi.refreshRowNode(params.node)
-
-            this.updateMsg = markUnreviewed?"failed to updated the review status":"GIR Delete Failed";
+            this.updateMsg = markUnreviewed   ? "failed to updated the review status" : "GIR Delete Failed";
             this.dataSvc.setWarningMsg(this.updateMsg,'dismiss','ark-theme-snackbar-error')
 
             console.error("Error deleting row." + error);
@@ -266,8 +253,7 @@ export class PortfolioHistoryComponent implements OnInit {
     this.assetGIR.isReviewed = params.value;           
     this.assetGIR.id = 0;
     this.assetGIR.fxRateOverride =  (params.data.isOverride==='Yes')?true:false;            // GIR is always overriden if update happens from GIREditor.
-    
-    //this.assetGIR.ModifiedOn = params.data.modifiedOn
+
     this.assetGIR.ModifiedOn = params.data.modifiedOn??new Date(null)
 
     this.assetGIR.CreatedBy = params.data.createdBy
@@ -360,14 +346,9 @@ export class PortfolioHistoryComponent implements OnInit {
               context: ActionColumnContext
             ) => {
 
-              // let dialogRef = this.dialog.open(DialogDeleteComponent,{
-              //   data: {
-              //     rowData: context.rowNode?.data,
-              //     adapTableApi: adapTableApi
-              //   }});
               let dialogRef = this.dialog.open(ConfirmPopupComponent,{
                 data: {
-                  headerText: context.rowNode.data?.isOverride === 'Yes'?'Are you sure to delete this GIR?':'There is no GIR to delete.',
+                  headerText: context.rowNode.data?.isOverride === 'Yes'  ? 'Are you sure to delete this GIR?'  : 'There is no GIR to delete.',
                   displayConfirmButton:context.rowNode.data?.isOverride === 'Yes'
                 }});
               this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {

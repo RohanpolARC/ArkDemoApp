@@ -44,7 +44,8 @@ export class ConfirmationComponent implements OnInit {
   close(action:string){
     this.actionEvent.emit({
       action:action,
-      textFieldValue:this.textField.value
+      textFieldValue:this.textField.value,
+      configData:this.configData
     })
 
   }
