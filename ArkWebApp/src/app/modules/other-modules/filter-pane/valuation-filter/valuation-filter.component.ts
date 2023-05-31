@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
 import { getLastBusinessDay, getMomentDateStr } from 'src/app/shared/functions/utilities';
@@ -8,7 +8,7 @@ import { getLastBusinessDay, getMomentDateStr } from 'src/app/shared/functions/u
   templateUrl: './valuation-filter.component.html',
   styleUrls: ['./valuation-filter.component.scss']
 })
-export class ValuationFilterComponent implements OnInit {
+export class ValuationFilterComponent implements OnInit, OnChanges {
 
   @Input() funds
   asOfDate: string = null;
@@ -30,6 +30,12 @@ export class ValuationFilterComponent implements OnInit {
     this.fundSettings = { ...this.dropdownSettings, ...{  textField: 'fund' } }
     this.asOfDate = getMomentDateStr(getLastBusinessDay());
     this.onAsOfDateChange(this.asOfDate)
+  }
+
+  ngOnChanges(changes: SimpleChanges){
+    if(changes?.['funds']?.currentValue){
+      this.preSelectedFunds = this.funds?.filter(x => ['SL2', 'DL4'].includes(x['fund']))
+    }
   }
 
   onFundChange(values){

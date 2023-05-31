@@ -1,7 +1,6 @@
 export interface Valuation {
     assetID: number,
-    type: 'Hedging Mark' | 'Mark Override',
-    valuationMethod: 'Impaired Cost' | 'Mark To Market',
+    markType: 'Impaired Cost' | 'Mark To Market' | 'Hedging Mark',
     override: number,
     overrideDate: Date,
     initialYieldCurveSpread: number,

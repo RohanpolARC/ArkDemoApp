@@ -12,8 +12,10 @@ import { ValuationService } from 'src/app/core/services/Valuation/valuation.serv
 export class ValuationComponent implements OnInit {
 
   asofdate: string;
+  asofdateIn: string;
   funds: string[]
   benchmarkIndexes: string[];
+  showLoadingOverlay: { show: 'Yes' | 'No' }
 
   constructor(
     private valuationSvc: ValuationService,
@@ -22,6 +24,10 @@ export class ValuationComponent implements OnInit {
 
   rowData$: Observable<any[]> = this.dataSvc.filterApplyBtnState.pipe(
     filter((isHit: boolean) => isHit),
+    tap((isHit) => { 
+      this.asofdate = this.asofdateIn;
+      this.showLoadingOverlay = { show: 'Yes' }
+    }),
     switchMap((isHit) => {
       return this.valuationSvc.getValuationData(this.asofdate, this.funds?.join(',')).pipe(
         tap((data: any[]) => {
@@ -38,7 +44,7 @@ export class ValuationComponent implements OnInit {
     
     this.asOfDate$ = this.valuationSvc.currentAsOfDate.pipe(
       tap((asOfDate: string) => {
-        this.asofdate = asOfDate
+        this.asofdateIn = asOfDate
       })
     )
 

@@ -78,7 +78,8 @@ export class ValuationGridService {
 
   isEditing(context: ActionColumnContext | RowNode): boolean{
     if(context instanceof RowNode){
-      return !!<RowNode>context?.data?.['editing']
+      let isRowEditing: boolean = !!<RowNode>context?.data?.['editing'];
+      return isRowEditing;
     }
     else{  
       return !!<ActionColumnContext>context.rowNode.data['editing'];
@@ -90,14 +91,13 @@ export class ValuationGridService {
 
     let valuation: Valuation = <Valuation> {};
     valuation.assetID = node.data?.['assetID'];
-    valuation.type = node.data?.['type'];   // Hedging Mark/Mark Override
-    valuation.valuationMethod = node.data?.['valuationMethod'];
+    valuation.markType = node.data?.['markType'];   // Hedging Mark/Mark Override
     valuation.creditSpreadIndex = node.data?.['creditSpreadIndex'];
     valuation.initialCreditSpread = node.data?.['initialCreditSpread'];
     valuation.initialYieldCurveSpread = node.data?.['initialYieldCurveSpread'];
     valuation.deltaSpreadDiscount = node.data?.['deltaSpreadDiscount'];
     valuation.override = node.data?.['override'];
-    valuation.overrideDate = getFinalDate(node.data?.['overrideDate']);
+    valuation.overrideDate = getFinalDate(new Date(this.getAsOfDate())); //getFinalDate(node.data?.['overrideDate']);
     valuation.modifiedBy = this.dataSvc.getCurrentUserName();
 
 
@@ -156,6 +156,8 @@ export class ValuationGridService {
   }
 
   hideRunActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext): boolean {
+    if(context?.data?.['markType'] !== 'Mark to Market')
+      return true;   
     return this.isEditing(context);
   }
 
@@ -173,7 +175,7 @@ export class ValuationGridService {
     if(node.group)
       return null;
 
-    if(this.isEditing(node)){
+    if(this.isCellEditable(params)){
       return {
         'border-color': '#0590ca'
       }
@@ -190,6 +192,18 @@ export class ValuationGridService {
   }
 
   isEditable = (params: EditableCallbackParams) => {
-    return this.isEditing(params.node);
+    return this.isCellEditable(params);
+  }
+
+  isCellEditable(params: EditableCallbackParams | CellClassParams){
+
+    if(params?.data?.['markType'] === 'Hedging Mark' || params?.data?.['markType'] === 'Impaired Cost'){
+      if(params.column.getColId() === 'override')
+        return this.isEditing(params.node);
+      else
+        return false;
+    }
+    else 
+        return this.isEditing(params.node);
   }
 }

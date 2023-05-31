@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
-import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
+import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { ValuationGridService } from '../service/valuation-grid.service';
@@ -20,6 +20,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   @Input() rowData;
   @Input() benchmarkIndexes: string[]
   @Input() asOfDate: string
+  @Input() showLoadingOverlay: { show: 'Yes' | 'No' }
 
   agGridModules: Module[]
   gridOptions: GridOptions;
@@ -49,7 +50,10 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   }
 
   ngOnChanges(changes: SimpleChanges){
-    console.log(this.rowData)
+
+    if(changes?.['showLoadingOverlay']?.currentValue?.show === 'Yes'){
+      this.gridApi.showLoadingOverlay();
+    }
   }
 
   ngOnInit(): void {
@@ -60,8 +64,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'assetID', type: 'abColDefNumber' },
       { field: 'override', type: 'abColDefNumber', cellStyle: this.gridSvc.editableCellStyle.bind(this), onCellValueChanged: this.gridSvc.onOverrideCellValueChanged.bind(this.gridSvc), editable: this.gridSvc.isEditable.bind(this.gridSvc) },
       { field: 'overrideDate', type: 'abColDefDate' },
-      { field: 'type', type: 'abColDefString' },
-      { field: 'valuationMethod', type: 'abColDefString' },
+      { field: 'markType', type: 'abColDefString' },
       { field: 'initialYieldCurveSpread', type: 'abColDefNumber', editable: this.gridSvc.isEditable.bind(this.gridSvc), cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc)  },
       { field: 'initialCreditSpread', type: 'abColDefNumber', editable: this.gridSvc.isEditable.bind(this.gridSvc), cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc) },
       { field: 'creditSpreadIndex', type: 'abColDefString', cellEditor: 'autocompleteCellEditor', cellEditorParams: () => {
@@ -71,17 +74,20 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       }, editable: this.gridSvc.isEditable.bind(this.gridSvc), cellEditorPopup: false , cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc) },
       { field: 'currentYieldCurveSpread', type: 'abColDefNumber' },
       { field: 'currentCreditSpread', type: 'abColDefNumber' },
-      { field: 'deltaSpreadDiscount', type: 'abColDefNumber', cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc) },
+      { field: 'deltaSpreadDiscount', type: 'abColDefNumber', cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), editable: this.gridSvc.isEditable.bind(this.gridSvc) },
       { field: 'modelValuation', type: 'abColDefNumber' },
       { field: 'modelValuationMinus100', type: 'abColDefNumber' },
       { field: 'modelValuationPlus100', type: 'abColDefNumber' },
       { field: 'isModelValuationStale', type: 'abColDefBoolean' },
       { field: 'usedSpreadDiscount', type: 'abColDefNumber' },
       { field: 'currentWSOMark', type: 'abColDefNumber' },
+      { field: 'dateTo', type: 'abColDefDate' },
       { field: 'previousWSOMark', type: 'abColDefNumber' },
+      { field: 'dateFrom', type: 'abColDefDate' },
       { field: 'faceValueIssue', type: 'abColDefNumber', hide: true },
       { field: 'mark', type: 'abColDefNumber', hide: true },
-      { field: 'costPrice', type: 'abColDefNumber', hide: true }
+      { field: 'costPrice', type: 'abColDefNumber', hide: true },
+      { field: 'comment', type: 'abColDefString', hide: true }
       // { field: 'modifiedBy', type: 'abColDefString' },
       // { field: 'modifiedOn', type: 'abColDefDate' }
     ]
@@ -94,14 +100,18 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       rowHeight: 30,
       singleClickEdit: true,
       stopEditingWhenCellsLoseFocus: false,
-      rowGroupPanelShow: 'always',
+      rowGroupPanelShow: 'never',
       onGridReady: (p: GridReadyEvent) => {
         this.gridApi = p.api;
         this.gridApi.hideOverlay();
       },
       defaultColDef: {
         resizable: true,
-        sortable: true
+        sortable: true,
+        filter: true,
+        rowGroup: false,
+        enableRowGroup: false,
+        enableValue: false
       },
       components: {
         'autocompleteCellEditor': MatAutocompleteEditorComponent
@@ -138,35 +148,40 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
                 hidden: this.gridSvc.hideEditActionColumn.bind(this.gridSvc),
                 icon: {
                   src: '../../assets/img/edit.svg', style: { height: 25, width: 25 }
-                }
+                },
+                tooltip: 'Edit'
               },
               {
                 onClick: this.gridSvc.saveActionColumn.bind(this.gridSvc),
                 hidden: this.gridSvc.hideSaveActionColumn.bind(this.gridSvc),
                 icon: {
                   src: '../../assets/img/save_black_24dp.svg', style: { height: 25, width: 25 }
-                }
+                },
+                tooltip: 'Save'
               },
               {
                 onClick: this.gridSvc.cancelActionColumn.bind(this.gridSvc),
                 hidden: this.gridSvc.hideCancelActionColumn.bind(this.gridSvc),
                 icon: {
                   src: '../../assets/img/cancel.svg', style: { height: 25, width: 25 }
-                }
+                },
+                tooltip: 'Cancel'
               },
               {
                 onClick: this.gridSvc.infoActionColumn.bind(this.gridSvc),
                 hidden: this.gridSvc.hideInfoActionColumn.bind(this.gridSvc),
                 icon: {
                   src: '../../assets/img/info.svg', style: { height: 25, width: 25 }
-                }
+                },
+                tooltip: 'Audit Log'
               },
               {
                 onClick: this.gridSvc.runActionColumn.bind(this.gridSvc),
                 hidden: this.gridSvc.hideRunActionColumn.bind(this.gridSvc),
                 icon: {
                   src: '../../assets/img/trigger.svg', style: { height: 25, width: 25 }
-                }
+                },
+                tooltip: 'Run'
               }
             ]
           }
@@ -174,7 +189,10 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       },
       userInterfaceOptions: {
         customDisplayFormatters: [
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', ['faceValueIssue', 'mark', 'costPrice'])
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', ['faceValueIssue', 'mark', 'costPrice', 
+          'initialYieldCurveSpread', 'initialCreditSpread', 'currentYieldCurveSpread', 'currentCreditSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount']),
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat', ['override', 'currentWSOMark', 'previousWSOMark']),
+
         ],
       },
       predefinedConfig: {
@@ -189,7 +207,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         },
         Layout: {
           CurrentLayout: 'Basic Layout',
-          Revision: 11,
+          Revision: 12,
           Layouts: [
             {
               Name: 'Basic Layout',
@@ -200,16 +218,18 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
               ColumnWidthMap: {
                 action: 5
               },
-              RowGroupedColumns: ['assetID', 'type']
             }
           ]
         },
         FormatColumn: {
-          Revision: 2,
+          Revision: 13,
           FormatColumns: [
-            CUSTOM_FORMATTER(['faceValueIssue', 'mark', 'costPrice'], 'amountFormatter'),
-            BLANK_DATETIME_FORMATTER_CONFIG(['overrideDate']),
-            DATE_FORMATTER_CONFIG_ddMMyyyy(['overrideDate'])
+            BLANK_DATETIME_FORMATTER_CONFIG(['overrideDate', 'dateTo', 'dateFrom']),
+            DATE_FORMATTER_CONFIG_ddMMyyyy(['overrideDate', 'dateTo', 'dateFrom']),
+            AMOUNT_FORMATTER_CONFIG_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 2, ['amountZeroFormat']),
+            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 10),
+            CUSTOM_FORMATTER(['faceValueIssue', 'mark', 'costPrice', 
+            'initialYieldCurveSpread', 'initialCreditSpread', 'currentYieldCurveSpread', 'currentCreditSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount'], 'amountFormatter')
           ]
         }
       }
