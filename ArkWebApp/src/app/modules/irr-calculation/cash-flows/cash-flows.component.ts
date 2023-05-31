@@ -9,7 +9,7 @@ import { CashFlowService } from 'src/app/core/services/CashFlows/cash-flow.servi
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
-import { amountFormatter, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, dateFormatter, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
+import {  BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,  DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
@@ -36,12 +36,11 @@ export class CashFlowsComponent implements OnInit {
   gridApi: GridApi;
   adaptableOptions: AdaptableOptions;
   adaptableApi: AdaptableApi;
-  AMOUNT_COLUMNS:string[]=
-  ['portfolioType',
-  'fxRate',
+
+  FX_COLUMNS:string[]=[
+    'fxRate',
   'fxRateCapital',
   'fxRateIncome',
-  'fxRateMethod',
   'fxRateBase',
   'fxRateBaseCapital',
   'fxRateBaseIncome',
@@ -59,6 +58,18 @@ export class CashFlowsComponent implements OnInit {
   'eurGIRWtAvgCommited',
   'eurGIRWtAvgFunded',
   'fxFWDRate',
+  'actualFXRate',
+  'translationFX',
+  'eurBasisRate',
+  'hedgeBasisRate',
+  'hedgeFinancingRate',
+  'eurFinancingRate',
+  'effectiveFXRate'
+  ]
+
+  AMOUNT_COLUMNS:string[]=
+  ['portfolioType',
+  
   'principal',
   'principalIndexed',
   'pik',
@@ -80,18 +91,14 @@ export class CashFlowsComponent implements OnInit {
   'interestCcy',
   'repaymentCcy',
   'capitalInvestedCcy',
-  'actualFXRate',
+
   'fxHedgeCost',
   'fxBasisCost',
   'actualCashBalance',
-  'eurBasisRate',
-  'hedgeBasisRate',
-  'hedgeFinancingRate',
-  'eurFinancingRate',
-  'effectiveFXRate',
+
   'effectiveTotalEur',
   'marketValueDaily',
-  'translationFX',
+
 'marketValueDailyEur',
 'faceValue',
 'internalTradeTotal',
@@ -257,7 +264,8 @@ export class CashFlowsComponent implements OnInit {
       
       userInterfaceOptions:{
         customDisplayFormatters:[
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',[...this.AMOUNT_COLUMNS])
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',[...this.AMOUNT_COLUMNS]),
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('fxFormatter',[...this.FX_COLUMNS])
         ]
       },
 
@@ -281,9 +289,10 @@ export class CashFlowsComponent implements OnInit {
           }]
         },
         FormatColumn:{
-          Revision:2,
+          Revision:6,
           FormatColumns:[
             CUSTOM_FORMATTER([...this.AMOUNT_COLUMNS],['amountFormatter']),
+            CUSTOM_FORMATTER([...this.FX_COLUMNS],['fxFormatter']),
             BLANK_DATETIME_FORMATTER_CONFIG(['cashDate']),
             DATE_FORMATTER_CONFIG_ddMMyyyy(['cashDate'])
           ]
