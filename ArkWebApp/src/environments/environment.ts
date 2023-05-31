@@ -25,7 +25,7 @@ export const environment = {
 
 
   //Production Report Server URL
-  ssrsUrl: 'https://vmuksouthapp03.arcmont-am.com/ReportServer/Pages/ReportViewer.aspx'
+  ssrsUrl: 'https://platform.arcmont-am.com/ReportServer/Pages/ReportViewer.aspx'
 };
 
 /*
