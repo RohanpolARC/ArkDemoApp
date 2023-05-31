@@ -274,4 +274,10 @@ export class UnfundedAssetsComponent implements OnInit {
       }
     }))
   }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub=>{
+      sub.unsubscribe();
+    })
+  }
 }

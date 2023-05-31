@@ -450,5 +450,11 @@ export class PortfolioManagerComponent implements OnInit {
       refresh: true
     }
   }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub=>{
+      sub.unsubscribe();
+    })
+  }
   
 }

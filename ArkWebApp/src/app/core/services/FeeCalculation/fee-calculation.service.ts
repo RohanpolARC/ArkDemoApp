@@ -107,6 +107,12 @@ export class FeeCalculationService {
   }))
 
   }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub=>{
+      sub.unsubscribe();
+    })
+  }
 }
 
 

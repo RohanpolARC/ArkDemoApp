@@ -1272,4 +1272,10 @@ export class PortfolioModellerComponent implements OnInit {
       }
     }
   }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub=>{
+      sub.unsubscribe();
+    })
+  }
 }

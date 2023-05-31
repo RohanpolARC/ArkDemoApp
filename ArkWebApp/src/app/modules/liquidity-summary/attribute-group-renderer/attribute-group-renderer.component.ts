@@ -94,4 +94,10 @@ export class AttributeGroupRendererComponent implements ICellRendererAngularComp
   ngOnInit(): void {
   }
 
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub=>{
+      sub.unsubscribe();
+    })
+  }
+
 }
