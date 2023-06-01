@@ -22,11 +22,19 @@ export class ValuationService {
   currentfundValues = this.fundsMessage.asObservable();
   
   changeFundValues(values: string[]){
-      this.fundsMessage.next(values);
+    this.fundsMessage.next(values);
   }
 
-  getValuationData(asofdate: string, funds: string){
-    return this.http.get<any[]>(`${APIConfig.VALUATION_DATA_GET_API}/?asofdate=${asofdate}&funds=${funds}`).pipe(
+  private markType = new BehaviorSubject<string[]>(null)
+  currentMarkTypes = this.markType.asObservable();
+
+  changeMarkType(values: string[]){
+    this.markType.next(values)
+  }
+  
+
+  getValuationData(asofdate: string, funds: string, marktypes: string){
+    return this.http.get<any[]>(`${APIConfig.VALUATION_DATA_GET_API}/?asofdate=${asofdate}&funds=${funds}&marktypes=${marktypes}`).pipe(
       catchError((ex) => throwError(ex))
     )
   }

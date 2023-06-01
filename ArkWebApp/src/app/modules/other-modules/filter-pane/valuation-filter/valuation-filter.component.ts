@@ -13,6 +13,9 @@ export class ValuationFilterComponent implements OnInit, OnChanges {
   @Input() funds
   asOfDate: string = null;
   fundSettings: IDropdownSettings
+  markTypeSettings: IDropdownSettings
+  markTypes: { id: number, markType: string }[]
+
   dropdownSettings: IDropdownSettings = {
     singleSelection: false,
     idField: 'id',
@@ -23,13 +26,23 @@ export class ValuationFilterComponent implements OnInit, OnChanges {
     allowSearchFilter: true
   };
   preSelectedFunds
+  preSelectedMarkTypes
 
   constructor(private valuationSvc: ValuationService) { }
 
   ngOnInit(): void {
     this.fundSettings = { ...this.dropdownSettings, ...{  textField: 'fund' } }
+    this.markTypeSettings = { ...this.dropdownSettings, ... { textField: 'markType' } }
     this.asOfDate = getMomentDateStr(getLastBusinessDay());
     this.onAsOfDateChange(this.asOfDate)
+
+    this.markTypes = [ 
+      { id: 1, markType: 'Impaired Cost' },
+      { id: 2, markType: 'Mark To Market' },
+      { id: 3, markType: 'Hedging Mark' }
+    ]
+
+    this.preSelectedMarkTypes = this.markTypes.filter(x => ['Impaired Cost', 'Mark To Market'].includes(x['markType']))
   }
 
   ngOnChanges(changes: SimpleChanges){
@@ -39,10 +52,14 @@ export class ValuationFilterComponent implements OnInit, OnChanges {
   }
 
   onFundChange(values){
-    this.valuationSvc.changeFundValues(values?.map(v => v.fund))
+    this.valuationSvc.changeFundValues(values?.map(v => v.fund));
   }
 
   onAsOfDateChange(date){
     this.valuationSvc.changeAsOfDate(getMomentDateStr(date));
+  }
+
+  onMarkTypeChange(values){
+    this.valuationSvc.changeMarkType(values?.map(v => v.markType));
   }
 }

@@ -7,10 +7,11 @@
             </span>
         </div>
         <ng-container *ngIf="funds$ | async"></ng-container>
+        <ng-container *ngIf="markTypes$ | async"></ng-container>
         <div class="action">
 
             <mat-icon svgIcon="trigger"></mat-icon>
-            <button mat-icon-button matTooltip="Clear editing state" matTooltipClass="tooltip-style">
+            <button mat-icon-button matTooltip="Clear editing state" matTooltipClass="tooltip-style" (click)="clearEditingState()">
                 <mat-icon class="material-icons-outlined">clear</mat-icon>
             </button>
         </div>
@@ -22,7 +23,9 @@
                 <app-valuation-grid [rowData]="rd.value1"
                                     [benchmarkIndexes]="benchmarkIndexes"
                                     [asOfDate]="asofdate"
-                                    [showLoadingOverlay]="showLoadingOverlay"
+                                    [marktypes]="marktypes"
+                                    [showLoadingOverlayReq]="showLoadingOverlayReq"
+                                    [clearEditingStateReq]="clearEditingStateReq"
                 ></app-valuation-grid>
             </ng-container>
         </mat-card>

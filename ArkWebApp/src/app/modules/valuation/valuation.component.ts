@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { filter, switchMap, take, tap } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
@@ -15,7 +15,10 @@ export class ValuationComponent implements OnInit {
   asofdateIn: string;
   funds: string[]
   benchmarkIndexes: string[];
-  showLoadingOverlay: { show: 'Yes' | 'No' }
+  marktypes: string[];
+
+  showLoadingOverlayReq: { show: 'Yes' | 'No' }
+  clearEditingStateReq: { clear: 'Yes' | 'No'  }
 
   constructor(
     private valuationSvc: ValuationService,
@@ -26,10 +29,10 @@ export class ValuationComponent implements OnInit {
     filter((isHit: boolean) => isHit),
     tap((isHit) => { 
       this.asofdate = this.asofdateIn;
-      this.showLoadingOverlay = { show: 'Yes' }
+      this.showLoadingOverlayReq = { show: 'Yes' }
     }),
     switchMap((isHit) => {
-      return this.valuationSvc.getValuationData(this.asofdate, this.funds?.join(',')).pipe(
+      return this.valuationSvc.getValuationData(this.asofdate, this.funds?.join(','), this.marktypes?.join(',')).pipe(
         tap((data: any[]) => {
           console.log(data);
         })
@@ -39,6 +42,7 @@ export class ValuationComponent implements OnInit {
 
   asOfDate$: Observable<string>;
   funds$: Observable<string[]>;
+  markTypes$: Observable<string[]>;
 
   ngOnInit(): void {
     
@@ -54,11 +58,18 @@ export class ValuationComponent implements OnInit {
       })
     )
 
+    this.markTypes$ = this.valuationSvc.currentMarkTypes.pipe(
+      tap((marktypes: string[]) => {
+        this.marktypes = marktypes;
+      })
+    )
+
     this.dataSvc.getUniqueValuesForField('BenchMark Index').pipe(take(1)).subscribe(d => {
       this.benchmarkIndexes = d.map((bmidx) => bmidx.value)
     })
-
   }
 
-
+  clearEditingState(){
+    this.clearEditingStateReq = { clear: 'Yes' }
+  }
 }

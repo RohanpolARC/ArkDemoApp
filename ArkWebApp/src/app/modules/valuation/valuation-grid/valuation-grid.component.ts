@@ -20,7 +20,9 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   @Input() rowData;
   @Input() benchmarkIndexes: string[]
   @Input() asOfDate: string
-  @Input() showLoadingOverlay: { show: 'Yes' | 'No' }
+  @Input() showLoadingOverlayReq: { show: 'Yes' | 'No' }
+  @Input() clearEditingStateReq: { clear: 'Yes' | 'No' }
+  @Input() marktypes: string[]
 
   agGridModules: Module[]
   gridOptions: GridOptions;
@@ -51,8 +53,12 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
 
   ngOnChanges(changes: SimpleChanges){
 
-    if(changes?.['showLoadingOverlay']?.currentValue?.show === 'Yes'){
+    if(changes?.['showLoadingOverlayReq']?.currentValue?.show === 'Yes'){
       this.gridApi.showLoadingOverlay();
+    }
+
+    if(changes?.['clearEditingStateReq']?.currentValue?.clear === 'Yes'){
+      this.gridSvc.clearEditingState(false);
     }
   }
 
@@ -62,32 +68,33 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'issuerShortName', type: 'abColDefString' },
       { field: 'asset', type: 'abColDefString' },
       { field: 'assetID', type: 'abColDefNumber' },
+      { field: 'currentWSOMark', type: 'abColDefNumber' },
+      // { field: 'dateTo', type: 'abColDefDate' },
+      { field: 'previousWSOMark', type: 'abColDefNumber' },
+      // { field: 'dateFrom', type: 'abColDefDate' },
       { field: 'override', type: 'abColDefNumber', cellStyle: this.gridSvc.editableCellStyle.bind(this), onCellValueChanged: this.gridSvc.onOverrideCellValueChanged.bind(this.gridSvc), editable: this.gridSvc.isEditable.bind(this.gridSvc) },
       { field: 'overrideDate', type: 'abColDefDate' },
       { field: 'markType', type: 'abColDefString' },
       { field: 'initialYieldCurveSpread', type: 'abColDefNumber', editable: this.gridSvc.isEditable.bind(this.gridSvc), cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc)  },
-      { field: 'initialCreditSpread', type: 'abColDefNumber', editable: this.gridSvc.isEditable.bind(this.gridSvc), cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc) },
+      { field: 'initialCreditSpread', type: 'abColDefNumber', editable: this.gridSvc.isEditable.bind(this.gridSvc), cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), headerName: 'Initial Benchmark Spread' },
       { field: 'creditSpreadIndex', type: 'abColDefString', cellEditor: 'autocompleteCellEditor', cellEditorParams: () => {
         return {
           options: this.benchmarkIndexes, isStrict: true, oldValRestoreOnStrict: true
         }
-      }, editable: this.gridSvc.isEditable.bind(this.gridSvc), cellEditorPopup: false , cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc) },
+      }, editable: this.gridSvc.isEditable.bind(this.gridSvc), cellEditorPopup: false , cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), headerName: 'Benchmark Spread Index' },
       { field: 'currentYieldCurveSpread', type: 'abColDefNumber' },
-      { field: 'currentCreditSpread', type: 'abColDefNumber' },
+      { field: 'currentCreditSpread', type: 'abColDefNumber', headerName: 'Current Benchmark Spread' },
       { field: 'deltaSpreadDiscount', type: 'abColDefNumber', cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), editable: this.gridSvc.isEditable.bind(this.gridSvc) },
       { field: 'modelValuation', type: 'abColDefNumber' },
-      { field: 'modelValuationMinus100', type: 'abColDefNumber' },
-      { field: 'modelValuationPlus100', type: 'abColDefNumber' },
+      { field: 'modelValuationMinus100', type: 'abColDefNumber', headerName: 'Model Valuation-100' },
+      { field: 'modelValuationPlus100', type: 'abColDefNumber', headerName: 'Model Valuation+100' },
       { field: 'isModelValuationStale', type: 'abColDefBoolean' },
       { field: 'usedSpreadDiscount', type: 'abColDefNumber' },
-      { field: 'currentWSOMark', type: 'abColDefNumber' },
-      { field: 'dateTo', type: 'abColDefDate' },
-      { field: 'previousWSOMark', type: 'abColDefNumber' },
-      { field: 'dateFrom', type: 'abColDefDate' },
       { field: 'faceValueIssue', type: 'abColDefNumber', hide: true },
       { field: 'mark', type: 'abColDefNumber', hide: true },
       { field: 'costPrice', type: 'abColDefNumber', hide: true },
-      { field: 'comment', type: 'abColDefString', hide: true }
+      { field: 'comment', type: 'abColDefString', hide: true },
+      { field: 'positionsCount', type: 'abColDefNumber', hide: true }
       // { field: 'modifiedBy', type: 'abColDefString' },
       // { field: 'modifiedOn', type: 'abColDefDate' }
     ]
@@ -207,7 +214,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         },
         Layout: {
           CurrentLayout: 'Basic Layout',
-          Revision: 12,
+          Revision: 15,
           Layouts: [
             {
               Name: 'Basic Layout',
@@ -222,10 +229,10 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         FormatColumn: {
-          Revision: 13,
+          Revision: 15,
           FormatColumns: [
-            BLANK_DATETIME_FORMATTER_CONFIG(['overrideDate', 'dateTo', 'dateFrom']),
-            DATE_FORMATTER_CONFIG_ddMMyyyy(['overrideDate', 'dateTo', 'dateFrom']),
+            BLANK_DATETIME_FORMATTER_CONFIG(['overrideDate']), //'dateTo', 'dateFrom'
+            DATE_FORMATTER_CONFIG_ddMMyyyy(['overrideDate']), //'dateTo', 'dateFrom'
             AMOUNT_FORMATTER_CONFIG_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 2, ['amountZeroFormat']),
             AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 10),
             CUSTOM_FORMATTER(['faceValueIssue', 'mark', 'costPrice', 

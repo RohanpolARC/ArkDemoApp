@@ -122,7 +122,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
         }
         else  return rowNode.data['state'] === 'edit'
       }
-    });
+    }); 
 
     if(rowNode.length > 1){
       this.dataSvc.setWarningMsg(`Error clearing editing state. Please reload.`, 'Dismiss', 'ark-theme-snackbar-error')

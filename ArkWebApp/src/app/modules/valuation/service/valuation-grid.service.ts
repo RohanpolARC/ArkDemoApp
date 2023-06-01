@@ -1,5 +1,5 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton } from '@adaptabletools/adaptable-angular-aggrid';
-import { CellClassParams, CellValueChangedEvent, EditableCallbackParams, RowNode } from '@ag-grid-community/core';
+import { CellClassParams, CellValueChangedEvent, EditableCallbackParams, GridApi, RowNode } from '@ag-grid-community/core';
 import { Injectable } from '@angular/core';
 import { first } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
@@ -44,6 +44,10 @@ export class ValuationGridService {
 
   getAdaptableApi(): AdaptableApi {
     return this.component.readProperty<AdaptableApi>('adaptableApi');
+  }
+
+  getGridApi(): GridApi {
+    return this.component.readProperty<GridApi>('gridApi');
   }
 
   getAsOfDate(): string {
@@ -132,13 +136,25 @@ export class ValuationGridService {
 
   }
 
-  cancelActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
+  clearEditingStateForRow(node: RowNode){
     this.lockEdit = false;
-    delete context.rowNode.data['editing'];
+    delete node?.data?.['editing'];
 
-    this.setFields(context.rowNode, [...this.getOverrideColumns()], 'Reset');
+    this.setFields(node, [...this.getOverrideColumns()], 'Reset');
 
-    this.getAdaptableApi().gridApi.refreshCells([context.rowNode], this.getOverrideColumns());
+    this.getAdaptableApi().gridApi.refreshCells([node], [...this.getOverrideColumns(), 'action']);
+  }
+
+  cancelActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
+    
+    this.clearEditingStateForRow(context.rowNode);
+    
+    // this.lockEdit = false;
+    // delete context.rowNode.data['editing'];
+
+    // this.setFields(context.rowNode, [...this.getOverrideColumns()], 'Reset');
+
+    // this.getAdaptableApi().gridApi.refreshCells([context.rowNode], this.getOverrideColumns());
   }
 
   infoActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
@@ -157,7 +173,7 @@ export class ValuationGridService {
 
   hideRunActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext): boolean {
     if(context?.data?.['markType'] !== 'Mark to Market')
-      return true;   
+      return true   
     return this.isEditing(context);
   }
 
@@ -205,5 +221,27 @@ export class ValuationGridService {
     }
     else 
         return this.isEditing(params.node);
+  }
+
+  clearEditingState(hideWarnings: boolean = false){
+    this.getGridApi().stopEditing(true);
+
+    let nodes: RowNode[] = this.getAdaptableApi().gridApi.getAllRowNodes({
+      includeGroupRows: false,
+      filterFn: (node: RowNode) => {
+        return this.isEditing(node);
+      }
+    })
+
+    if(nodes.length > 1){
+      this.dataSvc.setWarningMsg(`Error clearing editing state. Please reload.`, `Dismiss`, 'ark-theme-snackbar-warning')
+    }
+    else if(nodes.length = 1){
+      // Perform clearing action here.
+      this.clearEditingStateForRow(nodes[0]);
+
+    }
+    else if(!hideWarnings)
+      this.dataSvc.setWarningMsg(`Editing state already cleared`, 'Dismiss', 'ark-theme-snackbar-normal');
   }
 }
