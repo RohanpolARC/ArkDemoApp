@@ -75,6 +75,8 @@ export class APIConfig {
     public static FEE_RUN_CALCS_API: string = APIConfig.ARK_FEE_FUNCTION_BASEURL + "/api/FeeCalculatorFunction_HttpTrigger";
     public static MONTHLY_RETURNS_CALC_API: string = APIConfig.BASEURL + "/api/MonthlyReturns/GetMonthlyReturn";
 
+    public static RUN_MODEL_VALUATION_API: string = APIConfig.ARK_IRR_FUNCTION_BASEURL + "/api/ValuationMethodFunction_HttpTrigger";
+
     public static FUNDHEDGING_NET_IRR_POST_API: string = APIConfig.ARK_IRR_FUNCTION_BASEURL + "/api/NetIRRCalculatorFunction_HttpTrigger";
 
     public static FEE_PRESET_INVESTMENT_GET_API: string = APIConfig.BASEURL + "/api/FeePresets/GetFundInvestmentData";

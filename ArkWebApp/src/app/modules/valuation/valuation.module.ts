@@ -9,6 +9,7 @@ import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-
 import { ValuationGridService } from './service/valuation-grid.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { MatButtonModule } from '@angular/material/button';
     AgGridModule,
     AdaptableAngularAgGridModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    DetailedViewModule
   ],
   providers: [
     ValuationGridService

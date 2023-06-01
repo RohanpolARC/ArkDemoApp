@@ -1,12 +1,14 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton } from '@adaptabletools/adaptable-angular-aggrid';
 import { CellClassParams, CellValueChangedEvent, EditableCallbackParams, GridApi, RowNode } from '@ag-grid-community/core';
 import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { first } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
 import { getFinalDate } from 'src/app/shared/functions/utilities';
-import { APIReponse, IPropertyReader } from 'src/app/shared/models/GeneralModel';
+import { APIReponse, DetailedView, IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { Valuation } from 'src/app/shared/models/ValuationModel';
+import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
 
 @Injectable()
 export class ValuationGridService {
@@ -26,7 +28,8 @@ export class ValuationGridService {
   }
 
   constructor(private dataSvc: DataService,
-    private valuationSvc: ValuationService) {
+    private valuationSvc: ValuationService,
+    public dailog: MatDialog) {
 
     this.overrideColMap = {
       'override': { global: 'globaloverride' },
@@ -158,6 +161,26 @@ export class ValuationGridService {
   }
 
   infoActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
+
+    let node: RowNode = context.rowNode;
+
+    let req: DetailedView = <DetailedView>{};
+    req.screen = 'Valuation';
+    req.param1 = String(node.data?.['assetID']);
+    req.param2 = String(node.data?.['markType']); 
+    req.param3 = req.param4 = req.param5 = ''
+    req.strParam1 = []
+
+    const dialogRef = this.dailog.open(DefaultDetailedViewPopupComponent, {
+      data: {
+        detailedViewRequest: req,
+        noFilterSpace: true,
+        grid: 'Valuation'
+      },
+      width: '90vw',
+      height: '80vh'
+    })
+
   }
 
   runActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
