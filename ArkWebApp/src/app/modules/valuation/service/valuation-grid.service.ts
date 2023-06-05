@@ -126,7 +126,7 @@ export class ValuationGridService {
           delete context.rowNode.data['editing'];
           
           let adaptableApi: AdaptableApi = this.component.readProperty<AdaptableApi>('adaptableApi');
-          adaptableApi.gridApi.refreshCells([context.rowNode], [...this.getOverrideColumns(), 'action']);
+          adaptableApi.gridApi.refreshCells([context.rowNode], [...this.getOverrideColumns(), 'marketValue','action']);
         }
         else {
           this.dataSvc.setWarningMsg(`Failed to save valuation information for this asset`, 'Dismiss', 'ark-theme-snackbar-error')
@@ -145,7 +145,7 @@ export class ValuationGridService {
 
     this.setFields(node, [...this.getOverrideColumns()], 'Reset');
 
-    this.getAdaptableApi().gridApi.refreshCells([node], [...this.getOverrideColumns(), 'action']);
+    this.getAdaptableApi().gridApi.refreshCells([node], [...this.getOverrideColumns(),'marketValue', 'action']);
   }
 
   cancelActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
