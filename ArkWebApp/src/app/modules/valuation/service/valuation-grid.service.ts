@@ -1,5 +1,5 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton } from '@adaptabletools/adaptable-angular-aggrid';
-import { CellClassParams, CellValueChangedEvent, EditableCallbackParams, GridApi, RowNode } from '@ag-grid-community/core';
+import { CellClassParams, CellValueChangedEvent, EditableCallbackParams, GridApi, RowNode, ValueGetterParams } from '@ag-grid-community/core';
 import { EventEmitter, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { first } from 'rxjs/operators';
@@ -315,5 +315,16 @@ export class ValuationGridService {
 
     this.dataSvc.setWarningMsg(`Updated valuation for ${assetIDs.length || 0} assets`,`Dismiss`,'ark-theme-snackbar-normal');
 
+  }
+
+  marketValueGetter(params: ValueGetterParams) {
+    
+    let data = params.data;
+    
+    if(data?.['assetTypeName'] === 'Equity')
+      return (data?.['faceValueIssue'] ?? 0) * (data?.['override'] ?? (data?.['currentWSOMark'] ?? 0));
+    else if(['Bond', 'Loan'].includes(data?.['assetTypeName']))
+      return (data?.['faceValueIssue'] ?? 0) * (data?.['override'] ?? (data?.['currentWSOMark'] ?? 0)) / 100.0;
+    else return 0;
   }
 }

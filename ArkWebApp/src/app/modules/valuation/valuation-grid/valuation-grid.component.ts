@@ -105,9 +105,11 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'mark', type: 'abColDefNumber', hide: true },
       { field: 'costPrice', type: 'abColDefNumber', hide: true },
       { field: 'comment', type: 'abColDefString', hide: true },
-      { field: 'positionsCount', type: 'abColDefNumber', hide: true }
+      { field: 'positionsCount', type: 'abColDefNumber', hide: true },
+      { field: 'assetTypeName', type: 'abColDefString', hide: true },
       // { field: 'modifiedBy', type: 'abColDefString' },
       // { field: 'modifiedOn', type: 'abColDefDate' }
+      { field: 'marketValue', type: 'abColDefNumber', valueGetter: this.gridSvc.marketValueGetter }
     ]
 
     this.gridOptions = {
@@ -208,7 +210,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       userInterfaceOptions: {
         customDisplayFormatters: [
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', ['faceValueIssue', 'mark', 'costPrice', 
-          'initialYieldCurveSpread', 'initialCreditSpread', 'currentYieldCurveSpread', 'currentCreditSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount']),
+          'initialYieldCurveSpread', 'initialCreditSpread', 'currentYieldCurveSpread', 'currentCreditSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValue']),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat', ['override', 'currentWSOMark', 'previousWSOMark']),
 
         ],
@@ -225,7 +227,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         },
         Layout: {
           CurrentLayout: 'Basic Layout',
-          Revision: 15,
+          Revision: 17,
           Layouts: [
             {
               Name: 'Basic Layout',
@@ -240,16 +242,36 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         FormatColumn: {
-          Revision: 15,
+          Revision: 16,
           FormatColumns: [
             BLANK_DATETIME_FORMATTER_CONFIG(['overrideDate']), //'dateTo', 'dateFrom'
             DATE_FORMATTER_CONFIG_ddMMyyyy(['overrideDate']), //'dateTo', 'dateFrom'
             AMOUNT_FORMATTER_CONFIG_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 2, ['amountZeroFormat']),
             AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 10),
             CUSTOM_FORMATTER(['faceValueIssue', 'mark', 'costPrice', 
-            'initialYieldCurveSpread', 'initialCreditSpread', 'currentYieldCurveSpread', 'currentCreditSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount'], 'amountFormatter')
+            'initialYieldCurveSpread', 'initialCreditSpread', 'currentYieldCurveSpread', 'currentCreditSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValue'], 'amountFormatter')
           ]
-        }
+        },
+        // CalculatedColumn: {
+        //   CalculatedColumns: [
+        //     {
+        //       FriendlyName: 'MarketValue',
+        //       ColumnId: 'MarketValue',
+        //       Query: {
+        //         ScalarExpression: `[currentWSOMark] + [previousWSOMark] `
+        //         // ScalarExpression: `
+        //         //   CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssue] * COALESCE([override], [currentWSOMark])
+        //         //        WHEN [assetTypeName] IN ('Loan', 'Bond')   THEN [faceValueIssue] * COALESCE([override], [currentWSOMark]) / 100.0
+        //         //        ELSE 0
+        //         //   END
+        //         // `
+        //       },
+        //       CalculatedColumnSettings: {
+        //         DataType: 'Number'
+        //       }
+        //     }
+        //   ]
+        // }
       }
     }
   }

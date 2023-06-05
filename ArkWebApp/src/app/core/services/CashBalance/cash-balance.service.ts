@@ -12,6 +12,7 @@ import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 export class CashBalanceService {
   private searchDateRangeMessage = new BehaviorSubject<any>(null);
   currentSearchDateRange = this.searchDateRangeMessage.asObservable();
+  
   changeSearchDateRange(range: AsOfDateRange){
       this.searchDateRangeMessage.next(range);
   }
