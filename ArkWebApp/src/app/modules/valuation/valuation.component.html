@@ -3,30 +3,36 @@
         <div class="title">
             Valuation
             <span *ngIf = "asOfDate$ | async as dt" style="font-size: 1rem; font-weight: normal;">
-                ({{dt | date:"dd/MM/yyyy" }})
+                ({{asofdate.start | date:"dd/MM/yyyy" }} - {{asofdate.end | date:"dd/MM/yyyy"}})
             </span>
         </div>
         <ng-container *ngIf="funds$ | async"></ng-container>
         <ng-container *ngIf="markTypes$ | async"></ng-container>
         <div class="action">
-
-            <mat-icon svgIcon="trigger"></mat-icon>
-            <button mat-icon-button matTooltip="Clear editing state" matTooltipClass="tooltip-style" (click)="clearEditingState()">
-                <mat-icon class="material-icons-outlined">clear</mat-icon>
-            </button>
+                <div class="d-flex justify-content-between align-items-center">
+                <ng-container *ngIf="runValuationInProgress">
+                    <mat-spinner [diameter]="20" style="margin-right: 10px"></mat-spinner>
+                </ng-container>    
+                <mat-icon svgIcon="trigger"></mat-icon>
+                <button mat-icon-button matTooltip="Clear editing state" matTooltipClass="tooltip-style" (click)="clearEditingState()">
+                    <mat-icon class="material-icons-outlined">clear</mat-icon>
+                </button>
+            </div>
         </div>
     </div>
 
     <div class="content">
         <mat-card class="mat-content">
             <ng-container *ngIf="{value1: rowData$ | async} as rd">
-                <app-valuation-grid [rowData]="rd.value1"
-                                    [benchmarkIndexes]="benchmarkIndexes"
-                                    [asOfDate]="asofdate"
-                                    [marktypes]="marktypes"
-                                    [showLoadingOverlayReq]="showLoadingOverlayReq"
-                                    [clearEditingStateReq]="clearEditingStateReq"
-                ></app-valuation-grid>
+                    <app-valuation-grid [rowData]="rd.value1"
+                                        [benchmarkIndexes]="benchmarkIndexes"
+                                        [asOfDate]="asofdate?.end"
+                                        [marktypes]="marktypes"
+                                        [modelValuations]="modelValuations$ | async"
+                                        [showLoadingOverlayReq]="showLoadingOverlayReq"
+                                        [clearEditingStateReq]="clearEditingStateReq"
+                                        (valuationEventEmitter)="triggerRunValuation($event)"
+                    ></app-valuation-grid>
             </ng-container>
         </mat-card>
     </div>

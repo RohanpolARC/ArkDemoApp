@@ -1,6 +1,6 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton } from '@adaptabletools/adaptable-angular-aggrid';
 import { CellClassParams, CellValueChangedEvent, EditableCallbackParams, GridApi, RowNode } from '@ag-grid-community/core';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { first } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
@@ -39,6 +39,10 @@ export class ValuationGridService {
       'deltaSpreadDiscount': { global: 'globaldeltaSpreadDiscount' },
       'overrideDate': { global: 'globaloverrideDate' }
     }
+  }
+
+  runEvent(): EventEmitter<number[]> {
+    return this.component.readProperty<EventEmitter<number[]>>('valuationEventEmitter');
   }
 
   getOverrideColumns(): string[] {
@@ -94,6 +98,9 @@ export class ValuationGridService {
   }
 
   saveActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
+
+    this.dataSvc.setWarningMsg(`Please wait while we save the updates`,`Dismiss`,'ark-theme-snackbar-normal')
+
     let node: RowNode = context.rowNode;
 
     let valuation: Valuation = <Valuation> {};
@@ -106,13 +113,6 @@ export class ValuationGridService {
     valuation.override = node.data?.['override'];
     valuation.overrideDate = getFinalDate(new Date(this.getAsOfDate())); //getFinalDate(node.data?.['overrideDate']);
     valuation.modifiedBy = this.dataSvc.getCurrentUserName();
-
-
-
-    // let ovrdDate: string = formatDate(node.data?.['overrideDate']);
-    // ovrdDate = ovrdDate === 'NaN/NaN/NaN' ? null : ovrdDate;
-
-    // valuation.overrideDate = ovrdDate;
 
     this.valuationSvc.putValuationData([valuation]).pipe(first()).subscribe({
       next: (res: APIReponse) => {
@@ -165,7 +165,16 @@ export class ValuationGridService {
     let node: RowNode = context.rowNode;
 
     let req: DetailedView = <DetailedView>{};
-    req.screen = 'Valuation';
+
+    let marktype: string = node.data?.['markType'];
+
+    if(marktype.toLowerCase() === 'mark to market')
+      req.screen = 'Valuation-MTM';
+    else if(marktype.toLowerCase() === 'impaired cost')
+      req.screen = 'Valuation-Impaired Cost';
+    else
+      req.screen = '';
+
     req.param1 = String(node.data?.['assetID']);
     req.param2 = String(node.data?.['markType']); 
     req.param3 = req.param4 = req.param5 = ''
@@ -175,7 +184,7 @@ export class ValuationGridService {
       data: {
         detailedViewRequest: req,
         noFilterSpace: true,
-        grid: 'Valuation'
+        grid: req.screen
       },
       width: '90vw',
       height: '80vh'
@@ -184,6 +193,12 @@ export class ValuationGridService {
   }
 
   runActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
+
+    let assetID: number = context.rowNode.data?.['assetID'];
+
+    this.dataSvc.setWarningMsg(`Running calculations for model valuation for assetID ${assetID || ''}`,`Dismiss`,`ark-theme-snackbar-normal`)
+
+    this.runEvent().emit([assetID]);
   }
 
   hideEditActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext): boolean {
@@ -247,6 +262,15 @@ export class ValuationGridService {
   }
 
   clearEditingState(hideWarnings: boolean = false){
+
+    if(!this.lockEdit){
+
+      if(!hideWarnings){
+        this.dataSvc.setWarningMsg(`Editing state already cleared`, 'Dismiss', 'ark-theme-snackbar-normal');
+      }
+      return;
+    }
+
     this.getGridApi().stopEditing(true);
 
     let nodes: RowNode[] = this.getAdaptableApi().gridApi.getAllRowNodes({
@@ -262,9 +286,34 @@ export class ValuationGridService {
     else if(nodes.length = 1){
       // Perform clearing action here.
       this.clearEditingStateForRow(nodes[0]);
-
+      this.dataSvc.setWarningMsg(`Editing state has been cleared`, `Dismiss`, `ark-theme-snackbar-normal`)
     }
-    else if(!hideWarnings)
-      this.dataSvc.setWarningMsg(`Editing state already cleared`, 'Dismiss', 'ark-theme-snackbar-normal');
+  }
+
+  updateModelValuation(vals: { 
+    assetID: number, modelValuation: number, modelValuationMinus100: number, modelValuationPlus100: number }[]
+  ){
+    
+    let valMap = {};
+    vals.forEach(val => valMap[val.assetID] = { ...val, 'assetID': Number(val?.['assetID']) });
+      
+    let assetIDs: number[] = vals.map(val => Number(val?.['assetID']));
+    let nodes: RowNode[] = this.getAdaptableApi().gridApi.getAllRowNodes({
+      includeGroupRows: false, filterFn: (node: RowNode) => { 
+        return assetIDs.includes(node.data?.['assetID']) && (String(node.data?.['markType']).toLowerCase() === 'mark to market') 
+      }
+    })
+
+    let updatedData: any[] = []
+    for(let i: number = 0; i < nodes.length; i+= 1){
+      let data = nodes[i].data;
+      data = { ...data, ...valMap[data?.['assetID']] };
+      updatedData.push(data);
+    }
+
+    this.getAdaptableApi().gridApi.updateGridData(updatedData);
+
+    this.dataSvc.setWarningMsg(`Updated valuation for ${assetIDs.length || 0} assets`,`Dismiss`,'ark-theme-snackbar-normal');
+
   }
 }

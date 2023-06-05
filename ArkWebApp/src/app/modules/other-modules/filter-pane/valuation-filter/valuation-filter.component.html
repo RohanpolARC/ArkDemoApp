@@ -23,10 +23,19 @@
 </div>
 
 <div class="element">
-    <mat-form-field appearance="outline">
-      <mat-label>As Of Date</mat-label>
-      <input autocomplete="off"  matInput [matDatepicker]="Datepicker" [(ngModel)]="asOfDate" (ngModelChange) = "onAsOfDateChange($event)">
-      <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
-      <mat-datepicker #Datepicker></mat-datepicker>
+
+  <ng-container *ngIf="searchDateRange$ | async"></ng-container>
+  
+    <mat-form-field appearance="outline" color="primary">
+      <mat-label>Previous Date - Current Date</mat-label>
+      <mat-date-range-input [formGroup]="searchDateRange" [rangePicker]="picker">
+        <input matStartDate formControlName="start" placeholder="Start date">
+        <input matEndDate formControlName="end" placeholder="End date">
+      </mat-date-range-input>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+      <mat-error *ngIf="searchDateRange.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+      <mat-error *ngIf="searchDateRange.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
     </mat-form-field>
+  
 </div>

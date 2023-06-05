@@ -1,6 +1,6 @@
 import { AdaptableApi, AdaptableOptions, AdaptableReadyInfo } from '@adaptabletools/adaptable-angular-aggrid';
 import { ColDef, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
-import { Component, Input, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
@@ -17,12 +17,15 @@ import { ValuationGridService } from '../service/valuation-grid.service';
 })
 export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestroy {
 
+  @Output() valuationEventEmitter = new EventEmitter<number[]>();
+
   @Input() rowData;
   @Input() benchmarkIndexes: string[]
   @Input() asOfDate: string
   @Input() showLoadingOverlayReq: { show: 'Yes' | 'No' }
   @Input() clearEditingStateReq: { clear: 'Yes' | 'No' }
   @Input() marktypes: string[]
+  @Input() modelValuations
 
   agGridModules: Module[]
   gridOptions: GridOptions;
@@ -60,6 +63,14 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
     if(changes?.['clearEditingStateReq']?.currentValue?.clear === 'Yes'){
       this.gridSvc.clearEditingState(false);
     }
+
+    if(changes?.['modelValuations']?.currentValue){
+      this.gridSvc.updateModelValuation(this.modelValuations)
+    }
+
+    if(changes?.['rowData']?.currentValue?.length > 0){
+      this.gridSvc.clearEditingState(true)
+    }
   }
 
   ngOnInit(): void {
@@ -86,8 +97,8 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'currentCreditSpread', type: 'abColDefNumber', headerName: 'Current Benchmark Spread' },
       { field: 'deltaSpreadDiscount', type: 'abColDefNumber', cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), editable: this.gridSvc.isEditable.bind(this.gridSvc) },
       { field: 'modelValuation', type: 'abColDefNumber' },
-      { field: 'modelValuationMinus100', type: 'abColDefNumber', headerName: 'Model Valuation-100' },
-      { field: 'modelValuationPlus100', type: 'abColDefNumber', headerName: 'Model Valuation+100' },
+      { field: 'modelValuationMinus100', type: 'abColDefNumber', headerName: 'Valuation-100bps' },
+      { field: 'modelValuationPlus100', type: 'abColDefNumber', headerName: 'Valuation+100bps' },
       { field: 'isModelValuationStale', type: 'abColDefBoolean' },
       { field: 'usedSpreadDiscount', type: 'abColDefNumber' },
       { field: 'faceValueIssue', type: 'abColDefNumber', hide: true },

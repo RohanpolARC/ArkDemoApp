@@ -120,6 +120,10 @@ export function getLastBusinessDay(){
   return workday.subtract(diff, 'days').toDate();
 }
 
+export function getLastQuarterEnd(){
+  return moment().subtract(1, 'quarter').endOf('quarter').toDate();
+}
+
 export function getRowNodes(node: RowNode, rowNodes: any[] = []){
   /** Get all filtered children nodes recursively (Depth First Search)*/
   if(node.group){

@@ -377,7 +377,6 @@ export class AppComponent {
         this.dataService.getUniqueValuesForField('fund').subscribe({
           next: (data: any[]) => {
             this.funds = data.map(item => { return { fund: item.value, id: item.id } })
-        setTimeout(() => { this.filterApply() }, 250)
       }}))
       this.router.navigate(['/valuation'])
     }

@@ -1,7 +1,12 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
+import { Observable } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, tap } from 'rxjs/operators';
+import { DataService } from 'src/app/core/services/data.service';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
-import { getLastBusinessDay, getMomentDateStr } from 'src/app/shared/functions/utilities';
+import { getLastBusinessDay, getLastQuarterEnd, getMomentDateStr } from 'src/app/shared/functions/utilities';
+import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 
 @Component({
   selector: 'app-valuation-filter',
@@ -11,7 +16,6 @@ import { getLastBusinessDay, getMomentDateStr } from 'src/app/shared/functions/u
 export class ValuationFilterComponent implements OnInit, OnChanges {
 
   @Input() funds
-  asOfDate: string = null;
   fundSettings: IDropdownSettings
   markTypeSettings: IDropdownSettings
   markTypes: { id: number, markType: string }[]
@@ -28,13 +32,17 @@ export class ValuationFilterComponent implements OnInit, OnChanges {
   preSelectedFunds
   preSelectedMarkTypes
 
-  constructor(private valuationSvc: ValuationService) { }
+  searchDateRange: FormGroup
+  range: AsOfDateRange = null
+  searchDateRange$: Observable<AsOfDateRange>
+
+  constructor(private valuationSvc: ValuationService,
+    private dataSvc: DataService) { }
 
   ngOnInit(): void {
     this.fundSettings = { ...this.dropdownSettings, ...{  textField: 'fund' } }
     this.markTypeSettings = { ...this.dropdownSettings, ... { textField: 'markType' } }
-    this.asOfDate = getMomentDateStr(getLastBusinessDay());
-    this.onAsOfDateChange(this.asOfDate)
+
 
     this.markTypes = [ 
       { id: 1, markType: 'Impaired Cost' },
@@ -43,7 +51,32 @@ export class ValuationFilterComponent implements OnInit, OnChanges {
     ]
 
     this.preSelectedMarkTypes = this.markTypes.filter(x => ['Impaired Cost', 'Mark To Market'].includes(x['markType']))
-  }
+
+    this.range = {
+      start: getMomentDateStr(getLastQuarterEnd()),
+      end: getMomentDateStr(getLastBusinessDay())
+    }
+
+    this.searchDateRange = new FormGroup({
+      start: new FormControl(),
+      end: new FormControl(),
+    });
+
+    this.searchDateRange$ = this.searchDateRange.valueChanges.pipe(
+      debounceTime(200),
+      tap((dtRange) => { 
+        this.getSearchDateRange()
+        return dtRange; 
+      }) 
+    )
+
+    // searchDateRange$ start listening only after it exists the ngOnInit and patchValue updates synchronously
+    setTimeout(() => {
+      this.searchDateRange.patchValue({
+        start: this.range.start, end: this.range.end
+      })
+    }, 0)
+  }x    
 
   ngOnChanges(changes: SimpleChanges){
     if(changes?.['funds']?.currentValue){
@@ -55,11 +88,18 @@ export class ValuationFilterComponent implements OnInit, OnChanges {
     this.valuationSvc.changeFundValues(values?.map(v => v.fund));
   }
 
-  onAsOfDateChange(date){
-    this.valuationSvc.changeAsOfDate(getMomentDateStr(date));
-  }
-
   onMarkTypeChange(values){
     this.valuationSvc.changeMarkType(values?.map(v => v.markType));
+  }
+
+  getSearchDateRange(){
+
+    this.range.start = getMomentDateStr(this.searchDateRange.get('start').value);
+    this.range.end = getMomentDateStr(this.searchDateRange.get('end').value);
+
+    if(this.range.end === 'Invalid date')
+      this.range.end = this.range.start;
+    
+    this.valuationSvc.changeSearchDateRange(this.range);
   }
 }
