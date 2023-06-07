@@ -157,7 +157,7 @@ export class ValuationGridService {
 
     this.setFields(node, [...this.getOverrideColumns()], 'Reset');
 
-    this.getAdaptableApi().gridApi.refreshCells([node], [...this.getOverrideColumns(), 'action']);
+    this.getAdaptableApi().gridApi.refreshCells([node], [...this.getOverrideColumns(),'marketValue', 'action']);
   }
 
   cancelActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {

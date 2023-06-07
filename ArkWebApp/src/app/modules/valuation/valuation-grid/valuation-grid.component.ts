@@ -1,4 +1,4 @@
-import { AdaptableApi, AdaptableOptions, AdaptableReadyInfo } from '@adaptabletools/adaptable-angular-aggrid';
+import { AdaptableApi, AdaptableOptions, AdaptableReadyInfo, CustomQueryVariableContext } from '@adaptabletools/adaptable-angular-aggrid';
 import { ColDef, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
@@ -109,7 +109,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'assetTypeName', type: 'abColDefString', hide: true },
       // { field: 'modifiedBy', type: 'abColDefString' },
       // { field: 'modifiedOn', type: 'abColDefDate' }
-      { field: 'marketValue', type: 'abColDefNumber', valueGetter: this.gridSvc.marketValueGetter }
+      //{ field: 'marketValue', type: 'abColDefNumber', valueGetter: this.gridSvc.marketValueGetter }
     ]
 
     this.gridOptions = {
@@ -215,6 +215,23 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
 
         ],
       },
+      adaptableQLOptions: {
+        expressionOptions: {
+          customQueryVariables: {
+            markOverride: (context: CustomQueryVariableContext) => {
+
+
+              const override: any = context?.args[0];
+              if (override === 0) {
+                return null;
+              } else{
+                return override
+              }
+
+            },
+          },
+        },
+      },
       predefinedConfig: {
         Dashboard: {
           Revision: 1,
@@ -227,7 +244,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         },
         Layout: {
           CurrentLayout: 'Basic Layout',
-          Revision: 17,
+          Revision: 18,
           Layouts: [
             {
               Name: 'Basic Layout',
@@ -252,26 +269,21 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
             'initialYieldCurveSpread', 'initialCreditSpread', 'currentYieldCurveSpread', 'currentCreditSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValue'], 'amountFormatter')
           ]
         },
-        // CalculatedColumn: {
-        //   CalculatedColumns: [
-        //     {
-        //       FriendlyName: 'MarketValue',
-        //       ColumnId: 'MarketValue',
-        //       Query: {
-        //         ScalarExpression: `[currentWSOMark] + [previousWSOMark] `
-        //         // ScalarExpression: `
-        //         //   CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssue] * COALESCE([override], [currentWSOMark])
-        //         //        WHEN [assetTypeName] IN ('Loan', 'Bond')   THEN [faceValueIssue] * COALESCE([override], [currentWSOMark]) / 100.0
-        //         //        ELSE 0
-        //         //   END
-        //         // `
-        //       },
-        //       CalculatedColumnSettings: {
-        //         DataType: 'Number'
-        //       }
-        //     }
-        //   ]
-        // }
+        CalculatedColumn: {
+          Revision:8,
+          CalculatedColumns: [
+            {
+              FriendlyName: 'Market Value',
+              ColumnId: 'marketValue',
+              Query: {
+                ScalarExpression: ` CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssue] * COALESCE(VAR('markOverride',[override]), [currentWSOMark])  WHEN [assetTypeName] IN ('Loan', 'Bond')   THEN [faceValueIssue] * COALESCE(VAR('markOverride',[override]), [currentWSOMark]) / 100.0 ELSE 0 END`
+              },
+              CalculatedColumnSettings: {
+                DataType: 'Number'
+              }
+            }
+          ]
+        }
       }
     }
   }
