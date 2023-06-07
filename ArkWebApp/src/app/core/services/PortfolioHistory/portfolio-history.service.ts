@@ -39,7 +39,7 @@ export class PortfolioHistoryService {
       AssetGIR.WSOAssetid = data.assetId;
       AssetGIR.AsOfDate = data.asOfDate;
       AssetGIR.Ccy = 0;    // ?
-      AssetGIR.Rate = data.fxRateBaseEffective;       // Updated GIR.
+      AssetGIR.Rate = (data.fxRateBaseEffective===0)  ? null  : data.fxRateBaseEffective;       // Updated GIR.
       AssetGIR.last_update = new Date();
       AssetGIR.CcyName = data.fundCcy;
       AssetGIR.Text = data.asset;
