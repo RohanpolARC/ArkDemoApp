@@ -105,4 +105,7 @@ export class APIConfig {
 
     public static VALUATION_DATA_GET_API: string = APIConfig.BASEURL + "/api/Valuation/Data";
     public static VALUATION_DATA_PUT_API: string = APIConfig.BASEURL + "/api/Valuation/PutData";
+
+    public static VALUATION_AUDIT_MASTER_GET_API: string = APIConfig.BASEURL + "/api/Valuation/GetMasterRows";
+    public static VALUATION_AUDIT_DETAIL_GET_API: string = APIConfig.BASEURL + "/api/Valuation/GetDetailRows";
 }

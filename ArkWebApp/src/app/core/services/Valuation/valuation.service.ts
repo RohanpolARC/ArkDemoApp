@@ -48,6 +48,18 @@ export class ValuationService {
     )
   }
 
+  getAuditMaster(assetID: number, marktype: string, asofdate: string){
+    return this.http.get<any[]>(`${APIConfig.VALUATION_AUDIT_MASTER_GET_API}/?assetID=${assetID}&marktype=${marktype}&asofdate=${asofdate}`).pipe(
+      catchError((ex) => throwError(ex))
+    );
+  }
+
+  getAuditDetail(assetID: number, marktype: string, asofdate: string, auditeventID: number){
+    return this.http.get<any[]>(`${APIConfig.VALUATION_AUDIT_DETAIL_GET_API}/?assetID=${assetID}&marktype=${marktype}&asofdate=${asofdate}&auditeventID=${auditeventID}`).pipe(
+      catchError((ex) => throwError(ex))
+    );
+  }
+
   putValuationData(models: Valuation[]){
     return this.http.post<APIReponse>(`${APIConfig.VALUATION_DATA_PUT_API}`, models);
   }

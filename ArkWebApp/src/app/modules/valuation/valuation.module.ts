@@ -11,11 +11,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MarkOverrideMasterComponent } from './mark-override-master/mark-override-master.component';
+import { WSOMarkDetailComponent } from './wsomark-detail/wsomark-detail.component';
 
 @NgModule({
   declarations: [
     ValuationComponent,
-    ValuationGridComponent
+    ValuationGridComponent,
+    MarkOverrideMasterComponent,
+    WSOMarkDetailComponent
   ],
   imports: [
     CommonModule,

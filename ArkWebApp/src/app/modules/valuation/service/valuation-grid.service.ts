@@ -8,7 +8,7 @@ import { ValuationService } from 'src/app/core/services/Valuation/valuation.serv
 import { getFinalDate } from 'src/app/shared/functions/utilities';
 import { APIReponse, DetailedView, IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { Valuation } from 'src/app/shared/models/ValuationModel';
-import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
+import { MarkOverrideMasterComponent } from '../mark-override-master/mark-override-master.component';
 
 @Injectable()
 export class ValuationGridService {
@@ -122,11 +122,23 @@ export class ValuationGridService {
           node.data['modifiedBy'] = valuation.modifiedBy;
           node.data['modifiedOn'] = new Date();
 
+          node.data['comment'] = null;
+
           this.lockEdit = false;
           delete context.rowNode.data['editing'];
           
           let adaptableApi: AdaptableApi = this.component.readProperty<AdaptableApi>('adaptableApi');
-          adaptableApi.gridApi.refreshCells([context.rowNode], [...this.getOverrideColumns(), 'action']);
+          adaptableApi.gridApi.refreshCells([context.rowNode], [...this.getOverrideColumns(), 'action', 'comment']);
+        }
+        else if(res.isSuccess === false){
+          this.dataSvc.setWarningMsg(`Failed to mark all positions. Please see audit log for more information`, `Dismiss`, `ark-theme-snackbar-warning`)
+
+          node.data['comment'] = res.returnMessage;
+
+          this.lockEdit = false;
+          delete context.rowNode.data['editing'];
+
+          this.getAdaptableApi().gridApi.refreshCells([context.rowNode], [...this.getOverrideColumns(), 'action', 'comment'])
         }
         else {
           this.dataSvc.setWarningMsg(`Failed to save valuation information for this asset`, 'Dismiss', 'ark-theme-snackbar-error')
@@ -180,15 +192,25 @@ export class ValuationGridService {
     req.param3 = req.param4 = req.param5 = ''
     req.strParam1 = []
 
-    const dialogRef = this.dailog.open(DefaultDetailedViewPopupComponent, {
+    const dialogRef = this.dailog.open(MarkOverrideMasterComponent, {
       data: {
-        detailedViewRequest: req,
-        noFilterSpace: true,
-        grid: req.screen
+        assetID: node.data?.['assetID'],
+        marktype: node.data?.['markType'],
+        asofdate: this.getAsOfDate()
       },
       width: '90vw',
       height: '80vh'
     })
+
+    // const dialogRef = this.dailog.open(DefaultDetailedViewPopupComponent, {
+    //   data: {
+    //     detailedViewRequest: req,
+    //     noFilterSpace: true,
+    //     grid: req.screen
+    //   },
+    //   width: '90vw',
+    //   height: '80vh'
+    // })
 
   }
 
