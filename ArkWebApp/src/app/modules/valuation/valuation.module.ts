@@ -9,17 +9,14 @@ import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-
 import { ValuationGridService } from './service/valuation-grid.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MarkOverrideMasterComponent } from './mark-override-master/mark-override-master.component';
-import { WSOMarkDetailComponent } from './wsomark-detail/wsomark-detail.component';
 
 @NgModule({
   declarations: [
     ValuationComponent,
     ValuationGridComponent,
     MarkOverrideMasterComponent,
-    WSOMarkDetailComponent
   ],
   imports: [
     CommonModule,
@@ -29,9 +26,7 @@ import { WSOMarkDetailComponent } from './wsomark-detail/wsomark-detail.componen
     AdaptableAngularAgGridModule,
     MatIconModule,
     MatButtonModule,
-    MatProgressSpinnerModule,
-
-    DetailedViewModule
+    MatProgressSpinnerModule
   ],
   providers: [
     ValuationGridService

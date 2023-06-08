@@ -109,6 +109,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'assetTypeName', type: 'abColDefString', hide: true, headerName: 'WSO Asset Type Name' },
       { field: 'expectedDate', type: 'abColDefDate' },
       { field: 'seniority', type: 'abColDefNumber' },
+      { field: 'wsoStatus', type: 'abColDefString', hide: true}
     ]
 
     this.gridOptions = {
@@ -258,8 +259,13 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         FormatColumn: {
-          Revision: 18,
+          Revision: 19,
           FormatColumns: [
+            {
+              Scope: { ColumnIds: [ ...this.columnDefs.map(def => def.field), 'action'] },
+              Style: { BackColor: 'pink' },
+              Rule: { BooleanExpression: `[wsoStatus] = "Failed"` }
+            },
             BLANK_DATETIME_FORMATTER_CONFIG(['overrideDate', 'expectedDate']), //'dateTo', 'dateFrom'
             DATE_FORMATTER_CONFIG_ddMMyyyy(['overrideDate', 'expectedDate']), //'dateTo', 'dateFrom'
             AMOUNT_FORMATTER_CONFIG_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 2, ['amountZeroFormat']),

@@ -4,7 +4,6 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
-import { WSOMarkDetailComponent } from '../wsomark-detail/wsomark-detail.component';
 import { MasterDetailModule } from "@ag-grid-enterprise/master-detail";
 import { first, map } from 'rxjs/operators';
 import { dateFormatter, dateTimeFormatter, nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
@@ -22,7 +21,6 @@ export class MarkOverrideMasterComponent implements OnInit {
 
   columnDefs: ColDef[]
   gridOptions: GridOptions
-  wsomarkDetailRenderer: WSOMarkDetailComponent
   rowData$: Observable<any[]>
   agGridModules: Module[] = [...CommonConfig.AG_GRID_MODULES, MasterDetailModule];
 
