@@ -66,13 +66,15 @@ export class MarkOverrideMasterComponent implements OnInit {
       { field: 'valuationMethod', headerName: 'Mark Type' },
       { field: 'modifiedBy' },
       { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
-      { field: 'auditEventID', hide: true }
+      { field: 'auditEventID', hide: true },
+      { field: 'wsoStatus', hide: true }
     ]
 
     this.gridOptions = {
       columnDefs: this.columnDefs,
       defaultColDef: {
-        resizable: true
+        resizable: true,
+        cellStyle: this.gridCellStyle.bind(this)
       },
       masterDetail: true,
       detailRowHeight: 310,
@@ -94,7 +96,8 @@ export class MarkOverrideMasterComponent implements OnInit {
         { field: 'markDate', valueFormatter: dateFormatter },
         { field: 'modifiedBy' },
         { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
-        { field: 'wsoActivityID', valueFormatter: nonAmountNumberFormatter }    
+        { field: 'wsoActivityID', valueFormatter: nonAmountNumberFormatter },
+        { field: 'wsoStatus', hide: true }    
       ];
     }
     else if(this.marktype.toLowerCase() === 'impaired cost'){
@@ -113,7 +116,8 @@ export class MarkOverrideMasterComponent implements OnInit {
       detailGridOptions: {
         columnDefs: detailColDef,
         defaultColDef: {
-          resizable: true
+          resizable: true,
+          cellStyle: this.gridCellStyle.bind(this)
         },
         headerHeight: 30,
         rowHeight: 30,
@@ -135,5 +139,11 @@ export class MarkOverrideMasterComponent implements OnInit {
         })
       }
     } as IDetailCellRendererParams
+  }
+
+  gridCellStyle(params){
+    if(params.data?.['wsoStatus'] === 'Failed')
+      return { 'background': 'pink' }
+    return null;
   }
 }
