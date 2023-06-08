@@ -34,6 +34,11 @@ export class NetReturnsComponent implements OnInit {
       this.fundHedging = fundhedging
     })
   )
+  saveNetReturns$: Observable<any> = this.netReturnsSvc.currentSaveNetReturns.pipe(
+    tap((saveNetReturns:any)=>{
+      this.saveNetReturns = saveNetReturns
+    })
+  )
 
   closeTimer$ = new Subject<any>();
   cashflows: any[] = []
@@ -43,6 +48,8 @@ export class NetReturnsComponent implements OnInit {
   calcMethod: string
   fundHedging: string
   cashflowType: string
+  saveNetReturns:any
+  isDisabled:boolean = true
 
   constructor(private netReturnsSvc: NetReturnsService,
               private dataSvc: DataService,
@@ -53,6 +60,10 @@ export class NetReturnsComponent implements OnInit {
   rowData$: Observable<any>//: Observable<{cashflowCount: number, RunID: string, smry: any[], cashflows: any[]}>
 
   onRunReport(){
+    if(this.isDisabled){
+      this.dataSvc.setWarningMsg("Please run the calculations first.","Dismiss","ark-theme-snackbar-warning");
+      return
+    }
     let ReportParams:any  ={
       asOfDate:this.asOfDate,
       fundHedging:this.fundHedging,
@@ -79,26 +90,37 @@ export class NetReturnsComponent implements OnInit {
     this.rowData$ = this.dataSvc.filterApplyBtnState.pipe(
       filter((isHit: boolean) => isHit),
       switchMap((isHit) => {
-
+        this.isDisabled = true
         let m = {
           asOfDate: this.asOfDate,
           calcMethod: this.calcMethod,
           fundHedging: this.fundHedging,
-          cashflowType: this.cashflowType
+          cashflowType: this.cashflowType,
+          saveNetReturns: this.saveNetReturns,
+          runBy: this.dataSvc.getCurrentUserName()
         }
         return  this.netReturnsSvc.calculateNetIRR(m).pipe(
           switchMap(resp => {
             const pollingEndpoint: string = resp?.['statusQueryGetUri'];
             return interval(3000).pipe(
               takeUntil(this.closeTimer$),
-              switchMap(() => this.netReturnsSvc.getIRRStatus(pollingEndpoint).pipe(
+              switchMap(
+                () => this.netReturnsSvc.getIRRStatus(pollingEndpoint).pipe(
                 map((pollResp) => { return { 
-                  ...{ summary: pollResp?.['output']?.['Summary'], cashflows: pollResp?.['output']?.['Cashflows']  }
-                  , 'runtimeStatus': pollResp?.['runtimeStatus'] }}),
+                  ...{ 
+                      summary: pollResp?.['output']?.['Summary'], 
+                      cashflows: pollResp?.['output']?.['Cashflows']  
+                    }
+                  , 'runtimeStatus': pollResp?.['runtimeStatus'] 
+                }}),
                 tap((pollResp) => {
-                  if(['Terminated', 'Completed', 'Failed'].includes(pollResp?.['runtimeStatus']))
+                  if(['Terminated', 'Completed', 'Failed'].includes(pollResp?.['runtimeStatus'])){
                     this.closeTimer$.next();
-                }))              )
+                    this.isDisabled = false  
+                  }
+                }))              
+                
+              )
             )
           })
         )

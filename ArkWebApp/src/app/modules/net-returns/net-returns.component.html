@@ -2,16 +2,25 @@
     <div class="header">
         <div class="title">
             Net Returns
-            <span *ngIf = "asOfDate$ | async as dt" style="font-size: 1rem; font-weight: normal;">
-                ({{dt | date:"dd/MM/yyyy" }})
+            <span style="font-size: 1rem; font-weight: normal;">
+                (
+                <span *ngIf = "fundHedging$ | async as fh">
+                    {{fh}} |
+                </span>
+                <span *ngIf = "asOfDate$ | async as dt">
+                    {{dt | date:"dd/MM/yyyy" }}
+                </span>
+                )
             </span>
             <ng-container *ngIf="calcMethod$ | async"></ng-container>
             <ng-container *ngIf="fundHedging$ | async"></ng-container>
             <ng-container *ngIf="cashflowType$ | async"></ng-container>
+            <ng-container *ngIf="saveNetReturns$ | async"></ng-container>
+
         </div>
 
         <div class="action" style="margin-right: 2.5em;">
-            <button mat-raised-button (click)="onRunReport()">
+            <button  mat-raised-button (click)="onRunReport()">
                 Run Report
             </button>
         </div>
