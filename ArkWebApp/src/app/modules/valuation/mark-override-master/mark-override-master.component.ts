@@ -7,7 +7,7 @@ import { ValuationService } from 'src/app/core/services/Valuation/valuation.serv
 import { WSOMarkDetailComponent } from '../wsomark-detail/wsomark-detail.component';
 import { MasterDetailModule } from "@ag-grid-enterprise/master-detail";
 import { first, map } from 'rxjs/operators';
-import { dateFormatter, dateTimeFormatter, nullOrZeroFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, dateTimeFormatter, nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
 
 @Component({
   selector: 'app-mark-override-master',
@@ -61,7 +61,7 @@ export class MarkOverrideMasterComponent implements OnInit {
 
     this.columnDefs = [
       { field: 'assetID', cellRenderer: 'agGroupCellRenderer' },
-      { field: 'markOverride', valueFormatter: nullOrZeroFormatter },
+      { field: 'markOverride', valueFormatter: nonAmountNumberFormatter },
       { field: 'markDate', valueFormatter: dateFormatter },
       { field: 'valuationMethod', headerName: 'Mark Type' },
       { field: 'modifiedBy' },
@@ -90,11 +90,11 @@ export class MarkOverrideMasterComponent implements OnInit {
         { field: 'positionID' },
         { field: 'fundHedging' },
         { field: 'portfolioName' },
-        { field: 'mark', valueFormatter: nullOrZeroFormatter },
+        { field: 'mark', valueFormatter: nonAmountNumberFormatter },
         { field: 'markDate', valueFormatter: dateFormatter },
         { field: 'modifiedBy' },
         { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
-        { field: 'wsoActivityID', valueFormatter: nullOrZeroFormatter }    
+        { field: 'wsoActivityID', valueFormatter: nonAmountNumberFormatter }    
       ];
     }
     else if(this.marktype.toLowerCase() === 'impaired cost'){
@@ -102,11 +102,11 @@ export class MarkOverrideMasterComponent implements OnInit {
         { field: 'assetID' },
         { field: 'issuerShortName' },
         { field: 'asset' },
-        { field: 'mark', valueFormatter: nullOrZeroFormatter },
+        { field: 'mark', valueFormatter: nonAmountNumberFormatter },
         { field: 'markDate', valueFormatter: dateFormatter },
         { field: 'modifiedBy' },
         { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
-        { field: 'wsoActivityID', valueFormatter: nullOrZeroFormatter }    
+        { field: 'wsoActivityID', valueFormatter: nonAmountNumberFormatter }    
       ]
     }
     this.detailCellRendererParams = {
