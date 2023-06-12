@@ -9,7 +9,9 @@
         <ng-container *ngIf="funds$ | async"></ng-container>
         <ng-container *ngIf="markTypes$ | async"></ng-container>
         <div class="action">
-                <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center">
+                <button mat-raised-button matTooltip="Push reviewed marks to WSO" (click)="onPushtoWSO()" matTolltipClass="tooltip-style"> Push to WSO
+                </button>
                 <ng-container *ngIf="runValuationInProgress">
                     <mat-spinner [diameter]="20" style="margin-right: 10px"></mat-spinner>
                 </ng-container>    
@@ -31,7 +33,10 @@
                                         [modelValuations]="modelValuations$ | async"
                                         [showLoadingOverlayReq]="showLoadingOverlayReq"
                                         [clearEditingStateReq]="clearEditingStateReq"
+                                        [getReviewingAssetsReq]="getReviewingAssets"
+                                        [reviewedAssets]="reviewedAssets"
                                         (valuationEventEmitter)="triggerRunValuation($event)"
+                                        (reviewingAssetsEmitter)="reviewingAssets($event)"
                     ></app-valuation-grid>
             </ng-container>
         </mat-card>

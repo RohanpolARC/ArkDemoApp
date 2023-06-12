@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { interval, Observable, Subject } from 'rxjs';
-import { filter, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { filter, first, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
@@ -20,6 +20,9 @@ export class ValuationComponent implements OnInit {
 
   showLoadingOverlayReq: { show:  'Yes' | 'No' }
   clearEditingStateReq:  { clear: 'Yes' | 'No' }
+  getReviewingAssets: { get: 'Yes' | 'No' }
+
+  reviewedAssets: any[]
 
   modelValuations$: Observable<any[]>
   closeTimer$ = new Subject<any>();
@@ -89,6 +92,34 @@ export class ValuationComponent implements OnInit {
     this.clearEditingStateReq = { clear: 'Yes' }
   }
 
+  reviewingAssets(assets: { assetID: number, markType: string, overrideDate: Date /*YYYY-MM-DD */ }[]){
+    assets = assets.map(asset => { return { ...asset, modifiedBy: this.dataSvc.getCurrentUserName() } })
+
+    if(!assets.length){
+      this.dataSvc.setWarningMsg(`Nothing to be pushed to WSO`, `Dismiss`, `ark-theme-snackbar-normal`)
+      return;
+    }
+
+    this.valuationSvc.putReviewingAssets(assets).pipe(first()).subscribe({
+      next: (feed: any[]) => {
+        console.log(feed);
+        this.reviewedAssets = feed;
+
+        for(let i: number = 0; i < feed.length; i+= 1){
+          if(feed[i]['status'] === 'Failed'){
+            this.dataSvc.setWarningMsg(`Failed to push marks for all assets`, `Dismiss`, `ark-theme-snackbar-error`)
+            return;
+          }
+        }
+
+        this.dataSvc.setWarningMsg(`Pushed all marks to WSO`, `Dismiss`, `ark-theme-snackbar-success`)
+      },
+      error: (error) => {
+        console.error(`Failed to review the assets: {error}`);
+      }
+    })   
+  }
+
   triggerRunValuation(assetIDs: number[]){
     let m: {
       asOfDate: string;
@@ -126,5 +157,10 @@ export class ValuationComponent implements OnInit {
         )
       })
     )
+  }
+  onPushtoWSO(){
+    this.getReviewingAssets = {
+      get: 'Yes'
+    }
   }
 }

@@ -37,7 +37,10 @@ export class ValuationGridService {
       'initialCreditSpread': { global: 'globalinitialCreditSpread' },
       'creditSpreadIndex': { global: 'globalcreditSpreadIndex' },
       'deltaSpreadDiscount': { global: 'globaldeltaSpreadDiscount' },
-      'overrideDate': { global: 'globaloverrideDate' }
+      'overrideDate': { global: 'globaloverrideDate' },
+      'showIsReviewed': { global: 'globalshowIsReviewed' },
+      'review': { global: 'globalreview' },
+      'comment': { global: 'globalcomment' }
     }
   }
 
@@ -160,16 +163,8 @@ export class ValuationGridService {
     this.getAdaptableApi().gridApi.refreshCells([node], [...this.getOverrideColumns(),'marketValue', 'action']);
   }
 
-  cancelActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
-    
+  cancelActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {    
     this.clearEditingStateForRow(context.rowNode);
-    
-    // this.lockEdit = false;
-    // delete context.rowNode.data['editing'];
-
-    // this.setFields(context.rowNode, [...this.getOverrideColumns()], 'Reset');
-
-    // this.getAdaptableApi().gridApi.refreshCells([context.rowNode], this.getOverrideColumns());
   }
 
   infoActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
@@ -201,17 +196,6 @@ export class ValuationGridService {
       width: '90vw',
       height: '80vh'
     })
-
-    // const dialogRef = this.dailog.open(DefaultDetailedViewPopupComponent, {
-    //   data: {
-    //     detailedViewRequest: req,
-    //     noFilterSpace: true,
-    //     grid: req.screen
-    //   },
-    //   width: '90vw',
-    //   height: '80vh'
-    // })
-
   }
 
   runActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
@@ -259,10 +243,32 @@ export class ValuationGridService {
     return null;
   }
 
+  checkValidations(params: CellValueChangedEvent, tolerance: number = 5){
+
+    let column: string = params.column.getColId();
+    let data = params.data;
+    let marktype: string = data?.['markType'];
+    
+    if(column = 'override'){
+      let mark: number = data?.['override'] ?? 0.0;
+      let currentWSOMark: number = data?.['currentWSOMark'] ?? 0.0;
+      let diffRate: number = Math.abs(((currentWSOMark - mark) / currentWSOMark) * 100.0);
+      
+      if(diffRate > tolerance){
+        this.dataSvc.setWarningMsg(`Override mark varying by more than ${tolerance} percent as compared to current wso mark`);
+      }
+    }
+  }
+
   onOverrideCellValueChanged(event: CellValueChangedEvent){
+
+    this.checkValidations(event, 5.0);
 
     let node: RowNode = event.node;
     node.data['overrideDate'] = getFinalDate(new Date(this.getAsOfDate()));
+    node.data['showIsReviewed'] = 0;
+    node.data['review'] = false;
+    node.data['comment'] = '';
 
     this.getAdaptableApi().gridApi.refreshCells([node], [...this.getOverrideColumns()]);
   }
@@ -345,8 +351,53 @@ export class ValuationGridService {
     
     if(data?.['assetTypeName'] === 'Equity')
       return (data?.['faceValueIssue'] ?? 0) * (data?.['override'] ?? (data?.['currentWSOMark'] ?? 0));
-    else if(['Bond', 'Loan'].includes(data?.['assetTypeName']))
+      else if(['Bond', 'Loan'].includes(data?.['assetTypeName']))
       return (data?.['faceValueIssue'] ?? 0) * (data?.['override'] ?? (data?.['currentWSOMark'] ?? 0)) / 100.0;
-    else return 0;
+      else return 0;
   }
+
+  updateGridOnReview(reviewedAssets: any) {
+    // { assetID: number, markType: string, status: 'Updated' | '', comment: string }
+
+    let nodeData = []
+
+    for(let i: number = 0; i < reviewedAssets.length; i+= 1){
+
+      let nodes: RowNode[] = this.getAdaptableApi().gridApi.getAllRowNodes({
+        includeGroupRows: false,
+        filterFn: (node: RowNode) => {
+          return (node.data?.['assetID'] === reviewedAssets[i]?.['assetID']) && (node.data?.['markType'].toLowerCase() === reviewedAssets[i]?.['markType'].toLowerCase())
+        }
+      })
+      
+      let nData = {}
+      if(nodes.length === 1){
+        nData = nodes[0].data;
+      }
+
+      if(reviewedAssets[i].status === 'Updated'){
+        nData['wsoStatus'] = 'Updated';
+        nData['comment'] = ''
+
+        nData['showIsReviewed'] = 1;    // Important
+      }
+      else if(reviewedAssets[i].status === 'Failed'){
+        nData['wsoStatus'] = 'Failed';
+        nData['comment'] = reviewedAssets[i]?.['comment'];
+        nData['showIsReviewed'] = 0;
+      }
+
+      nodeData.push(nData);
+
+    }
+
+    this.getGridApi().applyTransaction({
+      update: nodeData
+    })
+
+    this.getGridApi().refreshCells({
+      force: true
+    })
+  }
+
 }

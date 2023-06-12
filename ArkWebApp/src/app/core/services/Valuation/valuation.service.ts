@@ -64,6 +64,10 @@ export class ValuationService {
     return this.http.post<APIReponse>(`${APIConfig.VALUATION_DATA_PUT_API}`, models);
   }
 
+  putReviewingAssets(model){
+    return this.http.post<any[]>(`${APIConfig.VALUATION_REVIEWING_ASSETS_PUT_API}`, model);
+  }
+
   runModelValuations(model: {asOfDate: string, assetID: number[]}): Observable<any[]>{
     return this.http.post<any[]>(
       `${APIConfig.RUN_MODEL_VALUATION_API}`, model, 

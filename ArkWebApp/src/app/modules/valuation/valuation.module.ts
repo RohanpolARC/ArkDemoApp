@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MarkOverrideMasterComponent } from './mark-override-master/mark-override-master.component';
+import { AggridMatCheckboxEditorModule } from 'src/app/shared/modules/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor.module';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { MarkOverrideMasterComponent } from './mark-override-master/mark-overrid
     AdaptableAngularAgGridModule,
     MatIconModule,
     MatButtonModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    AggridMatCheckboxEditorModule
   ],
   providers: [
     ValuationGridService

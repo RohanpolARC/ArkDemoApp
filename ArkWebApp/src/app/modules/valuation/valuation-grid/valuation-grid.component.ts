@@ -1,13 +1,14 @@
 import { AdaptableApi, AdaptableOptions, AdaptableReadyInfo, CustomQueryVariableContext } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
+import { ColDef, GridApi, GridOptions, GridReadyEvent, ICellRendererParams, Module } from '@ag-grid-community/core';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { getMomentDate, getMomentDateStr, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
+import { AggridMatCheckboxEditorComponent } from 'src/app/shared/modules/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor.component';
 import { ValuationGridService } from '../service/valuation-grid.service';
 
 @Component({
@@ -18,14 +19,17 @@ import { ValuationGridService } from '../service/valuation-grid.service';
 export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestroy {
 
   @Output() valuationEventEmitter = new EventEmitter<number[]>();
+  @Output() reviewingAssetsEmitter = new EventEmitter<any[]>();
 
   @Input() rowData;
   @Input() benchmarkIndexes: string[]
   @Input() asOfDate: string
   @Input() showLoadingOverlayReq: { show: 'Yes' | 'No' }
   @Input() clearEditingStateReq: { clear: 'Yes' | 'No' }
+  @Input() getReviewingAssetsReq: { get: 'Yes' | 'No' }
   @Input() marktypes: string[]
   @Input() modelValuations
+  @Input() reviewedAssets
 
   agGridModules: Module[]
   gridOptions: GridOptions;
@@ -64,6 +68,10 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       this.gridSvc.clearEditingState(false);
     }
 
+    if(changes?.['getReviewingAssetsReq']?.currentValue?.get === 'Yes'){
+      this.emitReviewingAssets()
+    }
+
     if(changes?.['modelValuations']?.currentValue){
       this.gridSvc.updateModelValuation(this.modelValuations)
     }
@@ -71,6 +79,24 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
     if(changes?.['rowData']?.currentValue?.length > 0){
       this.gridSvc.clearEditingState(true)
     }
+
+    if(changes?.['reviewedAssets']?.currentValue?.length > 0){
+      this.gridSvc.updateGridOnReview(this.reviewedAssets)
+    }
+  }
+
+  emitReviewingAssets(){
+    let r = [];
+    this.gridApi.forEachNodeAfterFilter((node) => r.push(node.data))
+    r = r.filter(row => row['showIsReviewed'] !== 1 && row['review'] === true) 
+
+    let reviewingAssets:{ 
+      assetID: number, markType: string, overrideDate: Date /*YYYY-MM-DD */ 
+    }[] = r.map(row => { 
+      return { assetID: row['assetID'], markType: row['markType'], overrideDate: getMomentDate(row['overrideDate']) }
+    })
+
+    this.reviewingAssetsEmitter.emit(reviewingAssets)
   }
 
   ngOnInit(): void {
@@ -109,7 +135,27 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'assetTypeName', type: 'abColDefString', hide: true, headerName: 'WSO Asset Type Name' },
       { field: 'expectedDate', type: 'abColDefDate' },
       { field: 'seniority', type: 'abColDefNumber' },
-      { field: 'wsoStatus', type: 'abColDefString', hide: true}
+      { field: 'wsoStatus', type: 'abColDefString', hide: true },
+      { field: 'showIsReviewed', type: 'abColDefNumber', hide: true },
+      { field: 'review', type: 'abColDefBoolean', cellRenderer: 'aggridMatCheckboxCellEditor', 
+        cellRendererParams: () => {
+          return {
+            showCheckbox: (params: ICellRendererParams) => { return !(params.data?.['showIsReviewed'] === -1) },
+            disableCheckbox: (params: ICellRendererParams) => { return this.gridSvc.isEditing(params.node) || params.data?.['showIsReviewed'] === 1 },
+            checkboxChanged: (params: ICellRendererParams, boolVal: boolean) => { 
+              // params.data['showIsReviewed'] = boolVal ? 1 : 0;
+              // params.api.refreshCells({ rowNodes: [params.node], force: true }) 
+            },
+            defaultVal: (params: ICellRendererParams) => { 
+              if(params.data?.['showIsReviewed'] === 1)
+                return true;
+                
+              return false;
+            }
+          }
+        }
+      },
+      // { field: 'showIsReviewed', type: 'abColDefBoolean' }
     ]
 
     this.gridOptions = {
@@ -134,7 +180,8 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         enableValue: true
       },
       components: {
-        'autocompleteCellEditor': MatAutocompleteEditorComponent
+        'autocompleteCellEditor': MatAutocompleteEditorComponent,
+        'aggridMatCheckboxCellEditor': AggridMatCheckboxEditorComponent
       }
     }
 
@@ -244,12 +291,13 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         },
         Layout: {
           CurrentLayout: 'Basic Layout',
-          Revision: 20,
+          Revision: 21,
           Layouts: [
             {
               Name: 'Basic Layout',
               Columns: [ ...this.columnDefs.filter(c => !c.hide).map(c => c.field), 'action' ],
               PinnedColumnsMap: {
+                'review': 'right',
                 'action': 'right'
               },
               ColumnWidthMap: {
@@ -259,12 +307,12 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         FormatColumn: {
-          Revision: 19,
+          Revision: 22,
           FormatColumns: [
             {
-              Scope: { ColumnIds: [ ...this.columnDefs.map(def => def.field), 'action'] },
+              Scope: { ColumnIds: [ ...this.columnDefs.map(def => def.field), 'marketValue', 'currentMarketValue', 'previousMarketValue'] },
               Style: { BackColor: 'pink' },
-              Rule: { BooleanExpression: `[wsoStatus] = "Failed"` }
+              Rule: { BooleanExpression: `COALESCE([comment],"" ) != ""` }
             },
             BLANK_DATETIME_FORMATTER_CONFIG(['overrideDate', 'expectedDate']), //'dateTo', 'dateFrom'
             DATE_FORMATTER_CONFIG_ddMMyyyy(['overrideDate', 'expectedDate']), //'dateTo', 'dateFrom'
