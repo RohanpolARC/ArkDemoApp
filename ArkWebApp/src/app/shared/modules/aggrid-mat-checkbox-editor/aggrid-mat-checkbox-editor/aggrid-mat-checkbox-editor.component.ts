@@ -42,12 +42,18 @@ export class AggridMatCheckboxEditorComponent implements ICellRendererAngularCom
   }
   
   refresh(params: ICellRendererParams<any, any>): boolean {
-    this.params = params;
-    this.initHelperFns(params);   
-
-    // this.onCheckboxChanged()
 
     return false;
+    // this.params = params;
+    // this.initHelperFns(params);   
+
+    // let colid: string = params.column.getColId();
+    // this.params.data[colid] = params.value
+    // this.checked = params.value;
+
+    // // this.onCheckboxChanged()
+
+    // return true;    // If we use return false, ag grid will reconstruct the cell based on defaultVal()
   }
 
   onModelChanged(boolVal: boolean){

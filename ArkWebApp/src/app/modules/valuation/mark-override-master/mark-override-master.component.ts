@@ -75,6 +75,8 @@ export class MarkOverrideMasterComponent implements OnInit {
         cellStyle: this.gridCellStyle.bind(this)
       },
       masterDetail: true,
+      keepDetailRows: true,
+      keepDetailRowsCount: 5,
       detailRowHeight: 310,
       onFirstDataRendered: this.onFirstDataRendered,
       onGridReady: this.onGridReady,
@@ -135,12 +137,28 @@ export class MarkOverrideMasterComponent implements OnInit {
             console.error(`Failed to load audit details for audit event ID: ${auditeventID}`);
           }
         })
-      }
+      },
+      // template: (params: IDetailCellRendererParams) => {
+        
+      //   return params.data?.['isReviewed'] ? 
+      //    (`
+      //     <div>
+      //       <div ref="eDetailGrid" style="height: 50%; width: 90%"></div>
+      //     </div>
+      //   `) : `
+      //     <div>
+      //       <ng-container *ngIf="1!=2">
+      //         <div ref="eDetailGrid"></div>
+      //       </ng-container>
+      //     </div>
+      //   `;
+
+      // }
     } as IDetailCellRendererParams
   }
 
   gridCellStyle(params){
-    if(params.data?.['wsoStatus'] === 'Failed')
+    if(params.data?.['wsoStatus'] === 'Failed' && params.data?.['isReviewed'] === true)
       return { 'background': 'pink' }
     return null;
   }

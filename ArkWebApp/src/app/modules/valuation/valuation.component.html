@@ -10,6 +10,7 @@
         <ng-container *ngIf="markTypes$ | async"></ng-container>
         <div class="action">
             <div class="d-flex justify-content-between align-items-center">
+                <button mat-raised-button color="primary" matTooltip="Select all for review" (click)="onSelectAllForReview()">Review All</button>
                 <button mat-raised-button matTooltip="Push reviewed marks to WSO" (click)="onPushtoWSO()" matTolltipClass="tooltip-style"> Push to WSO
                 </button>
                 <ng-container *ngIf="runValuationInProgress">
@@ -33,6 +34,7 @@
                                         [modelValuations]="modelValuations$ | async"
                                         [showLoadingOverlayReq]="showLoadingOverlayReq"
                                         [clearEditingStateReq]="clearEditingStateReq"
+                                        [setAllAssetsForReviewReq]="setAllAssetsForReviewReq"
                                         [getReviewingAssetsReq]="getReviewingAssets"
                                         [reviewedAssets]="reviewedAssets"
                                         (valuationEventEmitter)="triggerRunValuation($event)"

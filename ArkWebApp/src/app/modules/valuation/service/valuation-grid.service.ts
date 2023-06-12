@@ -400,4 +400,22 @@ export class ValuationGridService {
     })
   }
 
+  setAllAssetsForReview(){
+    let rows = []
+    this.getGridApi().forEachNodeAfterFilter((node: RowNode, idx: number) => {
+      
+      let nData = node.data;
+
+      if(nData?.['showIsReviewed'] === 0)
+        nData = { ...nData, review: true }
+      
+      rows.push(nData)
+    })
+
+    this.getGridApi().applyTransaction({
+      update: rows,
+    })
+
+    this.getGridApi().refreshCells({force: true})
+  }
 }

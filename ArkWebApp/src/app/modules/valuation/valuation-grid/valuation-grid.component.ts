@@ -30,6 +30,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   @Input() marktypes: string[]
   @Input() modelValuations
   @Input() reviewedAssets
+  @Input() setAllAssetsForReviewReq: { set: 'Yes' | 'No' }
 
   agGridModules: Module[]
   gridOptions: GridOptions;
@@ -83,12 +84,20 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
     if(changes?.['reviewedAssets']?.currentValue?.length > 0){
       this.gridSvc.updateGridOnReview(this.reviewedAssets)
     }
+
+    if(changes?.['setAllAssetsForReviewReq']?.currentValue?.set === 'Yes'){
+      this.gridSvc.setAllAssetsForReview();
+    }
   }
 
   emitReviewingAssets(){
     let r = [];
-    this.gridApi.forEachNodeAfterFilter((node) => r.push(node.data))
-    r = r.filter(row => row['showIsReviewed'] !== 1 && row['review'] === true) 
+    this.gridApi.forEachNodeAfterFilter((node) => r.push(node.data));
+
+    // if(assets === 'All')
+    //   r = r.filter(row => row['showIsReviewed'] === 0)
+    // else
+      r = r.filter(row => row['showIsReviewed'] !== 1 && row['review'] === true) 
 
     let reviewingAssets:{ 
       assetID: number, markType: string, overrideDate: Date /*YYYY-MM-DD */ 
@@ -149,7 +158,9 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
             defaultVal: (params: ICellRendererParams) => { 
               if(params.data?.['showIsReviewed'] === 1)
                 return true;
-                
+              
+              else if(params.data?.['review'] && params.data?.['showIsReviewed'] === 0)
+                return true;  
               return false;
             }
           }

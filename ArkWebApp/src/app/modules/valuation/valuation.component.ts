@@ -21,6 +21,7 @@ export class ValuationComponent implements OnInit {
   showLoadingOverlayReq: { show:  'Yes' | 'No' }
   clearEditingStateReq:  { clear: 'Yes' | 'No' }
   getReviewingAssets: { get: 'Yes' | 'No' }
+  setAllAssetsForReviewReq: { set: 'Yes' | 'No' }
 
   reviewedAssets: any[]
 
@@ -161,6 +162,12 @@ export class ValuationComponent implements OnInit {
   onPushtoWSO(){
     this.getReviewingAssets = {
       get: 'Yes'
+    }
+  }
+
+  onSelectAllForReview(){
+    this.setAllAssetsForReviewReq = {
+      set: 'Yes'
     }
   }
 }
