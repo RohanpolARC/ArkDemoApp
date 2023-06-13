@@ -1,5 +1,5 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton } from '@adaptabletools/adaptable-angular-aggrid';
-import { CellClassParams, CellValueChangedEvent, EditableCallbackParams, GridApi, RowNode, ValueGetterParams } from '@ag-grid-community/core';
+import { CellClassParams, CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, RowNode, ValueGetterParams } from '@ag-grid-community/core';
 import { EventEmitter, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { first } from 'rxjs/operators';
@@ -40,7 +40,11 @@ export class ValuationGridService {
       'overrideDate': { global: 'globaloverrideDate' },
       'showIsReviewed': { global: 'globalshowIsReviewed' },
       'review': { global: 'globalreview' },
-      'comment': { global: 'globalcomment' }
+      'comment': { global: 'globalcomment' },
+      'modifiedBy': { global: 'globalmodifiedBy' },
+      'modifiedOn': { global: 'globalmodifiedOn' },
+      'reviewedBy': { global: 'globalReviewedBy' },
+      'reviewedOn': { global: 'globalReviewedOn' }
     }
   }
 
@@ -58,6 +62,10 @@ export class ValuationGridService {
 
   getGridApi(): GridApi {
     return this.component.readProperty<GridApi>('gridApi');
+  }
+
+  getColumnDefs(): ColDef[] {
+    return this.component.readProperty<ColDef[]>('columnDefs');
   }
 
   getAsOfDate(): string {
@@ -160,7 +168,7 @@ export class ValuationGridService {
 
     this.setFields(node, [...this.getOverrideColumns()], 'Reset');
 
-    this.getAdaptableApi().gridApi.refreshCells([node], [...this.getOverrideColumns(),'marketValue', 'action']);
+    this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
   }
 
   cancelActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {    
@@ -269,8 +277,20 @@ export class ValuationGridService {
     node.data['showIsReviewed'] = 0;
     node.data['review'] = false;
     node.data['comment'] = '';
+    node.data['modifiedBy'] = this.dataSvc.getCurrentUserName();
+    node.data['modifiedOn'] = new Date();
+    node.data['createdBy'] = this.dataSvc.getCurrentUserName();
+    node.data['createdOn'] = new Date();
 
-    this.getAdaptableApi().gridApi.refreshCells([node], [...this.getOverrideColumns()]);
+    this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
+  }
+
+  onDeltaSpreadDiscountCellValueChanged(params: CellValueChangedEvent){
+
+    let node: RowNode = params.node;
+    node.data['isModelValuationStale'] = true;
+
+    this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
   }
 
   isEditable = (params: EditableCallbackParams) => {
@@ -319,7 +339,7 @@ export class ValuationGridService {
   }
 
   updateModelValuation(vals: { 
-    assetID: number, modelValuation: number, modelValuationMinus100: number, modelValuationPlus100: number }[]
+    assetID: number, modelValuation: number, modelValuationMinus100: number, modelValuationPlus100: number, deltaSpreadDiscount: number }[]
   ){
     
     let valMap = {};
@@ -335,7 +355,7 @@ export class ValuationGridService {
     let updatedData: any[] = []
     for(let i: number = 0; i < nodes.length; i+= 1){
       let data = nodes[i].data;
-      data = { ...data, ...valMap[data?.['assetID']] };
+      data = { ...data, ...valMap[data?.['assetID']], 'usedSpreadDiscount': valMap[data?.['assetID']]?.['deltaSpreadDiscount'] };
       updatedData.push(data);
     }
 
@@ -343,17 +363,6 @@ export class ValuationGridService {
 
     this.dataSvc.setWarningMsg(`Updated valuation for ${assetIDs.length || 0} assets`,`Dismiss`,'ark-theme-snackbar-normal');
 
-  }
-
-  marketValueGetter(params: ValueGetterParams) {
-    
-    let data = params.data;
-    
-    if(data?.['assetTypeName'] === 'Equity')
-      return (data?.['faceValueIssue'] ?? 0) * (data?.['override'] ?? (data?.['currentWSOMark'] ?? 0));
-      else if(['Bond', 'Loan'].includes(data?.['assetTypeName']))
-      return (data?.['faceValueIssue'] ?? 0) * (data?.['override'] ?? (data?.['currentWSOMark'] ?? 0)) / 100.0;
-      else return 0;
   }
 
   updateGridOnReview(reviewedAssets: any) {
@@ -375,16 +384,13 @@ export class ValuationGridService {
         nData = nodes[0].data;
       }
 
-      if(reviewedAssets[i].status === 'Updated'){
-        nData['wsoStatus'] = 'Updated';
+      if(['Updated', 'Failed'].includes(reviewedAssets[i].status)){
+        nData['wsoStatus'] = reviewedAssets[i].status;
         nData['comment'] = ''
 
-        nData['showIsReviewed'] = 1;    // Important
-      }
-      else if(reviewedAssets[i].status === 'Failed'){
-        nData['wsoStatus'] = 'Failed';
-        nData['comment'] = reviewedAssets[i]?.['comment'];
-        nData['showIsReviewed'] = 0;
+        nData['showIsReviewed'] = 1;    // Important. Still mark it as reviewed if it failed to mark.
+        nData['reviewedBy'] = this.dataSvc.getCurrentUserName();
+        nData['reviewedOn'] = new Date();
       }
 
       nodeData.push(nData);
@@ -417,5 +423,17 @@ export class ValuationGridService {
     })
 
     this.getGridApi().refreshCells({force: true})
+  }
+
+  getAllFilteredMTMAssets(): number[] {
+
+    let assetIDs: number[] = []
+    this.getGridApi().forEachNodeAfterFilter((node: RowNode, idx: number) => {
+      if(node.data?.['markType'].toLowerCase() === 'mark to market'){
+        assetIDs.push(Number(node.data?.['assetID']));
+      }
+    })
+
+    return [...new Set(assetIDs)];
   }
 }

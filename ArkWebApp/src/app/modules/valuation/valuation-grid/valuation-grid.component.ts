@@ -5,8 +5,8 @@ import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
-import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import { getMomentDate, getMomentDateStr, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
+import { getMomentDate, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { AggridMatCheckboxEditorComponent } from 'src/app/shared/modules/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor.component';
 import { ValuationGridService } from '../service/valuation-grid.service';
@@ -20,6 +20,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
 
   @Output() valuationEventEmitter = new EventEmitter<number[]>();
   @Output() reviewingAssetsEmitter = new EventEmitter<any[]>();
+  @Output() filteredMTMAssetsEmitter = new EventEmitter<number[]>();
 
   @Input() rowData;
   @Input() benchmarkIndexes: string[]
@@ -31,6 +32,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   @Input() modelValuations
   @Input() reviewedAssets
   @Input() setAllAssetsForReviewReq: { set: 'Yes' | 'No' }
+  @Input() getFilteredMTMAssetsReq: { get: 'Yes' | 'No' }
 
   agGridModules: Module[]
   gridOptions: GridOptions;
@@ -88,6 +90,11 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
     if(changes?.['setAllAssetsForReviewReq']?.currentValue?.set === 'Yes'){
       this.gridSvc.setAllAssetsForReview();
     }
+
+    if(changes?.['getFilteredMTMAssetsReq']?.currentValue?.get === 'Yes'){
+      let assetIDs: number[] = this.gridSvc.getAllFilteredMTMAssets();
+      this.filteredMTMAssetsEmitter.emit(assetIDs);
+    }
   }
 
   emitReviewingAssets(){
@@ -121,16 +128,26 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'override', type: 'abColDefNumber', cellStyle: this.gridSvc.editableCellStyle.bind(this), onCellValueChanged: this.gridSvc.onOverrideCellValueChanged.bind(this.gridSvc), editable: this.gridSvc.isEditable.bind(this.gridSvc) },
       { field: 'overrideDate', type: 'abColDefDate' },
       { field: 'markType', type: 'abColDefString' },
-      { field: 'initialYieldCurveSpread', type: 'abColDefNumber', editable: this.gridSvc.isEditable.bind(this.gridSvc), cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc)  },
-      { field: 'initialCreditSpread', type: 'abColDefNumber', editable: this.gridSvc.isEditable.bind(this.gridSvc), cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), headerName: 'Initial Benchmark Spread' },
-      { field: 'creditSpreadIndex', type: 'abColDefString', cellEditor: 'autocompleteCellEditor', cellEditorParams: () => {
-        return {
-          options: this.benchmarkIndexes, isStrict: true, oldValRestoreOnStrict: true
-        }
-      }, editable: this.gridSvc.isEditable.bind(this.gridSvc), cellEditorPopup: false , cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), headerName: 'Benchmark Spread Index' },
+      { field: 'initialYieldCurveSpread', type: 'abColDefNumber', 
+        editable: this.gridSvc.isEditable.bind(this.gridSvc), 
+        cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc)  },
+      { field: 'initialCreditSpread', type: 'abColDefNumber', 
+        editable: this.gridSvc.isEditable.bind(this.gridSvc), 
+        cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), headerName: 'Initial Benchmark Spread' },
+      { field: 'creditSpreadIndex', type: 'abColDefString', cellEditor: 'autocompleteCellEditor',    
+        cellEditorParams: () => {
+          return {
+            options: this.benchmarkIndexes, isStrict: true, oldValRestoreOnStrict: true
+          }
+        }, 
+        editable: this.gridSvc.isEditable.bind(this.gridSvc), cellEditorPopup: false ,
+        cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), headerName: 'Benchmark Spread Index' },
       { field: 'currentYieldCurveSpread', type: 'abColDefNumber' },
       { field: 'currentCreditSpread', type: 'abColDefNumber', headerName: 'Current Benchmark Spread' },
-      { field: 'deltaSpreadDiscount', type: 'abColDefNumber', cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), editable: this.gridSvc.isEditable.bind(this.gridSvc) },
+      { field: 'deltaSpreadDiscount', type: 'abColDefNumber', 
+        cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), 
+        editable: this.gridSvc.isEditable.bind(this.gridSvc), 
+        onCellValueChanged: this.gridSvc.onDeltaSpreadDiscountCellValueChanged.bind(this.gridSvc) },
       { field: 'modelValuation', type: 'abColDefNumber' },
       { field: 'modelValuationMinus100', type: 'abColDefNumber', headerName: 'Valuation-100bps' },
       { field: 'modelValuationPlus100', type: 'abColDefNumber', headerName: 'Valuation+100bps' },
@@ -146,6 +163,10 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'seniority', type: 'abColDefNumber' },
       { field: 'wsoStatus', type: 'abColDefString', hide: true },
       { field: 'showIsReviewed', type: 'abColDefNumber', hide: true },
+      { field: 'reviewedBy', type: 'abColDefString', hide: true },
+      { field: 'reviewedOn', type: 'abColDefDate', hide: true },
+      { field: 'modifiedBy', type: 'abColDefString', hide: true },
+      { field: 'modifiedOn', type: 'abColDefDate', hide: true },
       { field: 'review', type: 'abColDefBoolean', cellRenderer: 'aggridMatCheckboxCellEditor', 
         cellRendererParams: () => {
           return {
@@ -318,15 +339,16 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         FormatColumn: {
-          Revision: 22,
+          Revision: 25,
           FormatColumns: [
             {
               Scope: { ColumnIds: [ ...this.columnDefs.map(def => def.field), 'marketValue', 'currentMarketValue', 'previousMarketValue'] },
               Style: { BackColor: 'pink' },
               Rule: { BooleanExpression: `COALESCE([comment],"" ) != ""` }
             },
-            BLANK_DATETIME_FORMATTER_CONFIG(['overrideDate', 'expectedDate']), //'dateTo', 'dateFrom'
+            BLANK_DATETIME_FORMATTER_CONFIG(['overrideDate', 'expectedDate', 'modifiedOn', 'reviewedOn']), //'dateTo', 'dateFrom'
             DATE_FORMATTER_CONFIG_ddMMyyyy(['overrideDate', 'expectedDate']), //'dateTo', 'dateFrom'
+            DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn', 'reviewedOn']),
             AMOUNT_FORMATTER_CONFIG_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 2, ['amountZeroFormat']),
             AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 10),
             CUSTOM_FORMATTER(['faceValueIssue', 'mark', 'costPrice', 

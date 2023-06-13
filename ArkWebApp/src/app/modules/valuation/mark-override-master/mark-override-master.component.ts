@@ -1,4 +1,4 @@
-import { ColDef, FirstDataRenderedEvent, GetRowIdFunc, GetRowIdParams, GridOptions, GridReadyEvent, IDetailCellRendererParams, Module } from '@ag-grid-community/core';
+import { ColDef, FirstDataRenderedEvent, GetRowIdFunc, GetRowIdParams, GridOptions, GridReadyEvent, IDetailCellRendererParams, IsRowMaster, Module } from '@ag-grid-community/core';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
@@ -64,6 +64,8 @@ export class MarkOverrideMasterComponent implements OnInit {
       { field: 'valuationMethod', headerName: 'Mark Type' },
       { field: 'modifiedBy' },
       { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
+      { field: 'reviewedBy' },
+      { field: 'reviewedOn', valueFormatter: dateTimeFormatter },
       { field: 'auditEventID', hide: true },
       { field: 'wsoStatus', hide: true }
     ]
@@ -72,9 +74,10 @@ export class MarkOverrideMasterComponent implements OnInit {
       columnDefs: this.columnDefs,
       defaultColDef: {
         resizable: true,
-        cellStyle: this.gridCellStyle.bind(this)
+        cellStyle: this.masterGridCellStyle.bind(this)
       },
       masterDetail: true,
+      isRowMaster: this.isRowMaster,
       keepDetailRows: true,
       keepDetailRowsCount: 5,
       detailRowHeight: 310,
@@ -83,7 +86,6 @@ export class MarkOverrideMasterComponent implements OnInit {
       headerHeight: 30,
       rowHeight: 30,
       enableRangeSelection: true,
-      // sideBar: true
     }
 
     let detailColDef: ColDef[] = [];
@@ -97,7 +99,7 @@ export class MarkOverrideMasterComponent implements OnInit {
         { field: 'modifiedBy' },
         { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
         { field: 'wsoActivityID', valueFormatter: nonAmountNumberFormatter },
-        { field: 'wsoStatus', hide: true }    
+        { field: 'wsoStatus', hide: true },
       ];
     }
     else if(this.marktype.toLowerCase() === 'impaired cost'){
@@ -109,7 +111,7 @@ export class MarkOverrideMasterComponent implements OnInit {
         { field: 'markDate', valueFormatter: dateFormatter },
         { field: 'modifiedBy' },
         { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
-        { field: 'wsoActivityID', valueFormatter: nonAmountNumberFormatter }    
+        { field: 'wsoActivityID', valueFormatter: nonAmountNumberFormatter },
       ]
     }
     this.detailCellRendererParams = {
@@ -117,12 +119,11 @@ export class MarkOverrideMasterComponent implements OnInit {
         columnDefs: detailColDef,
         defaultColDef: {
           resizable: true,
-          cellStyle: this.gridCellStyle.bind(this)
+          cellStyle: this.detailGridCellStyle.bind(this)
         },
         headerHeight: 30,
         rowHeight: 30,
         enableRangeSelection: true,
-        // sideBar: true
       },
 
       getDetailRowData: (params) => {
@@ -138,28 +139,22 @@ export class MarkOverrideMasterComponent implements OnInit {
           }
         })
       },
-      // template: (params: IDetailCellRendererParams) => {
-        
-      //   return params.data?.['isReviewed'] ? 
-      //    (`
-      //     <div>
-      //       <div ref="eDetailGrid" style="height: 50%; width: 90%"></div>
-      //     </div>
-      //   `) : `
-      //     <div>
-      //       <ng-container *ngIf="1!=2">
-      //         <div ref="eDetailGrid"></div>
-      //       </ng-container>
-      //     </div>
-      //   `;
-
-      // }
     } as IDetailCellRendererParams
   }
 
-  gridCellStyle(params){
+  masterGridCellStyle(params){
     if(params.data?.['wsoStatus'] === 'Failed' && params.data?.['isReviewed'] === true)
       return { 'background': 'pink' }
     return null;
+  }
+
+  detailGridCellStyle(params){
+    if(params.data?.['wsoStatus'] === 'Failed')
+      return { 'background': 'pink' }
+    return null;
+  }
+
+  isRowMaster: IsRowMaster = (nData: any) => {
+    return nData ? nData?.['isReviewed'] : false;
   }
 }

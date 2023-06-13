@@ -22,6 +22,7 @@ export class ValuationComponent implements OnInit {
   clearEditingStateReq:  { clear: 'Yes' | 'No' }
   getReviewingAssets: { get: 'Yes' | 'No' }
   setAllAssetsForReviewReq: { set: 'Yes' | 'No' }
+  getFilteredMTMAssetsReq: { get: 'Yes' | 'No' }
 
   reviewedAssets: any[]
 
@@ -93,6 +94,10 @@ export class ValuationComponent implements OnInit {
     this.clearEditingStateReq = { clear: 'Yes' }
   }
 
+  getFilteredMTMAssets(assetIDs: number[]){
+    this.triggerRunValuation(assetIDs)
+  }
+  
   reviewingAssets(assets: { assetID: number, markType: string, overrideDate: Date /*YYYY-MM-DD */ }[]){
     assets = assets.map(asset => { return { ...asset, modifiedBy: this.dataSvc.getCurrentUserName() } })
 
@@ -122,6 +127,11 @@ export class ValuationComponent implements OnInit {
   }
 
   triggerRunValuation(assetIDs: number[]){
+
+    if(this.runValuationInProgress){
+      this.dataSvc.setWarningMsg(`Please wait for the triggered valuation process to finish`, `Dismiss`, `ark-theme-snackbar-warning`)
+    }
+
     let m: {
       asOfDate: string;
       assetID: number[];
@@ -159,6 +169,7 @@ export class ValuationComponent implements OnInit {
       })
     )
   }
+
   onPushtoWSO(){
     this.getReviewingAssets = {
       get: 'Yes'
@@ -168,6 +179,12 @@ export class ValuationComponent implements OnInit {
   onSelectAllForReview(){
     this.setAllAssetsForReviewReq = {
       set: 'Yes'
+    }
+  }
+
+  onTriggerModelValuation(){
+    this.getFilteredMTMAssetsReq = {
+      get: 'Yes'
     }
   }
 }
