@@ -113,7 +113,7 @@ export class ValuationComponent implements OnInit {
 
         for(let i: number = 0; i < feed.length; i+= 1){
           if(feed[i]['status'] === 'Failed'){
-            this.dataSvc.setWarningMsg(`Failed to push marks for all assets`, `Dismiss`, `ark-theme-snackbar-error`)
+            this.dataSvc.setWarningMsg(`Failed to push marks for all. Please check audit logs for more information`, `Dismiss`, `ark-theme-snackbar-error`)
             return;
           }
         }
