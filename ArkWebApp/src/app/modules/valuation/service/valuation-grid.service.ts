@@ -386,7 +386,7 @@ export class ValuationGridService {
 
       if(['Updated', 'Failed'].includes(reviewedAssets[i].status)){
         nData['wsoStatus'] = reviewedAssets[i].status;
-        nData['comment'] = ''
+        nData['comment'] = reviewedAssets[i].comment;
 
         nData['showIsReviewed'] = 1;    // Important. Still mark it as reviewed if it failed to mark.
         nData['reviewedBy'] = this.dataSvc.getCurrentUserName();
