@@ -15,7 +15,7 @@ export class ValuationComponent implements OnInit {
   asofdate: AsOfDateRange;        // Date currently used by the grid. Updated only after hitting apply.
   asofdateIn: AsOfDateRange;      // Date currently set on the filter panel.
   funds: string[]
-  benchmarkIndexes: string[];
+  benchmarkIndexes: { [index: string]: any }
   marktypes: string[];
 
   showLoadingOverlayReq: { show:  'Yes' | 'No' }
@@ -43,6 +43,23 @@ export class ValuationComponent implements OnInit {
     tap((isHit) => { 
       this.asofdate = this.asofdateIn;    // Update date for grid only when hit apply
       this.showLoadingOverlayReq = { show: 'Yes' }
+
+      this.valuationSvc.getSpreadBenchmarkIndex(this.asofdate.end, null).pipe(first()).subscribe({
+        next: (indexes: any[]) => {
+          
+          let spreadIndexes = {};
+          for(let i: number = 0; i < indexes.length; i+= 1){
+            let bmindex: string = indexes[i]?.['securityName'];
+            if(!spreadIndexes.hasOwnProperty(bmindex))
+              spreadIndexes[bmindex] = indexes[i];
+          }
+
+          this.benchmarkIndexes = spreadIndexes;
+        },
+        error: (error) => {
+          console.error(`Failed to load spread benchmark indexes`);
+        }
+      })
     }),
     switchMap((isHit) => {
       return this.valuationSvc.getValuationData(this.asofdate, this.funds?.join(','), this.marktypes?.join(',')).pipe(
@@ -130,6 +147,7 @@ export class ValuationComponent implements OnInit {
 
     if(this.runValuationInProgress){
       this.dataSvc.setWarningMsg(`Please wait for the triggered valuation process to finish`, `Dismiss`, `ark-theme-snackbar-warning`)
+      return;
     }
 
     let m: {

@@ -72,6 +72,10 @@ export class ValuationGridService {
     return this.component.readProperty<string>('asOfDate');
   }
 
+  getBenchmarkIndexes(): { [index: string]: any } {
+    return this.component.readProperty<{ [index: string]: any }>('benchmarkIndexes');
+  }
+
   setFields(node: RowNode, overrideCols: string[], mode: 'Set' | 'Reset'){
 
     for(let i: number = 0; i < overrideCols.length; i+= 1){
@@ -133,7 +137,7 @@ export class ValuationGridService {
           node.data['modifiedBy'] = valuation.modifiedBy;
           node.data['modifiedOn'] = new Date();
 
-          node.data['comment'] = null;
+          // node.data['comment'] = null;
 
           this.lockEdit = false;
           delete context.rowNode.data['editing'];
@@ -142,9 +146,9 @@ export class ValuationGridService {
           adaptableApi.gridApi.refreshCells([context.rowNode], [...this.getOverrideColumns(), 'action', 'comment']);
         }
         else if(res.isSuccess === false){
-          this.dataSvc.setWarningMsg(`Failed to mark all positions. Please see audit log for more information`, `Dismiss`, `ark-theme-snackbar-warning`)
+          this.dataSvc.setWarningMsg(`Failed to save valuation information. Please try again.`)
 
-          node.data['comment'] = res.returnMessage;
+          // node.data['comment'] = res.returnMessage;
 
           this.lockEdit = false;
           delete context.rowNode.data['editing'];
@@ -290,6 +294,18 @@ export class ValuationGridService {
     let node: RowNode = params.node;
     node.data['isModelValuationStale'] = true;
 
+    this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
+  }
+
+  onIndexCellValueChanged(params: CellValueChangedEvent){
+
+    let index: string = params?.data?.['creditSpreadIndex'];
+
+    let node: RowNode = params.node;
+    node.data['currentYieldCurveSpread'] = this.getBenchmarkIndexes()[index]?.['currentYieldCurveSpread'];
+    node.data['currentCreditSpread'] = this.getBenchmarkIndexes()[index]?.['currentBenchmarkSpread'];
+
+    node.data['deltaSpreadDiscount'] = (node.data?.['currentYieldCurveSpread'] ?? 0.0) - (node.data?.['currentCreditSpread'] ?? 0.0)
     this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
   }
 

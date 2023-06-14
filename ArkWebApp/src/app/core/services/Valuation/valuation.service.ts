@@ -48,6 +48,12 @@ export class ValuationService {
     )
   }
 
+  getSpreadBenchmarkIndex(asofdate: string, benchmarkindex: string){
+    return this.http.get<any[]>(`${APIConfig.VALUATION_SPREAD_BENCHMARK_INDEXES_GET_API}/?asofdate=${asofdate}&benchmarkindex=${benchmarkindex ?? ''}`).pipe(
+      catchError((ex) => throwError(ex))
+    )
+  }
+
   getAuditMaster(assetID: number, marktype: string, asofdate: string){
     return this.http.get<any[]>(`${APIConfig.VALUATION_AUDIT_MASTER_GET_API}/?assetID=${assetID}&marktype=${marktype}&asofdate=${asofdate}`).pipe(
       catchError((ex) => throwError(ex))

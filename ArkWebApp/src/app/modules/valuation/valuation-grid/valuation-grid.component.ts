@@ -23,7 +23,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   @Output() filteredMTMAssetsEmitter = new EventEmitter<number[]>();
 
   @Input() rowData;
-  @Input() benchmarkIndexes: string[]
+  @Input() benchmarkIndexes: { [index: string]: any }
   @Input() asOfDate: string
   @Input() showLoadingOverlayReq: { show: 'Yes' | 'No' }
   @Input() clearEditingStateReq: { clear: 'Yes' | 'No' }
@@ -95,6 +95,10 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       let assetIDs: number[] = this.gridSvc.getAllFilteredMTMAssets();
       this.filteredMTMAssetsEmitter.emit(assetIDs);
     }
+
+    if(changes?.['benchmarkIndexes']?.currentValue){
+      
+    }
   }
 
   emitReviewingAssets(){
@@ -137,9 +141,10 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'creditSpreadIndex', type: 'abColDefString', cellEditor: 'autocompleteCellEditor',    
         cellEditorParams: () => {
           return {
-            options: this.benchmarkIndexes, isStrict: true, oldValRestoreOnStrict: true
+            options: [...new Set(Object.keys(this.benchmarkIndexes))], isStrict: true, oldValRestoreOnStrict: true
           }
-        }, 
+        },
+        onCellValueChanged: this.gridSvc.onIndexCellValueChanged.bind(this.gridSvc),
         editable: this.gridSvc.isEditable.bind(this.gridSvc), cellEditorPopup: false ,
         cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), headerName: 'Benchmark Spread Index' },
       { field: 'currentYieldCurveSpread', type: 'abColDefNumber' },
