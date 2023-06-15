@@ -44,7 +44,8 @@ export class ValuationGridService {
       'modifiedBy': { global: 'globalmodifiedBy' },
       'modifiedOn': { global: 'globalmodifiedOn' },
       'reviewedBy': { global: 'globalReviewedBy' },
-      'reviewedOn': { global: 'globalReviewedOn' }
+      'reviewedOn': { global: 'globalReviewedOn' },
+      'useModelValuation': { global: 'globaluseModelValuation' }
     }
   }
 
@@ -280,6 +281,7 @@ export class ValuationGridService {
     node.data['overrideDate'] = getFinalDate(new Date(this.getAsOfDate()));
     node.data['showIsReviewed'] = 0;
     node.data['review'] = false;
+    node.data['useModelValuation'] = false;
     node.data['comment'] = '';
     node.data['modifiedBy'] = this.dataSvc.getCurrentUserName();
     node.data['modifiedOn'] = new Date();
@@ -376,6 +378,8 @@ export class ValuationGridService {
     }
 
     this.getAdaptableApi().gridApi.updateGridData(updatedData);
+
+    this.getAdaptableApi().gridApi.refreshCells(nodes, this.getColumnDefs().map(col => col.field))
 
     this.dataSvc.setWarningMsg(`Updated valuation for ${assetIDs.length || 0} assets`,`Dismiss`,'ark-theme-snackbar-normal');
 

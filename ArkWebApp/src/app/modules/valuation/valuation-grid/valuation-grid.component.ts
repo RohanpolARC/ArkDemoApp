@@ -172,7 +172,26 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'reviewedOn', type: 'abColDefDate', hide: true },
       { field: 'modifiedBy', type: 'abColDefString', hide: true },
       { field: 'modifiedOn', type: 'abColDefDate', hide: true },
-      { field: 'review', type: 'abColDefBoolean', cellRenderer: 'aggridMatCheckboxCellEditor', 
+      { field: 'useModelValuation', type: 'abColDefBoolean', cellRenderer: 'useModelValuationCheckbox', lockPinned: true,
+        cellRendererParams: () => {
+          return {
+            showCheckbox: (params: ICellRendererParams) => { return !!params.data?.['modelValuation'] },
+            disableCheckbox: (params: ICellRendererParams) => { return !this.gridSvc.isEditing(params.node); },
+            checkboxChanged: (params: ICellRendererParams, boolVal: boolean) => {
+              if(boolVal){
+                params.data['oldOverride'] = params.data?.['override'];
+                params.data['override'] = params.data?.['modelValuation'];
+              }
+              else{
+                params.data['override'] = params.data?.['oldOverride'];
+              }
+              this.adaptableApi.gridApi.refreshCells([params.node], this.columnDefs.map(col => col.field))
+            },
+            defaultVal: (params: ICellRendererParams) => { return params.value }
+          }
+        }
+      },
+      { field: 'review', type: 'abColDefBoolean', cellRenderer: 'aggridMatCheckboxCellEditor', lockPinned: true,
         cellRendererParams: () => {
           return {
             showCheckbox: (params: ICellRendererParams) => { return !(params.data?.['showIsReviewed'] === -1) },
@@ -218,7 +237,8 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       },
       components: {
         'autocompleteCellEditor': MatAutocompleteEditorComponent,
-        'aggridMatCheckboxCellEditor': AggridMatCheckboxEditorComponent
+        'aggridMatCheckboxCellEditor': AggridMatCheckboxEditorComponent,
+        'useModelValuationCheckbox': AggridMatCheckboxEditorComponent
       }
     }
 
@@ -294,7 +314,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       userInterfaceOptions: {
         customDisplayFormatters: [
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', ['faceValueIssue', 'mark', 'costPrice', 
-          'initialYieldCurveSpread', 'initialCreditSpread', 'currentYieldCurveSpread', 'currentCreditSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValue', 'currentMarketValue', 'previousMarketValue']),
+          'initialYieldCurveSpread', 'initialCreditSpread', 'currentYieldCurveSpread', 'currentCreditSpread', 'deltaSpreadDiscount', 'usedSpreadDiscount', 'marketValue', 'currentMarketValue', 'previousMarketValue']),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat', ['override', 'currentWSOMark', 'previousWSOMark']),
 
         ],
@@ -328,12 +348,13 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         },
         Layout: {
           CurrentLayout: 'Basic Layout',
-          Revision: 21,
+          Revision: 22,
           Layouts: [
             {
               Name: 'Basic Layout',
               Columns: [ ...this.columnDefs.filter(c => !c.hide).map(c => c.field), 'action' ],
               PinnedColumnsMap: {
+                'useModelValuation': 'right',
                 'review': 'right',
                 'action': 'right'
               },
@@ -344,7 +365,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         FormatColumn: {
-          Revision: 25,
+          Revision: 27,
           FormatColumns: [
             {
               Scope: { ColumnIds: [ ...this.columnDefs.map(def => def.field), 'marketValue', 'currentMarketValue', 'previousMarketValue'] },
@@ -355,7 +376,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
             DATE_FORMATTER_CONFIG_ddMMyyyy(['overrideDate', 'expectedDate']), //'dateTo', 'dateFrom'
             DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn', 'reviewedOn']),
             AMOUNT_FORMATTER_CONFIG_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 2, ['amountZeroFormat']),
-            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 10),
+            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['currentWSOMark', 'previousWSOMark', 'override', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100'], 4),
             CUSTOM_FORMATTER(['faceValueIssue', 'mark', 'costPrice', 
             'initialYieldCurveSpread', 'initialCreditSpread', 'currentYieldCurveSpread', 'currentCreditSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValue', 'currentMarketValue', 'previousMarketValue'], 'amountFormatter')
           ]
