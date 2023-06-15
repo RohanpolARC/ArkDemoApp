@@ -149,6 +149,15 @@ export class ValuationComponent implements OnInit {
       this.dataSvc.setWarningMsg(`Please wait for the triggered valuation process to finish`, `Dismiss`, `ark-theme-snackbar-warning`)
       return;
     }
+    else{
+      let msg: string = '';
+      if(assetIDs.length == 1)
+        msg = `Running model valuation for assetID ${assetIDs[0]}`;
+      else if(assetIDs.length > 1)
+        msg = `Running model valuation for assets`;
+
+        this.dataSvc.setWarningMsg(msg, `Dismiss`, `ark-theme-snackbar-normal`);
+    }
 
     let m: {
       asOfDate: string;

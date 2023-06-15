@@ -215,8 +215,6 @@ export class ValuationGridService {
 
     let assetID: number = context.rowNode.data?.['assetID'];
 
-    this.dataSvc.setWarningMsg(`Running calculations for model valuation for assetID ${assetID || ''}`,`Dismiss`,`ark-theme-snackbar-normal`)
-
     this.runEvent().emit([assetID]);
   }
 
