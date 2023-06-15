@@ -44,6 +44,10 @@ export class ValuationComponent implements OnInit {
       this.asofdate = this.asofdateIn;    // Update date for grid only when hit apply
       this.showLoadingOverlayReq = { show: 'Yes' }
 
+      // Closing all polling requests for model valuation if Apply is hit.
+      this.closeTimer$.next();
+      this.runValuationInProgress = false;
+
       this.valuationSvc.getSpreadBenchmarkIndex(this.asofdate.end, null).pipe(first()).subscribe({
         next: (indexes: any[]) => {
           
@@ -161,6 +165,8 @@ export class ValuationComponent implements OnInit {
       this.dataSvc.setWarningMsg(msg, `Dismiss`, `ark-theme-snackbar-normal`);
     }
 
+    this.closeTimer$ = new Subject<any>();
+    
     let m: {
       asOfDate: string;
       assetID: number[];
