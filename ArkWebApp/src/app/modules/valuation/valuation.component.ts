@@ -154,7 +154,7 @@ export class ValuationComponent implements OnInit {
       if(assetIDs.length === 1)
         msg = `Running model valuation for assetID ${assetIDs[0]}`;
       else if(assetIDs.length > 1)
-        msg = `Running model valuation for assets`;
+        msg = `Running model valuation for ${assetIDs.length} assets`;
       else if(assetIDs.length === 0){
         this.dataSvc.setWarningMsg(`No underlying Mark to market assets to run model valuation.`, `Dismiss`, `ark-theme-snackbar-warning`)
       }
