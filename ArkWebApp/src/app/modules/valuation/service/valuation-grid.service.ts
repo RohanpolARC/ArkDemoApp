@@ -427,22 +427,32 @@ export class ValuationGridService {
   }
 
   setAllAssetsForReview(){
-    let rows = []
-    this.getGridApi().forEachNodeAfterFilter((node: RowNode, idx: number) => {
-      
-      let nData = node.data;
 
-      if(nData?.['showIsReviewed'] === 0)
-        nData = { ...nData, review: true }
-      
-      rows.push(nData)
+    let nodes: RowNode[] = this.getAdaptableApi().gridApi.getAllRowNodes({
+      includeGroupRows: false,
+      filterFn: (node: RowNode) => {
+        return (node.data?.['showIsReviewed'] === 0)
+      }
     })
+
+    let reviewingNodes: RowNode[] = nodes.filter(node => !node.data?.['review']);
+
+    let rowNodeData: any[] = [];
+
+    // If all possible rows are already marked for review then we discard all such rows for review.
+    if(reviewingNodes.length === 0){
+      rowNodeData = nodes.map(node => { return { ...node.data, 'review': false }});
+    }
+
+    else if(reviewingNodes.length > 0){
+      rowNodeData = reviewingNodes.map(rnode => { return { ...rnode.data, 'review': true } })
+    }
 
     this.getGridApi().applyTransaction({
-      update: rows,
+      update: rowNodeData
     })
 
-    this.getGridApi().refreshCells({force: true})
+    this.getAdaptableApi().gridApi.refreshCells(nodes, this.getColumnDefs().map(col => col.field))
   }
 
   getAllFilteredMTMAssets(): number[] {
