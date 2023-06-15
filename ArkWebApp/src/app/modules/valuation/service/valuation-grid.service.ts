@@ -277,7 +277,16 @@ export class ValuationGridService {
 
     let node: RowNode = event.node;
     node.data['overrideDate'] = getFinalDate(new Date(this.getAsOfDate()));
-    node.data['showIsReviewed'] = 0;
+
+    let marktype: string = node.data?.['markType'];
+
+    if(marktype === 'hedging mark'){
+      node.data['showIsReviewed'] = -1;
+    }
+    else {
+      node.data['showIsReviewed'] = 0;
+    }
+
     node.data['review'] = false;
     node.data['useModelValuation'] = false;
     node.data['comment'] = '';
