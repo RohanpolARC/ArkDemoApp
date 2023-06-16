@@ -8,6 +8,7 @@ import { ValuationService } from 'src/app/core/services/Valuation/valuation.serv
 import { getFinalDate } from 'src/app/shared/functions/utilities';
 import { APIReponse, DetailedView, IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { Valuation } from 'src/app/shared/models/ValuationModel';
+import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
 import { MarkOverrideMasterComponent } from '../mark-override-master/mark-override-master.component';
 
 @Injectable()
@@ -184,31 +185,39 @@ export class ValuationGridService {
 
     let node: RowNode = context.rowNode;
 
-    let req: DetailedView = <DetailedView>{};
+    let marktype: string = node.data?.['markType'].toLowerCase();
 
-    let marktype: string = node.data?.['markType'];
+    if(marktype === 'mark to market' || marktype === 'impaired cost'){
+      const dialogRef = this.dailog.open(MarkOverrideMasterComponent, {
+        data: {
+          assetID: node.data?.['assetID'],
+          marktype: node.data?.['markType'],
+          asofdate: this.getAsOfDate()
+        },
+        width: '90vw',
+        height: '80vh'
+      })  
+    }
 
-    if(marktype.toLowerCase() === 'mark to market')
-      req.screen = 'Valuation-MTM';
-    else if(marktype.toLowerCase() === 'impaired cost')
-      req.screen = 'Valuation-Impaired Cost';
-    else
-      req.screen = '';
+    else if(marktype === 'hedging mark'){
+      let req: DetailedView = <DetailedView>{};
+      req.screen = 'Valuation-Hedging Mark';
+      req.param1 = String(node.data?.['assetID']);
+      req.param2 = String(node.data?.['markType']);
+      req.param3 = req.param4 = req.param5 = '';
+      req.strParam1 = [];
 
-    req.param1 = String(node.data?.['assetID']);
-    req.param2 = String(node.data?.['markType']); 
-    req.param3 = req.param4 = req.param5 = ''
-    req.strParam1 = []
+      this.dailog.open(DefaultDetailedViewPopupComponent, {
+        data: {
+          detailedViewRequest: req,
+          noFilterSpace: true,
+          grid: 'Valuation-Hedging Mark'
+        },
+        width: '90vw',
+        height: '80vh'
+      })
 
-    const dialogRef = this.dailog.open(MarkOverrideMasterComponent, {
-      data: {
-        assetID: node.data?.['assetID'],
-        marktype: node.data?.['markType'],
-        asofdate: this.getAsOfDate()
-      },
-      width: '90vw',
-      height: '80vh'
-    })
+    }
   }
 
   runActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
@@ -278,7 +287,7 @@ export class ValuationGridService {
     let node: RowNode = event.node;
     node.data['overrideDate'] = getFinalDate(new Date(this.getAsOfDate()));
 
-    let marktype: string = node.data?.['markType'];
+    let marktype: string = node.data?.['markType'].toLowerCase();
 
     if(marktype === 'hedging mark'){
       node.data['showIsReviewed'] = -1;
