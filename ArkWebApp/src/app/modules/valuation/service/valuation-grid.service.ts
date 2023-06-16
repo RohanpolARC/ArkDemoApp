@@ -325,7 +325,7 @@ export class ValuationGridService {
     node.data['currentYieldCurveSpread'] = this.getBenchmarkIndexes()[index]?.['currentYieldCurveSpread'];
     node.data['currentCreditSpread'] = this.getBenchmarkIndexes()[index]?.['currentBenchmarkSpread'];
 
-    node.data['deltaSpreadDiscount'] = (node.data?.['currentYieldCurveSpread'] ?? 0.0) - (node.data?.['currentCreditSpread'] ?? 0.0)
+    node.data['deltaSpreadDiscount'] = (node.data?.['currentCreditSpread'] ?? 0.0) - (node.data?.['initialCreditSpread'] ?? 0.0)
     this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
   }
 
