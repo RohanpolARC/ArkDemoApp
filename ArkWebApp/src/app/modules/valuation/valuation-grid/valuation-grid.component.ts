@@ -105,10 +105,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
     let r = [];
     this.gridApi.forEachNodeAfterFilter((node) => r.push(node.data));
 
-    // if(assets === 'All')
-    //   r = r.filter(row => row['showIsReviewed'] === 0)
-    // else
-      r = r.filter(row => row['showIsReviewed'] !== 1 && row['review'] === true) 
+    r = r.filter(row => row['showIsReviewed'] !== 1 && row['review'] === true) 
 
     let reviewingAssets:{ 
       assetID: number, markType: string, overrideDate: Date /*YYYY-MM-DD */ 
@@ -166,13 +163,13 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'assetTypeName', type: 'abColDefString', hide: true, headerName: 'WSO Asset Type Name' },
       { field: 'expectedDate', type: 'abColDefDate' },
       { field: 'seniority', type: 'abColDefNumber' },
-      { field: 'wsoStatus', type: 'abColDefString', hide: true },
-      { field: 'showIsReviewed', type: 'abColDefNumber', hide: true },
+      // { field: 'wsoStatus', type: 'abColDefString', hide: true },
+      // { field: 'showIsReviewed', type: 'abColDefNumber', hide: true },
       { field: 'reviewedBy', type: 'abColDefString', hide: true },
       { field: 'reviewedOn', type: 'abColDefDate', hide: true },
       { field: 'modifiedBy', type: 'abColDefString', hide: true },
       { field: 'modifiedOn', type: 'abColDefDate', hide: true },
-      { field: 'useModelValuation', type: 'abColDefBoolean', cellRenderer: 'useModelValuationCheckbox', lockPinned: true,
+      { field: 'useModelValuation', type: 'abColDefBoolean', cellRenderer: 'useModelValuationCheckbox', lockPinned: true, maxWidth: 180,
         cellRendererParams: () => {
           return {
             showCheckbox: (params: ICellRendererParams) => { return !!params.data?.['modelValuation'] },
@@ -191,14 +188,12 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           }
         }
       },
-      { field: 'review', type: 'abColDefBoolean', cellRenderer: 'aggridMatCheckboxCellEditor', lockPinned: true,
+      { field: 'review', type: 'abColDefBoolean', cellRenderer: 'aggridMatCheckboxCellEditor', lockPinned: true, maxWidth: 100,
         cellRendererParams: () => {
           return {
             showCheckbox: (params: ICellRendererParams) => { return !(params.data?.['showIsReviewed'] === -1) },
             disableCheckbox: (params: ICellRendererParams) => { return this.gridSvc.isEditing(params.node) || params.data?.['showIsReviewed'] === 1 },
             checkboxChanged: (params: ICellRendererParams, boolVal: boolean) => { 
-              // params.data['showIsReviewed'] = boolVal ? 1 : 0;
-              // params.api.refreshCells({ rowNodes: [params.node], force: true }) 
             },
             defaultVal: (params: ICellRendererParams) => { 
               if(params.data?.['showIsReviewed'] === 1)
@@ -211,7 +206,6 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           }
         }
       },
-      // { field: 'showIsReviewed', type: 'abColDefBoolean' }
     ]
 
     this.gridOptions = {
