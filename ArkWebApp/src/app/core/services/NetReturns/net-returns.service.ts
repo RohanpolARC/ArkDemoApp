@@ -21,6 +21,9 @@ export class NetReturnsService {
 
   private asOfDateMessage = new BehaviorSubject<string>(null)
   currentSearchDate = this.asOfDateMessage.asObservable();
+
+  private saveNetReturns = new BehaviorSubject<any>(null)
+  currentSaveNetReturns = this.saveNetReturns.asObservable();
   
   constructor(private http: HttpClient) { }
 
@@ -40,7 +43,20 @@ export class NetReturnsService {
     this.cashflowTypeMessage.next(cashflowType);
   }
 
-  calculateNetIRR(model: {asOfDate: string, fundHedging: string, calcMethod: string}): Observable<any[]>{
+  changeSaveNetReturns(saveNetReturns:any){
+    this.saveNetReturns.next(saveNetReturns);
+  }
+
+  calculateNetIRR(
+      model: {
+        asOfDate: string, 
+        fundHedging: string, 
+        calcMethod: string,
+        cashflowType: string,
+        saveNetReturns: any,
+        runBy:string
+      }
+    ): Observable<any[]>{
     return this.http.post<any[]>(
       `${APIConfig.FUNDHEDGING_NET_IRR_POST_API}`, model, 
       {

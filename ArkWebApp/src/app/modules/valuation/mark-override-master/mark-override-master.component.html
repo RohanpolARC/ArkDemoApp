@@ -1,0 +1,16 @@
+<h3>Audit Log - Mark Overrides</h3>
+
+<ag-grid-angular
+    style="width: 100%; height: calc(100% - 100px);"
+    class="ag-theme-alpine"
+    [modules]="agGridModules"
+    [gridOptions]="gridOptions"
+    [rowData]="rowData$ | async"
+    [detailCellRendererParams]="detailCellRendererParams"
+    [getRowId]="getRowId"
+>
+</ag-grid-angular>
+
+<mat-dialog-actions align="end">
+    <button type="button" mat-raised-button (click)="onClose()">Close</button>
+</mat-dialog-actions>

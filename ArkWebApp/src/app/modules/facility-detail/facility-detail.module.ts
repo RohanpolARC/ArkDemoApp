@@ -22,6 +22,7 @@ import { DateAdapter } from '@angular/material/core';
 import { CheckboxEditorComponent } from 'src/app/shared/components/checkbox-editor/checkbox-editor.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FacilityDetailRoutingModule } from './facility-detail-routing.module';
+import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,10 @@ import { FacilityDetailRoutingModule } from './facility-detail-routing.module';
     FormsModule,
     MatTooltipModule,
     ReactiveFormsModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+
+    DetailedViewModule,
+
   ],
   providers: [
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  

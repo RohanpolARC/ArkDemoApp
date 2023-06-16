@@ -7,10 +7,10 @@ import { AccessService } from './core/services/Auth/access.service';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { MsalUserService } from './core/services/Auth/msaluser.service';
-import { environment } from 'src/environments/environment';
 import { MsalBroadcastService } from '@azure/msal-angular';
-import { filter } from 'rxjs/operators';
 import { AuthenticationResult, EventMessage, EventType } from '@azure/msal-browser';
+import { MatIconRegistry } from '@angular/material/icon';
+import { DomSanitizer } from '@angular/platform-browser';
 
 let lastClickedTabRoute :string
 // var count = 0 
@@ -65,6 +65,7 @@ export class AppComponent {
   NetReturnsStyle: any = {};
   AUMDeltaStyle: any = {};
   MarkChangeStyle:any = {};
+  ValuationStyle: any = {};
 
   funds
   fundHedgings
@@ -81,8 +82,12 @@ export class AppComponent {
     public accessService: AccessService,
     private router:Router,
     private msalSvc: MsalUserService,
-    private msalBroadcastSvc: MsalBroadcastService
-  ) {}   
+    private msalBroadcastSvc: MsalBroadcastService,
+    private matIconRegistry: MatIconRegistry,
+    private domSanitizer: DomSanitizer
+  ) {
+    this.matIconRegistry.addSvgIcon('trigger', this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/img/trigger.svg"))
+  }   
 
   get getAccessibleTabs(){
     return this.accessService.accessibleTabs;
@@ -220,6 +225,9 @@ export class AppComponent {
     else if(this.location.path() === '/mark-changes'){
       this.updateSelection('Mark Changes')
     }
+    else if(this.location.path() === '/valuation'){
+      this.updateSelection('Valuation')
+    }
     else this.updateSelection('')
   }
 
@@ -235,7 +243,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle=this.HedgingMarkStyle=this.AUMDeltaStyle = this.NetReturnsStyle = this.MarkChangeStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle=this.HedgingMarkStyle=this.AUMDeltaStyle = this.NetReturnsStyle = this.MarkChangeStyle = this.ValuationStyle = this.notSelectedElement;
 
     if(screen === 'GIREditor'){
       this.GIREditorStyle = this.selectedElement;
@@ -300,8 +308,6 @@ export class AppComponent {
       this.subscriptions.push(this.dataService.getUniqueValuesForField('fundHedging').subscribe({
         next: (d: any[]) => {
           this.fundHedgings = d.map(i => { return { fundHedging: i.value, id: i.id } })
-        // Don't have to apply filter automatically here
-        // setTimeout(() => { this.filterApply() }, 250)    
       }}))
       this.router.navigate(['/net-returns'])
     }
@@ -311,7 +317,6 @@ export class AppComponent {
         this.dataService.getUniqueValuesForField('Fee-Calculation-Entities').subscribe({
           next: (data: any[]) => {
             this.entities = data.map(item => { return { entity: item.value, id: item.id } })
-        // setTimeout(() => { this.filterApply() }, 250)
           }
         })
       )
@@ -365,6 +370,15 @@ export class AppComponent {
     else if(screen === 'Mark Changes'){
       this.MarkChangeStyle = this.selectedElement;
       this.router.navigate(['/mark-changes'])
+    }
+    else if(screen === 'Valuation'){
+      this.ValuationStyle = this.selectedElement;
+      this.subscriptions.push(
+        this.dataService.getUniqueValuesForField('fund').subscribe({
+          next: (data: any[]) => {
+            this.funds = data.map(item => { return { fund: item.value, id: item.id } })
+      }}))
+      this.router.navigate(['/valuation'])
     }
   }
 }

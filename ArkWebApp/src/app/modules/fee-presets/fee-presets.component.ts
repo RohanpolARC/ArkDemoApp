@@ -283,4 +283,10 @@ export class FeePresetsComponent implements OnInit {
 
     this.subscriptions.push(dialogRef.afterClosed().subscribe())
   }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub=>{
+      sub.unsubscribe();
+    })
+  }
 }

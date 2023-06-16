@@ -1,12 +1,12 @@
-<span [hidden]="(componentParent.getSelectedRowID() === params.node.rowIndex)" (click)="onEditClick()">
+<span [hidden]="params.node.data?.['editing']" (click)="onEditClick()">
     <mat-icon [ngStyle]="{color:'#285170','cursor':'pointer'}" >edit</mat-icon>
 </span>
-<span [hidden]="!(componentParent.getSelectedRowID() === params.node.rowIndex)" (click)="onSave()">
+<span [hidden]="!(params.node.data?.['editing'])" (click)="onSave()">
     <mat-icon [ngStyle]="{'margin-left': '15px', color:'#0590ca','cursor':'pointer'}">save</mat-icon>
 
 </span>
 
-<span [hidden]="!(componentParent.getSelectedRowID() === params.node.rowIndex)" (click)="undoEdit()">
+<span [hidden]="!(params.node.data?.['editing'])" (click)="undoEdit()">
     <mat-icon [ngStyle]="{'margin-left':'15px',color:'#102439','cursor':'pointer'}">cancel</mat-icon>
 </span>
 

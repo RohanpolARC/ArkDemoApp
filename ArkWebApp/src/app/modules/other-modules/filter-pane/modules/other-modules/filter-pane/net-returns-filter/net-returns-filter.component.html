@@ -42,3 +42,13 @@
         >
     </app-multi-select>
 </div>
+
+<div class="element">
+    Save Net Returns
+    <mat-slide-toggle
+        [color] = "'primary'"
+        [(ngModel)] = "saveNetReturns"
+        (ngModelChange) = "onSaveNetReturnsChange($event)"
+    >
+    </mat-slide-toggle>
+  </div>
