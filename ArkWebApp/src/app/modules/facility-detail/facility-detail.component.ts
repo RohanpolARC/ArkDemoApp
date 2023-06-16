@@ -2,18 +2,21 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable/types';
 import { Subscription } from 'rxjs';
 import { FacilityDetailService } from 'src/app/core/services/FacilityDetails/facility-detail.service';
-import { removeDecimalFormatter, formatDate,DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm,CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER } from 'src/app/shared/functions/formatter';
+import { removeDecimalFormatter, formatDate,DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm,CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, BLANK_DATETIME_FORMATTER_CONFIG } from 'src/app/shared/functions/formatter';
 import { ActionCellRendererComponent } from './action-cell-renderer.component';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { AggridMaterialDatepickerComponent } from './aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { DataService } from 'src/app/core/services/data.service';
 import { CheckboxEditorComponent } from 'src/app/shared/components/checkbox-editor/checkbox-editor.component';
-import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/utilities';
+import { setSharedEntities, getSharedEntities, getLastBusinessDay, getMomentDateStr } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
-import { CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, GridOptions, ICellRendererParams, Module } from '@ag-grid-community/core';
+import { CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, GridOptions, ICellRendererParams, Module, PostSortRowsParams, RowNode } from '@ag-grid-community/core';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
-import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
+import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
+import { ActionColumnContext, AdaptableButton } from '@adaptabletools/adaptable-angular-aggrid';
+import { MatDialog } from '@angular/material/dialog';
+import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
 
 @Component({
   selector: 'app-facility-detail',
@@ -43,10 +46,14 @@ export class FacilityDetailComponent implements OnInit {
   gridApi: GridApi
   gridColumnApi
   params
-  actionClickedRowID: number = null;
   isWriteAccess: boolean = false;
   rowData: any[] = [];
   dealTypesCS: string[];
+
+  lockedit:boolean=false
+
+
+  
 
   AMOUNT_COLUMNS = [
     'maturityPrice',
@@ -69,21 +76,24 @@ export class FacilityDetailComponent implements OnInit {
     'unfundedMargin',
   'floorRate']
   noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
+  prevRowIndex: number;
 
   constructor(private facilityDetailsService: FacilityDetailService,
     private accessService: AccessService,
-    private dataSvc: DataService) { }
+    private dataSvc: DataService,
+    public dialog: MatDialog
+    ) { }
 
 
   editableCellStyle = (params) => {
-    return (params.rowIndex === this.actionClickedRowID) ? 
+    return (params.node.data?.['editing']) ? 
     {
       'border-color': '#0590ca',
     } : null
   }
 
   isEditable = (params: EditableCallbackParams) => {
-    return params.node.rowIndex === this.actionClickedRowID
+    return params.node.data?.['editing']
   } 
 
   checkValidation(newVal: any, columnID: string, rowData: any){
@@ -151,6 +161,45 @@ export class FacilityDetailComponent implements OnInit {
 
     this.toggleIsOverrideCheckbox(params, newVal, column);
     this.checkValidation(newVal, column, params.data);
+ 
+    let node  = this.getEditingRow()
+    this.gridApi.setFocusedCell(node?.rowIndex,column)
+  }
+
+
+  //We are using this function to maintain position of Editing Rownode when sort is activated on Editable column.
+  // Issue - ag grid sorts the column values before user can save the edited value.
+  //https://www.ag-grid.com/angular-data-grid/row-sorting/ => Post-Sort
+  postSortRows(params:PostSortRowsParams) {
+    let rowNodes = params.nodes;
+
+    if(rowNodes){
+      for (let i = 0; i < rowNodes.length; i++) {
+          if (!!rowNodes[i].data?.editing) {
+              rowNodes.splice(params.context.componentParent.prevRowIndex, 0, rowNodes.splice(i, 1)?.[0]);
+          }
+      }
+    }
+  };
+
+  getEditingRow(){
+    let node :RowNode
+    this.gridApi?.forEachNode(rownode=>{
+      if (rownode.data['editing'] === true){
+        node = rownode
+      }
+    });
+    if(node){
+      this.prevRowIndex = node.rowIndex
+    }
+    return node
+  }
+
+  clearEditingState(){
+    this.lockedit = false
+    let node = this.getEditingRow()
+    delete node?.data?.['editing']
+    this.prevRowIndex = null
   }
 
   onCheckboxChange(params: ICellRendererParams){
@@ -170,16 +219,6 @@ export class FacilityDetailComponent implements OnInit {
     }
   }
 
-  setSelectedRowID(rowID: number){
-    this.actionClickedRowID = rowID;
-    if(this.actionClickedRowID === null){
-      this.gridApi?.stopEditing(true);
-    }
-  }
-
-  getSelectedRowID(){
-    return this.actionClickedRowID;
-  }
 
   onGridReady(params) {
     this.gridApi = params.api;
@@ -247,6 +286,7 @@ export class FacilityDetailComponent implements OnInit {
       { field: 'dealType', type: 'abColDefString' },
       { field: 'dealTypeCS', type: 'abColDefString', cellEditor: 'autocompleteCellEditor',        
       editable: this.isEditable, filter: false,
+
       cellStyle: this.editableCellStyle,
       cellEditorParams: () => { 
         return {
@@ -256,8 +296,6 @@ export class FacilityDetailComponent implements OnInit {
       { field: 'expectedDate', 
         maxWidth: 150,
         width: 150,
-      //  valueFormatter: dateFormatter, 
-  
         editable: this.isEditable,filter: false,
         cellEditor: 'agGridMaterialDatepicker',
         cellStyle: this.editableCellStyle,
@@ -265,7 +303,6 @@ export class FacilityDetailComponent implements OnInit {
       },
       { field: 'expectedPrice', 
         width: 140,
-         
         cellClass: 'ag-right-aligned-cell', 
         editable: this.isEditable,filter: false,
         cellStyle: this.editableCellStyle, type: 'abColDefNumber'
@@ -292,7 +329,7 @@ export class FacilityDetailComponent implements OnInit {
         cellRenderer: 'agGridCheckboxRenderer',
         cellRendererParams: () => {
           return {
-            editableRowID: this.getSelectedRowID(),
+            editableRowID: this.getEditingRow()?.rowIndex,
             onCheckboxcolChanged: this.onCheckboxChange
           }
         },
@@ -344,7 +381,7 @@ export class FacilityDetailComponent implements OnInit {
 
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if(isHit){
-        this.setSelectedRowID(null);
+        this.clearEditingState();
 
         if(this.funds != null && this.asOfDate != null){
           this.gridOptions?.api?.showLoadingOverlay();
@@ -404,6 +441,8 @@ export class FacilityDetailComponent implements OnInit {
       },
     }
 
+
+
     this.adaptableOptions = {
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'assetID',
@@ -425,6 +464,59 @@ export class FacilityDetailComponent implements OnInit {
         ]
       },
 
+      actionOptions:{
+        actionColumns:[
+          {
+            columnId:'Audit',
+            friendlyName:' ',
+            includeGroupedRows:false,
+            actionColumnSettings:{
+              suppressMenu: true,
+              suppressMovable: true,
+              resizable: true
+            },
+            actionColumnButton:[
+              {
+                onClick:(
+                  button:AdaptableButton<ActionColumnContext>,
+                  context:ActionColumnContext
+                )=>{
+                  if(this.lockedit){
+                    this.dataSvc.setWarningMsg('Please save the existing entry', 'Dismiss', 'ark-theme-snackbar-warning')  
+                  }else{
+                    let m = <DetailedView>{};
+                    m.screen = 'Asset Browser';
+                    m.param1 = String(context.rowNode.data.assetID);
+                    m.param2 = '';
+                    m.param3 = ''
+                    m.param4 = '';
+                    m.param5 = '';
+                    m.strParam1 = []
+  
+  
+                    const dialogRef = this.dialog.open(DefaultDetailedViewPopupComponent,{
+                      data:{
+                        detailedViewRequest: m,
+                        noFilterSpace:true,
+                        grid: 'Asset Browser'
+                      },
+                      width: '90vw',
+                      height: '80vh'
+                    })
+                  }
+                },
+                icon:{
+                  src: '../assets/img/info.svg',
+                  style: {
+                    height: 25, width: 25
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+
       predefinedConfig: {
         Dashboard: {
           ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
@@ -433,7 +525,7 @@ export class FacilityDetailComponent implements OnInit {
           Revision: 3
         },
         Layout:{
-          Revision: 8,
+          Revision: 9,
           CurrentLayout: 'Basic Facility Detail',
           Layouts: [{
             Name: 'Basic Facility Detail',
@@ -478,17 +570,23 @@ export class FacilityDetailComponent implements OnInit {
               'modifiedBy',
               'modifiedOn',
               'Action',
+              'Audit'
             ],
             PinnedColumnsMap:{
               issuerShortName: 'left',
               asset: 'left',
-              Action: 'right'
+              Action: 'right',
+              Audit:'right'
+            },
+            ColumnWidthMap:{
+              'Audit':75
             }
           }]
         },
         FormatColumn: {
-          Revision: 6,
+          Revision: 7,
           FormatColumns:[
+            BLANK_DATETIME_FORMATTER_CONFIG(['modifiedOn']),
             DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn']),
             CUSTOM_FORMATTER([...this.AMOUNT_COLUMNS],['amountFormatter']),
 
@@ -497,6 +595,8 @@ export class FacilityDetailComponent implements OnInit {
       }
     }
    }
+
+
 
    onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApi = adaptableApi;

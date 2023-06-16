@@ -29,6 +29,9 @@ export class NetReturnsFilterComponent implements OnInit {
   preselectedFundhedgings
   preselectedCalcmethods
   preselectedCashflowTypes
+
+  saveNetReturns: any;
+
   
   constructor(private netReturnsSvc: NetReturnsService) { }
 
@@ -38,6 +41,9 @@ export class NetReturnsFilterComponent implements OnInit {
     this.cashflowTypeSettings = { ...this.dropdownSettings, ...{textField: 'cashflowType'}}
     this.asOfDate = getMomentDateStr(getLastBusinessDay());
     this.onAsOfDateChange(this.asOfDate)
+
+    this.saveNetReturns = false
+    this.onSaveNetReturnsChange(this.saveNetReturns)
   }
 
   // ngOnChanges getting called before OnInit
@@ -67,5 +73,9 @@ export class NetReturnsFilterComponent implements OnInit {
 
   onCashflowTypeChange(value){
     this.netReturnsSvc.changeCashflowType(value?.map(v => v.cashflowType)?.[0])
+  }
+
+  onSaveNetReturnsChange(value){
+    this.netReturnsSvc.changeSaveNetReturns(value)
   }
 }

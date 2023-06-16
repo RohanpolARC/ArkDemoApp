@@ -344,9 +344,18 @@ export function CUSTOM_DISPLAY_FORMATTERS_CONFIG(id,columnIds:any[]=[]){
             }
             else return ""
         }
-    }else if(id==='attributeValueFormatter'){
-        handlerFunc = (customDisplayFormatterContext:CustomDisplayFormatterContext)=>{
-            
+    }else if(id==='fxFormatter'){
+        handlerFunc =(customDisplayFormatterContext: CustomDisplayFormatterContext)=>{
+            let curretValue: any = customDisplayFormatterContext.cellValue
+            if(curretValue!=undefined && Number(Number(curretValue).toFixed(16))!=0    ){
+                if(Number.isInteger(Number(Number(curretValue).toFixed(16)))){         // Don't show trailing 0's if number rounded off to 2 decimals is an integer
+                    return Number(curretValue).toFixed(0)
+                }
+                else{
+                    return Number(curretValue).toFixed(16)
+                }
+            }
+            else return "-"
         }
     }
 

@@ -64,4 +64,10 @@ export class MarkChangesFilterComponent implements OnInit {
     }, 0)
   }
 
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub=>{
+      sub.unsubscribe();
+    })
+  }
+
 }

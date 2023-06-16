@@ -140,4 +140,10 @@ export class MonthlyReturnsComponent implements OnInit {
     }
   }
 
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub=>{
+      sub.unsubscribe();
+    })
+  }
+
 }
