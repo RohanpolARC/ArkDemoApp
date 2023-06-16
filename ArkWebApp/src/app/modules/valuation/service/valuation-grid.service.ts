@@ -211,7 +211,9 @@ export class ValuationGridService {
         data: {
           detailedViewRequest: req,
           noFilterSpace: true,
-          grid: 'Valuation-Hedging Mark'
+          grid: 'Valuation-Hedging Mark',
+          header: 'Audit Log - Hedging Mark'
+
         },
         width: '90vw',
         height: '80vh'

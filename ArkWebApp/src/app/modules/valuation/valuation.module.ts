@@ -13,6 +13,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MarkOverrideMasterComponent } from './mark-override-master/mark-override-master.component';
 import { AggridMatCheckboxEditorModule } from 'src/app/shared/modules/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor.module';
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,9 @@ import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detaile
     MatIconModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    AggridMatCheckboxEditorModule, DetailedViewModule
+    MatDialogModule,
+    AggridMatCheckboxEditorModule, 
+    DetailedViewModule
   ],
   providers: [
     ValuationGridService

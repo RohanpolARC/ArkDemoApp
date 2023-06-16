@@ -157,4 +157,8 @@ export class MarkOverrideMasterComponent implements OnInit {
   isRowMaster: IsRowMaster = (nData: any) => {
     return nData ? nData?.['isReviewed'] : false;
   }
+
+  onClose(){
+    this.dialogRef.close()
+  }
 }
