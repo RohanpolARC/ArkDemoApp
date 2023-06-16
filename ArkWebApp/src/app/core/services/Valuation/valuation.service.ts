@@ -13,13 +13,6 @@ import { RESOURCE_CONTEXT } from '../../interceptors/msal-http.interceptor';
 })
 export class ValuationService {
 
-  // private asOfDate = new BehaviorSubject<string>(null);
-  // currentAsOfDate = this.asOfDate.asObservable();
-
-  // changeAsOfDate(asofdate: string){
-  //   this.asOfDate.next(asofdate);
-  // }
-
   private fundsMessage = new BehaviorSubject<any>(null)
   currentfundValues = this.fundsMessage.asObservable();
   

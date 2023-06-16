@@ -33,7 +33,6 @@ export class AggridMatCheckboxEditorComponent implements ICellRendererAngularCom
 
   agInit(params: ICellRendererParams<any, any>): void {
     this.params = params;
-    // this.checked = params.value;
 
     this.initHelperFns(params)
     
@@ -43,17 +42,10 @@ export class AggridMatCheckboxEditorComponent implements ICellRendererAngularCom
   
   refresh(params: ICellRendererParams<any, any>): boolean {
 
+    // In this case, ag-grid will re-create the cell everytime anything happens here. There is not custom refresh logic here, hence false. So, refresh here is just the reinitialisation of the checkbox cell. Hence, it will always call agInit() to refresh the cell value and will use defaultVal() function to assign values. 
+
+    // NOTE: Here, setting the value of the checkbox will be done by defaultVal() at all times. So, implement the value switching logic, if any in this function. 
     return false;
-    // this.params = params;
-    // this.initHelperFns(params);   
-
-    // let colid: string = params.column.getColId();
-    // this.params.data[colid] = params.value
-    // this.checked = params.value;
-
-    // // this.onCheckboxChanged()
-
-    // return true;    // If we use return false, ag grid will reconstruct the cell based on defaultVal()
   }
 
   onModelChanged(boolVal: boolean){
