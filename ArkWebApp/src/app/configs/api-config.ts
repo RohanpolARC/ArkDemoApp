@@ -75,6 +75,8 @@ export class APIConfig {
     public static FEE_RUN_CALCS_API: string = APIConfig.ARK_FEE_FUNCTION_BASEURL + "/api/FeeCalculatorFunction_HttpTrigger";
     public static MONTHLY_RETURNS_CALC_API: string = APIConfig.BASEURL + "/api/MonthlyReturns/GetMonthlyReturn";
 
+    public static RUN_MODEL_VALUATION_API: string = APIConfig.ARK_IRR_FUNCTION_BASEURL + "/api/ValuationFunction_HttpTrigger";
+
     public static FUNDHEDGING_NET_IRR_POST_API: string = APIConfig.ARK_IRR_FUNCTION_BASEURL + "/api/NetIRRCalculatorFunction_HttpTrigger";
 
     public static FEE_PRESET_INVESTMENT_GET_API: string = APIConfig.BASEURL + "/api/FeePresets/GetFundInvestmentData";
@@ -101,4 +103,10 @@ export class APIConfig {
 
     public static MARK_CHANGES_GET_API: string = APIConfig.BASEURL + "/api/MarkChanges/GetMarkChanges";
 
+    public static VALUATION_DATA_GET_API: string = APIConfig.BASEURL + "/api/Valuation/Data";
+    public static VALUATION_DATA_PUT_API: string = APIConfig.BASEURL + "/api/Valuation/PutData";
+    public static VALUATION_REVIEWING_ASSETS_PUT_API: string = APIConfig.BASEURL + "/api/Valuation/PutReviewingAssets";
+    public static VALUATION_AUDIT_MASTER_GET_API: string = APIConfig.BASEURL + "/api/Valuation/GetMasterRows";
+    public static VALUATION_AUDIT_DETAIL_GET_API: string = APIConfig.BASEURL + "/api/Valuation/GetDetailRows";
+    public static VALUATION_SPREAD_BENCHMARK_INDEXES_GET_API: string = APIConfig.BASEURL + "/api/Valuation/GetBenchmarkIndexes";
 }

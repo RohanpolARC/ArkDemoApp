@@ -1,0 +1,50 @@
+<div class="parent">
+    <div class="header">
+        <div class="title">
+            Valuation
+            <span *ngIf = "asOfDate$ | async as dt" style="font-size: 1rem; font-weight: normal;">
+                ({{asofdate.start | date:"dd/MM/yyyy" }} - {{asofdate.end | date:"dd/MM/yyyy"}})
+            </span>
+        </div>
+        <ng-container *ngIf="funds$ | async"></ng-container>
+        <ng-container *ngIf="markTypes$ | async"></ng-container>
+        <div class="action">
+            <div class="d-flex justify-content-between align-items-center">
+                <button mat-raised-button color="primary" matTooltip="Select all for review" (click)="onSelectAllForReview()">Review All</button>
+                <button mat-raised-button matTooltip="Push reviewed marks to WSO" (click)="onPushtoWSO()" matTolltipClass="tooltip-style"> Push to WSO
+                </button>
+                <ng-container *ngIf="runValuationInProgress">
+                    <mat-spinner [diameter]="20" style="margin-right: 10px"></mat-spinner>
+                </ng-container>    
+                <button mat-icon-button matTooltip="Model Valuation" (click)="onTriggerModelValuation()">
+                    <mat-icon svgIcon="trigger"></mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Clear editing state" matTooltipClass="tooltip-style" (click)="clearEditingState()">
+                    <mat-icon class="material-icons-outlined">clear</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <mat-card class="mat-content">
+            <ng-container *ngIf="{value1: rowData$ | async} as rd">
+                    <app-valuation-grid [rowData]="rd.value1"
+                                        [benchmarkIndexes]="benchmarkIndexes"
+                                        [asOfDate]="asofdate?.end"
+                                        [marktypes]="marktypes"
+                                        [modelValuations]="modelValuations$ | async"
+                                        [showLoadingOverlayReq]="showLoadingOverlayReq"
+                                        [clearEditingStateReq]="clearEditingStateReq"
+                                        [setAllAssetsForReviewReq]="setAllAssetsForReviewReq"
+                                        [getReviewingAssetsReq]="getReviewingAssets"
+                                        [reviewedAssets]="reviewedAssets"
+                                        [getFilteredMTMAssetsReq]="getFilteredMTMAssetsReq"
+                                        (filteredMTMAssetsEmitter)="getFilteredMTMAssets($event)"
+                                        (valuationEventEmitter)="triggerRunValuation($event)"
+                                        (reviewingAssetsEmitter)="reviewingAssets($event)"
+                    ></app-valuation-grid>
+            </ng-container>
+        </mat-card>
+    </div>
+</div>

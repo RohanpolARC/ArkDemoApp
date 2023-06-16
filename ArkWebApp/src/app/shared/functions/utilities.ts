@@ -97,6 +97,15 @@ export function getMomentDate(date: Date): Date{
 export function getMomentDateStr(date: Date): string{
   return moment(date).format('YYYY-MM-DD');
 }
+
+export function getFinalDate(date: Date): Date | null{
+  let dt: Date = getMomentDate(date);
+
+  if(dt.getFullYear() <= 1970)
+    return null;
+  return dt;
+}
+
 /**
  * 
  * @returns Returns last business date from today
@@ -111,6 +120,10 @@ export function getLastBusinessDay(){
   return workday.subtract(diff, 'days').toDate();
 }
 
+export function getLastQuarterEnd(){
+  return moment().subtract(1, 'quarter').endOf('quarter').toDate();
+}
+
 export function getRowNodes(node: RowNode, rowNodes: any[] = []){
   /** Get all filtered children nodes recursively (Depth First Search)*/
   if(node.group){
@@ -123,5 +136,3 @@ export function getRowNodes(node: RowNode, rowNodes: any[] = []){
   }
   return rowNodes;
 }
-
-

@@ -92,26 +92,19 @@
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Positions Screen')" [ngStyle]="PositionsScreenStyle">
           <div class="list-item-text">Positions</div>
         </mat-list-item>
-      </mat-list>
-
-      <mat-list>
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Hedging Mark')" [ngStyle]="HedgingMarkStyle">
           <div class="list-item-text">Valuation/Hedging Mark</div>
         </mat-list-item>
-      </mat-list>
-
-      <mat-list>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Valuation')" [ngStyle]="ValuationStyle" >
+          <div class="list-item-text">Valuation</div>
+        </mat-list-item>
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('AUM Delta')" [ngStyle]="AUMDeltaStyle">
           <div class="list-item-text">AUM Delta</div>
         </mat-list-item>
-      </mat-list>
-
-      <mat-list>
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Mark Changes')" [ngStyle]="MarkChangeStyle">
           <div class="list-item-text">Mark Changes</div>
         </mat-list-item>
       </mat-list>
-
     </mat-expansion-panel>
   </mat-accordion>
 
@@ -191,7 +184,7 @@
       <button mat-raised-button id="apply-button"  
         *ngIf="[
         '/facility-detail', '/liquidity-summary', '/fee-calculation', '/management-fee',
-        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/hedging-mark','/aum-delta', '/net-returns','/mark-changes'].includes(location.path())" 
+        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/hedging-mark','/aum-delta', '/net-returns','/mark-changes','/valuation'].includes(location.path())" 
         (click)="filterApply()">Apply</button>
     </div>
 
@@ -245,6 +238,10 @@
 
     <div *ngIf="location.path() === '/mark-changes'" class="filter-element">
       <app-mark-changes-filter></app-mark-changes-filter>
+    </div>
+
+    <div *ngIf="location.path() === '/valuation'" class="filter-element">
+      <app-valuation-filter [funds] = "funds"></app-valuation-filter>
     </div>
 
   </mat-sidenav>
