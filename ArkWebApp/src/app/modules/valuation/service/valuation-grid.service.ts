@@ -93,6 +93,11 @@ export class ValuationGridService {
   editActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
     if(this.lockEdit){
       this.dataSvc.setWarningMsg(`An asset is already in editing state`,`Dismiss`,`ark-theme-snackbar-warning`)
+      return;
+    }
+    else if(context.rowNode.data?.['showIsReviewed'] != 1 && context.rowNode.data?.['review']){
+      this.dataSvc.setWarningMsg(`Please complete/discard the review first`);
+      return;
     }
     else {
       this.lockEdit = true;
