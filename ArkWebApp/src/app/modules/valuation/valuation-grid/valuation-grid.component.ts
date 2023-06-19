@@ -178,9 +178,12 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
               if(boolVal){
                 params.data['oldOverride'] = params.data?.['override'];
                 params.data['override'] = params.data?.['modelValuation'];
+                params.data['oldShowIsReviewed'] = params.data?.['showIsReviewed'];
+                params.data['showIsReviewed'] = 0;
               }
               else{
                 params.data['override'] = params.data?.['oldOverride'];
+                params.data['showIsReviewed'] = params.data['oldShowIsReviewed']; // need to reset it to the original value if useModelValuation was mistakenly ticked previously and now is being reverted back.
               }
               this.adaptableApi.gridApi.refreshCells([params.node], this.columnDefs.map(col => col.field))
             },

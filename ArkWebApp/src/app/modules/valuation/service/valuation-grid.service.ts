@@ -391,7 +391,8 @@ export class ValuationGridService {
     let updatedData: any[] = []
     for(let i: number = 0; i < nodes.length; i+= 1){
       let data = nodes[i].data;
-      data = { ...data, ...valMap[data?.['assetID']], 'usedSpreadDiscount': valMap[data?.['assetID']]?.['deltaSpreadDiscount'] };
+      data = { ...data, ...valMap[data?.['assetID']], 'usedSpreadDiscount': valMap[data?.['assetID']]?.['deltaSpreadDiscount'], 'useModelValuation': false };
+      // Not updating showIsReviewed as that is dependent on the value of the actual override cell which is not affected by this update.
       updatedData.push(data);
     }
 
