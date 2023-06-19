@@ -4,12 +4,13 @@ import { CashBalanceService } from 'src/app/core/services/CashBalance/cash-balan
 import { DataService } from 'src/app/core/services/data.service';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import {  CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy, BLANK_DATETIME_FORMATTER_CONFIG } from 'src/app/shared/functions/formatter';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import {  getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { ColDef, ColumnApi, GridApi, GridOptions, Module } from '@ag-grid-community/core';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
+import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 
 @Component({
   selector: 'app-cash-balance',
@@ -75,7 +76,8 @@ export class CashBalanceComponent implements OnInit {
   adaptableOptions: AdaptableOptions;
 
   constructor(private cashBalanceSvc: CashBalanceService,
-    private dataSvc: DataService) {
+    private dataSvc: DataService,
+    private filterSvc:GeneralFilterService) {
     
     this.gridOptions = {
       enableRangeSelection: true,
@@ -174,6 +176,18 @@ export class CashBalanceComponent implements OnInit {
 
   ngOnInit(): void {
     this.rowData = [];
+
+    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe((data)=>{
+      if(data){
+        if(data.id===121){
+          this.sDate = data.value
+          if(this.sDate.end === 'Invalid date')
+            this.sDate.end = this.sDate.start;
+          this.cashBalanceSvc.changeSearchDateRange(this.sDate);
+  
+        }
+      }
+    }))
 
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if(isHit){

@@ -53,6 +53,8 @@ export class APIConfig {
     public static REFDATA_GET_UNIQUE_VALUES_API: string = APIConfig.BASEURL + "/api/GetRef/GetUnqiueValuesForField";
     public static REFDATA_GET_FUNDHEDGINGS_API: string = APIConfig.BASEURL + "/api/GetRef/GetFundHedgings";
     public static REFDATA_GET_WSOPORTFOLIO_API: string = APIConfig.BASEURL + "/api/GetRef/GetWSOPortfolioRef";
+    public static REFDATA_GET_FILTER_CONFIG_API: string = APIConfig.BASEURL + "/api/GetRef/GetFilterConfig";
+
 
     public static IRR_POSITIONS_GET_API: string = APIConfig.BASEURL + "/api/IRRCalculation/GetPositions";
     public static IRR_PORTFOLIO_MODEL_PUT_API: string = APIConfig.BASEURL + "/api/IRRCalculation/PutModel";

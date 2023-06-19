@@ -6,8 +6,9 @@ import { DataService } from 'src/app/core/services/data.service';
 import { PositionScreenService } from 'src/app/core/services/PositionsScreen/positions-screen.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import {   BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { getMomentDateStr, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import {  AMOUNT_COLUMNS_LIST, DATE_COLUMNS_LIST, GRID_OPTIONS, POSITIONS_COLUMN_DEF } from './grid-structure';
+import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 
 @Component({
   selector: 'app-positions-screen',
@@ -31,7 +32,8 @@ export class PositionsScreenComponent implements OnInit {
 
   constructor(
     public dataSvc:DataService,
-    public positionScreenSvc: PositionScreenService
+    public positionScreenSvc: PositionScreenService,
+    private filterSvc: GeneralFilterService
   ) { }
 
   getPositionsData(){
@@ -64,6 +66,14 @@ export class PositionsScreenComponent implements OnInit {
 
 
   ngOnInit(): void {
+
+    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
+      if(data){
+        if(data.id === 311){
+          this.positionScreenSvc.changeSearchDate(getMomentDateStr(data.value))
+        }
+      }
+    }))
 
     this.columnDefs=[
       ...POSITIONS_COLUMN_DEF

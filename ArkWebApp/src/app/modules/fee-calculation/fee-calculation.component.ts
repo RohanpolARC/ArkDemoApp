@@ -5,6 +5,8 @@ import { Subject, Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { FeeCalculationService } from 'src/app/core/services/FeeCalculation/fee-calculation.service';
+import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
+import { getMomentDateStr } from 'src/app/shared/functions/utilities';
 
 @Component({
   selector: 'app-fee-calculation',
@@ -31,10 +33,21 @@ export class FeeCalculationComponent implements OnInit {
   status: 'Loading' | 'Loaded' | 'Failed'
   constructor(
     private dataSvc: DataService,
-    public feeCalcSvc: FeeCalculationService
+    public feeCalcSvc: FeeCalculationService,
+    private filterSvc: GeneralFilterService
   ) {}
 
   ngOnInit(): void {
+
+    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
+      if(data){
+        if(data.id===421){
+          this.feeCalcSvc.changeEntityValue(data.value?.[0].value)
+        }else if(data.id === 422){
+          this.feeCalcSvc.changeSearchDate(getMomentDateStr(data.value))
+        }
+      }
+    }))
 
     this.subscriptions.push(this.feeCalcSvc.currentSearchDate.subscribe(asOfDate => {
       this.asOfDate = asOfDate

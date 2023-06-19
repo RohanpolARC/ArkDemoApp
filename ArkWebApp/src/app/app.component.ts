@@ -260,66 +260,32 @@ export class AppComponent {
     else if(screen === 'Facility Detail'){
 
       this.FacilityDetailStyle = this.selectedElement
-      this.subscriptions.push(
-        this.dataService.getUniqueValuesForField('fund').subscribe({
-          next: (data: any[]) => {
-            this.funds = data.map(item => { return { fund: item.value, id: item.id } })
-        setTimeout(() => { this.filterApply() }, 250)
-      }}))
+      setTimeout(() => { this.filterApply() }, 250)
+
 
       this.router.navigate(['/facility-detail'])
     }
     else if(screen === 'Contract History'){
 
       this.ContractHistoryStyle = this.selectedElement;
-      this.subscriptions.push(
-        this.dataService.getUniqueValuesForField('fund').subscribe({
-          next: (data: any[]) => {
-            this.funds = data.map(item => { return { fund: item.value, id: item.id } })
-        setTimeout(() => { this.filterApply() }, 250)
-      }}))
+
+      setTimeout(() => { this.filterApply() }, 250)
 
       this.router.navigate(['/contract-history'])
     }
     else if(screen === 'Liquidity Summary'){
       this.LiquiditySummaryStyle = this.selectedElement;
-      this.subscriptions.push(
-        this.dataService.getUniqueValuesForField('fundHedging').subscribe({
-          next: (data: any[]) => {
-            this.fundHedgings = data.map(item => { return { fundHedging: item.value, id: item.id } })
-        setTimeout(() => { this.filterApply() }, 250)
-      }}))
+      setTimeout(() => { this.filterApply() }, 250)
 
       this.router.navigate(['/liquidity-summary'])
     }
     else if(screen === 'Net Returns'){
       this.NetReturnsStyle = this.selectedElement;
 
-      this.calcMethods = [
-        { id: 1, calcMethod: 'IRR' },
-        { id: 2, calcMethod: 'Dietz' }
-      ]
-
-      this.cashflowTypes = [
-        { id: 1, cashflowType: 'Actual' },
-        { id: 2, cashflowType: 'Expected' }
-      ]
-
-      this.subscriptions.push(this.dataService.getUniqueValuesForField('fundHedging').subscribe({
-        next: (d: any[]) => {
-          this.fundHedgings = d.map(i => { return { fundHedging: i.value, id: i.id } })
-      }}))
       this.router.navigate(['/net-returns'])
     }
     else if(screen === 'Performance Fees'){
       this.PerformanceFeesStyle = this.selectedElement;
-      this.subscriptions.push(
-        this.dataService.getUniqueValuesForField('Fee-Calculation-Entities').subscribe({
-          next: (data: any[]) => {
-            this.entities = data.map(item => { return { entity: item.value, id: item.id } })
-          }
-        })
-      )
       this.router.navigate(['/fee-calculation'])
     }
     else if(screen === 'Portfolio Modeller'){
@@ -373,11 +339,6 @@ export class AppComponent {
     }
     else if(screen === 'Valuation'){
       this.ValuationStyle = this.selectedElement;
-      this.subscriptions.push(
-        this.dataService.getUniqueValuesForField('fund').subscribe({
-          next: (data: any[]) => {
-            this.funds = data.map(item => { return { fund: item.value, id: item.id } })
-      }}))
       this.router.navigate(['/valuation'])
     }
   }

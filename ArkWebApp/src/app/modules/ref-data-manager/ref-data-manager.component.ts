@@ -14,6 +14,7 @@ import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/u
 import { NoRowsCustomMessages, RefDataProc } from 'src/app/shared/models/GeneralModel';
 import { AddRefDataFormComponent } from './add-ref-data-form/add-ref-data-form.component';
 import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
+import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 
 
 @Component({
@@ -128,12 +129,22 @@ export class RefDataManagerComponent implements OnInit {
     private refDataManagerSvc: RefDataManagerService,
     private accessSvc: AccessService,
     private dataSvc: DataService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private filterSvc: GeneralFilterService
   ) { }
 
   changeListeners(){
+    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
+      if(data){
+        if(data.id === 621){
+          if(data.value?.[0]?.value!==null && data.value?.[0]?.value!==undefined){
+            this.refDataManagerSvc.changeFilterValues([data.value?.[0]?.value])
+          }
+        }
+      }
+    }))
     this.subscriptions.push(this.refDataManagerSvc.currentFilterValues.subscribe(value=>{
-      if(value[0] === undefined){
+      if(value?.[0] === undefined){
         this.filterValue = 'undefined'
         this.dataSvc.setWarningMsg('Select Proper Filter', 'Dismiss', 'ark-theme-snackbar-warning')
       }else{
@@ -170,92 +181,94 @@ export class RefDataManagerComponent implements OnInit {
       }
 
       this.gridApi?.showLoadingOverlay()
-
-      this.subscriptions.push(
-        forkJoin(
-          [
-            this.dataSvc.getGridDynamicColumns(filterType[0]),
-            this.refDataManagerSvc.getRefData(filterType[0])
-          ])
-          .subscribe({
-          next: data=>{
-          let refData = data[1]
-          let dynamicColumns = parseFetchedData(data[0])
-
-          this.preSelectedColumns = dynamicColumns.filter(r=>r?.['IsDefault']==='True').map(r=>r?.['Column'].toLowerCase())
-          let doNotFormat :string[] = dynamicColumns.filter(r=>r?.['EscapeGridFormat']==='True').map(r=>r?.['Column'].toLowerCase());
-
-          this.DATETIME_COLUMNS = dynamicColumns.filter(r => (r?.['DataType'] === 'Date' && r?.['Column']==='CreatedOn' || r?.['Column']==='ModifiedOn')).map(r => r?.['Column']);
-
-          this.columnDefs = createColumnDefs(
-            refData[0].columnValues,
+      if(filterType!=null){
+        this.subscriptions.push(
+          forkJoin(
             [
-              ...GENERAL_FORMATTING_EXCEPTIONS,
-              ...doNotFormat,
-            ],
-            ['createdOn','modifiedOn']
-          )
-
-
-          this.rowRefData = parseFetchedData(refData)
-          this.gridApi?.setColumnDefs(this.columnDefs);
-
-          //this.gridColumnApi?.autoSizeAllColumns(true);
-
-          this.gridApi?.hideOverlay();
-
-          let selectedColDef: ColDef[] = [];
-          this.preSelectedColumns.forEach(colName => {
-            let colDefs:ColDef[] = this.columnDefs.filter(def =>{
-              return def.field.toLowerCase() === colName
-            })
-            if(colDefs.length > 1){
-              console.warn(`Duplicate columnDefs for field: ${colName}`)
-            }
-            if(colDefs.length > 0)
-              selectedColDef.push(colDefs[0])
-          })
-
-
-          //saveAndSetLayout(selectedColDef,this.adaptableApi);
-          if(filterType[0] === 'Attribute Fixing' )
-            this.adaptableOptions.primaryKey = 'AttributeId'
-          this.layout = {
-            Revision:1,
-            CurrentLayout: 'Default Layout',
-            Layouts: [{
-              Name: 'Default Layout',
-              Columns: [ 
-                'AttributeName',
-                'AttributeLevel',
-                'AttributeType',
-                'CreatedOn',
-                'CreatedBy','ActionDelete'],
-              PinnedColumnsMap: { 
-                ActionDelete:'right' 
-              },
-              ColumnWidthMap: {
-                ActionDelete: 18
+              this.dataSvc.getGridDynamicColumns(filterType[0]),
+              this.refDataManagerSvc.getRefData(filterType[0])
+            ])
+            .subscribe({
+            next: data=>{
+            let refData = data[1]
+            let dynamicColumns = parseFetchedData(data[0])
+  
+            this.preSelectedColumns = dynamicColumns.filter(r=>r?.['IsDefault']==='True').map(r=>r?.['Column'].toLowerCase())
+            let doNotFormat :string[] = dynamicColumns.filter(r=>r?.['EscapeGridFormat']==='True').map(r=>r?.['Column'].toLowerCase());
+  
+            this.DATETIME_COLUMNS = dynamicColumns.filter(r => (r?.['DataType'] === 'Date' && r?.['Column']==='CreatedOn' || r?.['Column']==='ModifiedOn')).map(r => r?.['Column']);
+  
+            this.columnDefs = createColumnDefs(
+              refData[0].columnValues,
+              [
+                ...GENERAL_FORMATTING_EXCEPTIONS,
+                ...doNotFormat,
+              ],
+              ['createdOn','modifiedOn']
+            )
+  
+  
+            this.rowRefData = parseFetchedData(refData)
+            this.gridApi?.setColumnDefs(this.columnDefs);
+  
+            //this.gridColumnApi?.autoSizeAllColumns(true);
+  
+            this.gridApi?.hideOverlay();
+  
+            let selectedColDef: ColDef[] = [];
+            this.preSelectedColumns.forEach(colName => {
+              let colDefs:ColDef[] = this.columnDefs.filter(def =>{
+                return def.field.toLowerCase() === colName
+              })
+              if(colDefs.length > 1){
+                console.warn(`Duplicate columnDefs for field: ${colName}`)
               }
-            }]
-          }
-          this.adaptableApi.configApi.reloadPredefinedConfig({
-            Dashboard: this.dashBoard,
-            Layout: this.layout,
-            FormatColumn:{
-              FormatColumns:[
-              BLANK_DATETIME_FORMATTER_CONFIG([...this.DATETIME_COLUMNS]),
-              DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm([...this.DATETIME_COLUMNS]),
-              ]
+              if(colDefs.length > 0)
+                selectedColDef.push(colDefs[0])
+            })
+  
+  
+            //saveAndSetLayout(selectedColDef,this.adaptableApi);
+            if(filterType[0] === 'Attribute Fixing' )
+              this.adaptableOptions.primaryKey = 'AttributeId'
+            this.layout = {
+              Revision:1,
+              CurrentLayout: 'Default Layout',
+              Layouts: [{
+                Name: 'Default Layout',
+                Columns: [ 
+                  'AttributeName',
+                  'AttributeLevel',
+                  'AttributeType',
+                  'CreatedOn',
+                  'CreatedBy','ActionDelete'],
+                PinnedColumnsMap: { 
+                  ActionDelete:'right' 
+                },
+                ColumnWidthMap: {
+                  ActionDelete: 18
+                }
+              }]
             }
-          })
-          this.gridApi?.setRowData(this.rowRefData)
-        },
-        error:error=>{
-          console.log(error)
-          this.gridApi?.hideOverlay();
-        }
-      }))
+            this.adaptableApi.configApi.reloadPredefinedConfig({
+              Dashboard: this.dashBoard,
+              Layout: this.layout,
+              FormatColumn:{
+                FormatColumns:[
+                BLANK_DATETIME_FORMATTER_CONFIG([...this.DATETIME_COLUMNS]),
+                DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm([...this.DATETIME_COLUMNS]),
+                ]
+              }
+            })
+            this.gridApi?.setRowData(this.rowRefData)
+          },
+          error:error=>{
+            console.log(error)
+            this.gridApi?.hideOverlay();
+          }
+        }))
+
+      }
     }))
 
   }

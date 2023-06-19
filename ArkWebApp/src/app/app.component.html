@@ -189,60 +189,63 @@
     </div>
 
     <div *ngIf="location.path() === '/cash-balance'" class="filter-element">
-      <app-cash-balance-filter></app-cash-balance-filter>
+      <app-general-filter [screen] = "'cash-balance'"></app-general-filter>
     </div>
-    
+
     <div *ngIf="location.path() === '/contract-history'" class="filter-element">
-      <app-contract-history-filter [funds] = "funds"></app-contract-history-filter>
+      <app-general-filter [screen] = "'contract-history'"></app-general-filter>
     </div>
 
     <div *ngIf="location.path() === '/facility-detail'" class="filter-element">
-      <app-facility-detail-filter [funds] = "funds"></app-facility-detail-filter>
+      <app-general-filter [screen] = "'facility-detail'"></app-general-filter>
     </div>
 
     <div *ngIf="location.path() === '/liquidity-summary'" class="filter-element">
-      <app-liquidity-summary-filter [fundHedgings] = "fundHedgings"></app-liquidity-summary-filter>
+      <app-general-filter [screen] = "'liquidity-summary'"></app-general-filter>
     </div>
 
     <div *ngIf="location.path() === '/irr/portfoliomodeller'" class="filter-element">
-      <app-irr-calculation-filter></app-irr-calculation-filter>
+      <app-general-filter [screen] = "'portfoliomodeller'"></app-general-filter>
     </div>
 
     <div *ngIf="location.path() === '/fee-calculation'" class="filter-element">
-      <app-fee-calculation-filter [entities] = "entities"></app-fee-calculation-filter>
+      <app-general-filter [screen] = "'fee-calculation'"></app-general-filter>
     </div>
 
+
     <div *ngIf="location.path() === '/ref-data-manager'" class="filter-element">
-      <app-ref-data-manager-filter [refDataFilter] = "refDataFilter"></app-ref-data-manager-filter>
+      <app-general-filter [screen] = "'ref-data-manager'"></app-general-filter>
     </div>
 
     <div *ngIf="location.path() === '/management-fee'" class="filter-element">
-      <app-management-fee-filter></app-management-fee-filter>
+      <app-general-filter [screen] = "'management-fee'"></app-general-filter>
     </div>
 
     <div *ngIf="location.path() === '/positions-screen'" class="filter-element">
-      <app-position-screen-filter></app-position-screen-filter>
+      <app-general-filter [screen] = "'positions-screen'"></app-general-filter>
     </div>
 
     <div *ngIf="location.path() === '/hedging-mark'" class="filter-element">
-      <app-position-screen-filter></app-position-screen-filter>
+      <app-general-filter [screen] = "'hedging-mark'"></app-general-filter>
     </div>
 
     <div *ngIf="location.path() === '/aum-delta'" class="filter-element">
-      <app-aum-delta-filter></app-aum-delta-filter>
+      <app-general-filter [screen] = "'aum-delta'"></app-general-filter>
     </div>
 
     <div *ngIf="location.path() === '/net-returns'" class="filter-element">
-      <app-net-returns-filter [fundHedgings] = "fundHedgings" [calcMethods] = "calcMethods" [cashflowTypes]="cashflowTypes"></app-net-returns-filter>
+      <app-general-filter [screen] = "'net-returns'"></app-general-filter>
     </div>
 
     <div *ngIf="location.path() === '/mark-changes'" class="filter-element">
-      <app-mark-changes-filter></app-mark-changes-filter>
+      <app-general-filter [screen] = "'mark-changes'"></app-general-filter>
     </div>
 
     <div *ngIf="location.path() === '/valuation'" class="filter-element">
-      <app-valuation-filter [funds] = "funds"></app-valuation-filter>
+      <app-general-filter [screen] = "'valuation'"></app-general-filter>
+
     </div>
+
 
   </mat-sidenav>
 
