@@ -9,3 +9,8 @@ export interface AsOfDateRange{
     start: string;
     end: string;
 }
+
+export interface FilterIdValuePair{
+    id:number,
+    value:any
+  }

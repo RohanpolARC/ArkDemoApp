@@ -5,6 +5,8 @@ import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { CashFlowParams, IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 import { LoadStatusType } from './portfolio-modeller/portfolio-modeller.component';
+import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
+import { getMomentDateStr } from 'src/app/shared/functions/utilities';
 
 type tabset = {
   displayName: string,
@@ -30,7 +32,8 @@ export class IrrCalculationComponent implements OnInit {
   asOfDate: string
   constructor(
     private dataSvc: DataService,
-    public irrCalcSvc: IRRCalcService 
+    public irrCalcSvc: IRRCalcService ,
+    private filterSvc: GeneralFilterService
   ) { }
 
   subscriptions: Subscription[] = []
@@ -50,6 +53,14 @@ export class IrrCalculationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
+      if(data){
+        if(data.id === 221){
+          this.irrCalcSvc.changeSearchDate(getMomentDateStr(data.value))
+        }
+      }
+    }))
+
     this.subscriptions.push(this.irrCalcSvc.currentSearchDate.subscribe(asOfDate => {
       this.asOfDate = asOfDate;
     }));

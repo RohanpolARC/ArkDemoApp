@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { PositionScreenService } from 'src/app/core/services/PositionsScreen/positions-screen.service';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { getMomentDateStr, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { CUSTOM_DISPLAY_FORMATTERS_CONFIG } from 'src/app/shared/functions/formatter';
 import { AMOUNT_COLUMNS_LIST, GRID_OPTIONS, POSITIONS_COLUMN_DEF } from '../positions-screen/grid-structure';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
@@ -25,6 +25,7 @@ import { AfterViewInit } from '@angular/core';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
 import { DetailedViewService } from 'src/app/shared/modules/detailed-view/detailed-view.service';
 import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
+import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 
 let overrideColMap: {
   [col: string] : {
@@ -81,6 +82,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
     private accessService: AccessService,
     private hedgingMarkSvc: HedgingMarkService,
     private detailedVwSvc: DetailedViewService,
+    private filterSvc: GeneralFilterService,
     public dialog: MatDialog
   ) { super(overrideColMap) }
 
@@ -197,6 +199,13 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
   }
 
   ngOnInit(): void {
+    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
+      if(data){
+        if(data.id === 321){
+          this.positionScreenSvc.changeSearchDate(getMomentDateStr(data.value))
+        }
+      }
+    }))
 
     this.isWriteAccess = false;
     for (let i: number = 0; i < this.accessService.accessibleTabs.length; i += 1) {

@@ -2,9 +2,10 @@ import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angula
 import { ColDef, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { forkJoin, Subscription } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { delay, first } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { ContractHistoryService } from 'src/app/core/services/ContractHistory/contract-history.service';
+import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { createColumnDefs, GENERAL_FORMATTING_EXCEPTIONS, parseFetchedData, saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
@@ -109,10 +110,23 @@ export class ContractHistoryComponent implements OnInit {
 
   constructor(
     private contractHistorySvc: ContractHistoryService,
-    private dataSvc: DataService
+    private dataSvc: DataService,
+    private filterSvc: GeneralFilterService
   ) { }
 
   changeListeners() {
+    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
+      if(data){
+        if(data.id===521){
+          this.contractHistorySvc.changeisLatestValue(data.value)
+        }else if(data.id === 522){
+          let funds:any[] = []
+          data.value?.forEach(ele=>funds.push(ele.value))
+          this.contractHistorySvc.changeFundValues(funds) 
+        }
+      }
+    }))
+
     this.subscriptions.push(this.contractHistorySvc.currentfundValues.subscribe(funds => {
       this.funds = funds
     }))

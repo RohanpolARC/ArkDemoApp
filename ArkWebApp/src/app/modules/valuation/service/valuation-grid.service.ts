@@ -325,7 +325,7 @@ export class ValuationGridService {
     node.data['currentYieldCurveSpread'] = this.getBenchmarkIndexes()[index]?.['currentYieldCurveSpread'];
     node.data['currentCreditSpread'] = this.getBenchmarkIndexes()[index]?.['currentBenchmarkSpread'];
 
-    node.data['deltaSpreadDiscount'] = (node.data?.['currentYieldCurveSpread'] ?? 0.0) - (node.data?.['currentCreditSpread'] ?? 0.0)
+    node.data['deltaSpreadDiscount'] = (node.data?.['currentCreditSpread'] ?? 0.0) - (node.data?.['initialCreditSpread'] ?? 0.0)
     this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
   }
 
@@ -391,7 +391,8 @@ export class ValuationGridService {
     let updatedData: any[] = []
     for(let i: number = 0; i < nodes.length; i+= 1){
       let data = nodes[i].data;
-      data = { ...data, ...valMap[data?.['assetID']], 'usedSpreadDiscount': valMap[data?.['assetID']]?.['deltaSpreadDiscount'] };
+      data = { ...data, ...valMap[data?.['assetID']], 'usedSpreadDiscount': valMap[data?.['assetID']]?.['deltaSpreadDiscount'], 'useModelValuation': false };
+      // Not updating showIsReviewed as that is dependent on the value of the actual override cell which is not affected by this update.
       updatedData.push(data);
     }
 

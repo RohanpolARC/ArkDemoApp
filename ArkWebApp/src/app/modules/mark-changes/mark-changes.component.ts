@@ -3,6 +3,7 @@ import { ColDef, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-c
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
+import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { MarkChangesService } from 'src/app/core/services/MarkChanges/MarkChanges.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
@@ -37,10 +38,22 @@ export class MarkChangesComponent implements OnInit {
 
   constructor(
     public dataSvc:DataService,
-    public markChangesSvc:MarkChangesService
+    public markChangesSvc:MarkChangesService,
+    private filterSvc: GeneralFilterService
   ) { }
 
   ngOnInit(): void {
+    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
+      if(data){
+        if(data.id === 341){
+          this.sDate = data.value
+          if(this.sDate.end === 'Invalid date')
+            this.sDate.end = this.sDate.start;
+          this.markChangesSvc.changeSearchDateRange(this.sDate)
+        }
+      }
+    }))
+
     this.sDate = null
     this.columnDefs=[
       {field: "positionId",type:"abColDefNumber",cellClass: 'ag-right-aligned-cell'},

@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { interval, Observable, Subject } from 'rxjs';
+import { interval, Observable, Subject, Subscription } from 'rxjs';
 import { filter, first, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
+import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
-import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
+import { AsOfDateRange, FilterIdValuePair } from 'src/app/shared/models/FilterPaneModel';
 
 @Component({
   selector: 'app-valuation',
@@ -17,6 +18,7 @@ export class ValuationComponent implements OnInit {
   funds: string[]
   benchmarkIndexes: { [index: string]: any }
   marktypes: string[];
+  subscriptions: Subscription[] = []
 
   showLoadingOverlayReq: { show:  'Yes' | 'No' }
   clearEditingStateReq:  { clear: 'Yes' | 'No' }
@@ -33,7 +35,8 @@ export class ValuationComponent implements OnInit {
 
   constructor(
     private valuationSvc: ValuationService,
-    private dataSvc: DataService  
+    private dataSvc: DataService,
+    private filterSvc: GeneralFilterService
   ) { }
 
   rowData$: Observable<any[]> = this.dataSvc.filterApplyBtnState.pipe(
@@ -78,7 +81,26 @@ export class ValuationComponent implements OnInit {
   funds$: Observable<string[]>;
   markTypes$: Observable<string[]>;
 
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub=>sub.unsubscribe())
+  }
+
   ngOnInit(): void {
+    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe((data:FilterIdValuePair)=>{
+      if(data){
+        if(data.id===351){
+          let funds = []
+          funds = data.value?.map(x=>x.value)
+          this.valuationSvc.changeFundValues(funds)
+        }else if(data.id===352){
+          let types = []
+          types = data.value?.map(x=>x.value)
+          this.valuationSvc.changeMarkType(types)
+        }else if (data.id===353){
+          this.valuationSvc.changeSearchDateRange(data.value)
+        }
+      }
+    }))
     
     this.asOfDate$ = this.valuationSvc.currentSearchDateRange.pipe(
       filter((asOfDate: AsOfDateRange) => !!asOfDate),

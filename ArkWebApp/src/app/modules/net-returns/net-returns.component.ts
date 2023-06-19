@@ -3,7 +3,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { interval, Observable, Subject, Subscription } from 'rxjs';
 import { filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
+import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { NetReturnsService } from 'src/app/core/services/NetReturns/net-returns.service';
+import { getMomentDateStr } from 'src/app/shared/functions/utilities';
 import { SsrsReportPopupComponent } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-popup/ssrs-report-popup.component';
 
 @Component({
@@ -14,6 +16,8 @@ import { SsrsReportPopupComponent } from 'src/app/shared/modules/ssrs-report-vie
 export class NetReturnsComponent implements OnInit {
 
   subscriptions: Subscription[] =[]
+
+
   asOfDate$: Observable<string> = this.netReturnsSvc.currentSearchDate.pipe(
     tap((asOfDate: string) => {
       this.asOfDate = asOfDate
@@ -52,10 +56,14 @@ export class NetReturnsComponent implements OnInit {
   isDisabled:boolean = true
 
   constructor(private netReturnsSvc: NetReturnsService,
+              private filterSvc: GeneralFilterService,
               private dataSvc: DataService,
               private dialog: MatDialog
   ) {   }
 
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub=>sub.unsubscribe())
+  }
 
   rowData$: Observable<any>//: Observable<{cashflowCount: number, RunID: string, smry: any[], cashflows: any[]}>
 
@@ -84,6 +92,25 @@ export class NetReturnsComponent implements OnInit {
 
 
   ngOnInit(){
+
+
+    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
+      if(data){
+        if(data.id===231){
+          this.netReturnsSvc.changeSearchDate(getMomentDateStr(data.value))
+        }else if(data.id === 232){
+          this.netReturnsSvc.changeFundHedgingValues(data.value?.[0]?.value)
+        }else if(data.id ===233){
+          this.netReturnsSvc.changeCalcMethod(data.value?.[0]?.value)
+        }else if(data.id === 234){
+          this.netReturnsSvc.changeCashflowType(data.value?.[0]?.value)
+        }else if(data.id === 235){
+          this.netReturnsSvc.changeSaveNetReturns(data.value)
+        }
+        
+      }
+    }))
+      
 
     // Recreated declarative rxjs stream manipulation.
 

@@ -32,6 +32,7 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
 import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
+import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 
 @Component({
   selector: 'app-liquidity-summary',
@@ -51,7 +52,8 @@ export class LiquiditySummaryComponent implements OnInit {
               private dataSvc: DataService,
               private accessSvc: AccessService,
               private warningMsgPopUp: MatSnackBar,
-              public dialog: MatDialog) { }
+              public dialog: MatDialog,
+              private filterSvc: GeneralFilterService) { }
 
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   gridOptions: GridOptions;
@@ -361,7 +363,7 @@ export class LiquiditySummaryComponent implements OnInit {
   fetchLiquiditySummary(){
 
     this.setSelectedRowID(null);
-    if(this.asOfDate !== null && this.fundHedgings !== null && this.days !== null){
+    if(this.asOfDate != null && this.fundHedgings != null && this.days != null){
 
       this.gridOptions.api?.showLoadingOverlay();
       this.subscriptions.push(this.liquiditySummarySvc.getLiquiditySummaryPivoted(this.asOfDate, this.fundHedgings, this.days,this.includeCoinvest).subscribe({
@@ -413,7 +415,7 @@ export class LiquiditySummaryComponent implements OnInit {
     commentRow['attrType'] = 'Notes'
     commentRow['subAttr'] =''
     commentRow['isManual'] = 0
-    this.fundHedgings.forEach(fh=>{
+    this.fundHedgings?.forEach(fh=>{
       this.fundHedgingsComments.forEach(element => {
         if(fh===element.fundHedging){
           commentRow[fh] = element.comment
@@ -634,6 +636,21 @@ export class LiquiditySummaryComponent implements OnInit {
       },
       getRowHeight: this.getRowHeight
     }
+
+    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
+      if(data){
+        if(data.id === 111){
+          this.liquiditySummarySvc.changeFundHedgingValues(data.value?.map(v => v.value)) //fundhedging
+        }else if(data.id === 112){
+          this.liquiditySummarySvc.changeSearchDate(getMomentDateStr(data.value))
+        }else if(data.id === 113){
+          this.liquiditySummarySvc.changenoofdaysValues(data.value)
+        }else if(data.id === 114){
+          this.liquiditySummarySvc.changeincludeCoinvestValue(data.value)
+        }
+      }
+
+    }))
 
     this.subscriptions.push(this.liquiditySummarySvc.currentSearchDate.subscribe(asOfDate => {
       this.asOfDate = asOfDate;
