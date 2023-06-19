@@ -51,4 +51,17 @@ export type ReportServerParams={
     data?:any
   }
 
+export type FilterConfig={
+        id: number,
+        label: string,
+        type: string,
+        order: number ,
+        default:string,
+        options?:string,
+        optionsList?:any,
+        value?:any
+}
+
+
+
 export type NoRowsCustomMessages = 'Please apply the filter.'|'No data found for applied filter.'|'No data found.'

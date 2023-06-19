@@ -4,11 +4,11 @@
             Net Returns
             <span style="font-size: 1rem; font-weight: normal;">
                 (
-                <span *ngIf = "fundHedging$ | async as fh">
-                    {{fh}} |
-                </span>
                 <span *ngIf = "asOfDate$ | async as dt">
                     {{dt | date:"dd/MM/yyyy" }}
+                </span>
+                <span *ngIf = "fundHedging$ | async as fh">
+                    - {{fh}} 
                 </span>
                 )
             </span>

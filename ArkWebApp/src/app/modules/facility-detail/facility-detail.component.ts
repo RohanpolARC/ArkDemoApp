@@ -17,6 +17,7 @@ import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/Genera
 import { ActionColumnContext, AdaptableButton } from '@adaptabletools/adaptable-angular-aggrid';
 import { MatDialog } from '@angular/material/dialog';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
+import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 
 @Component({
   selector: 'app-facility-detail',
@@ -81,7 +82,8 @@ export class FacilityDetailComponent implements OnInit {
   constructor(private facilityDetailsService: FacilityDetailService,
     private accessService: AccessService,
     private dataSvc: DataService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private filterSvc: GeneralFilterService
     ) { }
 
 
@@ -249,6 +251,18 @@ export class FacilityDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
+      if(data){
+        if(data.id===211){
+          let funds:any[] = []
+          data.value?.forEach(ele=>funds.push(ele.value))
+          this.facilityDetailsService.changeFundValues(funds)
+        }else if(data.id === 212){
+          this.facilityDetailsService.changeSearchDate(getMomentDateStr(data.value))
+        }
+      }
+    }))
 
     this.fetchUniqueDealTypesCS();
     

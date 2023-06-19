@@ -1,0 +1,67 @@
+<div *ngFor="let filter of filters;let i = index" [ngSwitch]="filter.type">
+
+    <div *ngSwitchCase="'number'" class="element">
+        <mat-form-field appearance="outline">
+          <mat-label>{{filter.label}}</mat-label>
+          <input type="number" autocomplete="off" matInput [(ngModel)]="filter.value" (ngModelChange) = "onChange($event,filter.id)">
+        </mat-form-field>
+    </div>
+
+    <div *ngSwitchCase="'date'" class="element">
+        <mat-form-field appearance="outline">
+            <mat-label>{{filter.label}}</mat-label>
+            <input autocomplete="off"  matInput [matDatepicker]="i" [(ngModel)]="filter.value" (ngModelChange) = "onChange($event,filter.id)">
+            <mat-datepicker-toggle matSuffix [for]="i"></mat-datepicker-toggle>
+            <mat-datepicker #i></mat-datepicker>
+        </mat-form-field>
+    </div>
+
+    <div *ngSwitchCase="'multi-select'" class="element">
+        {{filter.label}}
+        <app-multi-select
+            [placeholder] = "getPlaceholder(filter.options)"
+            [settings] = "dropdownSettingsMultiple"
+            [dropdownData] = "filter.optionsList"
+            [selectedDropdownData] = "filter.value"
+            (onNgModelChangeCallback) = "onChange($event,filter.id)"
+            >
+        </app-multi-select>
+    </div>
+
+    <div *ngSwitchCase="'single-select'" class="element">
+        {{filter.label}}
+        <app-multi-select
+            [placeholder] = "getPlaceholder(filter.options,1)"
+            [settings] = "dropdownSettingsSingle"
+            [dropdownData] = "filter.optionsList"
+            [selectedDropdownData] = "filter.value"
+            (onNgModelChangeCallback) = "onChange($event,filter.id)"
+            >
+        </app-multi-select>
+    </div>
+
+    <div  *ngSwitchCase="'toggle'" class="element">
+        {{filter.label}}
+        <mat-slide-toggle
+            [color] = "'primary'"
+            [(ngModel)] = "filter.value"
+            (ngModelChange) = "onChange($event,filter.id)"
+        >
+        </mat-slide-toggle>
+    </div>
+
+    <div *ngSwitchCase="'date-range'" class="element">
+        <mat-form-field appearance="outline" class="date-form-field" color="primary">
+            <mat-label>{{filter.label}}</mat-label>
+            <mat-date-range-input  [formGroup]="filter.value" [rangePicker]="i">
+              <input matStartDate formControlName="start" placeholder="Start date">
+              <input matEndDate   formControlName="end" placeholder="End date">
+            </mat-date-range-input>
+            <mat-datepicker-toggle matSuffix [for]="i"></mat-datepicker-toggle>
+            <mat-date-range-picker #i></mat-date-range-picker>
+            <mat-error *ngIf="filter.value?.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+            <mat-error *ngIf="filter.value?.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+          </mat-form-field>
+    </div>
+
+</div>

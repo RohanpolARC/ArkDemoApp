@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs-compat';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { AumDeltaService } from 'src/app/core/services/AumDelta/aumDelta.service';
+import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import {  CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, formatDate, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
@@ -56,7 +57,8 @@ export class AumDeltaComponent implements OnInit {
 
 
   constructor(private dataSvc: DataService,
-    private aumDeltaSvc: AumDeltaService) { }
+    private aumDeltaSvc: AumDeltaService,
+    private filterSvc: GeneralFilterService) { }
 
   getHeaderValue(params:HeaderValueGetterParams){
     let coldef = params.column.getColDef()
@@ -70,6 +72,17 @@ export class AumDeltaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
+      if(data){
+        if(data.id === 331){
+          this.sDate = data.value
+          if(this.sDate.end === 'Invalid date')
+            this.sDate.end = this.sDate.start;
+          this.aumDeltaSvc.changeSearchDateRange(this.sDate)
+        }
+      }
+    }))
+
     this.sDate = null
     this.columnDefs = [
       {field: "positionId",type:"abColDefNumber",cellClass: 'ag-right-aligned-cell'},
