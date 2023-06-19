@@ -46,7 +46,8 @@ export class ValuationGridService {
       'modifiedOn': { global: 'globalmodifiedOn' },
       'reviewedBy': { global: 'globalReviewedBy' },
       'reviewedOn': { global: 'globalReviewedOn' },
-      'useModelValuation': { global: 'globaluseModelValuation' }
+      'useModelValuation': { global: 'globaluseModelValuation' },
+      'isModelValuationStale': { global: 'globalisModelValuationStale' }
     }
   }
 
