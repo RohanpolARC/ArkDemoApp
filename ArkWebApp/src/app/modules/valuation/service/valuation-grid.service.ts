@@ -245,7 +245,7 @@ export class ValuationGridService {
   }
 
   hideRunActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext): boolean {
-    if(context?.data?.['markType'] !== 'Mark to Market')
+    if(context?.data?.['markType']?.toLowerCase() !== 'Mark to Market')
       return true   
     return this.isEditing(context);
   }
