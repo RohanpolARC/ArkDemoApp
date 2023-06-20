@@ -3,9 +3,10 @@ export interface Valuation {
     markType: 'Impaired Cost' | 'Mark To Market' | 'Hedging Mark',
     override: number,
     overrideDate: Date,
-    initialYieldCurveSpread: number,
-    initialCreditSpread: number,
-    creditSpreadIndex: string,
+    overrideSource: 'Model Valuation' | 'New Mark',  
+    // initialYieldCurveSpread: number,
+    // initialCreditSpread: number,
+    spreadBenchmarkIndex: string,
     deltaSpreadDiscount: number,
     modifiedBy: string
 }
