@@ -34,9 +34,11 @@ export class ValuationGridService {
 
     this.overrideColMap = {
       'override': { global: 'globaloverride' },
-      'initialYieldCurveSpread': { global: 'globalinitialYieldCurveSpread' },
-      'initialCreditSpread': { global: 'globalinitialCreditSpread' },
-      'creditSpreadIndex': { global: 'globalcreditSpreadIndex' },
+      'spreadBenchmarkIndex': { global: 'globalspreadBenchmarkIndex' },
+      'benchmarkIndexYield': { global: 'globalBenchmarkIndexYield' },
+      'currentBenchmarkSpread': { global: 'globalCurrentBenchmarkSpread' },
+      'benchmarkIndexPrice': { global: 'globalBenchmarkIndexPrice' },
+      'effectiveDate': { global: 'globalEffectiveDate' },
       'deltaSpreadDiscount': { global: 'globaldeltaSpreadDiscount' },
       'overrideDate': { global: 'globaloverrideDate' },
       'showIsReviewed': { global: 'globalshowIsReviewed' },
@@ -46,7 +48,8 @@ export class ValuationGridService {
       'modifiedOn': { global: 'globalmodifiedOn' },
       'reviewedBy': { global: 'globalReviewedBy' },
       'reviewedOn': { global: 'globalReviewedOn' },
-      'useModelValuation': { global: 'globaluseModelValuation' }
+      'useModelValuation': { global: 'globaluseModelValuation' },
+      'isModelValuationStale': { global: 'globalisModelValuationStale' }
     }
   }
 
@@ -93,6 +96,11 @@ export class ValuationGridService {
   editActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
     if(this.lockEdit){
       this.dataSvc.setWarningMsg(`An asset is already in editing state`,`Dismiss`,`ark-theme-snackbar-warning`)
+      return;
+    }
+    else if(context.rowNode.data?.['showIsReviewed'] != 1 && context.rowNode.data?.['review']){
+      this.dataSvc.setWarningMsg(`Please complete/discard the review first`);
+      return;
     }
     else {
       this.lockEdit = true;
@@ -123,11 +131,10 @@ export class ValuationGridService {
     let valuation: Valuation = <Valuation> {};
     valuation.assetID = node.data?.['assetID'];
     valuation.markType = node.data?.['markType'];   // Hedging Mark/Mark Override
-    valuation.creditSpreadIndex = node.data?.['creditSpreadIndex'];
-    valuation.initialCreditSpread = node.data?.['initialCreditSpread'];
-    valuation.initialYieldCurveSpread = node.data?.['initialYieldCurveSpread'];
+    valuation.spreadBenchmarkIndex = node.data?.['spreadBenchmarkIndex'];
     valuation.deltaSpreadDiscount = node.data?.['deltaSpreadDiscount'];
     valuation.override = node.data?.['override'];
+    valuation.overrideSource = (node.data?.['useModelValuation']) ? 'Model Valuation' : 'New Mark';
     valuation.overrideDate = getFinalDate(new Date(this.getAsOfDate())); //getFinalDate(node.data?.['overrideDate']);
     valuation.modifiedBy = this.dataSvc.getCurrentUserName();
 
@@ -174,7 +181,7 @@ export class ValuationGridService {
 
     this.setFields(node, [...this.getOverrideColumns()], 'Reset');
 
-    this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
+    this.getAdaptableApi().gridApi.refreshCells([node], [...this.getColumnDefs().map(col => col.field), 'action']);
   }
 
   cancelActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {    
@@ -319,13 +326,15 @@ export class ValuationGridService {
 
   onIndexCellValueChanged(params: CellValueChangedEvent){
 
-    let index: string = params?.data?.['creditSpreadIndex'];
+    let index: string = params?.data?.['spreadBenchmarkIndex'];
 
     let node: RowNode = params.node;
-    node.data['currentYieldCurveSpread'] = this.getBenchmarkIndexes()[index]?.['currentYieldCurveSpread'];
-    node.data['currentCreditSpread'] = this.getBenchmarkIndexes()[index]?.['currentBenchmarkSpread'];
+    node.data['benchmarkIndexYield'] = this.getBenchmarkIndexes()[index]?.['benchmarkIndexYield'];
+    node.data['currentBenchmarkSpread'] = this.getBenchmarkIndexes()[index]?.['currentBenchmarkSpread'];
+    node.data['benchmarkIndexPrice'] = this.getBenchmarkIndexes()[index]?.['benchmarkIndexPrice'];
+    node.data['effectiveDate'] = this.getBenchmarkIndexes()[index]?.['effectiveDate'];
 
-    node.data['deltaSpreadDiscount'] = (node.data?.['currentCreditSpread'] ?? 0.0) - (node.data?.['initialCreditSpread'] ?? 0.0)
+    node.data['deltaSpreadDiscount'] = node.data?.['currentBenchmarkSpread'] ?? 0.0;
     this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
   }
 

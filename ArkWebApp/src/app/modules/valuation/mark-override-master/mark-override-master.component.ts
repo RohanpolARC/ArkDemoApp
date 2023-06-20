@@ -59,6 +59,7 @@ export class MarkOverrideMasterComponent implements OnInit {
 
     this.columnDefs = [
       { field: 'assetID', cellRenderer: 'agGroupCellRenderer' },
+      { field: 'type' },
       { field: 'markOverride', valueFormatter: nonAmountNumberFormatter },
       { field: 'markDate', valueFormatter: dateFormatter },
       { field: 'valuationMethod', headerName: 'Mark Type' },

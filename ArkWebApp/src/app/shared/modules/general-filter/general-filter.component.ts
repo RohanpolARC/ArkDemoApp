@@ -2,7 +2,7 @@ import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { FilterConfig } from '../../models/GeneralModel';
 import {  Subscription } from 'rxjs';
-import { getLastBusinessDay, getLastQuarterEnd, getMomentDateStr } from '../../functions/utilities';
+import { getLastBusinessDay, getLastQuarterEnd, getLastToLastQuarterEnd, getMomentDateStr } from '../../functions/utilities';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { DataService } from 'src/app/core/services/data.service';
 import { debounceTime, distinctUntilChanged, first } from 'rxjs/operators';
@@ -166,8 +166,11 @@ export class GeneralFilterComponent implements OnInit {
   setDefaultDateValue(defaultValue?:string):any{
     if(defaultValue.toLowerCase() === 'lastbusinessday'){
       return getMomentDateStr(getLastBusinessDay());
-    }else if(defaultValue.toLocaleLowerCase()==='lastquarterend'){
+    }else if(defaultValue.toLowerCase()==='lastquarterend'){
       return getMomentDateStr(getLastQuarterEnd())
+    }
+    else if(defaultValue.toLowerCase()==='lasttolastquarterend'){
+      return getMomentDateStr(getLastToLastQuarterEnd())
     }
     return getMomentDateStr(getLastBusinessDay());
   }
