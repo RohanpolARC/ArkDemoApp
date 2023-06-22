@@ -507,7 +507,8 @@ export class ValuationGridService {
     req.param2 = params.data?.['markType'];
     req.param3 = this.getAsOfDate();
     req.param4 = this.getFunds().join(',');
-    req.param5 = ''; req.strParam1 = [];
+    req.param5 = ''; 
+    req.strParam1 = this.getFunds();
 
     const dialogRef = this.dialog.open(DefaultDetailedViewPopupComponent, {
       data: {
