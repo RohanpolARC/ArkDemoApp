@@ -1,5 +1,5 @@
 import { AdaptableApi, AdaptableOptions, AdaptableReadyInfo, CustomQueryVariableContext } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridApi, GridOptions, GridReadyEvent, ICellRendererParams, Module } from '@ag-grid-community/core';
+import { CellClassParams, ColDef, GridApi, GridOptions, GridReadyEvent, ICellRendererParams, ITooltipParams, Module } from '@ag-grid-community/core';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -25,6 +25,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   @Input() rowData;
   @Input() benchmarkIndexes: { [index: string]: any }
   @Input() asOfDate: string
+  @Input() funds: string[]
   @Input() showLoadingOverlayReq: { show: 'Yes' | 'No' }
   @Input() clearEditingStateReq: { clear: 'Yes' | 'No' }
   @Input() getReviewingAssetsReq: { get: 'Yes' | 'No' }
@@ -155,7 +156,21 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'mark', type: 'abColDefNumber', hide: true },
       { field: 'costPrice', type: 'abColDefNumber', hide: true },
       { field: 'comment', type: 'abColDefString', hide: true },
-      { field: 'positionsCount', type: 'abColDefNumber', hide: true },
+      { field: 'positionsCount', type: 'abColDefNumber', hide: true, 
+        onCellClicked: this.gridSvc.onPositionsCountClicked.bind(this.gridSvc),
+        cellStyle: (params: CellClassParams) => {
+          if(!!params.value){
+            return { color: '#0590ca' }
+          }
+          return null;
+        },
+        tooltipValueGetter: (params: ITooltipParams) => {
+          if(!!params.value){
+            return `Click here to check all underlying positions`;
+          }
+          return null;
+        }
+      },
       { field: 'assetTypeName', type: 'abColDefString', hide: true, headerName: 'WSO Asset Type Name' },
       { field: 'expectedDate', type: 'abColDefDate' },
       { field: 'seniority', type: 'abColDefNumber' },
