@@ -8,6 +8,7 @@ import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-au
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getMomentDate, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
+import { YieldCurve } from 'src/app/shared/models/ValuationModel';
 import { AggridMatCheckboxEditorComponent } from 'src/app/shared/modules/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor.component';
 import { ValuationGridService } from '../service/valuation-grid.service';
 
@@ -24,6 +25,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
 
   @Input() rowData;
   @Input() benchmarkIndexes: { [index: string]: any }
+  @Input() yieldCurves: YieldCurve[]
   @Input() asOfDate: string
   @Input() showLoadingOverlayReq: { show: 'Yes' | 'No' }
   @Input() clearEditingStateReq: { clear: 'Yes' | 'No' }
@@ -122,6 +124,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'issuerShortName', type: 'abColDefString' },
       { field: 'asset', type: 'abColDefString' },
       { field: 'assetID', type: 'abColDefNumber' },
+      { field: 'assetCcy', type: 'abColDefString', hide: true },
       { field: 'currentWSOMark', type: 'abColDefNumber' },
       // { field: 'dateTo', type: 'abColDefDate' },
       { field: 'previousWSOMark', type: 'abColDefNumber' },
@@ -129,6 +132,17 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'override', type: 'abColDefNumber', cellStyle: this.gridSvc.editableCellStyle.bind(this), onCellValueChanged: this.gridSvc.onOverrideCellValueChanged.bind(this.gridSvc), editable: this.gridSvc.isEditable.bind(this.gridSvc) },
       { field: 'overrideDate', type: 'abColDefDate' },
       { field: 'markType', type: 'abColDefString' },
+      { field: 'yieldCurve', type: 'abColDefString', cellEditor: 'yieldCurveAutocompleteCellEditor',
+        cellEditorParams: () => {
+          return {
+            options: [...new Set(this.yieldCurves.map(yc => yc.name))], isStrict: true, oldValRestoreOnStrict: true
+          }
+        },
+        editable: this.gridSvc.isEditable.bind(this.gridSvc),
+        cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc)
+      },
+      { field: 'initialYCYield', type: 'abColDefNumber', headerName: 'Initial YC Yield' },
+      { field: 'currentYCYield', type: 'abColDefNumber', headerName: 'Current YC Yield' },
       { field: 'spreadBenchmarkIndex', type: 'abColDefString', cellEditor: 'autocompleteCellEditor',    
         cellEditorParams: () => {
           return {
@@ -138,9 +152,13 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         onCellValueChanged: this.gridSvc.onIndexCellValueChanged.bind(this.gridSvc),
         editable: this.gridSvc.isEditable.bind(this.gridSvc), cellEditorPopup: false ,
         cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), headerName: 'Benchmark Spread Index' },
-      { field: 'benchmarkIndexPrice', type: 'abColDefNumber' },
-      { field: 'benchmarkIndexYield', type: 'abColDefNumber' },
-      { field: 'currentBenchmarkSpread', type: 'abColDefNumber', headerName: 'Current Benchmark Spread' },
+      { field: 'initialBenchmarkYield', type: 'abColDefNumber' },
+      { field: 'currentBenchmarkYield', type: 'abColDefNumber' },
+      { field: 'initialSpread', type: 'abColDefNumber' },
+      { field: 'currentSpread', type: 'abColDefNumber' },
+      { field: 'benchmarkIndexPrice', type: 'abColDefNumber', hide: true },
+      // { field: 'benchmarkIndexYield', type: 'abColDefNumber' },
+      // { field: 'currentBenchmarkSpread', type: 'abColDefNumber', headerName: 'Current Benchmark Spread' },
       { field: 'deltaSpreadDiscount', type: 'abColDefNumber', 
         cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), 
         editable: this.gridSvc.isEditable.bind(this.gridSvc), 
@@ -230,6 +248,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       },
       components: {
         'autocompleteCellEditor': MatAutocompleteEditorComponent,
+        'yieldCurveAutocompleteCellEditor': MatAutocompleteEditorComponent,
         'aggridMatCheckboxCellEditor': AggridMatCheckboxEditorComponent,
         'useModelValuationCheckbox': AggridMatCheckboxEditorComponent
       }
@@ -341,7 +360,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         },
         Layout: {
           CurrentLayout: 'Basic Layout',
-          Revision: 24,
+          Revision: 25,
           Layouts: [
             {
               Name: 'Basic Layout',

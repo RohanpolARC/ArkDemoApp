@@ -63,7 +63,6 @@ export class AuditFilterComponent implements OnInit {
 
     this.dataSvc.getUniqueValuesForField('PositionID').pipe(take(1)).subscribe({
       next: (data) => {
-        console.log(data)
         this.positionsDropdown = data
       },
       error: (error) => {

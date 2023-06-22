@@ -31,6 +31,7 @@
             <ng-container *ngIf="{value1: rowData$ | async} as rd">
                     <app-valuation-grid [rowData]="rd.value1"
                                         [benchmarkIndexes]="benchmarkIndexes"
+                                        [yieldCurves]="yieldCurves"
                                         [asOfDate]="asofdate?.end"
                                         [marktypes]="marktypes"
                                         [modelValuations]="modelValuations$ | async"

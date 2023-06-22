@@ -10,3 +10,8 @@ export interface Valuation {
     deltaSpreadDiscount: number,
     modifiedBy: string
 }
+
+
+export interface YieldCurve {
+    name: string, rate: number, currency: string 
+}

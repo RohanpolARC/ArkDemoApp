@@ -5,6 +5,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
 import { AsOfDateRange, FilterIdValuePair } from 'src/app/shared/models/FilterPaneModel';
+import { YieldCurve } from 'src/app/shared/models/ValuationModel';
 
 @Component({
   selector: 'app-valuation',
@@ -17,6 +18,7 @@ export class ValuationComponent implements OnInit {
   asofdateIn: AsOfDateRange;      // Date currently set on the filter panel.
   funds: string[]
   benchmarkIndexes: { [index: string]: any }
+  yieldCurves: YieldCurve[]
   marktypes: string[];
   subscriptions: Subscription[] = []
 
@@ -51,6 +53,12 @@ export class ValuationComponent implements OnInit {
       this.closeTimer$.next();
       this.runValuationInProgress = false;
 
+      this.valuationSvc.getYieldCurves(this.asofdate.end).pipe(first()).subscribe({
+        next: (yieldcurves: YieldCurve[]) => {
+          this.yieldCurves = [...yieldcurves];
+        }
+      })
+
       this.valuationSvc.getSpreadBenchmarkIndex(this.asofdate.end, null).pipe(first()).subscribe({
         next: (indexes: any[]) => {
           
@@ -70,9 +78,7 @@ export class ValuationComponent implements OnInit {
     }),
     switchMap((isHit) => {
       return this.valuationSvc.getValuationData(this.asofdate, this.funds?.join(','), this.marktypes?.join(',')).pipe(
-        tap((data: any[]) => {
-          console.log(data);
-        })
+        tap((data: any[]) => { })
       )
     })
   )
@@ -151,7 +157,6 @@ export class ValuationComponent implements OnInit {
 
     this.valuationSvc.putReviewingAssets(assets).pipe(first()).subscribe({
       next: (feed: any[]) => {
-        console.log(feed);
         this.reviewedAssets = feed;
 
         for(let i: number = 0; i < feed.length; i+= 1){
