@@ -71,7 +71,6 @@ export class ValuationComponent implements OnInit {
     switchMap((isHit) => {
       return this.valuationSvc.getValuationData(this.asofdate, this.funds?.join(','), this.marktypes?.join(',')).pipe(
         tap((data: any[]) => {
-          console.log(data);
         })
       )
     })
