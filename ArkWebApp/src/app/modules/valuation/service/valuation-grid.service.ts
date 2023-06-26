@@ -1,5 +1,5 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton } from '@adaptabletools/adaptable-angular-aggrid';
-import { CellClassParams, CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, RowNode, ValueGetterParams } from '@ag-grid-community/core';
+import { CellClassParams, CellClickedEvent, CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, RowNode, ValueGetterParams } from '@ag-grid-community/core';
 import { EventEmitter, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { first } from 'rxjs/operators';
@@ -30,7 +30,7 @@ export class ValuationGridService {
 
   constructor(private dataSvc: DataService,
     private valuationSvc: ValuationService,
-    public dailog: MatDialog) {
+    public dialog: MatDialog) {
 
     this.overrideColMap = {
       'override': { global: 'globaloverride' },
@@ -75,6 +75,10 @@ export class ValuationGridService {
 
   getAsOfDate(): string {
     return this.component.readProperty<string>('asOfDate');
+  }
+
+  getFunds(): string[] {
+    return this.component.readProperty<string[]>('funds');
   }
 
   getBenchmarkIndexes(): { [index: string]: any } {
@@ -195,7 +199,7 @@ export class ValuationGridService {
     let marktype: string = node.data?.['markType'].toLowerCase();
 
     if(marktype === 'mark to market' || marktype === 'impaired cost'){
-      const dialogRef = this.dailog.open(MarkOverrideMasterComponent, {
+      const dialogRef = this.dialog.open(MarkOverrideMasterComponent, {
         data: {
           assetID: node.data?.['assetID'],
           marktype: node.data?.['markType'],
@@ -214,7 +218,7 @@ export class ValuationGridService {
       req.param3 = req.param4 = req.param5 = '';
       req.strParam1 = [];
 
-      this.dailog.open(DefaultDetailedViewPopupComponent, {
+      this.dialog.open(DefaultDetailedViewPopupComponent, {
         data: {
           detailedViewRequest: req,
           noFilterSpace: true,
@@ -493,5 +497,27 @@ export class ValuationGridService {
     })
 
     return [...new Set(assetIDs)];
+  }
+
+  onPositionsCountClicked(params: CellClickedEvent){
+
+    let req: DetailedView = <DetailedView> {};
+    req.screen = 'Valuation-Positions';
+    req.param1 = String(params.data?.['assetID']);
+    req.param2 = params.data?.['markType'];
+    req.param3 = this.getAsOfDate();
+    req.param4 = this.getFunds().join(',');
+    req.param5 = ''; 
+    req.strParam1 = this.getFunds();
+
+    const dialogRef = this.dialog.open(DefaultDetailedViewPopupComponent, {
+      data: {
+        detailedViewRequest: req,
+        noFilterSpace: true,
+        grid: 'Valuation-Positions',
+        header: 'Positions'
+      },
+      width: '90vw', height: '80vh'
+    })
   }
 }
