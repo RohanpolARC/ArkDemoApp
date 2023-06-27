@@ -134,9 +134,14 @@ export class ValuationGridService {
 
   saveActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
 
-    this.dataSvc.setWarningMsg(`Please wait while we save the updates`,`Dismiss`,'ark-theme-snackbar-normal')
-
     let node: RowNode = context.rowNode;
+
+    if(node.data?.['markType']?.toLowerCase() !== 'hedging mark' && node.data?.['override'] === ""){
+      this.dataSvc.setWarningMsg(`Cannot clear override for WSO mark`, `Dismiss`, 'ark-theme-snackbar-warning');
+      return;
+    }
+
+    this.dataSvc.setWarningMsg(`Please wait while we save the updates`,`Dismiss`,'ark-theme-snackbar-normal')
 
     let valuation: Valuation = <Valuation> {};
     valuation.assetID = node.data?.['assetID'];
