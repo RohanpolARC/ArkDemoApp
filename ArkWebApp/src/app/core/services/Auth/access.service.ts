@@ -33,7 +33,7 @@ export class AccessService {
   }
 
   public checkWriteAccessForTab(tab: string): boolean {
-    let isWriteAccess: boolean = this.accessibleTabs.filter(accessibleTab => accessibleTab.tab === tab && accessibleTab.isWrite)?.[0].isWrite ?? false;
+    let isWriteAccess: boolean = this.accessibleTabs.filter(accessibleTab => accessibleTab.tab === tab && accessibleTab.isWrite)?.[0]?.isWrite ?? false;
 
     return isWriteAccess;
   }
