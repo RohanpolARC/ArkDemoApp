@@ -31,4 +31,10 @@ export class AccessService {
   public putAssociations(model: PutAccessModel){
     return this.http.post<any>(`${APIConfig.ARKWEB_PUTASSOCIATIONS_API}`, model);
   }
+
+  public checkWriteAccessForTab(tab: string): boolean {
+    let isWriteAccess: boolean = this.accessibleTabs.filter(accessibleTab => accessibleTab.tab === tab && accessibleTab.isWrite)?.[0].isWrite ?? false;
+
+    return isWriteAccess;
+  }
 }
