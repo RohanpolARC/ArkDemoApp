@@ -7,7 +7,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
 import { getFinalDate } from 'src/app/shared/functions/utilities';
 import { APIReponse, DetailedView, IPropertyReader } from 'src/app/shared/models/GeneralModel';
-import { Valuation } from 'src/app/shared/models/ValuationModel';
+import { SpreadBenchmarkIndex, Valuation, YieldCurve } from 'src/app/shared/models/ValuationModel';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
 import { MarkOverrideMasterComponent } from '../mark-override-master/mark-override-master.component';
 
@@ -81,8 +81,12 @@ export class ValuationGridService {
     return this.component.readProperty<string[]>('funds');
   }
 
-  getBenchmarkIndexes(): { [index: string]: any } {
-    return this.component.readProperty<{ [index: string]: any }>('benchmarkIndexes');
+  getBenchmarkIndexes(): { [index: string]: SpreadBenchmarkIndex } {
+    return this.component.readProperty<{ [index: string]: SpreadBenchmarkIndex }>('benchmarkIndexes');
+  }
+
+  getYieldCurves(){
+    return this.component.readProperty<YieldCurve[]>('yieldCurves');
   }
 
   setFields(node: RowNode, overrideCols: string[], mode: 'Set' | 'Reset'){
@@ -112,7 +116,7 @@ export class ValuationGridService {
 
       this.setFields(context.rowNode, this.getOverrideColumns(), 'Set');
 
-      this.getAdaptableApi().gridApi.refreshCells([context.rowNode], this.getOverrideColumns());
+      this.getAdaptableApi().gridApi.refreshCells([context.rowNode], this.getColumnDefs().map(col => col.field));
     }
   }
 
@@ -135,7 +139,10 @@ export class ValuationGridService {
     let valuation: Valuation = <Valuation> {};
     valuation.assetID = node.data?.['assetID'];
     valuation.markType = node.data?.['markType'];   // Hedging Mark/Mark Override
+    valuation.yieldCurve = node.data?.['yieldCurve'];
+    valuation.initialYCYield = node.data?.['initialYCYield'];
     valuation.spreadBenchmarkIndex = node.data?.['spreadBenchmarkIndex'];
+    valuation.initialBenchmarkYield = node.data?.['initialBenchmarkYield'];
     valuation.deltaSpreadDiscount = node.data?.['deltaSpreadDiscount'];
     valuation.override = node.data?.['override'];
     valuation.overrideSource = (node.data?.['useModelValuation']) ? 'Model Valuation' : 'New Mark';
@@ -328,18 +335,45 @@ export class ValuationGridService {
     this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
   }
 
+  onYieldCurveValueChanged(params: CellValueChangedEvent){
+    
+    let yieldCurve: string = params.data?.['yieldCurve'], assetCcy: string = params.data?.['assetCcy'];
+
+    let rate: number = this.getYieldCurves().filter(curve => curve.name === yieldCurve && curve.currency === assetCcy)?.[0]?.['rate'] ?? 0;
+
+    let node: RowNode = params.node;
+    node.data['currentYCYield'] = rate;
+
+    this.refreshIndexAndYieldFields(node);
+  }
+
+  onInitialYCYieldValueChanged(params: CellValueChangedEvent){
+    this.refreshIndexAndYieldFields(params.node)
+  }
+
+  onInitialBenchmarkYieldValueChanged(params: CellValueChangedEvent){
+    this.refreshIndexAndYieldFields(params.node)
+  }
+
   onIndexCellValueChanged(params: CellValueChangedEvent){
 
     let index: string = params?.data?.['spreadBenchmarkIndex'];
 
     let node: RowNode = params.node;
-    node.data['benchmarkIndexYield'] = this.getBenchmarkIndexes()[index]?.['benchmarkIndexYield'];
-    node.data['currentBenchmarkSpread'] = this.getBenchmarkIndexes()[index]?.['currentBenchmarkSpread'];
-    node.data['benchmarkIndexPrice'] = this.getBenchmarkIndexes()[index]?.['benchmarkIndexPrice'];
-    node.data['effectiveDate'] = this.getBenchmarkIndexes()[index]?.['effectiveDate'];
+    node.data['currentBenchmarkYield'] = this.getBenchmarkIndexes()[index]?.['benchmarkIndexYield'] ?? 0;
 
-    node.data['deltaSpreadDiscount'] = node.data?.['currentBenchmarkSpread'] ?? 0.0;
+    this.refreshIndexAndYieldFields(node);
+  }
+
+  refreshIndexAndYieldFields(node: RowNode): RowNode {
+
+    node.data['initialSpread'] = (node.data?.['initialBenchmarkYield'] ?? 0) - (node.data?.['initialYCYield'] ?? 0) * 100;
+    node.data['currentSpread'] = (node.data?.['currentBenchmarkYield'] ?? 0) - (node.data?.['currentYCYield'] ?? 0) * 100;
+    node.data['deltaSpreadDiscount'] = (node.data?.['currentSpread']) - (node.data?.['initialSpread']);
+
     this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
+
+    return node;
   }
 
   isEditable = (params: EditableCallbackParams) => {

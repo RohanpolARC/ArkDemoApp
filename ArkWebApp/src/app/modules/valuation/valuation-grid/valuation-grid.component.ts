@@ -8,7 +8,7 @@ import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-au
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getMomentDate, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
 import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
-import { YieldCurve } from 'src/app/shared/models/ValuationModel';
+import { SpreadBenchmarkIndex, YieldCurve } from 'src/app/shared/models/ValuationModel';
 import { AggridMatCheckboxEditorComponent } from 'src/app/shared/modules/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor.component';
 import { ValuationGridService } from '../service/valuation-grid.service';
 
@@ -24,7 +24,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   @Output() filteredMTMAssetsEmitter = new EventEmitter<number[]>();
 
   @Input() rowData;
-  @Input() benchmarkIndexes: { [index: string]: any }
+  @Input() benchmarkIndexes: { [index: string]: SpreadBenchmarkIndex }
   @Input() yieldCurves: YieldCurve[]
   @Input() asOfDate: string
   @Input() funds: string[]
@@ -140,9 +140,15 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           }
         },
         editable: this.gridSvc.isEditable.bind(this.gridSvc),
-        cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc)
+        cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc),
+        onCellValueChanged: this.gridSvc.onYieldCurveValueChanged.bind(this.gridSvc)
       },
-      { field: 'initialYCYield', type: 'abColDefNumber', headerName: 'Initial YC Yield' },
+      { field: 'initialYCYield', type: 'abColDefNumber', 
+        headerName: 'Initial YC Yield',      
+        cellStyle: this.gridSvc.editableCellStyle.bind(this), 
+        editable: this.gridSvc.isEditable.bind(this.gridSvc), 
+        onCellValueChanged: this.gridSvc.onInitialYCYieldValueChanged.bind(this.gridSvc)
+      },
       { field: 'currentYCYield', type: 'abColDefNumber', headerName: 'Current YC Yield' },
       { field: 'spreadBenchmarkIndex', type: 'abColDefString', cellEditor: 'autocompleteCellEditor',    
         cellEditorParams: () => {
@@ -153,13 +159,15 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         onCellValueChanged: this.gridSvc.onIndexCellValueChanged.bind(this.gridSvc),
         editable: this.gridSvc.isEditable.bind(this.gridSvc), cellEditorPopup: false ,
         cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), headerName: 'Benchmark Spread Index' },
-      { field: 'initialBenchmarkYield', type: 'abColDefNumber' },
+      { field: 'initialBenchmarkYield', type: 'abColDefNumber', 
+        cellStyle: this.gridSvc.editableCellStyle.bind(this), 
+        editable: this.gridSvc.isEditable.bind(this.gridSvc),
+        onCellValueChanged: this.gridSvc.onInitialBenchmarkYieldValueChanged.bind(this.gridSvc)
+      },
       { field: 'currentBenchmarkYield', type: 'abColDefNumber' },
       { field: 'initialSpread', type: 'abColDefNumber' },
       { field: 'currentSpread', type: 'abColDefNumber' },
       { field: 'benchmarkIndexPrice', type: 'abColDefNumber', hide: true },
-      // { field: 'benchmarkIndexYield', type: 'abColDefNumber' },
-      // { field: 'currentBenchmarkSpread', type: 'abColDefNumber', headerName: 'Current Benchmark Spread' },
       { field: 'deltaSpreadDiscount', type: 'abColDefNumber', 
         cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), 
         editable: this.gridSvc.isEditable.bind(this.gridSvc), 
@@ -375,7 +383,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         },
         Layout: {
           CurrentLayout: 'Basic Layout',
-          Revision: 25,
+          Revision: 26,
           Layouts: [
             {
               Name: 'Basic Layout',
@@ -392,7 +400,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         FormatColumn: {
-          Revision: 29,
+          Revision: 30,
           FormatColumns: [
             {
               Scope: { ColumnIds: [ ...this.columnDefs.map(def => def.field), 'marketValue', 'currentMarketValue', 'previousMarketValue'] },
@@ -405,7 +413,9 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
             AMOUNT_FORMATTER_CONFIG_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 2, ['amountZeroFormat']),
             AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['currentWSOMark', 'previousWSOMark', 'override', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100'], 4),
             CUSTOM_FORMATTER(['faceValueIssue', 'mark', 'costPrice', 
-            'benchmarkIndexPrice', 'benchmarkIndexYield', 'currentBenchmarkSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValue', 'currentMarketValue', 'previousMarketValue'], 'amountFormatter')
+            'benchmarkIndexPrice', 
+            'initialYCYield', 'currentYCYield', 'initialSpread', 'initialBenchmarkYield', 'currentBenchmarkYield', 'currentSpread',
+            'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValue', 'currentMarketValue', 'previousMarketValue'], 'amountFormatter')
           ]
         },
         CalculatedColumn: {
