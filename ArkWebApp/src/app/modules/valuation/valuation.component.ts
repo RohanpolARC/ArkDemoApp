@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { interval, Observable, Subject, Subscription } from 'rxjs';
 import { filter, first, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
@@ -38,7 +39,8 @@ export class ValuationComponent implements OnInit {
   constructor(
     private valuationSvc: ValuationService,
     private dataSvc: DataService,
-    private filterSvc: GeneralFilterService
+    private filterSvc: GeneralFilterService,
+    private accessSvc: AccessService
   ) { }
 
   rowData$: Observable<any[]> = this.dataSvc.filterApplyBtnState.pipe(
@@ -229,6 +231,12 @@ export class ValuationComponent implements OnInit {
   }
 
   onPushtoWSO(){
+
+    if(!this.accessSvc.checkWriteAccessForTab('Valuation')){
+      this.dataSvc.setWarningMsg(`No write access found`, `Dismiss`, `ark-theme-snackbar-warning`)
+      return;
+    }
+    
     this.getReviewingAssets = {
       get: 'Yes'
     }

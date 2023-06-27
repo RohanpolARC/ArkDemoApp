@@ -3,6 +3,7 @@ import { CellClassParams, CellClickedEvent, CellValueChangedEvent, ColDef, Edita
 import { EventEmitter, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { first } from 'rxjs/operators';
+import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
 import { getFinalDate } from 'src/app/shared/functions/utilities';
@@ -30,6 +31,7 @@ export class ValuationGridService {
 
   constructor(private dataSvc: DataService,
     private valuationSvc: ValuationService,
+    private accessSvc: AccessService,
     public dialog: MatDialog) {
 
     this.overrideColMap = {
@@ -102,7 +104,11 @@ export class ValuationGridService {
   }
 
   editActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
-    if(this.lockEdit){
+    if(!this.accessSvc.checkWriteAccessForTab('Valuation')){
+      this.dataSvc.setWarningMsg(`No write access found`, `Dismiss`, `ark-theme-snackbar-warning`)
+      return;
+    }
+    else if(this.lockEdit){
       this.dataSvc.setWarningMsg(`An asset is already in editing state`,`Dismiss`,`ark-theme-snackbar-warning`)
       return;
     }
@@ -144,9 +150,11 @@ export class ValuationGridService {
     valuation.spreadBenchmarkIndex = node.data?.['spreadBenchmarkIndex'];
     valuation.initialBenchmarkYield = node.data?.['initialBenchmarkYield'];
     valuation.deltaSpreadDiscount = node.data?.['deltaSpreadDiscount'];
-    valuation.override = node.data?.['override'];
+    
+    // To clear up hedging mark by setting it to NULL in DB.
+    valuation.override = (node.data?.['override'] === "") ? null : node.data?.['override'];
     valuation.overrideSource = (node.data?.['useModelValuation']) ? 'Model Valuation' : 'New Mark';
-    valuation.overrideDate = getFinalDate(new Date(this.getAsOfDate())); //getFinalDate(node.data?.['overrideDate']);
+    valuation.overrideDate = getFinalDate(new Date(this.getAsOfDate())); 
     valuation.modifiedBy = this.dataSvc.getCurrentUserName();
 
     this.valuationSvc.putValuationData([valuation]).pipe(first()).subscribe({
