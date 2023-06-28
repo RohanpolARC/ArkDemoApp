@@ -36,12 +36,6 @@ export class ValuationGridService {
 
     this.overrideColMap = {
       'override': { global: 'globaloverride' },
-      'spreadBenchmarkIndex': { global: 'globalspreadBenchmarkIndex' },
-      'benchmarkIndexYield': { global: 'globalBenchmarkIndexYield' },
-      'currentBenchmarkSpread': { global: 'globalCurrentBenchmarkSpread' },
-      'benchmarkIndexPrice': { global: 'globalBenchmarkIndexPrice' },
-      'effectiveDate': { global: 'globalEffectiveDate' },
-      'deltaSpreadDiscount': { global: 'globaldeltaSpreadDiscount' },
       'overrideDate': { global: 'globaloverrideDate' },
       'showIsReviewed': { global: 'globalshowIsReviewed' },
       'review': { global: 'globalreview' },
@@ -51,7 +45,18 @@ export class ValuationGridService {
       'reviewedBy': { global: 'globalReviewedBy' },
       'reviewedOn': { global: 'globalReviewedOn' },
       'useModelValuation': { global: 'globaluseModelValuation' },
-      'isModelValuationStale': { global: 'globalisModelValuationStale' }
+      'isModelValuationStale': { global: 'globalisModelValuationStale' },
+      'yieldCurve': { global: 'globalYieldCurve' },
+      'initialYCYield': { global: 'globalinitialYCYield' },
+      'currentYCYield': { global: 'globalcurrentYCYield' },
+      'spreadBenchmarkIndex': { global: 'globalspreadBenchmarkIndex' },
+      'initialBenchmarkYield': { global: 'globalinitialBenchmarkYield' },
+      'currentBenchmarkYield': { global: 'globalcurrentBenchmarkYield' },
+      'initialSpread': { global: 'globalinitialSpread' },
+      'currentSpread': { global: 'globalcurrentSpread' },
+      'benchmarkIndexPrice': { global: 'globalBenchmarkIndexPrice' },
+      'effectiveDate': { global: 'globaleffectiveDate' },
+      'deltaSpreadDiscount': { global: 'globaldeltaSpreadDiscount' }
     }
   }
 
@@ -380,9 +385,9 @@ export class ValuationGridService {
 
   refreshIndexAndYieldFields(node: RowNode): RowNode {
 
-    node.data['initialSpread'] = (node.data?.['initialBenchmarkYield'] ?? 0) - (node.data?.['initialYCYield'] ?? 0) * 100;
-    node.data['currentSpread'] = (node.data?.['currentBenchmarkYield'] ?? 0) - (node.data?.['currentYCYield'] ?? 0) * 100;
-    node.data['deltaSpreadDiscount'] = (node.data?.['currentSpread']) - (node.data?.['initialSpread']);
+    node.data['initialSpread'] = ((node.data?.['initialBenchmarkYield'] ?? 0) - (node.data?.['initialYCYield'] ?? 0)) * 100;
+    node.data['currentSpread'] = ((node.data?.['currentBenchmarkYield'] ?? 0) - (node.data?.['currentYCYield'] ?? 0)) * 100;
+    node.data['deltaSpreadDiscount'] = ((node.data?.['currentSpread']) - (node.data?.['initialSpread']));
 
     this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
 
