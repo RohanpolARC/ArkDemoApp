@@ -1,12 +1,12 @@
 import { AdaptableApi, AdaptableOptions, AdaptableReadyInfo, CustomQueryVariableContext } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridApi, GridOptions, GridReadyEvent, ICellRendererParams, Module } from '@ag-grid-community/core';
+import { ColDef, GridApi, GridOptions, GridReadyEvent, ICellRendererParams, Module, RowNode } from '@ag-grid-community/core';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import { getMomentDate, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { getMomentDate, presistSharedEntities, loadSharedEntities } from 'src/app/shared/functions/utilities';
 import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { AggridMatCheckboxEditorComponent } from 'src/app/shared/modules/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor.component';
 import { ValuationGridService } from '../service/valuation-grid.service';
@@ -173,7 +173,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         cellRendererParams: () => {
           return {
             showCheckbox: (params: ICellRendererParams) => { return !!params.data?.['modelValuation'] },
-            disableCheckbox: (params: ICellRendererParams) => { return !this.gridSvc.isEditing(params.node); },
+            disableCheckbox: (params: ICellRendererParams) => { return !this.gridSvc.isEditing(params.node as RowNode); },
             checkboxChanged: (params: ICellRendererParams, boolVal: boolean) => {
               if(boolVal){
                 params.data['oldOverride'] = params.data?.['override'];
@@ -195,7 +195,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         cellRendererParams: () => {
           return {
             showCheckbox: (params: ICellRendererParams) => { return !(params.data?.['showIsReviewed'] === -1) },
-            disableCheckbox: (params: ICellRendererParams) => { return this.gridSvc.isEditing(params.node) || params.data?.['showIsReviewed'] === 1 },
+            disableCheckbox: (params: ICellRendererParams) => { return this.gridSvc.isEditing(params.node as RowNode) || params.data?.['showIsReviewed'] === 1 },
             checkboxChanged: (params: ICellRendererParams, boolVal: boolean) => { 
             },
             defaultVal: (params: ICellRendererParams) => { 
@@ -248,8 +248,8 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       adaptableStateKey: 'Valuation State Key',
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), 
+        loadSharedEntities: loadSharedEntities.bind(this)
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
       actionOptions: {

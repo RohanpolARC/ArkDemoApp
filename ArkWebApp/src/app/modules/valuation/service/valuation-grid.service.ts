@@ -104,7 +104,7 @@ export class ValuationGridService {
       this.lockEdit = true;
       context.rowNode.data['editing'] = true;
 
-      this.setFields(context.rowNode, this.getOverrideColumns(), 'Set');
+      this.setFields(context.rowNode as RowNode, this.getOverrideColumns(), 'Set');
 
       this.getAdaptableApi().gridApi.refreshCells([context.rowNode], this.getOverrideColumns());
     }
@@ -124,7 +124,7 @@ export class ValuationGridService {
 
     this.dataSvc.setWarningMsg(`Please wait while we save the updates`,`Dismiss`,'ark-theme-snackbar-normal')
 
-    let node: RowNode = context.rowNode;
+    let node: RowNode = <RowNode>context.rowNode;
 
     let valuation: Valuation = <Valuation> {};
     valuation.assetID = node.data?.['assetID'];
@@ -184,12 +184,12 @@ export class ValuationGridService {
   }
 
   cancelActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {    
-    this.clearEditingStateForRow(context.rowNode);
+    this.clearEditingStateForRow(context.rowNode as RowNode);
   }
 
   infoActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
 
-    let node: RowNode = context.rowNode;
+    let node: RowNode = <RowNode>context.rowNode;
 
     let marktype: string = node.data?.['markType'].toLowerCase();
 
@@ -258,14 +258,14 @@ export class ValuationGridService {
   }
 
   editableCellStyle = (params: CellClassParams) => {
-    let node: RowNode = params.node;
+    let node: RowNode = <RowNode>params.node;
 
     if(node.group)
       return null;
 
     if(this.isCellEditable(params)){
       return {
-        'border-color': '#0590ca'
+        borderColor: '#0590ca'
       }
     }
     return null;
@@ -292,7 +292,7 @@ export class ValuationGridService {
 
     this.checkValidations(event, 5.0);
 
-    let node: RowNode = event.node;
+    let node: RowNode = <RowNode>event.node;
     node.data['overrideDate'] = getFinalDate(new Date(this.getAsOfDate()));
 
     let marktype: string = node.data?.['markType'].toLowerCase();
@@ -317,7 +317,7 @@ export class ValuationGridService {
 
   onDeltaSpreadDiscountCellValueChanged(params: CellValueChangedEvent){
 
-    let node: RowNode = params.node;
+    let node: RowNode =<RowNode> params.node;
     node.data['isModelValuationStale'] = true;
 
     this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
@@ -327,7 +327,7 @@ export class ValuationGridService {
 
     let index: string = params?.data?.['creditSpreadIndex'];
 
-    let node: RowNode = params.node;
+    let node: RowNode = <RowNode>params.node;
     node.data['currentYieldCurveSpread'] = this.getBenchmarkIndexes()[index]?.['currentYieldCurveSpread'];
     node.data['currentCreditSpread'] = this.getBenchmarkIndexes()[index]?.['currentBenchmarkSpread'];
 
@@ -343,12 +343,12 @@ export class ValuationGridService {
 
     if(params?.data?.['markType'] === 'Hedging Mark' || params?.data?.['markType'] === 'Impaired Cost'){
       if(params.column.getColId() === 'override')
-        return this.isEditing(params.node);
+        return this.isEditing(params.node as RowNode);
       else
         return false;
     }
     else 
-        return this.isEditing(params.node);
+        return this.isEditing(params.node as RowNode);
   }
 
   clearEditingState(hideWarnings: boolean = false){
@@ -363,7 +363,7 @@ export class ValuationGridService {
 
     this.getGridApi().stopEditing(true);
 
-    let nodes: RowNode[] = this.getAdaptableApi().gridApi.getAllRowNodes({
+    let nodes: RowNode[] = <RowNode[]>this.getAdaptableApi().gridApi.getAllRowNodes({
       includeGroupRows: false,
       filterFn: (node: RowNode) => {
         return this.isEditing(node);
@@ -388,7 +388,7 @@ export class ValuationGridService {
     vals.forEach(val => valMap[val.assetID] = { ...val, 'assetID': Number(val?.['assetID']) });
       
     let assetIDs: number[] = vals.map(val => Number(val?.['assetID']));
-    let nodes: RowNode[] = this.getAdaptableApi().gridApi.getAllRowNodes({
+    let nodes: RowNode[] = <RowNode[]>this.getAdaptableApi().gridApi.getAllRowNodes({
       includeGroupRows: false, filterFn: (node: RowNode) => { 
         return assetIDs.includes(node.data?.['assetID']) && (String(node.data?.['markType']).toLowerCase() === 'mark to market') 
       }
@@ -417,7 +417,7 @@ export class ValuationGridService {
 
     for(let i: number = 0; i < reviewedAssets.length; i+= 1){
 
-      let nodes: RowNode[] = this.getAdaptableApi().gridApi.getAllRowNodes({
+      let nodes: RowNode[] = <RowNode[]>this.getAdaptableApi().gridApi.getAllRowNodes({
         includeGroupRows: false,
         filterFn: (node: RowNode) => {
           return (node.data?.['assetID'] === reviewedAssets[i]?.['assetID']) && (node.data?.['markType'].toLowerCase() === reviewedAssets[i]?.['markType'].toLowerCase())
@@ -453,7 +453,7 @@ export class ValuationGridService {
 
   setAllAssetsForReview(){
 
-    let nodes: RowNode[] = this.getAdaptableApi().gridApi.getAllRowNodes({
+    let nodes: RowNode[] = <RowNode[]>this.getAdaptableApi().gridApi.getAllRowNodes({
       includeGroupRows: false,
       filterFn: (node: RowNode) => {
         return (node.data?.['showIsReviewed'] === 0)

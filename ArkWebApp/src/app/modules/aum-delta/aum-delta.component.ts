@@ -8,7 +8,7 @@ import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/genera
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import {  CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, formatDate, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import {  loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 
@@ -176,7 +176,6 @@ export class AumDeltaComponent implements OnInit {
     }
 
 
-
     this.adaptableOptions = {
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       autogeneratePrimaryKey: true,
@@ -186,8 +185,8 @@ export class AumDeltaComponent implements OnInit {
       adaptableStateKey: 'AUMDelta Key',
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), //https://docs.adaptabletools.com/guide/version-15-upgrade-guide
+        loadSharedEntities: loadSharedEntities.bind(this)
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 

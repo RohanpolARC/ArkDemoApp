@@ -619,17 +619,17 @@ export class LiquiditySummaryComponent implements OnInit {
             return 'Notes'
           }
 
-          return ''
+          return ' ' //if we pass empty string '' then ag grid will display it as (blank) on UI
         },
         cellRendererParams: {
           suppressCount: true    // Disable row count on group
         }
       },
-      frameworkComponents:{
+      components:{
         addCellRenderer: UpdateCellRendererComponent,
         attributeGroupRenderer: AttributeGroupRendererComponent
       },
-      groupMultiAutoColumn: true,
+      groupDisplayType:'multipleColumns',
       noRowsOverlayComponent: NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsDisplayMsg,

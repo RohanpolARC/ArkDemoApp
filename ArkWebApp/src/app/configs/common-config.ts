@@ -1,6 +1,8 @@
 import { AdaptableButton, DashboardOptions, ExportOptions } from "@adaptabletools/adaptable-angular-aggrid";
-import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
+import { AdaptableModuleButtons } from "@adaptabletools/adaptable/src/PredefinedConfig/Common/Types";
 import { ExcelStyle, Module } from "@ag-grid-community/core";
+
+import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
 import { ClipboardModule } from "@ag-grid-enterprise/clipboard";
 import { ColumnsToolPanelModule } from "@ag-grid-enterprise/column-tool-panel";
 import { ExcelExportModule } from "@ag-grid-enterprise/excel-export";
@@ -10,8 +12,8 @@ import { RangeSelectionModule } from "@ag-grid-enterprise/range-selection";
 import { RowGroupingModule } from "@ag-grid-enterprise/row-grouping";
 import { SetFilterModule } from "@ag-grid-enterprise/set-filter";
 import { SideBarModule } from "@ag-grid-enterprise/side-bar";
-import { AdaptableModuleButtons } from "@adaptabletools/adaptable/src/PredefinedConfig/Common/Types";
 import { CsvExportModule } from "@ag-grid-community/csv-export";
+
 
 export class CommonConfig{
 
@@ -46,5 +48,5 @@ export class CommonConfig{
         RowGroupingModule
       ];
 
-    public static DASHBOARD_MODULE_BUTTONS: AdaptableModuleButtons = ['SettingsPanel', 'TeamSharing', 'Export', 'Layout', 'ConditionalStyle', 'Filter'] 
+    public static DASHBOARD_MODULE_BUTTONS: AdaptableModuleButtons = ['SettingsPanel', 'TeamSharing', 'Export', 'Layout', 'Filter'] 
 }

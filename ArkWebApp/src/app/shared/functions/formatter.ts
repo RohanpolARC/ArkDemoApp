@@ -304,6 +304,14 @@ export function CUSTOM_DISPLAY_FORMATTERS_CONFIG(id,columnIds:any[]=[]){
                 return `${Number(curretValue * 100).toFixed(2)}%`
             }
         }
+    }else if(id==='nonAmountNumberFormatter'){
+        handlerFunc = (customDisplayFormatterContext: CustomDisplayFormatterContext) =>{
+            let currentValue : any = customDisplayFormatterContext.cellValue
+            if(currentValue == null || Number(currentValue) == 0)
+            return " ";
+            else return String(currentValue);
+
+        }
     }else if(id==='nonAmountNumberFormatter2Dec'){
         handlerFunc =(customDisplayFormatterContext: CustomDisplayFormatterContext)=>{
             let curretValue: any = customDisplayFormatterContext.cellValue
@@ -357,6 +365,16 @@ export function CUSTOM_DISPLAY_FORMATTERS_CONFIG(id,columnIds:any[]=[]){
             }
             else return "-"
         }
+    }else if(id ==='nullOrZeroFormatter'){
+        handlerFunc =(customDisplayFormatterContext: CustomDisplayFormatterContext)=>{
+            let curretValue: any = customDisplayFormatterContext.cellValue
+            if(curretValue == null || Number(curretValue) == 0)
+                return "";
+            else return Number(curretValue).toLocaleString(undefined, {
+            });
+
+        }
+
     }
 
     let scope

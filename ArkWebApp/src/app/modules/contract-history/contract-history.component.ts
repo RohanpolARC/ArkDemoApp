@@ -10,7 +10,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { createColumnDefs, GENERAL_FORMATTING_EXCEPTIONS, parseFetchedData, saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
 import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/utilities';
+import {  presistSharedEntities, loadSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
@@ -75,8 +75,8 @@ export class ContractHistoryComponent implements OnInit {
 
     teamSharingOptions: {
       enableTeamSharing: true,
-      setSharedEntities: setSharedEntities.bind(this),
-      getSharedEntities: getSharedEntities.bind(this)
+      persistSharedEntities: presistSharedEntities.bind(this), //https://docs.adaptabletools.com/guide/version-15-upgrade-guide
+      loadSharedEntities: loadSharedEntities.bind(this)
 
     },
 

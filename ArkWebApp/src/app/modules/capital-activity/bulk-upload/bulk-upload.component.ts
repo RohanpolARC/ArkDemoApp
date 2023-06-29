@@ -17,7 +17,7 @@ import {
 } from '@adaptabletools/adaptable/types';
 import { validateColumns, validateExcelRows } from './validation';
 import { DataService } from 'src/app/core/services/data.service';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import {  loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import * as moment from 'moment';
 import { CommonConfig } from 'src/app/configs/common-config';
 
@@ -198,8 +198,8 @@ export class BulkUploadComponent implements OnInit {
 
      teamSharingOptions: {
       enableTeamSharing: true,
-      setSharedEntities: setSharedEntities.bind(this),
-      getSharedEntities: getSharedEntities.bind(this)
+      persistSharedEntities: presistSharedEntities.bind(this), //https://docs.adaptabletools.com/guide/version-15-upgrade-guide
+      loadSharedEntities: loadSharedEntities.bind(this)
     },
 
      predefinedConfig: {

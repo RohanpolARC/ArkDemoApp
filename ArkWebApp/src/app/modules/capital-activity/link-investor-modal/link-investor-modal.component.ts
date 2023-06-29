@@ -17,7 +17,6 @@ import {
 } from '@adaptabletools/adaptable/types';
 import { AssociateInvestment, CapitalActivityModel } from 'src/app/shared/models/CapitalActivityModel';
 import { Subscription } from 'rxjs';
-import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
 import { CommonConfig } from 'src/app/configs/common-config';
 
 @Component({
@@ -124,7 +123,7 @@ export class LinkInvestorModalComponent implements OnInit {
     predefinedConfig: {
       Dashboard: {
         Revision: 1,
-        ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
+        ModuleButtons: ['Export', 'Layout'],
         IsCollapsed: true,
         Tabs: [],
         IsHidden: true,

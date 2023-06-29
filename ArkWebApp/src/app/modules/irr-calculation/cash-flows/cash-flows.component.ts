@@ -10,7 +10,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import {  BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,  DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
 
@@ -257,8 +257,8 @@ export class CashFlowsComponent implements OnInit {
       adaptableStateKey: 'Cashflows Key',
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), 
+        loadSharedEntities: loadSharedEntities.bind(this)
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
       
@@ -282,14 +282,14 @@ export class CashFlowsComponent implements OnInit {
         },
         Layout:{
           CurrentLayout: 'Basic Cashflows Layout',
-          Revision: 2,
+          Revision: 3,
           Layouts: [{
             Name: 'Basic Cashflows Layout',
             Columns: this.columnDefs.map(def => def.field)
           }]
         },
         FormatColumn:{
-          Revision:6,
+          Revision:9,
           FormatColumns:[
             CUSTOM_FORMATTER([...this.AMOUNT_COLUMNS],['amountFormatter']),
             CUSTOM_FORMATTER([...this.FX_COLUMNS],['fxFormatter']),

@@ -8,7 +8,7 @@ import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { AggridMaterialDatepickerComponent } from './aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { DataService } from 'src/app/core/services/data.service';
 import { CheckboxEditorComponent } from 'src/app/shared/components/checkbox-editor/checkbox-editor.component';
-import { setSharedEntities, getSharedEntities, getLastBusinessDay, getMomentDateStr } from 'src/app/shared/functions/utilities';
+import { getMomentDateStr, presistSharedEntities, loadSharedEntities } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, GridOptions, ICellRendererParams, Module, PostSortRowsParams, RowNode } from '@ag-grid-community/core';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
@@ -90,7 +90,7 @@ export class FacilityDetailComponent implements OnInit {
   editableCellStyle = (params) => {
     return (params.node.data?.['editing']) ? 
     {
-      'border-color': '#0590ca',
+      borderColor: '#0590ca',
     } : null
   }
 
@@ -188,7 +188,7 @@ export class FacilityDetailComponent implements OnInit {
     let node :RowNode
     this.gridApi?.forEachNode(rownode=>{
       if (rownode.data['editing'] === true){
-        node = rownode
+        node = <RowNode> rownode
       }
     });
     if(node){
@@ -353,7 +353,6 @@ export class FacilityDetailComponent implements OnInit {
         field: 'Action',
         width: 130,
         pinned: 'right',
-        pinnedRowCellRenderer: 'right',
         cellRenderer: 'actionCellRenderer',
         editable: false,
         menuTabs: []
@@ -468,8 +467,8 @@ export class FacilityDetailComponent implements OnInit {
 
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), //https://docs.adaptabletools.com/guide/version-15-upgrade-guide
+        loadSharedEntities: loadSharedEntities.bind(this)
       },
 
       userInterfaceOptions:{
@@ -613,6 +612,7 @@ export class FacilityDetailComponent implements OnInit {
 
 
    onAdaptableReady = ({ adaptableApi, gridOptions }) => {
+    console.log("ready")
     this.adapTableApi = adaptableApi;
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
   };

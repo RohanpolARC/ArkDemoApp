@@ -144,13 +144,13 @@ export class MarkOverrideMasterComponent implements OnInit {
 
   masterGridCellStyle(params){
     if(params.data?.['wsoStatus'] === 'Failed' && params.data?.['isReviewed'] === true)
-      return { 'background': 'pink' }
+      return { background: 'pink' }
     return null;
   }
 
   detailGridCellStyle(params){
     if(params.data?.['wsoStatus'] === 'Failed')
-      return { 'background': 'pink' }
+      return { background: 'pink' }
     return null;
   }
 

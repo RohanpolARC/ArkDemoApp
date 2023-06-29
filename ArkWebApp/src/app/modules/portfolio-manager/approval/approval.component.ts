@@ -9,7 +9,7 @@ import { PortfolioMappingDataService } from 'src/app/core/services/PortfolioMana
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { BLANK_DATETIME_FORMATTER_CONFIG, dateTimeFormatter, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm } from 'src/app/shared/functions/formatter';
-import { setSharedEntities, getSharedEntities } from 'src/app/shared/functions/utilities';
+import { presistSharedEntities, loadSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { ApprovalActionCellRendererComponent } from '../approval-action-cell-renderer/approval-action-cell-renderer.component';
 import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, validateAndUpdate } from '../utilities/functions';
@@ -109,10 +109,10 @@ export class ApprovalComponent implements OnInit {
 
   getCellStyle(col, params) {
 
-    let onlyEdit = { 'border-color': '#0590ca' }
-    let current = { 'background-color': 'rgb(253,100,100)' }
-    let onlyRequested = { 'background-color': 'rgb(135, 243, 180)'}
-    let requestedAndEdit = { 'background-color': 'rgb(135, 243, 180)','border-color': '#0590ca'}
+    let onlyEdit = { borderColor: '#0590ca' }
+    let current = { backgroundColor: 'rgb(253,100,100)' }
+    let onlyRequested = { backgroundColor: 'rgb(135, 243, 180)'}
+    let requestedAndEdit = { backgroundColor: 'rgb(135, 243, 180)',borderColor: '#0590ca'}
 
     if(!params.node?.group){
 
@@ -370,7 +370,7 @@ export class ApprovalComponent implements OnInit {
       // components: {
       //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
       // },
-      frameworkComponents: {
+      components: {
         actionCellRenderer: ApprovalActionCellRendererComponent,
         autocompleteCellEditor: MatAutocompleteEditorComponent
       },
@@ -404,8 +404,8 @@ export class ApprovalComponent implements OnInit {
 
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), 
+        loadSharedEntities: loadSharedEntities.bind(this)
   
       },
 

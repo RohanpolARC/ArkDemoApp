@@ -9,7 +9,7 @@ import {DataService} from '../../core/services/data.service'
 import {BtnCellRenderer} from './btn-cell-renderer.component'
 import {PortfolioHistoryService} from '../../core/services/PortfolioHistory/portfolio-history.service'
 import {MatDialog } from '@angular/material/dialog';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { map } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { ColDef, GridOptions, ICellRendererParams, Module, ValueGetterParams } from '@ag-grid-community/core';
@@ -39,7 +39,6 @@ export class PortfolioHistoryComponent implements OnInit {
   modules: Module[] = CommonConfig.AG_GRID_MODULES
 
   public gridOptions: GridOptions;
-  public getRowNodeId;
   public userName: String;
   public dialogRef;
   public rowGroupPanelShow;
@@ -126,7 +125,7 @@ export class PortfolioHistoryComponent implements OnInit {
     this.gridOptions = {
 
       enableRangeSelection: true,
-      sideBar:  ['columns','adaptable','filters'],
+      // sideBar:  ['columns','adaptable','filters'],
       suppressMenuHide: true,
       singleClickEdit: true,
       statusBar: {
@@ -165,7 +164,7 @@ export class PortfolioHistoryComponent implements OnInit {
       sortable: true,
     };
 
-    //this.sideBar = ['columns','adaptable','filters'];
+    this.sideBar = ['columns','adaptable','filters'];
     this.frameworkComponents = {
       btnCellRenderer: BtnCellRenderer,
       agGridCheckboxRenderer: CheckboxEditorComponent,
@@ -331,8 +330,8 @@ export class PortfolioHistoryComponent implements OnInit {
 
     teamSharingOptions: {
       enableTeamSharing: true,
-      setSharedEntities: setSharedEntities.bind(this),
-      getSharedEntities: getSharedEntities.bind(this)
+      persistSharedEntities: presistSharedEntities.bind(this), 
+      loadSharedEntities: loadSharedEntities.bind(this)
     },
 
     actionOptions:{

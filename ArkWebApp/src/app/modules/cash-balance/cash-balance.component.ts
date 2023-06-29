@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import {  Subscription } from 'rxjs';
 import { CashBalanceService } from 'src/app/core/services/CashBalance/cash-balance.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import {  CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy, BLANK_DATETIME_FORMATTER_CONFIG } from 'src/app/shared/functions/formatter';
-import {  getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import {   loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { ColDef, ColumnApi, GridApi, GridOptions, Module } from '@ag-grid-community/core';
@@ -84,9 +84,6 @@ export class CashBalanceComponent implements OnInit {
       sideBar: true,
       suppressMenuHide: true,
       singleClickEdit: false,
-      // components: {
-      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      // },
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:true,
       excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
@@ -114,8 +111,8 @@ export class CashBalanceComponent implements OnInit {
   
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), //https://docs.adaptabletools.com/guide/version-15-upgrade-guide
+        loadSharedEntities: loadSharedEntities.bind(this)
       },
 
       userInterfaceOptions:{
@@ -162,10 +159,11 @@ export class CashBalanceComponent implements OnInit {
           }]
         },
         FormatColumn:{
-          Revision:3,
+          Revision:5,
           FormatColumns:[
-            CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountFormatter'),
+            BLANK_DATETIME_FORMATTER_CONFIG(['asofDate']),
             DATE_FORMATTER_CONFIG_ddMMyyyy(['asofDate']),
+            CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,['amountFormatter']),
             
           ]
         }
