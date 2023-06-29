@@ -356,6 +356,7 @@ export class ValuationGridService {
 
     let node: RowNode = params.node;
     node.data['currentYCYield'] = rate;
+    node.data['initialYCYield'] = null;
 
     this.refreshIndexAndYieldFields(node);
   }
@@ -373,15 +374,26 @@ export class ValuationGridService {
     let index: string = params?.data?.['spreadBenchmarkIndex'];
 
     let node: RowNode = params.node;
-    node.data['currentBenchmarkYield'] = this.getBenchmarkIndexes()[index]?.['benchmarkIndexYield'] ?? 0;
+    node.data['initialBenchmarkYield'] = null;
+    node.data['currentBenchmarkYield'] = this.getBenchmarkIndexes()[index]?.['benchmarkIndexYield'] ?? 0;     //YTW
 
+    node.data['effectiveDate'] = this.getBenchmarkIndexes()[index]?.['effectiveDate']
+    node.data['benchmarkIndexPrice'] = this.getBenchmarkIndexes()[index]?.['benchmarkIndexPrice']
     this.refreshIndexAndYieldFields(node);
   }
 
   refreshIndexAndYieldFields(node: RowNode): RowNode {
 
     node.data['initialSpread'] = ((node.data?.['initialBenchmarkYield'] ?? 0) - (node.data?.['initialYCYield'] ?? 0)) * 100;
-    node.data['currentSpread'] = ((node.data?.['currentBenchmarkYield'] ?? 0) - (node.data?.['currentYCYield'] ?? 0)) * 100;
+
+    let index: string = node?.data?.['spreadBenchmarkIndex'];
+    let optionAdjSpread: number = this.getBenchmarkIndexes()[index]?.['currentBenchmarkSpread'];
+
+    if(!optionAdjSpread)
+      node.data['currentSpread'] = ((node.data?.['currentBenchmarkYield'] ?? 0) - (node.data?.['currentYCYield'] ?? 0)) * 100;
+    else
+      node.data['currentSpread'] = optionAdjSpread;
+
     node.data['deltaSpreadDiscount'] = ((node.data?.['currentSpread']) - (node.data?.['initialSpread']));
 
     this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
