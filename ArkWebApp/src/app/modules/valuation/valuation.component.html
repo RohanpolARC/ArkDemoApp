@@ -10,11 +10,11 @@
         <ng-container *ngIf="markTypes$ | async"></ng-container>
         <div class="action">
             <div class="d-flex justify-content-between align-items-center gap-2">
-                <button mat-raised-button color="primary" matTooltip="Select all for review" (click)="onSelectAllForReview()">Review All</button>
+                <button mat-raised-button color="primary" matTooltip="Select all for review" (click)="onSelectAllForReview()"> Select All</button>
                 <button mat-raised-button matTooltip="Push reviewed marks to WSO" (click)="onPushtoWSO()" matTolltipClass="tooltip-style"> Push to WSO
                 </button>
                 <ng-container *ngIf="runValuationInProgress">
-                    <mat-spinner [diameter]="20" style="margin-right: 10px"></mat-spinner>
+                    <mat-spinner [diameter]="20" style="margin-right: 10px" matTooltip="Running model valuation"></mat-spinner>
                 </ng-container>    
                 <button mat-icon-button matTooltip="Model Valuation" (click)="onTriggerModelValuation()">
                     <mat-icon svgIcon="trigger"></mat-icon>
@@ -32,6 +32,7 @@
                     <app-valuation-grid [rowData]="rd.value1"
                                         [benchmarkIndexes]="benchmarkIndexes"
                                         [asOfDate]="asofdate?.end"
+                                        [funds]="funds"
                                         [marktypes]="marktypes"
                                         [modelValuations]="modelValuations$ | async"
                                         [showLoadingOverlayReq]="showLoadingOverlayReq"

@@ -1,4 +1,4 @@
-import { ColDef, FirstDataRenderedEvent, GetRowIdFunc, GetRowIdParams, GridOptions, GridReadyEvent, IDetailCellRendererParams, IsRowMaster, Module } from '@ag-grid-community/core';
+import { ColDef, DetailGridInfo, FirstDataRenderedEvent, GetRowIdFunc, GetRowIdParams, GridOptions, GridReadyEvent, IDetailCellRendererParams, IsRowMaster, Module, RowGroupOpenedEvent } from '@ag-grid-community/core';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
@@ -6,7 +6,7 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
 import { MasterDetailModule } from "@ag-grid-enterprise/master-detail";
 import { first, map } from 'rxjs/operators';
-import { dateFormatter, dateTimeFormatter, nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
+import { dateFormatter, dateTimeFormatter, nonAmountNumberFormatter, nullOrZeroFormatterWithoutLocale } from 'src/app/shared/functions/formatter';
 
 @Component({
   selector: 'app-mark-override-master',
@@ -20,6 +20,7 @@ export class MarkOverrideMasterComponent implements OnInit {
   asofdate: string
 
   columnDefs: ColDef[]
+  detailColumnDefs: ColDef[]
   gridOptions: GridOptions
   rowData$: Observable<any[]>
   agGridModules: Module[] = [...CommonConfig.AG_GRID_MODULES, MasterDetailModule];
@@ -59,6 +60,7 @@ export class MarkOverrideMasterComponent implements OnInit {
 
     this.columnDefs = [
       { field: 'assetID', cellRenderer: 'agGroupCellRenderer' },
+      { field: 'type' },
       { field: 'markOverride', valueFormatter: nonAmountNumberFormatter },
       { field: 'markDate', valueFormatter: dateFormatter },
       { field: 'valuationMethod', headerName: 'Mark Type' },
@@ -67,7 +69,9 @@ export class MarkOverrideMasterComponent implements OnInit {
       { field: 'reviewedBy' },
       { field: 'reviewedOn', valueFormatter: dateTimeFormatter },
       { field: 'auditEventID', hide: true },
-      { field: 'wsoStatus', hide: true }
+      { field: 'wsoStatus', hide: true },
+      { field: 'isMarkedAtCost', hide: true },
+      { field: 'comment' }
     ]
 
     this.gridOptions = {
@@ -86,37 +90,12 @@ export class MarkOverrideMasterComponent implements OnInit {
       headerHeight: 30,
       rowHeight: 30,
       enableRangeSelection: true,
+      onRowGroupOpened: this.onRowGroupOpened
     }
 
-    let detailColDef: ColDef[] = [];
-    if(this.marktype.toLowerCase() === 'mark to market'){
-      detailColDef = [
-        { field: 'positionID' },
-        { field: 'fundHedging' },
-        { field: 'portfolioName' },
-        { field: 'mark', valueFormatter: nonAmountNumberFormatter },
-        { field: 'markDate', valueFormatter: dateFormatter },
-        { field: 'modifiedBy' },
-        { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
-        { field: 'wsoActivityID', valueFormatter: nonAmountNumberFormatter },
-        { field: 'wsoStatus', hide: true },
-      ];
-    }
-    else if(this.marktype.toLowerCase() === 'impaired cost'){
-      detailColDef = [
-        { field: 'assetID' },
-        { field: 'issuerShortName' },
-        { field: 'asset' },
-        { field: 'mark', valueFormatter: nonAmountNumberFormatter },
-        { field: 'markDate', valueFormatter: dateFormatter },
-        { field: 'modifiedBy' },
-        { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
-        { field: 'wsoActivityID', valueFormatter: nonAmountNumberFormatter },
-      ]
-    }
     this.detailCellRendererParams = {
       detailGridOptions: {
-        columnDefs: detailColDef,
+        columnDefs: this.detailColumnDefs,
         defaultColDef: {
           resizable: true,
           cellStyle: this.detailGridCellStyle.bind(this)
@@ -143,14 +122,27 @@ export class MarkOverrideMasterComponent implements OnInit {
   }
 
   masterGridCellStyle(params){
-    if(params.data?.['wsoStatus'] === 'Failed' && params.data?.['isReviewed'] === true)
-      return { background: 'pink' }
+
+    let data = params.data;
+
+    if(data?.['isReviewed'] === true){
+      
+      if(data?.['isMarkedAtCost'])
+        return { backgroundColor: '#f5d442' }
+      else if(data?.['wsoStatus'] === 'Failed')
+        return { backgroundColor: 'pink' }
+    }  
     return null;
   }
 
   detailGridCellStyle(params){
-    if(params.data?.['wsoStatus'] === 'Failed')
-      return { background: 'pink' }
+    let data = params.data;
+
+    if(data?.['wsoStatus'] === 'Failed')
+      return { backgroundColor: 'pink' }
+    else if(data?.['isMarkedAtCost'])
+      return { backgroundColor: '#f5d442' }
+
     return null;
   }
 
@@ -160,5 +152,39 @@ export class MarkOverrideMasterComponent implements OnInit {
 
   onClose(){
     this.dialogRef.close()
+  }
+
+  onRowGroupOpened: (event: RowGroupOpenedEvent<any>) => void = (params: RowGroupOpenedEvent) => {
+
+    this.detailColumnDefs = [
+      { field: 'assetID', valueFormatter: nullOrZeroFormatterWithoutLocale }
+    ]
+
+    if((this.marktype.toLowerCase() === 'impaired cost' && params.data?.['isMarkedAtCost']) || this.marktype.toLowerCase() === 'mark to market'){
+
+        this.detailColumnDefs = [
+          ...this.detailColumnDefs,
+          { field: 'positionID', valueFormatter: nullOrZeroFormatterWithoutLocale },
+          { field: 'fundHedging' },
+          { field: 'portfolioName' }
+        ]
+    }
+
+    this.detailColumnDefs = [
+      ...this.detailColumnDefs,
+      { field: 'mark', valueFormatter: nonAmountNumberFormatter },
+      { field: 'markDate', valueFormatter: dateFormatter },
+      { field: 'modifiedBy' },
+      { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
+      { field: 'wsoAuditID', valueFormatter: nonAmountNumberFormatter },
+      { field: 'wsoStatus', hide: true },
+      { field: 'isMarkedAtCost', hide: true },
+      { field: 'comment' }
+    ]
+
+    let detailGridInfo: DetailGridInfo = params.api.getDetailGridInfo(`detail_${params.data?.['uniqueID']}`);
+    if(detailGridInfo){
+      detailGridInfo.api.setColumnDefs(this.detailColumnDefs);
+    }
   }
 }

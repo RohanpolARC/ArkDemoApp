@@ -106,6 +106,12 @@ export function nullOrZeroFormatter(params){
     });
 }
 
+export function nullOrZeroFormatterWithoutLocale(params: ValueFormatterParams){
+    if(!params.value)
+        return "";
+    else return params.value;
+}
+
 export function removeDecimalFormatter(params){
     if(params.value != null && Number(params.value)!= 0){
         return String(parseInt(params.value));

@@ -1,5 +1,5 @@
 import { AdaptableApi, AdaptableOptions, AdaptableReadyInfo, CustomQueryVariableContext } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridApi, GridOptions, GridReadyEvent, ICellRendererParams, Module, RowNode } from '@ag-grid-community/core';
+import { CellClassParams, ColDef, GridApi, GridOptions, GridReadyEvent, ICellRendererParams, ITooltipParams, Module, RowNode } from '@ag-grid-community/core';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -25,6 +25,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   @Input() rowData;
   @Input() benchmarkIndexes: { [index: string]: any }
   @Input() asOfDate: string
+  @Input() funds: string[]
   @Input() showLoadingOverlayReq: { show: 'Yes' | 'No' }
   @Input() clearEditingStateReq: { clear: 'Yes' | 'No' }
   @Input() getReviewingAssetsReq: { get: 'Yes' | 'No' }
@@ -129,13 +130,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'override', type: 'abColDefNumber', cellStyle: this.gridSvc.editableCellStyle.bind(this), onCellValueChanged: this.gridSvc.onOverrideCellValueChanged.bind(this.gridSvc), editable: this.gridSvc.isEditable.bind(this.gridSvc) },
       { field: 'overrideDate', type: 'abColDefDate' },
       { field: 'markType', type: 'abColDefString' },
-      { field: 'initialYieldCurveSpread', type: 'abColDefNumber', 
-        editable: this.gridSvc.isEditable.bind(this.gridSvc), 
-        cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc)  },
-      { field: 'initialCreditSpread', type: 'abColDefNumber', 
-        editable: this.gridSvc.isEditable.bind(this.gridSvc), 
-        cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), headerName: 'Initial Benchmark Spread' },
-      { field: 'creditSpreadIndex', type: 'abColDefString', cellEditor: 'autocompleteCellEditor',    
+      { field: 'spreadBenchmarkIndex', type: 'abColDefString', cellEditor: 'autocompleteCellEditor',    
         cellEditorParams: () => {
           return {
             options: [...new Set(Object.keys(this.benchmarkIndexes))], isStrict: true, oldValRestoreOnStrict: true
@@ -144,12 +139,14 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         onCellValueChanged: this.gridSvc.onIndexCellValueChanged.bind(this.gridSvc),
         editable: this.gridSvc.isEditable.bind(this.gridSvc), cellEditorPopup: false ,
         cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), headerName: 'Benchmark Spread Index' },
-      { field: 'currentYieldCurveSpread', type: 'abColDefNumber' },
-      { field: 'currentCreditSpread', type: 'abColDefNumber', headerName: 'Current Benchmark Spread' },
+      { field: 'benchmarkIndexPrice', type: 'abColDefNumber' },
+      { field: 'benchmarkIndexYield', type: 'abColDefNumber' },
+      { field: 'currentBenchmarkSpread', type: 'abColDefNumber', headerName: 'Current Benchmark Spread' },
       { field: 'deltaSpreadDiscount', type: 'abColDefNumber', 
         cellStyle: this.gridSvc.editableCellStyle.bind(this.gridSvc), 
         editable: this.gridSvc.isEditable.bind(this.gridSvc), 
         onCellValueChanged: this.gridSvc.onDeltaSpreadDiscountCellValueChanged.bind(this.gridSvc) },
+      { field: 'effectiveDate', type: 'abColDefDate', headerName: 'Effective Date' },
       { field: 'modelValuation', type: 'abColDefNumber' },
       { field: 'modelValuationMinus100', type: 'abColDefNumber', headerName: 'Valuation-100bps' },
       { field: 'modelValuationPlus100', type: 'abColDefNumber', headerName: 'Valuation+100bps' },
@@ -159,7 +156,21 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'mark', type: 'abColDefNumber', hide: true },
       { field: 'costPrice', type: 'abColDefNumber', hide: true },
       { field: 'comment', type: 'abColDefString', hide: true },
-      { field: 'positionsCount', type: 'abColDefNumber', hide: true },
+      { field: 'positionsCount', type: 'abColDefNumber', hide: true, 
+        onCellClicked: this.gridSvc.onPositionsCountClicked.bind(this.gridSvc),
+        cellStyle: (params: CellClassParams) => {
+          if(!!params.value){
+            return { color: '#0590ca' }
+          }
+          return null;
+        },
+        tooltipValueGetter: (params: ITooltipParams) => {
+          if(!!params.value){
+            return `Click here to check all underlying positions`;
+          }
+          return null;
+        }
+      },
       { field: 'assetTypeName', type: 'abColDefString', hide: true, headerName: 'WSO Asset Type Name' },
       { field: 'expectedDate', type: 'abColDefDate' },
       { field: 'seniority', type: 'abColDefNumber' },
@@ -311,7 +322,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       userInterfaceOptions: {
         customDisplayFormatters: [
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', ['faceValueIssue', 'mark', 'costPrice', 
-          'initialYieldCurveSpread', 'initialCreditSpread', 'currentYieldCurveSpread', 'currentCreditSpread', 'deltaSpreadDiscount', 'usedSpreadDiscount', 'marketValue', 'currentMarketValue', 'previousMarketValue']),
+           'benchmarkIndexYield', 'currentBenchmarkSpread', 'deltaSpreadDiscount', 'usedSpreadDiscount', 'marketValue', 'currentMarketValue', 'previousMarketValue', 'benchmarkIndexPrice']),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat', ['override', 'currentWSOMark', 'previousWSOMark']),
 
         ],
@@ -345,7 +356,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         },
         Layout: {
           CurrentLayout: 'Basic Layout',
-          Revision: 22,
+          Revision: 24,
           Layouts: [
             {
               Name: 'Basic Layout',
@@ -362,24 +373,24 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         FormatColumn: {
-          Revision: 27,
+          Revision: 29,
           FormatColumns: [
             {
               Scope: { ColumnIds: [ ...this.columnDefs.map(def => def.field), 'marketValue', 'currentMarketValue', 'previousMarketValue'] },
               Style: { BackColor: 'pink' },
               Rule: { BooleanExpression: `COALESCE([comment],"" ) != ""` }
             },
-            BLANK_DATETIME_FORMATTER_CONFIG(['overrideDate', 'expectedDate', 'modifiedOn', 'reviewedOn']), //'dateTo', 'dateFrom'
-            DATE_FORMATTER_CONFIG_ddMMyyyy(['overrideDate', 'expectedDate']), //'dateTo', 'dateFrom'
+            BLANK_DATETIME_FORMATTER_CONFIG(['overrideDate', 'expectedDate', 'modifiedOn', 'reviewedOn', 'effectiveDate']), //'dateTo', 'dateFrom'
+            DATE_FORMATTER_CONFIG_ddMMyyyy(['overrideDate', 'expectedDate', 'effectiveDate']), //'dateTo', 'dateFrom'
             DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn', 'reviewedOn']),
             AMOUNT_FORMATTER_CONFIG_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 2, ['amountZeroFormat']),
             AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['currentWSOMark', 'previousWSOMark', 'override', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100'], 4),
             CUSTOM_FORMATTER(['faceValueIssue', 'mark', 'costPrice', 
-            'initialYieldCurveSpread', 'initialCreditSpread', 'currentYieldCurveSpread', 'currentCreditSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValue', 'currentMarketValue', 'previousMarketValue'], 'amountFormatter')
+            'benchmarkIndexPrice', 'benchmarkIndexYield', 'currentBenchmarkSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValue', 'currentMarketValue', 'previousMarketValue'], 'amountFormatter')
           ]
         },
         CalculatedColumn: {
-          Revision: 14,
+          Revision: 15,
           CalculatedColumns: [
             {
               FriendlyName: 'Market Value',
