@@ -153,6 +153,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'isModelValuationStale', type: 'abColDefBoolean' },
       { field: 'usedSpreadDiscount', type: 'abColDefNumber' },
       { field: 'faceValueIssue', type: 'abColDefNumber', hide: true },
+      { field: 'faceValueIssueFunded', type: 'abColDefNumber', hide: true },
       { field: 'mark', type: 'abColDefNumber', hide: true },
       { field: 'costPrice', type: 'abColDefNumber', hide: true },
       { field: 'comment', type: 'abColDefString', hide: true },
@@ -321,7 +322,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       },
       userInterfaceOptions: {
         customDisplayFormatters: [
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', ['faceValueIssue', 'mark', 'costPrice', 
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', ['faceValueIssue','faceValueIssueFunded', 'mark', 'costPrice', 
            'benchmarkIndexYield', 'currentBenchmarkSpread', 'deltaSpreadDiscount', 'usedSpreadDiscount', 'marketValue', 'currentMarketValue', 'previousMarketValue', 'benchmarkIndexPrice']),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat', ['override', 'currentWSOMark', 'previousWSOMark']),
 
@@ -373,7 +374,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         FormatColumn: {
-          Revision: 29,
+          Revision: 30,
           FormatColumns: [
             {
               Scope: { ColumnIds: [ ...this.columnDefs.map(def => def.field), 'marketValue', 'currentMarketValue', 'previousMarketValue'] },
@@ -385,7 +386,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
             DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn', 'reviewedOn']),
             AMOUNT_FORMATTER_CONFIG_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 2, ['amountZeroFormat']),
             AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['currentWSOMark', 'previousWSOMark', 'override', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100'], 4),
-            CUSTOM_FORMATTER(['faceValueIssue', 'mark', 'costPrice', 
+            CUSTOM_FORMATTER(['faceValueIssue','faceValueIssueFunded',, 'mark', 'costPrice', 
             'benchmarkIndexPrice', 'benchmarkIndexYield', 'currentBenchmarkSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValue', 'currentMarketValue', 'previousMarketValue'], 'amountFormatter')
           ]
         },
