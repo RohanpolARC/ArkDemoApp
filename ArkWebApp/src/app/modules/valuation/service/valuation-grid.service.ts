@@ -354,7 +354,7 @@ export class ValuationGridService {
 
     let rate: number = this.getYieldCurves().filter(curve => curve.name === yieldCurve && curve.currency === assetCcy)?.[0]?.['rate'] ?? 0;
 
-    let node: RowNode = params.node;
+    let node: RowNode = <RowNode>params.node;
     node.data['currentYCYield'] = rate;
     node.data['initialYCYield'] = null;
 
@@ -362,18 +362,18 @@ export class ValuationGridService {
   }
 
   onInitialYCYieldValueChanged(params: CellValueChangedEvent){
-    this.refreshIndexAndYieldFields(params.node)
+    this.refreshIndexAndYieldFields(params.node as RowNode)
   }
 
   onInitialBenchmarkYieldValueChanged(params: CellValueChangedEvent){
-    this.refreshIndexAndYieldFields(params.node)
+    this.refreshIndexAndYieldFields(params.node as RowNode)
   }
 
   onIndexCellValueChanged(params: CellValueChangedEvent){
 
     let index: string = params?.data?.['spreadBenchmarkIndex'];
 
-    let node: RowNode = params.node;
+    let node: RowNode = <RowNode>params.node;
     node.data['initialBenchmarkYield'] = null;
     node.data['currentBenchmarkYield'] = this.getBenchmarkIndexes()[index]?.['benchmarkIndexYield'] ?? 0;     //YTW
 
