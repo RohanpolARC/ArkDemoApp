@@ -157,21 +157,10 @@ export class MarkOverrideMasterComponent implements OnInit {
   onRowGroupOpened: (event: RowGroupOpenedEvent<any>) => void = (params: RowGroupOpenedEvent) => {
 
     this.detailColumnDefs = [
-      { field: 'assetID', valueFormatter: nullOrZeroFormatterWithoutLocale }
-    ]
-
-    if((this.marktype.toLowerCase() === 'impaired cost' && params.data?.['isMarkedAtCost']) || this.marktype.toLowerCase() === 'mark to market'){
-
-        this.detailColumnDefs = [
-          ...this.detailColumnDefs,
-          { field: 'positionID', valueFormatter: nullOrZeroFormatterWithoutLocale },
-          { field: 'fundHedging' },
-          { field: 'portfolioName' }
-        ]
-    }
-
-    this.detailColumnDefs = [
-      ...this.detailColumnDefs,
+      { field: 'assetID', valueFormatter: nullOrZeroFormatterWithoutLocale },
+      { field: 'positionID', valueFormatter: nullOrZeroFormatterWithoutLocale },
+      { field: 'fundHedging' },
+      { field: 'portfolioName' },
       { field: 'mark', valueFormatter: nonAmountNumberFormatter },
       { field: 'markDate', valueFormatter: dateFormatter },
       { field: 'modifiedBy' },

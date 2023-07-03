@@ -483,7 +483,12 @@ export class ValuationGridService {
 
     for(let i: number = 0; i < reviewedAssets.length; i+= 1){
 
-      let nodes: RowNode[] = <RowNode[]>this.getAdaptableApi().gridApi.getAllRowNodes({
+      // When push to WSO is clicked multiple times, API sends empty array back after push is already done.
+      if(!reviewedAssets[i]?.['assetID'] || !reviewedAssets[i]?.['markType']){
+        continue;
+      }
+
+      let nodes: RowNode[] = <RowNode[]> this.getAdaptableApi().gridApi.getAllRowNodes({
         includeGroupRows: false,
         filterFn: (node: RowNode) => {
           return (node.data?.['assetID'] === reviewedAssets[i]?.['assetID']) && (node.data?.['markType'].toLowerCase() === reviewedAssets[i]?.['markType'].toLowerCase())

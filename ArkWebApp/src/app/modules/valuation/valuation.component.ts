@@ -159,7 +159,7 @@ export class ValuationComponent implements OnInit {
 
         for(let i: number = 0; i < feed.length; i+= 1){
           if(feed[i]['status'] === 'Failed'){
-            this.dataSvc.setWarningMsg(`Failed to push marks for all. Please check audit logs for more information`, `Dismiss`, `ark-theme-snackbar-error`)
+            this.dataSvc.setWarningMsg(`Some positions might have different marks. Please check audit log for more information`, `Dismiss`, `ark-theme-snackbar-warning`)
             return;
           }
         }
@@ -167,7 +167,8 @@ export class ValuationComponent implements OnInit {
         this.dataSvc.setWarningMsg(`Pushed all marks to WSO`, `Dismiss`, `ark-theme-snackbar-success`)
       },
       error: (error) => {
-        console.error(`Failed to review the assets: {error}`);
+        this.dataSvc.setWarningMsg(`Failed to review the marks`, `Dismiss`, `ark-theme-snackbar-error`);
+        console.error(`Failed to review the assets: ${error}`);
       }
     })   
   }
