@@ -113,7 +113,6 @@ export class AttributesFixingComponent implements OnInit {
       },
     }
 
-    this.columnsList = this.columnDefs.map(colDef => colDef.field)
 
     this.adaptableOptions= {
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
@@ -194,11 +193,11 @@ export class AttributesFixingComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 13,
+          Revision: 14,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
-            Columns: [ ...this.columnsList.filter(r => !['fixingID'
+            Columns: [ ...this.columnDefs.map(colDef => colDef.field).filter(r => !['fixingID'
             ,'attributeId'
             ,'attributeType'
             ,'createdBy'
