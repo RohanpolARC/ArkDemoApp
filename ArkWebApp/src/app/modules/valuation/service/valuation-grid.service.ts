@@ -432,6 +432,11 @@ export class ValuationGridService {
 
     for(let i: number = 0; i < reviewedAssets.length; i+= 1){
 
+      // When push to WSO is clicked multiple times, API sends empty array back after push is already done.
+      if(!reviewedAssets[i]?.['assetID'] || !reviewedAssets[i]?.['markType']){
+        continue;
+      }
+
       let nodes: RowNode[] = this.getAdaptableApi().gridApi.getAllRowNodes({
         includeGroupRows: false,
         filterFn: (node: RowNode) => {
