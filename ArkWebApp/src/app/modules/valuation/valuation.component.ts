@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { interval, Observable, Subject, Subscription } from 'rxjs';
 import { filter, first, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
@@ -6,6 +7,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
 import { AsOfDateRange, FilterIdValuePair } from 'src/app/shared/models/FilterPaneModel';
+import { MarkOverrideMasterComponent } from './mark-override-master/mark-override-master.component';
 
 @Component({
   selector: 'app-valuation',
@@ -38,7 +40,8 @@ export class ValuationComponent implements OnInit {
     private valuationSvc: ValuationService,
     private dataSvc: DataService,
     private filterSvc: GeneralFilterService,
-    private accessSvc: AccessService
+    private accessSvc: AccessService,
+    public dialog: MatDialog
   ) { }
 
   rowData$: Observable<any[]> = this.dataSvc.filterApplyBtnState.pipe(
@@ -226,6 +229,18 @@ export class ValuationComponent implements OnInit {
         )
       })
     )
+  }
+
+  onAuditMarkOverrides(){
+    const dialogRef = this.dialog.open(MarkOverrideMasterComponent, {
+      data: {
+        assetID: null,
+        marktype: null,
+        asofdate: this.asofdate.end
+      },
+      width: '90vw',
+      height: '80vh'
+    })
   }
 
   onPushtoWSO(){

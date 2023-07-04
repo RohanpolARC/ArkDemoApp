@@ -14,6 +14,7 @@ import { MarkOverrideMasterComponent } from './mark-override-master/mark-overrid
 import { AggridMatCheckboxEditorModule } from 'src/app/shared/modules/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor.module';
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatProgressSpinnerModule,
     MatDialogModule,
     AggridMatCheckboxEditorModule, 
-    DetailedViewModule
+    DetailedViewModule,
+    MatTooltipModule
   ],
   providers: [
     ValuationGridService

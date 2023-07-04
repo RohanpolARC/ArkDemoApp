@@ -46,8 +46,10 @@ export class MarkOverrideMasterComponent implements OnInit {
 
   constructor(public dialogRef: MatDialogRef<MarkOverrideMasterComponent>,
     @Inject(MAT_DIALOG_DATA) public params: {
-      assetID: number,
-      marktype: string,
+      assetID?: number,   // Can be empty, in case of global audit
+      marktype?: string,  // Can be empty, in case of global audit
+
+      // This will be the date (likely current date) for which its positions will be used to check the mark (not markDate).
       asofdate: string  //'YYYY-MM-DD'
     },
     private valuationSvc: ValuationService) { }
@@ -109,8 +111,10 @@ export class MarkOverrideMasterComponent implements OnInit {
       getDetailRowData: (params) => {
 
         let auditeventID: number = params.data?.['auditEventID'];
+        let assetID: number = params.data?.['assetID'];
+        let marktype: string = params.data?.['valuationMethod']; 
 
-        this.valuationSvc.getAuditDetail(this.assetID, this.marktype, this.asofdate, auditeventID).pipe(first()).subscribe({
+        this.valuationSvc.getAuditDetail(assetID, marktype, this.asofdate, auditeventID).pipe(first()).subscribe({
           next: (detail) => {
             params.successCallback(detail)
           },
