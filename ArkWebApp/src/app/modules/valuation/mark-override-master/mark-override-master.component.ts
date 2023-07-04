@@ -62,6 +62,7 @@ export class MarkOverrideMasterComponent implements OnInit {
       { field: 'assetID', cellRenderer: 'agGroupCellRenderer' },
       { field: 'type' },
       { field: 'markOverride', valueFormatter: nonAmountNumberFormatter },
+      { field: 'calculatedWSOMark', valueFormatter: nonAmountNumberFormatter },
       { field: 'markDate', valueFormatter: dateFormatter },
       { field: 'valuationMethod', headerName: 'Mark Type' },
       { field: 'modifiedBy' },
@@ -71,14 +72,14 @@ export class MarkOverrideMasterComponent implements OnInit {
       { field: 'auditEventID', hide: true },
       { field: 'wsoStatus', hide: true },
       { field: 'isMarkedAtCost', hide: true },
-      { field: 'comment' }
+      { field: 'comment', width: 500 }
     ]
 
     this.gridOptions = {
       columnDefs: this.columnDefs,
       defaultColDef: {
         resizable: true,
-        cellStyle: this.masterGridCellStyle.bind(this)
+        cellStyle: this.gridCellStyle.bind(this)
       },
       masterDetail: true,
       isRowMaster: this.isRowMaster,
@@ -98,7 +99,7 @@ export class MarkOverrideMasterComponent implements OnInit {
         columnDefs: this.detailColumnDefs,
         defaultColDef: {
           resizable: true,
-          cellStyle: this.detailGridCellStyle.bind(this)
+          cellStyle: this.gridCellStyle.bind(this)
         },
         headerHeight: 30,
         rowHeight: 30,
@@ -121,29 +122,8 @@ export class MarkOverrideMasterComponent implements OnInit {
     } as IDetailCellRendererParams
   }
 
-  masterGridCellStyle(params){
-
-    let data = params.data;
-
-    if(data?.['isReviewed'] === true){
-      
-      if(data?.['isMarkedAtCost'])
-        return { 'background': '#f5d442' }
-      else if(data?.['wsoStatus'] === 'Failed')
-        return { 'background': 'pink' }
-    }  
-    return null;
-  }
-
-  detailGridCellStyle(params){
-    let data = params.data;
-
-    if(data?.['wsoStatus'] === 'Failed')
-      return { 'background': 'pink' }
-    else if(data?.['isMarkedAtCost'])
-      return { 'background': '#f5d442' }
-
-    return null;
+  gridCellStyle(params){
+    return { 'background': params.data?.['colour'] };
   }
 
   isRowMaster: IsRowMaster = (nData: any) => {

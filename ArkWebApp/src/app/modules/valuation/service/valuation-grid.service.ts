@@ -22,6 +22,7 @@ export class ValuationGridService {
   }
 
   public lockEdit: boolean
+  public saveInProgress: boolean
 
   overrideColMap: {
     [col: string] : {
@@ -134,6 +135,14 @@ export class ValuationGridService {
 
   saveActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
 
+    if(this.saveInProgress){
+      this.dataSvc.setWarningMsg(`Current save is in progress`, `Dismiss`, `ark-theme-snackbar-warning`)
+      return  
+    }
+    else {
+      this.saveInProgress = true;
+    }
+
     this.dataSvc.setWarningMsg(`Please wait while we save the updates`,`Dismiss`,'ark-theme-snackbar-normal')
 
     let node: RowNode = context.rowNode;
@@ -152,6 +161,7 @@ export class ValuationGridService {
 
     this.valuationSvc.putValuationData([valuation]).pipe(first()).subscribe({
       next: (res: APIReponse) => {
+        this.saveInProgress = false;
         if(res.isSuccess){
           this.dataSvc.setWarningMsg(`Saved Valuation information for this asset`, `Dismiss`, `ark-theme-snackbar-success`);
 
@@ -182,6 +192,7 @@ export class ValuationGridService {
       },
       error: (err) => {
         console.error(`Failed to save valuation model: ${err}`)
+        this.saveInProgress = false
       }
     })
 

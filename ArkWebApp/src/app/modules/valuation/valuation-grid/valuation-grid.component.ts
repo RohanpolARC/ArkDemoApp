@@ -120,6 +120,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   ngOnInit(): void {
 
     this.columnDefs = [
+      { field: 'issuer', type: 'abColDefString', hide: true },
       { field: 'issuerShortName', type: 'abColDefString' },
       { field: 'asset', type: 'abColDefString' },
       { field: 'assetID', type: 'abColDefNumber' },
@@ -323,7 +324,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       userInterfaceOptions: {
         customDisplayFormatters: [
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', ['faceValueIssue','faceValueIssueFunded', 'mark', 'costPrice', 
-           'benchmarkIndexYield', 'currentBenchmarkSpread', 'deltaSpreadDiscount', 'usedSpreadDiscount', 'marketValue', 'currentMarketValue', 'previousMarketValue', 'benchmarkIndexPrice']),
+           'benchmarkIndexYield', 'currentBenchmarkSpread', 'deltaSpreadDiscount', 'usedSpreadDiscount', 'marketValue', 'currentMarketValueIssue', 'previousMarketValueIssue', 'currentMarketValueIssueFunded', 'previousMarketValueIssueFunded', 'benchmarkIndexPrice']),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat', ['override', 'currentWSOMark', 'previousWSOMark']),
 
         ],
@@ -357,7 +358,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         },
         Layout: {
           CurrentLayout: 'Basic Layout',
-          Revision: 24,
+          Revision: 25,
           Layouts: [
             {
               Name: 'Basic Layout',
@@ -374,10 +375,10 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         FormatColumn: {
-          Revision: 30,
+          Revision: 37,
           FormatColumns: [
             {
-              Scope: { ColumnIds: [ ...this.columnDefs.map(def => def.field), 'marketValue', 'currentMarketValue', 'previousMarketValue'] },
+              Scope: { ColumnIds: [ ...this.columnDefs.map(def => def.field), 'marketValue', 'currentMarketValueIssue', 'previousMarketValueIssue', 'currentMarketValueIssueFunded', 'previousMarketValueIssueFunded'] },
               Style: { BackColor: 'pink' },
               Rule: { BooleanExpression: `COALESCE([comment],"" ) != ""` }
             },
@@ -386,12 +387,12 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
             DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn', 'reviewedOn']),
             AMOUNT_FORMATTER_CONFIG_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 2, ['amountZeroFormat']),
             AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['currentWSOMark', 'previousWSOMark', 'override', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100'], 4),
-            CUSTOM_FORMATTER(['faceValueIssue','faceValueIssueFunded',, 'mark', 'costPrice', 
-            'benchmarkIndexPrice', 'benchmarkIndexYield', 'currentBenchmarkSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValue', 'currentMarketValue', 'previousMarketValue'], 'amountFormatter')
+            CUSTOM_FORMATTER(['faceValueIssue','faceValueIssueFunded', 'mark', 'costPrice', 
+            'benchmarkIndexPrice', 'benchmarkIndexYield', 'currentBenchmarkSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValue', 'currentMarketValueIssue', 'previousMarketValueIssue', 'currentMarketValueIssueFunded', 'previousMarketValueIssueFunded'], 'amountFormatter')
           ]
         },
         CalculatedColumn: {
-          Revision: 15,
+          Revision: 19,
           CalculatedColumns: [
             {
               FriendlyName: 'Market Value',
@@ -400,27 +401,47 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
                 ScalarExpression: ` CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssue] * COALESCE(VAR('markOverride',[override]), [currentWSOMark])  WHEN [assetTypeName] IN ('Loan', 'Bond')   THEN [faceValueIssue] * COALESCE(VAR('markOverride',[override]), [currentWSOMark]) / 100.0 ELSE 0 END`
               },
               CalculatedColumnSettings: {
-                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true
+                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
               }
             },
             {
-              FriendlyName: 'Current Market Value',
-              ColumnId: 'currentMarketValue',
+              FriendlyName: 'Curr Market Value Issue',
+              ColumnId: 'currentMarketValueIssue',
               Query: {
                 ScalarExpression: `CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssue] * COALESCE([currentWSOMark], 0.0) WHEN [assetTypeName] IN ('Loan', 'Bond') THEN [faceValueIssue] * COALESCE([currentWSOMark], 0.0) / 100.0 ELSE 0 END`
               },
               CalculatedColumnSettings: {
-                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true
+                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
               }
             },
             {
-              FriendlyName: 'Previous Market Value',
-              ColumnId: 'previousMarketValue',
+              FriendlyName: 'Curr Market Value Issue Funded',
+              ColumnId: 'currentMarketValueIssueFunded',
+              Query: {
+                ScalarExpression: `CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssueFunded] * COALESCE([currentWSOMark], 0.0) WHEN [assetTypeName] IN ('Loan', 'Bond') THEN [faceValueIssueFunded] * COALESCE([currentWSOMark], 0.0) / 100.0 ELSE 0 END`
+              },
+              CalculatedColumnSettings: {
+                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
+              }
+            },
+            {
+              FriendlyName: 'Prev Market Value Issue',
+              ColumnId: 'previousMarketValueIssue',
               Query: {
                 ScalarExpression: `CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssue] * COALESCE([previousWSOMark], 0.0) WHEN [assetTypeName] IN ('Loan', 'Bond') THEN [faceValueIssue] * COALESCE([previousWSOMark], 0.0) / 100.0 ELSE 0 END`
               },
               CalculatedColumnSettings: {
-                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true
+                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
+              }
+            },
+            {
+              FriendlyName: 'Prev Market Value Issue Funded',
+              ColumnId: 'previousMarketValueIssueFunded',
+              Query: {
+                ScalarExpression: `CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssueFunded] * COALESCE([previousWSOMark], 0.0) WHEN [assetTypeName] IN ('Loan', 'Bond') THEN [faceValueIssueFunded] * COALESCE([previousWSOMark], 0.0) / 100.0 ELSE 0 END`
+              },
+              CalculatedColumnSettings: {
+                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
               }
             }
           ]
