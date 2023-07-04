@@ -7,9 +7,10 @@ import { DataService } from 'src/app/core/services/data.service';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getMomentDate, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
-import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
+import { IPropertyReader, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { AggridMatCheckboxEditorComponent } from 'src/app/shared/modules/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor.component';
 import { ValuationGridService } from '../service/valuation-grid.service';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 
 @Component({
   selector: 'app-valuation-grid',
@@ -34,6 +35,8 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   @Input() reviewedAssets
   @Input() setAllAssetsForReviewReq: { set: 'Yes' | 'No' }
   @Input() getFilteredMTMAssetsReq: { get: 'Yes' | 'No' }
+
+  @Input() noRowsToDisplayMsg:NoRowsCustomMessages 
 
   agGridModules: Module[]
   gridOptions: GridOptions;
@@ -235,7 +238,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       rowGroupPanelShow: 'always',
       onGridReady: (p: GridReadyEvent) => {
         this.gridApi = p.api;
-        this.gridApi.hideOverlay();
+        this.gridApi.showNoRowsOverlay();
       },
       defaultColDef: {
         resizable: true,
@@ -249,7 +252,11 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         'autocompleteCellEditor': MatAutocompleteEditorComponent,
         'aggridMatCheckboxCellEditor': AggridMatCheckboxEditorComponent,
         'useModelValuationCheckbox': AggridMatCheckboxEditorComponent
-      }
+      },
+      noRowsOverlayComponent:NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
 
     this.adaptableOptions = {

@@ -8,6 +8,7 @@ import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/genera
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
 import { AsOfDateRange, FilterIdValuePair } from 'src/app/shared/models/FilterPaneModel';
 import { MarkOverrideMasterComponent } from './mark-override-master/mark-override-master.component';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
   selector: 'app-valuation',
@@ -28,6 +29,8 @@ export class ValuationComponent implements OnInit {
   getReviewingAssets: { get: 'Yes' | 'No' }
   setAllAssetsForReviewReq: { set: 'Yes' | 'No' }
   getFilteredMTMAssetsReq: { get: 'Yes' | 'No' }
+
+  noRowsToDisplayMsg:NoRowsCustomMessages = 'Please apply the filter.'
 
   reviewedAssets: any[]
 
@@ -51,6 +54,7 @@ export class ValuationComponent implements OnInit {
     tap((isHit) => { 
       this.asofdate = this.asofdateIn;    // Update date for grid only when hit apply
       this.showLoadingOverlayReq = { show: 'Yes' }
+      this.noRowsToDisplayMsg = 'No data found for applied filter.'
 
       // Closing all polling requests for model valuation if Apply is hit.
       this.closeTimer$.next();

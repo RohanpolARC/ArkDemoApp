@@ -49,6 +49,7 @@
                                         [getReviewingAssetsReq]="getReviewingAssets"
                                         [reviewedAssets]="reviewedAssets"
                                         [getFilteredMTMAssetsReq]="getFilteredMTMAssetsReq"
+                                        [noRowsToDisplayMsg] = "noRowsToDisplayMsg" 
                                         (filteredMTMAssetsEmitter)="getFilteredMTMAssets($event)"
                                         (valuationEventEmitter)="triggerRunValuation($event)"
                                         (reviewingAssetsEmitter)="reviewingAssets($event)"
