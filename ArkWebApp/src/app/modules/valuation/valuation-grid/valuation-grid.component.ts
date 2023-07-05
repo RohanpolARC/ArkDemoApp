@@ -131,6 +131,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'override', type: 'abColDefNumber', cellStyle: this.gridSvc.editableCellStyle.bind(this), onCellValueChanged: this.gridSvc.onOverrideCellValueChanged.bind(this.gridSvc), editable: this.gridSvc.isEditable.bind(this.gridSvc) },
       { field: 'overrideDate', type: 'abColDefDate' },
       { field: 'markType', type: 'abColDefString' },
+      { field: 'calculatedWSOMark', type: 'abColDefNumber' },
       { field: 'spreadBenchmarkIndex', type: 'abColDefString', cellEditor: 'autocompleteCellEditor',    
         cellEditorParams: () => {
           return {
@@ -325,7 +326,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         customDisplayFormatters: [
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', ['faceValueIssue','faceValueIssueFunded', 'mark', 'costPrice', 
            'benchmarkIndexYield', 'currentBenchmarkSpread', 'deltaSpreadDiscount', 'usedSpreadDiscount', 'marketValue', 'currentMarketValueIssue', 'previousMarketValueIssue', 'currentMarketValueIssueFunded', 'previousMarketValueIssueFunded', 'benchmarkIndexPrice']),
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat', ['override', 'currentWSOMark', 'previousWSOMark']),
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat', ['override', 'currentWSOMark', 'previousWSOMark', 'calculatedWSOMark']),
 
         ],
       },
@@ -333,14 +334,14 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         expressionOptions: {
           customQueryVariables: {
             // Adding markOverride variable to set 0 as null for coalesce used below
-            markOverride: (context: CustomQueryVariableContext) => {
+            calculatedWSOMark: (context: CustomQueryVariableContext) => {
 
 
-              const override: any = context?.args[0];
-              if (override === 0) {
+              const mark: any = context?.args[0];
+              if (mark === 0) {
                 return null;
               } else{
-                return override
+                return mark
               }
             },
           },
@@ -358,7 +359,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         },
         Layout: {
           CurrentLayout: 'Basic Layout',
-          Revision: 25,
+          Revision: 27,
           Layouts: [
             {
               Name: 'Basic Layout',
@@ -375,7 +376,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         FormatColumn: {
-          Revision: 37,
+          Revision: 40,
           FormatColumns: [
             {
               Scope: { ColumnIds: [ ...this.columnDefs.map(def => def.field), 'marketValue', 'currentMarketValueIssue', 'previousMarketValueIssue', 'currentMarketValueIssueFunded', 'previousMarketValueIssueFunded'] },
@@ -385,20 +386,20 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
             BLANK_DATETIME_FORMATTER_CONFIG(['overrideDate', 'expectedDate', 'modifiedOn', 'reviewedOn', 'effectiveDate']), //'dateTo', 'dateFrom'
             DATE_FORMATTER_CONFIG_ddMMyyyy(['overrideDate', 'expectedDate', 'effectiveDate']), //'dateTo', 'dateFrom'
             DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn', 'reviewedOn']),
-            AMOUNT_FORMATTER_CONFIG_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 2, ['amountZeroFormat']),
-            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['currentWSOMark', 'previousWSOMark', 'override', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100'], 4),
+            AMOUNT_FORMATTER_CONFIG_Zero(['override','calculatedWSOMark', 'currentWSOMark', 'previousWSOMark'], 2, ['amountZeroFormat']),
+            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['currentWSOMark', 'previousWSOMark', 'override','calculatedWSOMark', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100'], 4),
             CUSTOM_FORMATTER(['faceValueIssue','faceValueIssueFunded', 'mark', 'costPrice', 
             'benchmarkIndexPrice', 'benchmarkIndexYield', 'currentBenchmarkSpread', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValue', 'currentMarketValueIssue', 'previousMarketValueIssue', 'currentMarketValueIssueFunded', 'previousMarketValueIssueFunded'], 'amountFormatter')
           ]
         },
         CalculatedColumn: {
-          Revision: 19,
+          Revision: 22,
           CalculatedColumns: [
             {
               FriendlyName: 'Market Value',
               ColumnId: 'marketValue',
               Query: {
-                ScalarExpression: ` CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssue] * COALESCE(VAR('markOverride',[override]), [currentWSOMark])  WHEN [assetTypeName] IN ('Loan', 'Bond')   THEN [faceValueIssue] * COALESCE(VAR('markOverride',[override]), [currentWSOMark]) / 100.0 ELSE 0 END`
+                ScalarExpression: ` CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssue] * COALESCE(VAR('calculatedWSOMark',[calculatedWSOMark]), [override], [currentWSOMark])  WHEN [assetTypeName] IN ('Loan', 'Bond')   THEN [faceValueIssue] * COALESCE(VAR('calculatedWSOMark', [calculatedWSOMark]), [override], [currentWSOMark]) / 100.0 ELSE 0 END`
               },
               CalculatedColumnSettings: {
                 DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
