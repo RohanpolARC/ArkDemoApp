@@ -143,6 +143,7 @@ export class AumDeltaComponent implements OnInit {
     ]
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       defaultColDef: {
         resizable: true,
         sortable: true,

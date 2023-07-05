@@ -590,6 +590,7 @@ export class LiquiditySummaryComponent implements OnInit {
       componentParent: this
     }
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       tooltipShowDelay: 0,
       suppressAggFuncInHeader: true,
       enableRangeSelection: true,

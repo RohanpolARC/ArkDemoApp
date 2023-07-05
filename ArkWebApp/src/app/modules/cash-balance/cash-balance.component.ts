@@ -80,6 +80,7 @@ export class CashBalanceComponent implements OnInit {
     private filterSvc:GeneralFilterService) {
     
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       sideBar: true,
       suppressMenuHide: true,

@@ -42,6 +42,7 @@ export class FeePresetsGridComponent implements OnInit {
     ]
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       columnDefs: this.columnDefs,
       // onGridReady: this.onGridReady.bind(this),

@@ -504,6 +504,7 @@ export class PortfolioModellerComponent implements OnInit {
     }
     
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       context: this.context,
       singleClickEdit: true,
       enableRangeSelection: true,

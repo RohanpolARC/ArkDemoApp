@@ -72,6 +72,7 @@ export class MarkChangesComponent implements OnInit {
 
 
     this.gridOptions={
+      ...CommonConfig.GRID_OPTIONS,
       defaultColDef:{
         resizable: true,
         sortable: true,

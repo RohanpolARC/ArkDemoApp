@@ -284,6 +284,7 @@ NON_AMOUNT_2DEC_COLUMNS=['GrossMOM',
     ]
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       columnDefs: this.columnDefs,
       defaultColDef: this.defaultColDef,

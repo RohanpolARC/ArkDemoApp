@@ -112,6 +112,7 @@ export class MonthlyReturnsComponent implements OnInit {
     ]
 
     this.gridOptionsMonthlyRets = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       sideBar: true,
       columnDefs: this.columnDefsMonthlyRets,

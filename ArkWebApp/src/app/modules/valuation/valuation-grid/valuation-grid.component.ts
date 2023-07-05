@@ -250,6 +250,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
     ]
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       sideBar: true,
       columnDefs: this.columnDefs,
@@ -418,7 +419,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         CalculatedColumn: {
-          Revision: 17,
+          Revision: 18,
           CalculatedColumns: [
             {
               FriendlyName: 'Market Value',
@@ -427,7 +428,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
                 ScalarExpression: ` CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssue] * COALESCE(VAR('markOverride',[override]), [currentWSOMark])  WHEN [assetTypeName] IN ('Loan', 'Bond')   THEN [faceValueIssue] * COALESCE(VAR('markOverride',[override]), [currentWSOMark]) / 100.0 ELSE 0 END`
               },
               CalculatedColumnSettings: {
-                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true
+                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true,Resizable:true
               }
             },
             {
@@ -437,7 +438,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
                 ScalarExpression: `CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssue] * COALESCE([currentWSOMark], 0.0) WHEN [assetTypeName] IN ('Loan', 'Bond') THEN [faceValueIssue] * COALESCE([currentWSOMark], 0.0) / 100.0 ELSE 0 END`
               },
               CalculatedColumnSettings: {
-                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true
+                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true,Resizable:true
               }
             },
             {
@@ -447,7 +448,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
                 ScalarExpression: `CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssue] * COALESCE([previousWSOMark], 0.0) WHEN [assetTypeName] IN ('Loan', 'Bond') THEN [faceValueIssue] * COALESCE([previousWSOMark], 0.0) / 100.0 ELSE 0 END`
               },
               CalculatedColumnSettings: {
-                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true
+                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true,Resizable:true
               }
             }
           ]

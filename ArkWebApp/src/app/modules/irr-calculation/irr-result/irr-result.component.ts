@@ -139,6 +139,7 @@ export class IrrResultComponent implements OnInit {
     this.columnDefs = this.calcColDefs;
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       sideBar: true,
       columnDefs: this.columnDefs,

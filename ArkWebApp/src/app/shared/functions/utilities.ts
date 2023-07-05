@@ -1,5 +1,5 @@
 import { SharedEntitiesContext, SharedEntity } from "@adaptabletools/adaptable-angular-aggrid";
-import { RowNode } from "@ag-grid-community/core";
+import { ColDef, RowNode } from "@ag-grid-community/core";
 import { DecimalPipe } from "@angular/common";
 import * as moment from "moment";
 import { first } from "rxjs/operators";
@@ -147,4 +147,11 @@ export function getRowNodes(node: RowNode, rowNodes: any[] = []){
       rowNodes.push(node);
   }
   return rowNodes;
+}
+
+export function getWrapWidth(cd:ColDef):number[]{
+  if(cd.headerName.length<7){
+    return [cd.headerName.length*0.4*16,100]
+  }
+  return [cd.headerName.length*0.4*16,cd.headerName.length*0.7*16]
 }

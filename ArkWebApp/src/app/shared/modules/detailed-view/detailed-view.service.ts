@@ -7,6 +7,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from '../../components/no-rows-overlay/no-rows-overlay.component';
 import { createColumnDefs2, GridColumnConfig, parseFetchedData } from '../../functions/dynamic.parse';
 import { DetailedView } from '../../models/GeneralModel';
+import { CommonConfig } from 'src/app/configs/common-config';
 
 @Injectable()
 export class DetailedViewService {
@@ -62,6 +63,7 @@ export class DetailedViewService {
   getGridOptions(): GridOptions {
     
     return {
+      ...CommonConfig.GRID_OPTIONS,
       columnDefs: this.columnDefs,
       defaultColDef: {
         resizable: true,

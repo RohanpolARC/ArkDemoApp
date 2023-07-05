@@ -57,6 +57,7 @@ export class NetReturnsCashflowsComponent implements OnInit {
     ].map((x: ColDef) => { x.type = x.type ?? 'abColDefNumber'; x.width = 175; return x; })
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       columnDefs: this.columnDefs,
       sideBar: true,

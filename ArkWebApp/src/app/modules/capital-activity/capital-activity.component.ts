@@ -233,6 +233,7 @@ export class CapitalActivityComponent implements OnInit {
 
   ngOnInit(): void {
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       sideBar: true,
       suppressMenuHide: true,

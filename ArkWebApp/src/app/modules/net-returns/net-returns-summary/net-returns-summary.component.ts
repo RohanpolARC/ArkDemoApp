@@ -64,6 +64,7 @@ export class NetReturnsSummaryComponent implements OnInit {
     this.FORMAT_COLUMNS = ['GrossIRR','Leverage','Other','FX','SetupCosts','Opex','MgmtFee','PerfFee','NetIRR']
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       columnDefs: this.columnDefs,
       defaultColDef: {

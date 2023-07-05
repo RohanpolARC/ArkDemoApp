@@ -182,6 +182,7 @@ export class ManagementFeeComponent implements OnInit {
     }
   
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       columnDefs: this.columnDefs,
       sideBar: true,

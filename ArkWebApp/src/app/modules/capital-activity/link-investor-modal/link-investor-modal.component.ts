@@ -89,6 +89,7 @@ export class LinkInvestorModalComponent implements OnInit {
   };
 
   gridOptions: GridOptions = {
+    ...CommonConfig.GRID_OPTIONS,
     enableRangeSelection: true,
     sideBar: false,
     rowSelection: 'multiple',

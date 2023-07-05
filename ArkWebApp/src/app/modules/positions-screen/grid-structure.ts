@@ -89,6 +89,7 @@ let POSITIONS_COLUMN_DEF:ColDef[] = [
 
 
 let GRID_OPTIONS:GridOptions = {
+  ...CommonConfig.GRID_OPTIONS,
     defaultColDef: {
         resizable: true,
         sortable: true,

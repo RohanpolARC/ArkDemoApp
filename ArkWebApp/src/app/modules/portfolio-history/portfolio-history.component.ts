@@ -123,7 +123,7 @@ export class PortfolioHistoryComponent implements OnInit {
     private dataSvc: DataService) {
 
     this.gridOptions = {
-
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       // sideBar:  ['columns','adaptable','filters'],
       suppressMenuHide: true,

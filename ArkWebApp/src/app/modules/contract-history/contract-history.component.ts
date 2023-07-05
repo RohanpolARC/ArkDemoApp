@@ -35,6 +35,7 @@ export class ContractHistoryComponent implements OnInit {
 
   preSelectedColumns: string[] = []
   gridOptions: GridOptions = {
+    ...CommonConfig.GRID_OPTIONS,
     enableRangeSelection: true,
     columnDefs: this.columnDefs,
     tooltipShowDelay: 0,

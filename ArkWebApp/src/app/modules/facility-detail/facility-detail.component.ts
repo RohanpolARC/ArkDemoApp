@@ -10,7 +10,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { CheckboxEditorComponent } from 'src/app/shared/components/checkbox-editor/checkbox-editor.component';
 import { getMomentDateStr, presistSharedEntities, loadSharedEntities } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
-import { CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, GridOptions, ICellRendererParams, Module, PostSortRowsParams, RowNode } from '@ag-grid-community/core';
+import { CellValueChangedEvent, ColDef, ColumnResizedEvent, EditableCallbackParams, GridApi, GridOptions, ICellRendererParams, Module, PostSortRowsParams, RowNode } from '@ag-grid-community/core';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
@@ -436,6 +436,7 @@ export class FacilityDetailComponent implements OnInit {
     }
 
     this.gridOptions =  {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       sideBar: true,
       suppressMenuHide: true,

@@ -75,6 +75,7 @@ export class MarkOverrideMasterComponent implements OnInit {
     ]
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       columnDefs: this.columnDefs,
       defaultColDef: {
         resizable: true,
@@ -94,6 +95,7 @@ export class MarkOverrideMasterComponent implements OnInit {
     }
 
     this.detailCellRendererParams = {
+      ...CommonConfig.GRID_OPTIONS,
       detailGridOptions: {
         columnDefs: this.detailColumnDefs,
         defaultColDef: {

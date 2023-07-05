@@ -56,6 +56,7 @@ export class FeePresetsComponent implements OnInit {
     this.columnDefs = this.feePresetsSvc.columnDefs;
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       columnDefs: this.columnDefs,
       sideBar: true,
