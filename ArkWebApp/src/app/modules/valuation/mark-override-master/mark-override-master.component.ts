@@ -65,12 +65,12 @@ export class MarkOverrideMasterComponent implements OnInit {
       { field: 'type' },
       { field: 'markOverride', valueFormatter: nonAmountNumberFormatter },
       { field: 'calculatedWSOMark', valueFormatter: nonAmountNumberFormatter },
-      { field: 'markDate', valueFormatter: dateFormatter },
+      { field: 'markDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
       { field: 'valuationMethod', headerName: 'Mark Type' },
       { field: 'modifiedBy' },
-      { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
+      { field: 'modifiedOn', valueFormatter: dateTimeFormatter, cellClass: 'dateUK' },
       { field: 'reviewedBy' },
-      { field: 'reviewedOn', valueFormatter: dateTimeFormatter },
+      { field: 'reviewedOn', valueFormatter: dateTimeFormatter, cellClass: 'dateUK' },
       { field: 'auditEventID', hide: true },
       { field: 'wsoStatus', hide: true },
       { field: 'isMarkedAtCost', hide: true },
@@ -81,8 +81,10 @@ export class MarkOverrideMasterComponent implements OnInit {
       columnDefs: this.columnDefs,
       defaultColDef: {
         resizable: true,
-        cellStyle: this.gridCellStyle.bind(this)
+        cellStyle: this.gridCellStyle.bind(this),
+        filter: true 
       },
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
       masterDetail: true,
       isRowMaster: this.isRowMaster,
       keepDetailRows: true,

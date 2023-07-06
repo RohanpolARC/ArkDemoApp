@@ -126,15 +126,15 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'issuer', type: 'abColDefString', hide: true },
       { field: 'issuerShortName', type: 'abColDefString' },
       { field: 'asset', type: 'abColDefString' },
-      { field: 'assetID', type: 'abColDefNumber' },
-      { field: 'currentWSOMark', type: 'abColDefNumber' },
+      { field: 'assetID', type: 'abColDefNumber', hide: true },
+      { field: 'currentWSOMark', type: 'abColDefNumber', width: 175 },
       // { field: 'dateTo', type: 'abColDefDate' },
-      { field: 'previousWSOMark', type: 'abColDefNumber' },
+      { field: 'previousWSOMark', type: 'abColDefNumber', width: 175 },
       // { field: 'dateFrom', type: 'abColDefDate' },
-      { field: 'override', type: 'abColDefNumber', cellStyle: this.gridSvc.editableCellStyle.bind(this), onCellValueChanged: this.gridSvc.onOverrideCellValueChanged.bind(this.gridSvc), editable: this.gridSvc.isEditable.bind(this.gridSvc) },
-      { field: 'overrideDate', type: 'abColDefDate' },
-      { field: 'markType', type: 'abColDefString' },
-      { field: 'calculatedWSOMark', type: 'abColDefNumber' },
+      { field: 'override', type: 'abColDefNumber', cellStyle: this.gridSvc.editableCellStyle.bind(this), onCellValueChanged: this.gridSvc.onOverrideCellValueChanged.bind(this.gridSvc), editable: this.gridSvc.isEditable.bind(this.gridSvc), width: 120 },
+      { field: 'calculatedWSOMark', type: 'abColDefNumber', width: 195 },
+      { field: 'overrideDate', type: 'abColDefDate', width: 150 },
+      { field: 'markType', type: 'abColDefString', width: 140 },
       { field: 'spreadBenchmarkIndex', type: 'abColDefString', cellEditor: 'autocompleteCellEditor',    
         cellEditorParams: () => {
           return {
@@ -366,7 +366,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         },
         Layout: {
           CurrentLayout: 'Basic Layout',
-          Revision: 27,
+          Revision: 29,
           Layouts: [
             {
               Name: 'Basic Layout',
