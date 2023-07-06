@@ -212,7 +212,11 @@ export class ValuationGridService {
     this.getAdaptableApi().gridApi.refreshCells([node], [...this.getColumnDefs().map(col => col.field), 'action']);
   }
 
-  cancelActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {    
+  cancelActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {   
+    if(this.saveInProgress){
+      this.dataSvc.setWarningMsg(`Current save is in progress`, `Dismiss`, `ark-theme-snackbar-warning`)
+      return  
+    } 
     this.clearEditingStateForRow(context.rowNode);
   }
 
