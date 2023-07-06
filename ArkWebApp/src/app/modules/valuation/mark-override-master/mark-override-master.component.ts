@@ -46,8 +46,10 @@ export class MarkOverrideMasterComponent implements OnInit {
 
   constructor(public dialogRef: MatDialogRef<MarkOverrideMasterComponent>,
     @Inject(MAT_DIALOG_DATA) public params: {
-      assetID: number,
-      marktype: string,
+      assetID?: number,   // Can be empty, in case of global audit
+      marktype?: string,  // Can be empty, in case of global audit
+
+      // This will be the date (likely current date) for which its positions will be used to check the mark (not markDate).
       asofdate: string  //'YYYY-MM-DD'
     },
     private valuationSvc: ValuationService) { }
@@ -62,24 +64,27 @@ export class MarkOverrideMasterComponent implements OnInit {
       { field: 'assetID', cellRenderer: 'agGroupCellRenderer' },
       { field: 'type' },
       { field: 'markOverride', valueFormatter: nonAmountNumberFormatter },
-      { field: 'markDate', valueFormatter: dateFormatter },
+      { field: 'calculatedWSOMark', valueFormatter: nonAmountNumberFormatter },
+      { field: 'markDate', valueFormatter: dateFormatter, cellClass: 'dateUK' },
       { field: 'valuationMethod', headerName: 'Mark Type' },
       { field: 'modifiedBy' },
-      { field: 'modifiedOn', valueFormatter: dateTimeFormatter },
+      { field: 'modifiedOn', valueFormatter: dateTimeFormatter, cellClass: 'dateUK' },
       { field: 'reviewedBy' },
-      { field: 'reviewedOn', valueFormatter: dateTimeFormatter },
+      { field: 'reviewedOn', valueFormatter: dateTimeFormatter, cellClass: 'dateUK' },
       { field: 'auditEventID', hide: true },
       { field: 'wsoStatus', hide: true },
       { field: 'isMarkedAtCost', hide: true },
-      { field: 'comment' }
+      { field: 'comment', width: 500 }
     ]
 
     this.gridOptions = {
       columnDefs: this.columnDefs,
       defaultColDef: {
         resizable: true,
-        cellStyle: this.masterGridCellStyle.bind(this)
+        cellStyle: this.gridCellStyle.bind(this),
+        filter: true 
       },
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
       masterDetail: true,
       isRowMaster: this.isRowMaster,
       keepDetailRows: true,
@@ -98,7 +103,7 @@ export class MarkOverrideMasterComponent implements OnInit {
         columnDefs: this.detailColumnDefs,
         defaultColDef: {
           resizable: true,
-          cellStyle: this.detailGridCellStyle.bind(this)
+          cellStyle: this.gridCellStyle.bind(this)
         },
         headerHeight: 30,
         rowHeight: 30,
@@ -108,8 +113,10 @@ export class MarkOverrideMasterComponent implements OnInit {
       getDetailRowData: (params) => {
 
         let auditeventID: number = params.data?.['auditEventID'];
+        let assetID: number = params.data?.['assetID'];
+        let marktype: string = params.data?.['valuationMethod']; 
 
-        this.valuationSvc.getAuditDetail(this.assetID, this.marktype, this.asofdate, auditeventID).pipe(first()).subscribe({
+        this.valuationSvc.getAuditDetail(assetID, marktype, this.asofdate, auditeventID).pipe(first()).subscribe({
           next: (detail) => {
             params.successCallback(detail)
           },
@@ -121,29 +128,8 @@ export class MarkOverrideMasterComponent implements OnInit {
     } as IDetailCellRendererParams
   }
 
-  masterGridCellStyle(params){
-
-    let data = params.data;
-
-    if(data?.['isReviewed'] === true){
-      
-      if(data?.['isMarkedAtCost'])
-        return { 'background': '#f5d442' }
-      else if(data?.['wsoStatus'] === 'Failed')
-        return { 'background': 'pink' }
-    }  
-    return null;
-  }
-
-  detailGridCellStyle(params){
-    let data = params.data;
-
-    if(data?.['wsoStatus'] === 'Failed')
-      return { 'background': 'pink' }
-    else if(data?.['isMarkedAtCost'])
-      return { 'background': '#f5d442' }
-
-    return null;
+  gridCellStyle(params){
+    return { 'background': params.data?.['colour'] };
   }
 
   isRowMaster: IsRowMaster = (nData: any) => {

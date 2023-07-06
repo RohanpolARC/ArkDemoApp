@@ -10,16 +10,32 @@
         <ng-container *ngIf="markTypes$ | async"></ng-container>
         <div class="action">
             <div class="d-flex justify-content-between align-items-center gap-2">
-                <button mat-raised-button color="primary" matTooltip="Select all for review" (click)="onSelectAllForReview()"> Select All</button>
-                <button mat-raised-button matTooltip="Push reviewed marks to WSO" (click)="onPushtoWSO()" matTolltipClass="tooltip-style"> Push to WSO
+                
+                <a mat-icon-button target="_blank"
+                href="https://arcmont.sharepoint.com/:b:/r/sites/ArcReporting/Shared%20Documents/Valuation/Valuation%20User%20Guide%20(ArkWeb).pdf?csf=1&web=1&e=shIv5o">
+                    <mat-icon class="material-icons-outlined"
+                    matTooltip="Valuation User Guide" matTooltipClass="tooltip-style">help
+                    </mat-icon>
+                </a>
+
+                <button mat-raised-button color="primary" matTooltip="Select all for review" matTooltipClass="tooltip-style" (click)="onSelectAllForReview()"> Select All</button>
+
+                <button mat-raised-button matTooltip="Push reviewed marks to WSO" (click)="onPushtoWSO()" matTooltipClass="tooltip-style"> Push to WSO
                 </button>
+
+                <button mat-icon-button matTooltip="Audit (Mark Overrides)" (click)="onAuditMarkOverrides()" matTooltipClass="tooltip-style">
+                    <mat-icon class="material-icons-outlined">info</mat-icon>
+                </button>
+
                 <ng-container *ngIf="runValuationInProgress">
-                    <mat-spinner [diameter]="20" style="margin-right: 10px" matTooltip="Running model valuation"></mat-spinner>
-                </ng-container>    
-                <button mat-icon-button matTooltip="Model Valuation" (click)="onTriggerModelValuation()">
+                    <mat-spinner [diameter]="20" matTooltip="Running model valuation" matTooltipClass="tooltip-style"></mat-spinner>
+                </ng-container>
+
+                <button mat-icon-button matTooltip="Model Valuation" matTooltipClass="tooltip-style" (click)="onTriggerModelValuation()">
                     <mat-icon svgIcon="trigger"></mat-icon>
                 </button>
-                <button mat-icon-button matTooltip="Clear editing state" matTooltipClass="tooltip-style" (click)="clearEditingState()">
+
+                <button mat-icon-button matTooltip="Clear editing state" matTooltipClass="tooltip-style" (click)="clearEditingState()" style="margin-right: 10px">
                     <mat-icon class="material-icons-outlined">clear</mat-icon>
                 </button>
             </div>
@@ -41,6 +57,7 @@
                                         [getReviewingAssetsReq]="getReviewingAssets"
                                         [reviewedAssets]="reviewedAssets"
                                         [getFilteredMTMAssetsReq]="getFilteredMTMAssetsReq"
+                                        [noRowsToDisplayMsg] = "noRowsToDisplayMsg" 
                                         (filteredMTMAssetsEmitter)="getFilteredMTMAssets($event)"
                                         (valuationEventEmitter)="triggerRunValuation($event)"
                                         (reviewingAssetsEmitter)="reviewingAssets($event)"

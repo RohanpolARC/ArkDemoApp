@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { interval, Observable, Subject, Subscription } from 'rxjs';
 import { filter, first, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
@@ -6,6 +7,8 @@ import { DataService } from 'src/app/core/services/data.service';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
 import { AsOfDateRange, FilterIdValuePair } from 'src/app/shared/models/FilterPaneModel';
+import { MarkOverrideMasterComponent } from './mark-override-master/mark-override-master.component';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
   selector: 'app-valuation',
@@ -27,6 +30,8 @@ export class ValuationComponent implements OnInit {
   setAllAssetsForReviewReq: { set: 'Yes' | 'No' }
   getFilteredMTMAssetsReq: { get: 'Yes' | 'No' }
 
+  noRowsToDisplayMsg:NoRowsCustomMessages = 'Please apply the filter.'
+
   reviewedAssets: any[]
 
   modelValuations$: Observable<any[]>
@@ -38,7 +43,8 @@ export class ValuationComponent implements OnInit {
     private valuationSvc: ValuationService,
     private dataSvc: DataService,
     private filterSvc: GeneralFilterService,
-    private accessSvc: AccessService
+    private accessSvc: AccessService,
+    public dialog: MatDialog
   ) { }
 
   rowData$: Observable<any[]> = this.dataSvc.filterApplyBtnState.pipe(
@@ -48,6 +54,7 @@ export class ValuationComponent implements OnInit {
     tap((isHit) => { 
       this.asofdate = this.asofdateIn;    // Update date for grid only when hit apply
       this.showLoadingOverlayReq = { show: 'Yes' }
+      this.noRowsToDisplayMsg = 'No data found for applied filter.'
 
       // Closing all polling requests for model valuation if Apply is hit.
       this.closeTimer$.next();
@@ -226,6 +233,18 @@ export class ValuationComponent implements OnInit {
         )
       })
     )
+  }
+
+  onAuditMarkOverrides(){
+    const dialogRef = this.dialog.open(MarkOverrideMasterComponent, {
+      data: {
+        assetID: null,
+        marktype: null,
+        asofdate: this.asofdate.end
+      },
+      width: '90vw',
+      height: '80vh'
+    })
   }
 
   onPushtoWSO(){
