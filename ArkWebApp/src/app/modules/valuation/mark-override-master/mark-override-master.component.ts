@@ -62,6 +62,16 @@ export class MarkOverrideMasterComponent implements OnInit {
 
     this.columnDefs = [
       { field: 'assetID', cellRenderer: 'agGroupCellRenderer' },
+    ]
+
+    if(!this.assetID) {      // In case of global audit
+      this.columnDefs = [...this.columnDefs,
+        { field: 'issuerShortName' },
+        { field: 'asset' },    
+      ]
+    }
+
+    this.columnDefs = [ ...this.columnDefs,
       { field: 'type' },
       { field: 'markOverride', valueFormatter: nonAmountNumberFormatter },
       { field: 'calculatedWSOMark', valueFormatter: nonAmountNumberFormatter },
@@ -74,8 +84,14 @@ export class MarkOverrideMasterComponent implements OnInit {
       { field: 'auditEventID', hide: true },
       { field: 'wsoStatus', hide: true },
       { field: 'isMarkedAtCost', hide: true },
-      { field: 'comment', width: 500 }
+      { field: 'comment', width: 500 },
     ]
+
+    if(!this.assetID) {      // In case of global audit
+      this.columnDefs = [...this.columnDefs,
+        { field: 'issuer' }
+      ]
+    }
 
     this.gridOptions = {
       columnDefs: this.columnDefs,
