@@ -1,12 +1,12 @@
 import { AdaptableApi, AdaptableOptions, AdaptableReadyInfo, CustomQueryVariableContext } from '@adaptabletools/adaptable-angular-aggrid';
-import { CellClassParams, ColDef, GridApi, GridOptions, GridReadyEvent, ICellRendererParams, ITooltipParams, Module, RowNode } from '@ag-grid-community/core';
+import { CellClassParams, ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, ICellRendererParams, ITooltipParams, Module, RowNode } from '@ag-grid-community/core';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import { getMomentDate, presistSharedEntities, loadSharedEntities } from 'src/app/shared/functions/utilities';
+import { getMomentDate, presistSharedEntities, loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { SpreadBenchmarkIndex, YieldCurve } from 'src/app/shared/models/ValuationModel';
 import { AggridMatCheckboxEditorComponent } from 'src/app/shared/modules/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor.component';
@@ -276,7 +276,10 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         'yieldCurveAutocompleteCellEditor': MatAutocompleteEditorComponent,
         'aggridMatCheckboxCellEditor': AggridMatCheckboxEditorComponent,
         'useModelValuationCheckbox': AggridMatCheckboxEditorComponent
-      }
+      },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     }
 
     this.adaptableOptions = {
@@ -460,6 +463,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   onAdaptableReady = ({ adaptableApi, gridOptions }: AdaptableReadyInfo) => {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
+    this.adaptableApi.columnApi.autosizeAllColumns()
   }
 
   ngOnDestroy() {

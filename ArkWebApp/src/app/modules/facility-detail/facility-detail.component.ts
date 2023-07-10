@@ -8,9 +8,9 @@ import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { AggridMaterialDatepickerComponent } from './aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { DataService } from 'src/app/core/services/data.service';
 import { CheckboxEditorComponent } from 'src/app/shared/components/checkbox-editor/checkbox-editor.component';
-import { getMomentDateStr, presistSharedEntities, loadSharedEntities } from 'src/app/shared/functions/utilities';
+import { getMomentDateStr, presistSharedEntities, loadSharedEntities,  autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
-import { CellValueChangedEvent, ColDef, ColumnResizedEvent, EditableCallbackParams, GridApi, GridOptions, ICellRendererParams, Module, PostSortRowsParams, RowNode } from '@ag-grid-community/core';
+import { CellValueChangedEvent, ColDef,  EditableCallbackParams, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, ICellRendererParams, Module, PostSortRowsParams, RowNode } from '@ag-grid-community/core';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
@@ -222,7 +222,7 @@ export class FacilityDetailComponent implements OnInit {
   }
 
 
-  onGridReady(params) {
+  onGridReady(params:GridReadyEvent) {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
     this.params = params;
@@ -453,6 +453,9 @@ export class FacilityDetailComponent implements OnInit {
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
       },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     }
 
 
@@ -616,5 +619,7 @@ export class FacilityDetailComponent implements OnInit {
     console.log("ready")
     this.adapTableApi = adaptableApi;
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
+    this.adapTableApi.columnApi.autosizeAllColumns()
+
   };
 }

@@ -1,5 +1,5 @@
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
+import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -8,7 +8,7 @@ import { MarkChangesService } from 'src/app/core/services/MarkChanges/MarkChange
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER } from 'src/app/shared/functions/formatter';
-import { loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
+import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 
 @Component({
@@ -94,6 +94,9 @@ export class MarkChangesComponent implements OnInit {
       noRowsOverlayComponent: NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
       },
     }
 
@@ -187,6 +190,7 @@ export class MarkChangesComponent implements OnInit {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
     this.getMarkChanges()
+    this.adaptableApi.columnApi.autosizeAllColumns();
   }
 
   ngOnDestroy():void{

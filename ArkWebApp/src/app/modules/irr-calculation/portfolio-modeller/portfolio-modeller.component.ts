@@ -1,5 +1,5 @@
 import { ColumnFilter, AdaptableOptions, AdaptableApi, AdaptableButton, ActionColumnContext } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, EditableCallbackParams, GridOptions, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi, Module, CellClassParams } from '@ag-grid-community/core';
+import { ColDef, EditableCallbackParams, GridOptions, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi, Module, CellClassParams, FirstDataRenderedEvent } from '@ag-grid-community/core';
 import { Component, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -12,7 +12,7 @@ import { IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams, PortfolioM
 import { EventEmitter } from '@angular/core';
 import { AggridMaterialDatepickerComponent } from '../../facility-detail/aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/portfolio-save-run-model.component';
-import { getLastBusinessDay, getMomentDateStr, presistSharedEntities, loadSharedEntities } from 'src/app/shared/functions/utilities';
+import { getLastBusinessDay, getMomentDateStr, presistSharedEntities, loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { first, switchMap, takeUntil } from 'rxjs/operators';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
@@ -532,6 +532,9 @@ export class PortfolioModellerComponent implements OnInit {
       noRowsOverlayComponent:NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
       },
     }
 

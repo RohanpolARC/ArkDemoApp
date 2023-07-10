@@ -2,7 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
 import * as XLSX from 'xlsx';
-import { ColDef } from '@ag-grid-community/core';
+import { ColDef, FirstDataRenderedEvent } from '@ag-grid-community/core';
 import { amountFormatter } from 'src/app/shared/functions/formatter';
 import { dateFormatter } from '../utilities/utility';
 import { CapitalActivityModel } from 'src/app/shared/models/CapitalActivityModel';
@@ -17,7 +17,7 @@ import {
 } from '@adaptabletools/adaptable/types';
 import { validateColumns, validateExcelRows } from './validation';
 import { DataService } from 'src/app/core/services/data.service';
-import {  loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
+import {  autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import * as moment from 'moment';
 import { CommonConfig } from 'src/app/configs/common-config';
 
@@ -176,7 +176,10 @@ export class BulkUploadComponent implements OnInit {
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:true,
       rowGroupPanelShow: 'always',
-      aggFuncs: this.aggFuncs
+      aggFuncs: this.aggFuncs,
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     }
 
     this.updateMsg = null;
@@ -303,6 +306,7 @@ export class BulkUploadComponent implements OnInit {
     }
 
     adaptableApi.toolPanelApi.closeAdapTableToolPanel();
+    this.adapTableApi.columnApi.autosizeAllColumns()
   }
 
   ngOnDestroy(): void {

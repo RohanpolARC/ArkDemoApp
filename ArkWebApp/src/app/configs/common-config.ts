@@ -1,6 +1,6 @@
-import { AdaptableButton, DashboardOptions, ExportOptions } from "@adaptabletools/adaptable-angular-aggrid";
+import { AdaptableButton, DashboardOptions, ExportOptions, LayoutOptions } from "@adaptabletools/adaptable-angular-aggrid";
 import { AdaptableModuleButtons } from "@adaptabletools/adaptable/src/PredefinedConfig/Common/Types";
-import { ColumnResizedEvent, ExcelStyle, GridOptions, Module } from "@ag-grid-community/core";
+import { ColDef, Column, ColumnResizedEvent, ColumnVisibleEvent, ExcelStyle, FirstDataRenderedEvent, GridOptions, Module, VirtualColumnsChangedEvent } from "@ag-grid-community/core";
 
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
 import { ClipboardModule } from "@ag-grid-enterprise/clipboard";
@@ -13,26 +13,22 @@ import { RowGroupingModule } from "@ag-grid-enterprise/row-grouping";
 import { SetFilterModule } from "@ag-grid-enterprise/set-filter";
 import { SideBarModule } from "@ag-grid-enterprise/side-bar";
 import { CsvExportModule } from "@ag-grid-community/csv-export";
-import { getWrapWidth } from "../shared/functions/utilities";
+import { autosizeColumnExceptResized, getWrapWidth, handleResizedColumns } from "../shared/functions/utilities";
 
 
 export class CommonConfig{
 
     public static GRID_OPTIONS :GridOptions ={
+      context:{
+        resizedColumnList:[]
+      },
+      tooltipShowDelay:0,
+
+      onVirtualColumnsChanged:(event:VirtualColumnsChangedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
       onColumnResized: (params:ColumnResizedEvent)=>{
-        if(params.column){
-          let cd = params.column?.getColDef()
-          let sizes = params.api.getSizesForCurrentTheme()
-          let wrapSizes = getWrapWidth(cd)
-          if(sizes.headerHeight>30 && (params.column?.getActualWidth()>wrapSizes[0] && params.column?.getActualWidth()<wrapSizes[1])){
-            cd.headerClass = 'header-font-size-small'
-            cd.wrapHeaderText=true
-          }else{
-            cd.headerClass = ' '
-            cd.wrapHeaderText=false
-          }
-          params.column.setColDef(cd,cd)
-        }
+        handleResizedColumns(params)
       },
     }
 

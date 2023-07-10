@@ -1,5 +1,5 @@
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
+import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { forkJoin, Subscription } from 'rxjs';
 import { delay, first } from 'rxjs/operators';
@@ -10,7 +10,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { createColumnDefs, GENERAL_FORMATTING_EXCEPTIONS, parseFetchedData, saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
 import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import {  presistSharedEntities, loadSharedEntities } from 'src/app/shared/functions/utilities';
+import {  presistSharedEntities, loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
@@ -56,6 +56,9 @@ export class ContractHistoryComponent implements OnInit {
     noRowsOverlayComponent : NoRowsOverlayComponent,
     noRowsOverlayComponentParams: {
       noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+    },
+    onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+      autosizeColumnExceptResized(event)
     },
   }
 
@@ -239,5 +242,7 @@ export class ContractHistoryComponent implements OnInit {
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
+    this.adaptableApi.columnApi.autosizeAllColumns()
+
   }
 }

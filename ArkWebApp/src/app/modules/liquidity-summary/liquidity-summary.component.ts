@@ -4,6 +4,7 @@ import {
   CellClickedEvent,
   ColDef,
   EditableCallbackParams,
+  FirstDataRenderedEvent,
   GetMainMenuItemsParams,
   GridApi,
   GridOptions,
@@ -25,7 +26,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { ConfirmComponentConfigure, DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
-import { getMomentDateStr } from 'src/app/shared/functions/utilities';
+import { autosizeColumnExceptResized, getMomentDateStr } from 'src/app/shared/functions/utilities';
 import { UnfundedAssetsService } from 'src/app/core/services/UnfundedAssets/unfunded-assets.service';
 import { UnfundedAssetsEditorComponent } from '../unfunded-assets/unfunded-assets-editor/unfunded-assets-editor.component';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -635,7 +636,10 @@ export class LiquiditySummaryComponent implements OnInit {
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsDisplayMsg,
       },
-      getRowHeight: this.getRowHeight
+      getRowHeight: this.getRowHeight,
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     }
 
     this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{

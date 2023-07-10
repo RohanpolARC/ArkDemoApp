@@ -1,5 +1,5 @@
 import { AdaptableApi, AdaptableOptions, ColumnSort, FormatColumn } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, ColGroupDef, GridOptions, Module, SortController, ValueFormatterParams } from '@ag-grid-community/core';
+import { ColDef, ColGroupDef, FirstDataRenderedEvent, GridOptions, Module, SortController, ValueFormatterParams } from '@ag-grid-community/core';
 import { Component, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
 import { Subject, Subscription, timer } from 'rxjs';
 import { first, switchMap, takeUntil } from 'rxjs/operators';
@@ -9,7 +9,7 @@ import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.ser
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
 import { amountFormatter, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, noDecimalAmountFormatter, nonAmountNumberFormatter2Dec } from 'src/app/shared/functions/formatter';
-import { presistSharedEntities, loadSharedEntities } from 'src/app/shared/functions/utilities';
+import { presistSharedEntities, loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
@@ -150,6 +150,9 @@ export class IrrResultComponent implements OnInit {
       noRowsOverlayComponent : NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
       },
     }
     

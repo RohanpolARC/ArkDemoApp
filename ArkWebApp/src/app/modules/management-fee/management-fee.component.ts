@@ -5,10 +5,10 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { ManagementFeeService } from 'src/app/core/services/ManagementFee/management-fee.service';
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,  DATE_FORMATTER_CONFIG_ddMMyyyy, formatDate } from 'src/app/shared/functions/formatter';
-import { getMomentDateStr,  presistSharedEntities,loadSharedEntities } from 'src/app/shared/functions/utilities';
+import { getMomentDateStr,  presistSharedEntities,loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { getNodes } from '../capital-activity/utilities/functions';
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { GridApi, GridOptions, Module, ColDef, IAggFuncParams, GridReadyEvent, ValueGetterParams, ValueParserParams, RowNode } from '@ag-grid-community/core';
+import { GridApi, GridOptions, Module, ColDef, IAggFuncParams, GridReadyEvent, ValueGetterParams, ValueParserParams, RowNode, FirstDataRenderedEvent } from '@ag-grid-community/core';
 import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
@@ -205,6 +205,9 @@ export class ManagementFeeComponent implements OnInit {
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
       },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     }
 
     this.adaptableOptions = {
@@ -285,6 +288,7 @@ export class ManagementFeeComponent implements OnInit {
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
+    this.adaptableApi.columnApi.autosizeAllColumns()
     // use AdaptableApi for runtime access to Adaptable
   };
 

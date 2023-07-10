@@ -4,10 +4,10 @@ import { CashBalanceService } from 'src/app/core/services/CashBalance/cash-balan
 import { DataService } from 'src/app/core/services/data.service';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import {  CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy, BLANK_DATETIME_FORMATTER_CONFIG } from 'src/app/shared/functions/formatter';
-import {   loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
+import {   autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { CommonConfig } from 'src/app/configs/common-config';
-import { ColDef, ColumnApi, GridApi, GridOptions, Module } from '@ag-grid-community/core';
+import { ColDef, ColumnApi, FirstDataRenderedEvent, GridApi, GridOptions, Module } from '@ag-grid-community/core';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
@@ -91,6 +91,9 @@ export class CashBalanceComponent implements OnInit {
       noRowsOverlayComponent: NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
       },
 
     }
@@ -224,5 +227,6 @@ export class CashBalanceComponent implements OnInit {
 
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     adaptableApi.toolPanelApi.closeAdapTableToolPanel();
+    adaptableApi.columnApi.autosizeAllColumns()
   };
 }

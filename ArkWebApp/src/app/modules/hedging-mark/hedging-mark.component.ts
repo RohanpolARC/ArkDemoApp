@@ -1,11 +1,11 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableColumn, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridOptions, GridReadyEvent, Module, GridApi, CellValueChangedEvent, RowNode, CellClickedEvent, TabToNextCellParams } from '@ag-grid-community/core';
+import { ColDef, GridOptions, GridReadyEvent, Module, GridApi, CellValueChangedEvent, RowNode, CellClickedEvent, TabToNextCellParams, FirstDataRenderedEvent } from '@ag-grid-community/core';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { PositionScreenService } from 'src/app/core/services/PositionsScreen/positions-screen.service';
-import { getMomentDateStr, presistSharedEntities,loadSharedEntities } from 'src/app/shared/functions/utilities';
+import { getMomentDateStr, presistSharedEntities,loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { CUSTOM_DISPLAY_FORMATTERS_CONFIG } from 'src/app/shared/functions/formatter';
 import { AMOUNT_COLUMNS_LIST, GRID_OPTIONS, POSITIONS_COLUMN_DEF } from '../positions-screen/grid-structure';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
@@ -302,7 +302,10 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
 
       aggFuncs: {
         'Max': this.maxAggFunc
-      }
+      },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     }
 
     this.adaptableOptions = {
@@ -634,6 +637,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
     this.getPositionsData();
+    this.adaptableApi.columnApi.autosizeAllColumns()
   }
 
   ngOnDestroy() {

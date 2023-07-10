@@ -9,10 +9,10 @@ import {DataService} from '../../core/services/data.service'
 import {BtnCellRenderer} from './btn-cell-renderer.component'
 import {PortfolioHistoryService} from '../../core/services/PortfolioHistory/portfolio-history.service'
 import {MatDialog } from '@angular/material/dialog';
-import { loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
+import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { map } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
-import { ColDef, GridOptions, ICellRendererParams, Module, ValueGetterParams } from '@ag-grid-community/core';
+import { ColDef, FirstDataRenderedEvent, GridOptions, ICellRendererParams, Module, ValueGetterParams, VirtualColumnsChangedEvent } from '@ag-grid-community/core';
 import { ActionColumnContext } from '@adaptabletools/adaptable-angular-aggrid';
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
@@ -146,7 +146,9 @@ export class PortfolioHistoryComponent implements OnInit {
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
       },
-
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     };
 
     this.defaultColDef = {
@@ -592,6 +594,7 @@ export class PortfolioHistoryComponent implements OnInit {
     adapTableApi = adaptableApi;
     adaptableApi.toolPanelApi.closeAdapTableToolPanel();
     this.adaptableApi = adapTableApi
+    this.adaptableApi.columnApi.autosizeAllColumns()
     // use AdaptableApi for runtime access to Adaptable
   };
 

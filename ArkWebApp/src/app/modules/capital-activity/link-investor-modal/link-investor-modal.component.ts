@@ -4,7 +4,8 @@ import {
   GridOptions,
   Module,
   ColDef,
-  SelectionChangedEvent
+  SelectionChangedEvent,
+  FirstDataRenderedEvent
 } from '@ag-grid-community/core';
 import { dateFormatter, amountFormatter, nonAmountNumberFormatter, formatDate } from 'src/app/shared/functions/formatter';
 
@@ -18,6 +19,7 @@ import {
 import { AssociateInvestment, CapitalActivityModel } from 'src/app/shared/models/CapitalActivityModel';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
+import { autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 
 @Component({
   selector: 'app-link-investor-modal',
@@ -105,8 +107,10 @@ export class LinkInvestorModalComponent implements OnInit {
     // },
     columnDefs: this.columnDefs,
     allowContextMenuWithControlKey:true,
-    onSelectionChanged: this.onSelectionChanged.bind(this)
-
+    onSelectionChanged: this.onSelectionChanged.bind(this),
+    onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+      autosizeColumnExceptResized(event)
+    },
   };
   adapTableApi: AdaptableApi;
   adaptableOptions: AdaptableOptions = {

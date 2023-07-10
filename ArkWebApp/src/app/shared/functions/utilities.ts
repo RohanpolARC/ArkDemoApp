@@ -1,5 +1,5 @@
 import { SharedEntitiesContext, SharedEntity } from "@adaptabletools/adaptable-angular-aggrid";
-import { ColDef, RowNode } from "@ag-grid-community/core";
+import { ColDef, ColumnResizedEvent, FirstDataRenderedEvent, RowNode, VirtualColumnsChangedEvent } from "@ag-grid-community/core";
 import { DecimalPipe } from "@angular/common";
 import * as moment from "moment";
 import { first } from "rxjs/operators";
@@ -150,8 +150,48 @@ export function getRowNodes(node: RowNode, rowNodes: any[] = []){
 }
 
 export function getWrapWidth(cd:ColDef):number[]{
-  if(cd.headerName.length<7){
-    return [cd.headerName.length*0.4*16,100]
+  if(cd.colId){
+    if(cd.colId.length<7){
+      return [cd.colId.length*0.4*14,100]
+    }
+    return [cd.colId.length*0.4*14,cd.colId.length*0.7*14]
   }
-  return [cd.headerName.length*0.4*16,cd.headerName.length*0.7*16]
+  return [50,150]
+}
+
+export  function autosizeColumnExceptResized(event: FirstDataRenderedEvent|VirtualColumnsChangedEvent){
+  let coldef:ColDef<any>[] = event.api.getColumnDefs()
+  let autosizeCols = coldef.map(col=>col.colId).filter(colId=>!event.context?.resizedColumnList?.includes(colId))
+  event.columnApi.autoSizeColumns(autosizeCols)
+  // console.log(event.context?.resizedColumnList??[])
+}
+
+export function handleResizedColumns(params:ColumnResizedEvent){
+  if(params.column){
+    let coldef = params.column?.getColDef()
+    if(params.context?.resizedColumnList?.length){
+      if(!params.context.resizedColumnList?.includes(coldef.colId)){
+        params.context.resizedColumnList?.push(coldef.colId)
+      }
+    }else{
+      params.context.resizedColumnList = [coldef.colId]
+    }
+    
+    let sizes:{
+        rowHeight: number;
+        headerHeight: number;
+      } = params.api.getSizesForCurrentTheme()
+    let wrapSizes = getWrapWidth(coldef)
+    if(params.column?.getActualWidth()>wrapSizes[0] && params.column?.getActualWidth()<wrapSizes[1]){
+      coldef.headerClass = 'header-font-size-small'
+      coldef.headerTooltip=coldef.headerName
+      if(sizes.headerHeight>30 ){
+        coldef.wrapHeaderText=true
+      }
+    }else{
+      coldef.headerClass = ' '
+      coldef.wrapHeaderText=false
+    }
+    params.column.setColDef(coldef,coldef)
+  }
 }

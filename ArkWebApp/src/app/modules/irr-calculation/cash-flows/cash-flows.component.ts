@@ -1,6 +1,6 @@
 
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridOptions,GridApi, GridReadyEvent, Module } from '@ag-grid-community/core';
+import { ColDef, GridOptions,GridApi, GridReadyEvent, Module, FirstDataRenderedEvent } from '@ag-grid-community/core';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
@@ -10,7 +10,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import {  BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,  DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import { loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
+import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
 
@@ -150,7 +150,7 @@ export class CashFlowsComponent implements OnInit {
       { field: 'portfolioType', type: 'abColDefNumber' },
       { field: 'bookName', type: 'abColDefString' },
       { field: 'entity', type: 'abColDefString'},
-      { field: 'cashDate', cellClass: 'dateUK', minWidth: 122, type: 'abColDefDate' },
+      { field: 'cashDate', cellClass: 'dateUK',  type: 'abColDefDate' },
       { field: 'fxRate', type: 'abColDefNumber' },
       { field: 'fxRateCapital', type: 'abColDefNumber' },
       { field: 'fxRateIncome', type: 'abColDefNumber' },
@@ -246,6 +246,9 @@ export class CashFlowsComponent implements OnInit {
       noRowsOverlayComponent: NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
       },
     }
 

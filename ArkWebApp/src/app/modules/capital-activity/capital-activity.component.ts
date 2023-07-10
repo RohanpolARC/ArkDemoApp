@@ -8,7 +8,8 @@ import {
   Module,
   ColDef,
   CellClickedEvent,
-  RowNode
+  RowNode,
+  FirstDataRenderedEvent
 } from '@ag-grid-community/core';
 import {
   AdaptableOptions,
@@ -27,7 +28,7 @@ import { UpdateConfirmComponent } from './update-confirm/update-confirm.componen
 import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
 import { DataService } from 'src/app/core/services/data.service';
 import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
-import {  loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
+import {  autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
@@ -234,6 +235,7 @@ export class CapitalActivityComponent implements OnInit {
   ngOnInit(): void {
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
+      context:{},
       enableRangeSelection: true,
       sideBar: true,
       suppressMenuHide: true,
@@ -249,9 +251,18 @@ export class CapitalActivityComponent implements OnInit {
             noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplay,
       },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     }
 
-    this.gridOptionsInvstmnt = JSON.parse(JSON.stringify(this.gridOptions));
+    this.gridOptionsInvstmnt = {
+      ...CommonConfig.GRID_OPTIONS,
+      ...JSON.parse(JSON.stringify(this.gridOptions)),
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
+    }
     this.gridOptionsInvstmnt.columnDefs = this.columnDefsInvstmnt;
 
     // this.gridOptionsInvstmnt.components = {
@@ -573,12 +584,14 @@ export class CapitalActivityComponent implements OnInit {
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApi = adaptableApi;
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
+    this.adapTableApi.columnApi.autosizeAllColumns()
     // use AdaptableApi for runtime access to Adaptable
   };
 
   onAdaptableInvstmntReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApiInvstmnt = adaptableApi;
     this.adapTableApiInvstmnt.toolPanelApi.closeAdapTableToolPanel();
+    this.adapTableApi.columnApi.autosizeAllColumns()
     // use AdaptableApi for runtime access to Adaptable
   };
 

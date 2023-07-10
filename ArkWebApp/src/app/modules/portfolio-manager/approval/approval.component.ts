@@ -1,5 +1,5 @@
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridOptions, Module, GridReadyEvent, RowNode, EditableCallbackParams, ICellRendererParams, CellValueChangedEvent } from '@ag-grid-community/core';
+import { ColDef, GridOptions, Module, GridReadyEvent, RowNode, EditableCallbackParams, ICellRendererParams, CellValueChangedEvent, FirstDataRenderedEvent } from '@ag-grid-community/core';
 import { Component, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -9,7 +9,7 @@ import { PortfolioMappingDataService } from 'src/app/core/services/PortfolioMana
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { BLANK_DATETIME_FORMATTER_CONFIG, dateTimeFormatter, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm } from 'src/app/shared/functions/formatter';
-import { presistSharedEntities, loadSharedEntities } from 'src/app/shared/functions/utilities';
+import { presistSharedEntities, loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { ApprovalActionCellRendererComponent } from '../approval-action-cell-renderer/approval-action-cell-renderer.component';
 import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, validateAndUpdate } from '../utilities/functions';
@@ -383,6 +383,9 @@ export class ApprovalComponent implements OnInit {
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
       },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     }
 
     this.adaptableOptions = {
@@ -495,6 +498,7 @@ export class ApprovalComponent implements OnInit {
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel()
+    this.adaptableApi.columnApi.autosizeAllColumns()
 
     this.portfolioMapDataSvc.approvalAdaptableApi = adaptableApi
   }

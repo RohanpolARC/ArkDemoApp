@@ -1,5 +1,5 @@
 import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { GridOptions, CellValueChangedEvent, Module, ColDef, GridReadyEvent, GridApi } from '@ag-grid-community/core';
+import { GridOptions, CellValueChangedEvent, Module, ColDef, GridReadyEvent, GridApi, FirstDataRenderedEvent } from '@ag-grid-community/core';
 import { Component, Input, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -7,7 +7,7 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER } from 'src/app/shared/functions/formatter';
-import { loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
+import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
@@ -49,7 +49,7 @@ export class NetReturnsSummaryComponent implements OnInit {
     this.agGridModules = CommonConfig.AG_GRID_MODULES
 
     this.columnDefs = <ColDef[]>[
-      { field: 'Category', type: 'abColDefString', maxWidth: 175,headerTooltip:'Category' },
+      { field: 'Category', type: 'abColDefString', headerTooltip:'Category' },
       { field: 'GrossIRR',headerTooltip:'GrossIRR'},
       { field: 'Leverage', headerName:'Grosss IRR with Leverage',headerTooltip:'Grosss IRR with Leverage'},
       { field: 'Other' ,headerTooltip:'Other'},
@@ -59,7 +59,7 @@ export class NetReturnsSummaryComponent implements OnInit {
       { field: 'MgmtFee', headerName:'Net IRR before Management Fee',headerTooltip: 'Net IRR before Management Fee'},
       { field: 'PerfFee', headerName:'Net IRR before Performance Fee',headerTooltip:'Net IRR before Performance Fee' },
       { field: 'NetIRR' ,headerTooltip:'NetIRR'}
-    ].map((x: ColDef) => { x.type = x.type ?? 'abColDefNumber'; x.maxWidth = x.maxWidth ?? 225; x.width = 200; return x; })
+    ].map((x: ColDef) => { x.type = x.type ?? 'abColDefNumber'; return x; })
 
     this.FORMAT_COLUMNS = ['GrossIRR','Leverage','Other','FX','SetupCosts','Opex','MgmtFee','PerfFee','NetIRR']
 
@@ -75,6 +75,9 @@ export class NetReturnsSummaryComponent implements OnInit {
       noRowsOverlayComponent : NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
       },
     }
 
@@ -125,7 +128,9 @@ export class NetReturnsSummaryComponent implements OnInit {
     }
   }
 
-  onAdaptableReady = ({ adaptableApi: AdaptableApi, gridOptions: GridOptions }) => {}
+  onAdaptableReady = ({ adaptableApi: AdaptableApi, gridOptions: GridOptions }) => {
+    AdaptableApi.columnApi.autosizeAllColumns()
+  }
 
   onCellValueChanged(params: CellValueChangedEvent){}
 
