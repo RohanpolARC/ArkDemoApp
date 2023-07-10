@@ -163,7 +163,6 @@ export  function autosizeColumnExceptResized(event: FirstDataRenderedEvent|Virtu
   let coldef:ColDef<any>[] = event.api.getColumnDefs()
   let autosizeCols = coldef.map(col=>col.colId).filter(colId=>!event.context?.resizedColumnList?.includes(colId))
   event.columnApi.autoSizeColumns(autosizeCols)
-  // console.log(event.context?.resizedColumnList??[])
 }
 
 export function handleResizedColumns(params:ColumnResizedEvent){

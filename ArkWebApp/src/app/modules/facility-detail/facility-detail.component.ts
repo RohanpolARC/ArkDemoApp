@@ -437,8 +437,8 @@ export class FacilityDetailComponent implements OnInit {
 
     this.gridOptions =  {
       ...CommonConfig.GRID_OPTIONS,
+      sideBar:true,
       enableRangeSelection: true,
-      sideBar: true,
       suppressMenuHide: true,
       singleClickEdit: true,
       undoRedoCellEditing: false,
@@ -448,6 +448,7 @@ export class FacilityDetailComponent implements OnInit {
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey:true, 
       onCellValueChanged: this.onCellValueChanged.bind(this),
+      components:this.frameworkComponents,
       excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
       noRowsOverlayComponent:NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {

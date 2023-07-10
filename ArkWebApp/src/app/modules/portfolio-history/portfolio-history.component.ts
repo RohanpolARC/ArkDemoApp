@@ -122,10 +122,15 @@ export class PortfolioHistoryComponent implements OnInit {
     public dialog: MatDialog, 
     private dataSvc: DataService) {
 
+    this.frameworkComponents = {
+      btnCellRenderer: BtnCellRenderer,
+      agGridCheckboxRenderer: CheckboxEditorComponent,
+
+    }
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
-      // sideBar:  ['columns','adaptable','filters'],
+      sideBar:  true,
       suppressMenuHide: true,
       singleClickEdit: true,
       statusBar: {
@@ -143,6 +148,7 @@ export class PortfolioHistoryComponent implements OnInit {
       },
       excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
       noRowsOverlayComponent : NoRowsOverlayComponent,
+      components:this.frameworkComponents,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
       },
@@ -166,12 +172,7 @@ export class PortfolioHistoryComponent implements OnInit {
       sortable: true,
     };
 
-    this.sideBar = ['columns','adaptable','filters'];
-    this.frameworkComponents = {
-      btnCellRenderer: BtnCellRenderer,
-      agGridCheckboxRenderer: CheckboxEditorComponent,
 
-    }
     this.rowGroupPanelShow = 'always';
 
 

@@ -584,14 +584,14 @@ export class CapitalActivityComponent implements OnInit {
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApi = adaptableApi;
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
-    this.adapTableApi.columnApi.autosizeAllColumns()
+    this.adapTableApi?.columnApi?.autosizeAllColumns()
     // use AdaptableApi for runtime access to Adaptable
   };
 
   onAdaptableInvstmntReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApiInvstmnt = adaptableApi;
     this.adapTableApiInvstmnt.toolPanelApi.closeAdapTableToolPanel();
-    this.adapTableApi.columnApi.autosizeAllColumns()
+    this.adapTableApi?.columnApi?.autosizeAllColumns()
     // use AdaptableApi for runtime access to Adaptable
   };
 
