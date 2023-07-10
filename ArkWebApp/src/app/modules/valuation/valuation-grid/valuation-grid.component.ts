@@ -413,7 +413,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         CalculatedColumn: {
-          Revision: 25,
+          Revision: 27,
           CalculatedColumns: [
             {
               FriendlyName: 'Market Value Issue',
@@ -439,7 +439,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
               FriendlyName: 'Curr Market Value Issue',
               ColumnId: 'currentMarketValueIssue',
               Query: {
-                ScalarExpression: `CASE WHEN COALESCE([faceValueIssueFunded], 0.0) = 0.0 THEN 0 WHEN [assetTypeName] = 'Equity' THEN (([currentWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssue]) WHEN [assetTypeName] IN ('Loan', 'Bond') THEN (([currentWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssue]/100.0) ELSE 0 END`
+                ScalarExpression: `CASE WHEN COALESCE([faceValueIssueFunded], 0.0) = 0.0 THEN 0 WHEN [assetTypeName] = 'Equity' THEN [currentWSOMark]*[faceValueIssue] WHEN [assetTypeName] IN ('Loan', 'Bond') THEN (([currentWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssue]/100.0) ELSE 0 END`
               },
               CalculatedColumnSettings: {
                 DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
@@ -449,7 +449,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
               FriendlyName: 'Curr Market Value Issue Funded',
               ColumnId: 'currentMarketValueIssueFunded',
               Query: {
-                ScalarExpression:  `CASE WHEN COALESCE([faceValueIssueFunded], 0.0) = 0.0 THEN 0 WHEN [assetTypeName] = 'Equity' THEN (([currentWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssueFunded]) WHEN [assetTypeName] IN ('Loan', 'Bond') THEN (([currentWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssueFunded]/100.0) ELSE 0 END`
+                ScalarExpression:  `CASE WHEN COALESCE([faceValueIssueFunded], 0.0) = 0.0 THEN 0 WHEN [assetTypeName] = 'Equity' THEN [currentWSOMark]*[faceValueIssueFunded] WHEN [assetTypeName] IN ('Loan', 'Bond') THEN (([currentWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssueFunded]/100.0) ELSE 0 END`
               },
               CalculatedColumnSettings: {
                 DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
@@ -459,7 +459,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
               FriendlyName: 'Prev Market Value Issue',
               ColumnId: 'previousMarketValueIssue',
               Query: {
-                ScalarExpression: `CASE WHEN COALESCE([faceValueIssueFunded], 0.0) = 0.0 THEN 0 WHEN [assetTypeName] = 'Equity' THEN (([previousWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssue]) WHEN [assetTypeName] IN ('Loan', 'Bond') THEN (([previousWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssue]/100.0) ELSE 0 END`
+                ScalarExpression: `CASE WHEN COALESCE([faceValueIssueFunded], 0.0) = 0.0 THEN 0 WHEN [assetTypeName] = 'Equity' THEN [previousWSOMark]*[faceValueIssue] WHEN [assetTypeName] IN ('Loan', 'Bond') THEN (([previousWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssue]/100.0) ELSE 0 END`
               },
               CalculatedColumnSettings: {
                 DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
@@ -469,7 +469,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
               FriendlyName: 'Prev Market Value Issue Funded',
               ColumnId: 'previousMarketValueIssueFunded',
               Query: {
-                ScalarExpression: `CASE WHEN COALESCE([faceValueIssueFunded], 0.0) = 0.0 THEN 0 WHEN [assetTypeName] = 'Equity' THEN (([previousWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssueFunded]) WHEN [assetTypeName] IN ('Loan', 'Bond') THEN (([previousWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssueFunded]/100.0) ELSE 0 END`
+                ScalarExpression: `CASE WHEN COALESCE([faceValueIssueFunded], 0.0) = 0.0 THEN 0 WHEN [assetTypeName] = 'Equity' THEN [previousWSOMark]*[faceValueIssueFunded] WHEN [assetTypeName] IN ('Loan', 'Bond') THEN (([previousWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssueFunded]/100.0) ELSE 0 END`
               },
               CalculatedColumnSettings: {
                 DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
