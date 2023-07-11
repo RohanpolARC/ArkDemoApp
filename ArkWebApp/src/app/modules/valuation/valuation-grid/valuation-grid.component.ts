@@ -395,7 +395,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         },
         Layout: {
           CurrentLayout: 'Valuation',
-          Revision: 4,
+          Revision: 6,
           Layouts: [
             {
               Name: 'Valuation',
@@ -425,7 +425,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         FormatColumn: {
-          Revision: 43,
+          Revision: 45,
           FormatColumns: [
             {
               Scope: { ColumnIds: [ ...this.columnDefs.map(def => def.field), 'marketValueIssue', 'marketValueIssueFunded','currentMarketValueIssue', 'previousMarketValueIssue', 'currentMarketValueIssueFunded', 'previousMarketValueIssueFunded'] },
@@ -442,7 +442,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         CalculatedColumn: {
-          Revision: 28,
+          Revision: 30,
           CalculatedColumns: [
             {
               FriendlyName: 'Market Value Issue',
