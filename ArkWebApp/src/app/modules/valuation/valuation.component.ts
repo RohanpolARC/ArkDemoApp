@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { interval, Observable, Subject, Subscription } from 'rxjs';
 import { filter, first, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
@@ -7,6 +8,8 @@ import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/genera
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
 import { AsOfDateRange, FilterIdValuePair } from 'src/app/shared/models/FilterPaneModel';
 import { SpreadBenchmarkIndex, YieldCurve } from 'src/app/shared/models/ValuationModel';
+import { MarkOverrideMasterComponent } from './mark-override-master/mark-override-master.component';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
   selector: 'app-valuation',
@@ -29,6 +32,8 @@ export class ValuationComponent implements OnInit {
   setAllAssetsForReviewReq: { set: 'Yes' | 'No' }
   getFilteredMTMAssetsReq: { get: 'Yes' | 'No' }
 
+  noRowsToDisplayMsg:NoRowsCustomMessages = 'Please apply the filter.'
+
   reviewedAssets: any[]
 
   modelValuations$: Observable<any[]>
@@ -40,7 +45,8 @@ export class ValuationComponent implements OnInit {
     private valuationSvc: ValuationService,
     private dataSvc: DataService,
     private filterSvc: GeneralFilterService,
-    private accessSvc: AccessService
+    private accessSvc: AccessService,
+    public dialog: MatDialog
   ) { }
 
   rowData$: Observable<any[]> = this.dataSvc.filterApplyBtnState.pipe(
@@ -50,6 +56,7 @@ export class ValuationComponent implements OnInit {
     tap((isHit) => { 
       this.asofdate = this.asofdateIn;    // Update date for grid only when hit apply
       this.showLoadingOverlayReq = { show: 'Yes' }
+      this.noRowsToDisplayMsg = 'No data found for applied filter.'
 
       // Closing all polling requests for model valuation if Apply is hit.
       this.closeTimer$.next();
@@ -159,7 +166,7 @@ export class ValuationComponent implements OnInit {
 
         for(let i: number = 0; i < feed.length; i+= 1){
           if(feed[i]['status'] === 'Failed'){
-            this.dataSvc.setWarningMsg(`Failed to push marks for all. Please check audit logs for more information`, `Dismiss`, `ark-theme-snackbar-error`)
+            this.dataSvc.setWarningMsg(`Some positions might have different marks. Please check audit log for more information`, `Dismiss`, `ark-theme-snackbar-warning`)
             return;
           }
         }
@@ -167,7 +174,8 @@ export class ValuationComponent implements OnInit {
         this.dataSvc.setWarningMsg(`Pushed all marks to WSO`, `Dismiss`, `ark-theme-snackbar-success`)
       },
       error: (error) => {
-        console.error(`Failed to review the assets: {error}`);
+        this.dataSvc.setWarningMsg(`Failed to review the marks`, `Dismiss`, `ark-theme-snackbar-error`);
+        console.error(`Failed to review the assets: ${error}`);
       }
     })   
   }
@@ -228,6 +236,18 @@ export class ValuationComponent implements OnInit {
         )
       })
     )
+  }
+
+  onAuditMarkOverrides(){
+    const dialogRef = this.dialog.open(MarkOverrideMasterComponent, {
+      data: {
+        assetID: null,
+        marktype: null,
+        asofdate: this.asofdate.end
+      },
+      width: '90vw',
+      height: '80vh'
+    })
   }
 
   onPushtoWSO(){

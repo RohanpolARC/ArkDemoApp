@@ -7,10 +7,11 @@ import { DataService } from 'src/app/core/services/data.service';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getMomentDate, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
-import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { SpreadBenchmarkIndex, YieldCurve } from 'src/app/shared/models/ValuationModel';
+import { IPropertyReader, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { AggridMatCheckboxEditorComponent } from 'src/app/shared/modules/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor.component';
 import { ValuationGridService } from '../service/valuation-grid.service';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 
 @Component({
   selector: 'app-valuation-grid',
@@ -36,6 +37,8 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   @Input() reviewedAssets
   @Input() setAllAssetsForReviewReq: { set: 'Yes' | 'No' }
   @Input() getFilteredMTMAssetsReq: { get: 'Yes' | 'No' }
+
+  @Input() noRowsToDisplayMsg:NoRowsCustomMessages 
 
   agGridModules: Module[]
   gridOptions: GridOptions;
@@ -122,17 +125,20 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   ngOnInit(): void {
 
     this.columnDefs = [
+      { field: 'issuer', type: 'abColDefString', hide: true },
       { field: 'issuerShortName', type: 'abColDefString' },
       { field: 'asset', type: 'abColDefString' },
-      { field: 'assetID', type: 'abColDefNumber' },
       { field: 'assetCcy', type: 'abColDefString', hide: true },
       { field: 'currentWSOMark', type: 'abColDefNumber' },
+      { field: 'assetID', type: 'abColDefNumber', hide: true },
+      { field: 'currentWSOMark', type: 'abColDefNumber', width: 175 },
       // { field: 'dateTo', type: 'abColDefDate' },
-      { field: 'previousWSOMark', type: 'abColDefNumber' },
+      { field: 'previousWSOMark', type: 'abColDefNumber', width: 175 },
       // { field: 'dateFrom', type: 'abColDefDate' },
-      { field: 'override', type: 'abColDefNumber', cellStyle: this.gridSvc.editableCellStyle.bind(this), onCellValueChanged: this.gridSvc.onOverrideCellValueChanged.bind(this.gridSvc), editable: this.gridSvc.isEditable.bind(this.gridSvc) },
-      { field: 'overrideDate', type: 'abColDefDate' },
-      { field: 'markType', type: 'abColDefString' },
+      { field: 'override', type: 'abColDefNumber', cellStyle: this.gridSvc.editableCellStyle.bind(this), onCellValueChanged: this.gridSvc.onOverrideCellValueChanged.bind(this.gridSvc), editable: this.gridSvc.isEditable.bind(this.gridSvc), width: 120 },
+      { field: 'calculatedWSOMark', type: 'abColDefNumber', width: 195 },
+      { field: 'overrideDate', type: 'abColDefDate', width: 150 },
+      { field: 'markType', type: 'abColDefString', width: 140 },
       { field: 'yieldCurve', type: 'abColDefString', cellEditor: 'yieldCurveAutocompleteCellEditor',
         cellEditorParams: () => {
           return {
@@ -150,6 +156,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         onCellValueChanged: this.gridSvc.onInitialYCYieldValueChanged.bind(this.gridSvc)
       },
       { field: 'currentYCYield', type: 'abColDefNumber', headerName: 'Current YC Yield' },
+
       { field: 'spreadBenchmarkIndex', type: 'abColDefString', cellEditor: 'autocompleteCellEditor',    
         cellEditorParams: () => {
           return {
@@ -178,11 +185,12 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'modelValuationPlus100', type: 'abColDefNumber', headerName: 'Valuation+100bps' },
       { field: 'isModelValuationStale', type: 'abColDefBoolean' },
       { field: 'usedSpreadDiscount', type: 'abColDefNumber' },
-      { field: 'faceValueIssue', type: 'abColDefNumber', hide: true },
+      { field: 'faceValueIssue', type: 'abColDefNumber' },
+      { field: 'faceValueIssueFunded', type: 'abColDefNumber' },
       { field: 'mark', type: 'abColDefNumber', hide: true },
       { field: 'costPrice', type: 'abColDefNumber', hide: true },
-      { field: 'comment', type: 'abColDefString', hide: true },
-      { field: 'positionsCount', type: 'abColDefNumber', hide: true, 
+      { field: 'comment', type: 'abColDefString' },
+      { field: 'positionsCount', type: 'abColDefNumber', 
         onCellClicked: this.gridSvc.onPositionsCountClicked.bind(this.gridSvc),
         cellStyle: (params: CellClassParams) => {
           if(!!params.value){
@@ -259,7 +267,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       rowGroupPanelShow: 'always',
       onGridReady: (p: GridReadyEvent) => {
         this.gridApi = p.api;
-        this.gridApi.hideOverlay();
+        this.gridApi.showNoRowsOverlay();
       },
       defaultColDef: {
         resizable: true,
@@ -274,7 +282,11 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         'yieldCurveAutocompleteCellEditor': MatAutocompleteEditorComponent,
         'aggridMatCheckboxCellEditor': AggridMatCheckboxEditorComponent,
         'useModelValuationCheckbox': AggridMatCheckboxEditorComponent
-      }
+      },
+      noRowsOverlayComponent:NoRowsOverlayComponent,
+      noRowsOverlayComponentParams: {
+        noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
     }
 
     this.adaptableOptions = {
@@ -348,9 +360,9 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       },
       userInterfaceOptions: {
         customDisplayFormatters: [
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', ['faceValueIssue', 'mark', 'costPrice', 
-           'benchmarkIndexYield', 'currentBenchmarkSpread', 'deltaSpreadDiscount', 'usedSpreadDiscount', 'marketValue', 'currentMarketValue', 'previousMarketValue', 'benchmarkIndexPrice']),
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat', ['override', 'currentWSOMark', 'previousWSOMark']),
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', ['faceValueIssue','faceValueIssueFunded', 'mark', 'costPrice', 
+           'initialYCYield','currentYCYield','initialBenchmarkYield', 'currentBenchmarkYield','initialSpread','currentSpread', 'deltaSpreadDiscount', 'usedSpreadDiscount', 'marketValueIssue', 'marketValueIssueFunded', 'currentMarketValueIssue', 'previousMarketValueIssue', 'currentMarketValueIssueFunded', 'previousMarketValueIssueFunded', 'benchmarkIndexPrice']),
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat', ['override', 'currentWSOMark', 'previousWSOMark', 'calculatedWSOMark']),
 
         ],
       },
@@ -361,11 +373,11 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
             markOverride: (context: CustomQueryVariableContext) => {
 
 
-              const override: any = context?.args[0];
-              if (override === 0) {
+              const mark: any = context?.args[0];
+              if (mark === 0) {
                 return null;
               } else{
-                return override
+                return mark
               }
             },
           },
@@ -382,12 +394,12 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           IsHidden: false, DashboardTitle: ' '
         },
         Layout: {
-          CurrentLayout: 'Basic Layout',
-          Revision: 28,
+          CurrentLayout: 'Valuation',
+          Revision: 3,
           Layouts: [
             {
-              Name: 'Basic Layout',
-              Columns: [ ...this.columnDefs.filter(c => !c.hide).map(c => c.field), 'action' ],
+              Name: 'Valuation',
+              Columns: [ ...this.columnDefs.filter(c => !c.hide).map(c => c.field), 'action', 'marketValueIssue', 'marketValueIssueFunded','currentMarketValueIssueFunded', 'previousMarketValueIssueFunded' ],
               PinnedColumnsMap: {
                 'useModelValuation': 'right',
                 'review': 'right',
@@ -396,59 +408,100 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
               ColumnWidthMap: {
                 action: 5
               },
-            }
+            },
+            {
+              Name: 'Manual Mark',
+              Columns: [ ...this.columnDefs.filter(c => !c.hide)
+                .filter(c => !['yieldCurve','initialYCYield','currentYCYield','spreadBenchmarkIndex','initialBenchmarkYield','currentBenchmarkYield','initialSpread','currentSpread','benchmarkIndexPrice','effectiveDate', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'isModelValuationStale', 'usedSpreadDiscount'].includes(c.field)).map(c => c.field), 'action', 'marketValueIssue', 'marketValueIssueFunded','currentMarketValueIssueFunded', 'previousMarketValueIssueFunded' ],
+              PinnedColumnsMap: {
+                'useModelValuation': 'right',
+                'review': 'right',
+                'action': 'right'
+              },
+              ColumnWidthMap: {
+                action: 5
+              },
+            },
           ]
         },
         FormatColumn: {
-          Revision: 32,
+          Revision: 42,
           FormatColumns: [
             {
-              Scope: { ColumnIds: [ ...this.columnDefs.map(def => def.field), 'marketValue', 'currentMarketValue', 'previousMarketValue'] },
+              Scope: { ColumnIds: [ ...this.columnDefs.map(def => def.field), 'marketValueIssue', 'marketValueIssueFunded','currentMarketValueIssue', 'previousMarketValueIssue', 'currentMarketValueIssueFunded', 'previousMarketValueIssueFunded'] },
               Style: { BackColor: 'pink' },
               Rule: { BooleanExpression: `COALESCE([comment],"" ) != ""` }
             },
             BLANK_DATETIME_FORMATTER_CONFIG(['overrideDate', 'expectedDate', 'modifiedOn', 'reviewedOn', 'effectiveDate']), //'dateTo', 'dateFrom'
             DATE_FORMATTER_CONFIG_ddMMyyyy(['overrideDate', 'expectedDate', 'effectiveDate']), //'dateTo', 'dateFrom'
             DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn', 'reviewedOn']),
-            AMOUNT_FORMATTER_CONFIG_Zero(['override', 'currentWSOMark', 'previousWSOMark'], 2, ['amountZeroFormat']),
-            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['currentWSOMark', 'previousWSOMark', 'override', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100'], 4),
-            CUSTOM_FORMATTER(['faceValueIssue', 'mark', 'costPrice', 
-            'benchmarkIndexPrice', 
-            'initialYCYield', 'currentYCYield', 'initialSpread', 'initialBenchmarkYield', 'currentBenchmarkYield', 'currentSpread',
-            'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValue', 'currentMarketValue', 'previousMarketValue'], 'amountFormatter')
+            AMOUNT_FORMATTER_CONFIG_Zero(['override','calculatedWSOMark', 'currentWSOMark', 'previousWSOMark'], 2, ['amountZeroFormat']),
+            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['currentWSOMark', 'previousWSOMark', 'override','calculatedWSOMark', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100'], 4),
+            CUSTOM_FORMATTER(['faceValueIssue','faceValueIssueFunded', 'mark', 'costPrice', 
+            'benchmarkIndexPrice', 'initialYCYield', 'currentYCYield', 'initialSpread', 'initialBenchmarkYield', 'currentBenchmarkYield', 'currentSpread',   'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValueIssue', 'marketValueIssueFunded', 'currentMarketValueIssue', 'previousMarketValueIssue', 'currentMarketValueIssueFunded', 'previousMarketValueIssueFunded'], 'amountFormatter')
           ]
         },
         CalculatedColumn: {
-          Revision: 17,
+          Revision: 27,
           CalculatedColumns: [
             {
-              FriendlyName: 'Market Value',
-              ColumnId: 'marketValue',
+              FriendlyName: 'Market Value Issue',
+              ColumnId: 'marketValueIssue',
               Query: {
-                ScalarExpression: ` CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssue] * COALESCE(VAR('markOverride',[override]), [currentWSOMark])  WHEN [assetTypeName] IN ('Loan', 'Bond')   THEN [faceValueIssue] * COALESCE(VAR('markOverride',[override]), [currentWSOMark]) / 100.0 ELSE 0 END`
+                ScalarExpression: ` CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssue] * [override]  WHEN [assetTypeName] IN ('Loan', 'Bond')   THEN [faceValueIssue] * [override] / 100.0 ELSE 0 END`
               },
               CalculatedColumnSettings: {
-                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true
+                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
               }
             },
             {
-              FriendlyName: 'Current Market Value',
-              ColumnId: 'currentMarketValue',
+              FriendlyName: 'Market Value Issue Funded',
+              ColumnId: 'marketValueIssueFunded',
               Query: {
-                ScalarExpression: `CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssue] * COALESCE([currentWSOMark], 0.0) WHEN [assetTypeName] IN ('Loan', 'Bond') THEN [faceValueIssue] * COALESCE([currentWSOMark], 0.0) / 100.0 ELSE 0 END`
+                ScalarExpression: ` CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssueFunded] * [override]  WHEN [assetTypeName] IN ('Loan', 'Bond')   THEN [faceValueIssueFunded] * [override] / 100.0 ELSE 0 END`
               },
               CalculatedColumnSettings: {
-                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true
+                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
               }
             },
             {
-              FriendlyName: 'Previous Market Value',
-              ColumnId: 'previousMarketValue',
+              FriendlyName: 'Curr Market Value Issue',
+              ColumnId: 'currentMarketValueIssue',
               Query: {
-                ScalarExpression: `CASE WHEN [assetTypeName] = 'Equity' THEN [faceValueIssue] * COALESCE([previousWSOMark], 0.0) WHEN [assetTypeName] IN ('Loan', 'Bond') THEN [faceValueIssue] * COALESCE([previousWSOMark], 0.0) / 100.0 ELSE 0 END`
+                ScalarExpression: `CASE WHEN COALESCE([faceValueIssueFunded], 0.0) = 0.0 THEN 0 WHEN [assetTypeName] = 'Equity' THEN [currentWSOMark]*[faceValueIssue] WHEN [assetTypeName] IN ('Loan', 'Bond') THEN (([currentWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssue]/100.0) ELSE 0 END`
               },
               CalculatedColumnSettings: {
-                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true
+                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
+              }
+            },
+            {
+              FriendlyName: 'Curr Market Value Issue Funded',
+              ColumnId: 'currentMarketValueIssueFunded',
+              Query: {
+                ScalarExpression:  `CASE WHEN COALESCE([faceValueIssueFunded], 0.0) = 0.0 THEN 0 WHEN [assetTypeName] = 'Equity' THEN [currentWSOMark]*[faceValueIssueFunded] WHEN [assetTypeName] IN ('Loan', 'Bond') THEN (([currentWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssueFunded]/100.0) ELSE 0 END`
+              },
+              CalculatedColumnSettings: {
+                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
+              }
+            },
+            {
+              FriendlyName: 'Prev Market Value Issue',
+              ColumnId: 'previousMarketValueIssue',
+              Query: {
+                ScalarExpression: `CASE WHEN COALESCE([faceValueIssueFunded], 0.0) = 0.0 THEN 0 WHEN [assetTypeName] = 'Equity' THEN [previousWSOMark]*[faceValueIssue] WHEN [assetTypeName] IN ('Loan', 'Bond') THEN (([previousWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssue]/100.0) ELSE 0 END`
+              },
+              CalculatedColumnSettings: {
+                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
+              }
+            },
+            {
+              FriendlyName: 'Prev Market Value Issue Funded',
+              ColumnId: 'previousMarketValueIssueFunded',
+              Query: {
+                ScalarExpression: `CASE WHEN COALESCE([faceValueIssueFunded], 0.0) = 0.0 THEN 0 WHEN [assetTypeName] = 'Equity' THEN [previousWSOMark]*[faceValueIssueFunded] WHEN [assetTypeName] IN ('Loan', 'Bond') THEN (([previousWSOMark]*[faceValueIssue]-100*([faceValueIssue]-[faceValueIssueFunded]))/[faceValueIssueFunded])*([faceValueIssueFunded]/100.0) ELSE 0 END`
+              },
+              CalculatedColumnSettings: {
+                DataType: 'Number', Groupable: true, Sortable: true, ShowToolTip: true, Aggregatable: true, Resizable: true
               }
             }
           ]
