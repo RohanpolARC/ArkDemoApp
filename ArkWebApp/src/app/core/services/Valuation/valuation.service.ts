@@ -5,7 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { APIReponse } from 'src/app/shared/models/GeneralModel';
-import { Valuation } from 'src/app/shared/models/ValuationModel';
+import { SpreadBenchmarkIndex, Valuation, YieldCurve } from 'src/app/shared/models/ValuationModel';
 import { RESOURCE_CONTEXT } from '../../interceptors/msal-http.interceptor';
 
 @Injectable({
@@ -42,7 +42,13 @@ export class ValuationService {
   }
 
   getSpreadBenchmarkIndex(asofdate: string, benchmarkindex: string){
-    return this.http.get<any[]>(`${APIConfig.VALUATION_SPREAD_BENCHMARK_INDEXES_GET_API}/?asofdate=${asofdate}&benchmarkindex=${benchmarkindex ?? ''}`).pipe(
+    return this.http.get<SpreadBenchmarkIndex[]>(`${APIConfig.VALUATION_SPREAD_BENCHMARK_INDEXES_GET_API}/?asofdate=${asofdate}&benchmarkindex=${benchmarkindex ?? ''}`).pipe(
+      catchError((ex) => throwError(ex))
+    )
+  }
+
+  getYieldCurves(asofdate: string){
+    return this.http.get<YieldCurve[]>(`${APIConfig.VALUATION_YIELD_CURVES_GET_API}/?asofdate=${asofdate}`).pipe(
       catchError((ex) => throwError(ex))
     )
   }
