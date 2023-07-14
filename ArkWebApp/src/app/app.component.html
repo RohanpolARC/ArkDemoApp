@@ -95,9 +95,6 @@
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Valuation')" [ngStyle]="ValuationStyle" >
           <div class="list-item-text">Valuation</div>
         </mat-list-item>
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Hedging Mark')" [ngStyle]="HedgingMarkStyle">
-          <div class="list-item-text">Valuation/Hedging Mark Old</div>
-        </mat-list-item>
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('AUM Delta')" [ngStyle]="AUMDeltaStyle">
           <div class="list-item-text">AUM Delta</div>
         </mat-list-item>
@@ -184,7 +181,7 @@
       <button mat-raised-button id="apply-button"  
         *ngIf="[
         '/facility-detail', '/liquidity-summary', '/fee-calculation', '/management-fee',
-        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/hedging-mark','/aum-delta', '/net-returns','/mark-changes','/valuation'].includes(location.path())" 
+        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/aum-delta', '/net-returns','/mark-changes','/valuation'].includes(location.path())" 
         (click)="filterApply()">Apply</button>
     </div>
 
@@ -223,10 +220,6 @@
 
     <div *ngIf="location.path() === '/positions-screen'" class="filter-element">
       <app-general-filter [screen] = "'positions-screen'"></app-general-filter>
-    </div>
-
-    <div *ngIf="location.path() === '/hedging-mark'" class="filter-element">
-      <app-general-filter [screen] = "'hedging-mark'"></app-general-filter>
     </div>
 
     <div *ngIf="location.path() === '/aum-delta'" class="filter-element">

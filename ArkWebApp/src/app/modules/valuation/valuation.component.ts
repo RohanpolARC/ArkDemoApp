@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { interval, Observable, Subject, Subscription } from 'rxjs';
 import { filter, first, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
@@ -7,6 +8,9 @@ import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/genera
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
 import { AsOfDateRange, FilterIdValuePair } from 'src/app/shared/models/FilterPaneModel';
 import { SpreadBenchmarkIndex, YieldCurve } from 'src/app/shared/models/ValuationModel';
+import { MarkOverrideMasterComponent } from './mark-override-master/mark-override-master.component';
+import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
+import { formatDate } from 'src/app/shared/functions/formatter';
 
 @Component({
   selector: 'app-valuation',
@@ -29,6 +33,8 @@ export class ValuationComponent implements OnInit {
   setAllAssetsForReviewReq: { set: 'Yes' | 'No' }
   getFilteredMTMAssetsReq: { get: 'Yes' | 'No' }
 
+  noRowsToDisplayMsg:NoRowsCustomMessages = 'Please apply the filter.'
+
   reviewedAssets: any[]
 
   modelValuations$: Observable<any[]>
@@ -40,7 +46,8 @@ export class ValuationComponent implements OnInit {
     private valuationSvc: ValuationService,
     private dataSvc: DataService,
     private filterSvc: GeneralFilterService,
-    private accessSvc: AccessService
+    private accessSvc: AccessService,
+    public dialog: MatDialog
   ) { }
 
   rowData$: Observable<any[]> = this.dataSvc.filterApplyBtnState.pipe(
@@ -50,6 +57,7 @@ export class ValuationComponent implements OnInit {
     tap((isHit) => { 
       this.asofdate = this.asofdateIn;    // Update date for grid only when hit apply
       this.showLoadingOverlayReq = { show: 'Yes' }
+      this.noRowsToDisplayMsg = 'No data found for applied filter.'
 
       // Closing all polling requests for model valuation if Apply is hit.
       this.closeTimer$.next();
@@ -80,7 +88,19 @@ export class ValuationComponent implements OnInit {
     }),
     switchMap((isHit) => {
       return this.valuationSvc.getValuationData(this.asofdate, this.funds?.join(','), this.marktypes?.join(',')).pipe(
-        tap((data: any[]) => { })
+        tap((data: any[]) => { 
+          // console.log(data)
+          let formatDateCols = ['overrideDate', 'expectedDate', 'modifiedOn', 'reviewedOn', 'effectiveDate']
+          data.map(row=>{
+            formatDateCols.forEach(dateCol=>{
+              let dateFormated =   formatDate(row[dateCol]);
+              console.log(dateFormated)
+              if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(dateFormated)){
+                row[dateCol] = null;
+              }
+            })
+          })
+        })
       )
     })
   )
@@ -229,6 +249,18 @@ export class ValuationComponent implements OnInit {
         )
       })
     )
+  }
+
+  onAuditMarkOverrides(){
+    const dialogRef = this.dialog.open(MarkOverrideMasterComponent, {
+      data: {
+        assetID: null,
+        marktype: null,
+        asofdate: this.asofdate.end
+      },
+      width: '90vw',
+      height: '80vh'
+    })
   }
 
   onPushtoWSO(){

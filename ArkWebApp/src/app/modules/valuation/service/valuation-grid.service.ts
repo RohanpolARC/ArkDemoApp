@@ -22,6 +22,7 @@ export class ValuationGridService {
   }
 
   public lockEdit: boolean
+  public saveInProgress: boolean
 
   overrideColMap: {
     [col: string] : {
@@ -56,7 +57,8 @@ export class ValuationGridService {
       'currentSpread': { global: 'globalcurrentSpread' },
       'benchmarkIndexPrice': { global: 'globalBenchmarkIndexPrice' },
       'effectiveDate': { global: 'globaleffectiveDate' },
-      'deltaSpreadDiscount': { global: 'globaldeltaSpreadDiscount' }
+      'deltaSpreadDiscount': { global: 'globaldeltaSpreadDiscount' },
+      'calculatedWSOMark': { global: 'globalcalculatedWSOMark' }
     }
   }
 
@@ -143,6 +145,14 @@ export class ValuationGridService {
 
   saveActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
 
+    if(this.saveInProgress){
+      this.dataSvc.setWarningMsg(`Current save is in progress`, `Dismiss`, `ark-theme-snackbar-warning`)
+      return  
+    }
+    else {
+      this.saveInProgress = true;
+    }
+
     this.dataSvc.setWarningMsg(`Please wait while we save the updates`,`Dismiss`,'ark-theme-snackbar-normal')
 
     let node: RowNode = <RowNode>context.rowNode;
@@ -164,9 +174,14 @@ export class ValuationGridService {
 
     this.valuationSvc.putValuationData([valuation]).pipe(first()).subscribe({
       next: (res: APIReponse) => {
+        this.saveInProgress = false;
         if(res.isSuccess){
           this.dataSvc.setWarningMsg(`Saved Valuation information for this asset`, `Dismiss`, `ark-theme-snackbar-success`);
 
+          // Returns calculatedWSOMark after save.(Returns -1 from procedure (as default) if mark override was not modified)
+          if(res.data > 0){
+            node.data['calculatedWSOMark'] = res.data;
+          }
           node.data['modifiedBy'] = valuation.modifiedBy;
           node.data['modifiedOn'] = new Date();
 
@@ -176,7 +191,7 @@ export class ValuationGridService {
           delete context.rowNode.data['editing'];
           
           let adaptableApi: AdaptableApi = this.component.readProperty<AdaptableApi>('adaptableApi');
-          adaptableApi.gridApi.refreshCells([context.rowNode], [...this.getOverrideColumns(), 'action', 'comment']);
+          adaptableApi.gridApi.refreshCells([context.rowNode], [...this.getOverrideColumns(), 'action', 'comment', 'marketValue']);
         }
         else if(res.isSuccess === false){
           this.dataSvc.setWarningMsg(`Failed to save valuation information. Please try again.`)
@@ -186,7 +201,7 @@ export class ValuationGridService {
           this.lockEdit = false;
           delete context.rowNode.data['editing'];
 
-          this.getAdaptableApi().gridApi.refreshCells([context.rowNode], [...this.getOverrideColumns(), 'action', 'comment'])
+          this.getAdaptableApi().gridApi.refreshCells([context.rowNode], [...this.getOverrideColumns(), 'action', 'comment', 'marketValue'])
         }
         else {
           this.dataSvc.setWarningMsg(`Failed to save valuation information for this asset`, 'Dismiss', 'ark-theme-snackbar-error')
@@ -194,6 +209,7 @@ export class ValuationGridService {
       },
       error: (err) => {
         console.error(`Failed to save valuation model: ${err}`)
+        this.saveInProgress = false
       }
     })
 
@@ -208,7 +224,11 @@ export class ValuationGridService {
     this.getAdaptableApi().gridApi.refreshCells([node], [...this.getColumnDefs().map(col => col.field), 'action']);
   }
 
-  cancelActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {    
+  cancelActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {   
+    if(this.saveInProgress){
+      this.dataSvc.setWarningMsg(`Current save is in progress`, `Dismiss`, `ark-theme-snackbar-warning`)
+      return  
+    } 
     this.clearEditingStateForRow(context.rowNode as RowNode);
   }
 

@@ -12,9 +12,6 @@ import { AuthenticationResult, EventMessage, EventType } from '@azure/msal-brows
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 
-let lastClickedTabRoute :string
-// var count = 0 
-
 @Component({  
   selector: 'app-root',  
   templateUrl: './app.component.html',  
@@ -61,7 +58,6 @@ export class AppComponent {
   RefDataManagerStyle:any = {};
   ManagementFeeStyle: any = {};
   PositionsScreenStyle: any = {};
-  HedgingMarkStyle:any = {};
   NetReturnsStyle: any = {};
   AUMDeltaStyle: any = {};
   MarkChangeStyle:any = {};
@@ -213,9 +209,6 @@ export class AppComponent {
     else if(this.location.path() === '/positions-screen'){
       this.updateSelection('Positions Screen')
     }
-    else if(this.location.path() === '/hedging-mark'){
-      this.updateSelection('Hedging Mark')
-    }
     else if(this.location.path() === '/aum-delta'){
       this.updateSelection('AUM Delta')
     }
@@ -243,7 +236,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle=this.HedgingMarkStyle=this.AUMDeltaStyle = this.NetReturnsStyle = this.MarkChangeStyle = this.ValuationStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle = this.AUMDeltaStyle = this.NetReturnsStyle = this.MarkChangeStyle = this.ValuationStyle = this.notSelectedElement;
 
     if(screen === 'GIREditor'){
       this.GIREditorStyle = this.selectedElement;
@@ -324,10 +317,6 @@ export class AppComponent {
     else if(screen === 'Positions Screen'){
       this.PositionsScreenStyle = this.selectedElement;
       this.router.navigate(['/positions-screen'])
-    }
-    else if(screen === 'Hedging Mark'){
-      this.HedgingMarkStyle = this.selectedElement;
-      this.router.navigate(['/hedging-mark'])
     }
     else if(screen === 'AUM Delta'){
       this.AUMDeltaStyle = this.selectedElement;
