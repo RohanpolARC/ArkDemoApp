@@ -236,6 +236,26 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           }
         }
       },
+      { field: 'forceOverride', type: 'abColDefBoolean', cellRenderer: 'forceOverrideCheckbox', lockPinned: true, maxWidth: 180,
+        cellRendererParams: () => {
+          return {
+            showCheckbox: (params: ICellRendererParams) => { return String(params.data?.['markType']).toLowerCase() === 'impaired cost' },
+            disableCheckbox: (params: ICellRendererParams) => { return !this.gridSvc.isEditing(params.node) },
+            checkboxChanged: (params: ICellRendererParams, boolVal: boolean) => {
+              params.data['forceOverride'] = boolVal;
+              if(boolVal){
+                params.data['oldShowIsReviewed'] = params.data?.['showIsReviewed'];
+                params.data['showIsReviewed'] = 0;
+              }
+              else{
+                params.data['showIsReviewed'] = params.data['oldShowIsReviewed']; // need to reset it to the original value if useModelValuation was mistakenly ticked previously and now is being reverted back.
+              }
+              this.adaptableApi.gridApi.refreshCells([params.node], this.columnDefs.map(col => col.field))
+            },
+            defaultVal: (params: ICellRendererParams) => { return params.value }
+          }
+        }
+      },
       { field: 'review', type: 'abColDefBoolean', cellRenderer: 'aggridMatCheckboxCellEditor', lockPinned: true, maxWidth: 100,
         cellRendererParams: () => {
           return {
@@ -281,7 +301,8 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         'autocompleteCellEditor': MatAutocompleteEditorComponent,
         'yieldCurveAutocompleteCellEditor': MatAutocompleteEditorComponent,
         'aggridMatCheckboxCellEditor': AggridMatCheckboxEditorComponent,
-        'useModelValuationCheckbox': AggridMatCheckboxEditorComponent
+        'useModelValuationCheckbox': AggridMatCheckboxEditorComponent,
+        'forceOverrideCheckbox': AggridMatCheckboxEditorComponent
       },
       noRowsOverlayComponent:NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
@@ -395,13 +416,14 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         },
         Layout: {
           CurrentLayout: 'Valuation',
-          Revision: 6,
+          Revision: 31,
           Layouts: [
             {
               Name: 'Valuation',
               Columns: [ ...this.columnDefs.filter(c => !c.hide).map(c => c.field), 'action', 'marketValueIssue', 'marketValueIssueFunded','currentMarketValueIssueFunded', 'previousMarketValueIssueFunded' ],
               PinnedColumnsMap: {
                 'useModelValuation': 'right',
+                'forceOverride': 'right',
                 'review': 'right',
                 'action': 'right'
               },
@@ -415,6 +437,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
                 .filter(c => !['yieldCurve','initialYCYield','currentYCYield','spreadBenchmarkIndex','initialBenchmarkYield','currentBenchmarkYield','initialSpread','currentSpread','benchmarkIndexPrice','effectiveDate', 'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'isModelValuationStale', 'usedSpreadDiscount'].includes(c.field)).map(c => c.field), 'action', 'marketValueIssue', 'marketValueIssueFunded','currentMarketValueIssueFunded', 'previousMarketValueIssueFunded' ],
               PinnedColumnsMap: {
                 'useModelValuation': 'right',
+                'forceOverride': 'right',
                 'review': 'right',
                 'action': 'right'
               },

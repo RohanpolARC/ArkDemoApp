@@ -85,6 +85,7 @@ export class MarkOverrideMasterComponent implements OnInit {
       { field: 'wsoStatus', hide: true },
       { field: 'isMarkedAtCost', hide: true },
       { field: 'comment', width: 500 },
+      { field: 'forceOverride', maxWidth: 150 }
     ]
 
     if(!this.assetID) {      // In case of global audit

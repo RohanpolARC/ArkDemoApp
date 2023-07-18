@@ -46,6 +46,7 @@ export class ValuationGridService {
       'reviewedBy': { global: 'globalReviewedBy' },
       'reviewedOn': { global: 'globalReviewedOn' },
       'useModelValuation': { global: 'globaluseModelValuation' },
+      'forceOverride': { global: 'globalforceOverride' },
       'isModelValuationStale': { global: 'globalisModelValuationStale' },
       'yieldCurve': { global: 'globalYieldCurve' },
       'initialYCYield': { global: 'globalinitialYCYield' },
@@ -160,6 +161,7 @@ export class ValuationGridService {
     let valuation: Valuation = <Valuation> {};
     valuation.assetID = node.data?.['assetID'];
     valuation.markType = node.data?.['markType'];   // Hedging Mark/Mark Override
+    valuation.forceOverride = node.data?.['forceOverride'];
     valuation.yieldCurve = node.data?.['yieldCurve'];
     valuation.initialYCYield = node.data?.['initialYCYield'];
     valuation.spreadBenchmarkIndex = node.data?.['spreadBenchmarkIndex'];
@@ -198,10 +200,10 @@ export class ValuationGridService {
 
           // node.data['comment'] = res.returnMessage;
 
-          this.lockEdit = false;
-          delete context.rowNode.data['editing'];
+          // this.lockEdit = false;
+          // delete context.rowNode.data['editing'];
 
-          this.getAdaptableApi().gridApi.refreshCells([context.rowNode], [...this.getOverrideColumns(), 'action', 'comment', 'marketValue'])
+          // this.getAdaptableApi().gridApi.refreshCells([context.rowNode], [...this.getOverrideColumns(), 'action', 'comment', 'marketValue'])
         }
         else {
           this.dataSvc.setWarningMsg(`Failed to save valuation information for this asset`, 'Dismiss', 'ark-theme-snackbar-error')
