@@ -1,28 +1,29 @@
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { Component } from '@angular/core';
+import { ICheckboxCellParams, ICheckboxChanged, ICheckboxControl, IDefaultValue, IDisableCheckbox, IShowCheckbox } from '../aggrid-mat-checkbox-editor.types';
 
 @Component({
   selector: 'app-aggrid-mat-checkbox-editor',
   templateUrl: './aggrid-mat-checkbox-editor.component.html',
   styleUrls: ['./aggrid-mat-checkbox-editor.component.scss']
 })
-export class AggridMatCheckboxEditorComponent implements ICellRendererAngularComp {
+export class AggridMatCheckboxEditorComponent implements ICellRendererAngularComp, ICheckboxControl  {
 
   params: ICellRendererParams;
   checked: boolean;
 
-  showCheckbox: ((params: ICellRendererParams) => boolean) = ((params) => true);
-  disableCheckbox: ((params: ICellRendererParams) => boolean) = ((params) => false);
-  onCheckboxChanged: (params: ICellRendererParams, boolVal: boolean) => void = ((params, boolVal) => {});
-  defaultVal: (params: ICellRendererParams) => boolean = ((params) => false); 
+  showCheckbox: IShowCheckbox = ((params) => true);
+  disableCheckbox: IDisableCheckbox = ((params) => false);
+  onCheckboxChanged: ICheckboxChanged = ((params, boolVal) => {});
+  defaultVal: IDefaultValue = ((params) => false); 
   
   constructor() { }
 
-  initHelperFns(params: ICellRendererParams<any, any>): void {
+  initHelperFns(params: ICheckboxCellParams): void {
 
     if(params?.['showCheckbox'])
-      this.showCheckbox = params?.['showCheckbox'];
+      this.showCheckbox = params?.['showCheckbox']
     if(params?.['disableCheckbox'])
       this.disableCheckbox = params?.['disableCheckbox'];
     if(params?.['checkboxChanged'])
@@ -31,7 +32,7 @@ export class AggridMatCheckboxEditorComponent implements ICellRendererAngularCom
       this.defaultVal = params?.['defaultVal'];
   }
 
-  agInit(params: ICellRendererParams<any, any>): void {
+  agInit(params: ICheckboxCellParams): void {
     this.params = params;
 
     this.initHelperFns(params)

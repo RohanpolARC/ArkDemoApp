@@ -12,6 +12,7 @@ import { IPropertyReader, NoRowsCustomMessages } from 'src/app/shared/models/Gen
 import { AggridMatCheckboxEditorComponent } from 'src/app/shared/modules/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor.component';
 import { ValuationGridService } from '../service/valuation-grid.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
+import { GridCheckboxUtilService } from '../service/grid-checkbox-util.service';
 
 @Component({
   selector: 'app-valuation-grid',
@@ -50,10 +51,12 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
 
   constructor(
     private dataSvc: DataService,
-    private gridSvc: ValuationGridService
+    private gridSvc: ValuationGridService,
+    private gridCheckboxUtilSvc: GridCheckboxUtilService
   ) { 
     this.agGridModules = CommonConfig.AG_GRID_MODULES
     this.gridSvc.registerComponent(this);
+    this.gridCheckboxUtilSvc.registerComponent(this);
   }
 
   /**
@@ -124,6 +127,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
 
   ngOnInit(): void {
 
+    console.log('ngoninit called')
     this.columnDefs = [
       { field: 'issuer', type: 'abColDefString', hide: true },
       { field: 'issuerShortName', type: 'abColDefString' },
@@ -214,69 +218,15 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'reviewedOn', type: 'abColDefDate', hide: true },
       { field: 'modifiedBy', type: 'abColDefString', hide: true },
       { field: 'modifiedOn', type: 'abColDefDate', hide: true },
-      { field: 'useModelValuation', type: 'abColDefBoolean', cellRenderer: 'useModelValuationCheckbox', lockPinned: true, maxWidth: 180,
-        cellRendererParams: () => {
-          return {
-            showCheckbox: (params: ICellRendererParams) => { return !!params.data?.['modelValuation'] },
-            disableCheckbox: (params: ICellRendererParams) => { return !this.gridSvc.isEditing(params.node); },
-            checkboxChanged: (params: ICellRendererParams, boolVal: boolean) => {
-              if(boolVal){
-                params.data['oldOverride'] = params.data?.['override'];
-                params.data['override'] = params.data?.['modelValuation'];
-                params.data['oldShowIsReviewed'] = params.data?.['showIsReviewed'];
-                params.data['showIsReviewed'] = 0;
-                delete params.data['review']
-              }
-              else{
-                params.data['override'] = params.data?.['oldOverride'];
-                params.data['showIsReviewed'] = params.data['oldShowIsReviewed']; // need to reset it to the original value if useModelValuation was mistakenly ticked previously and now is being reverted back.
-              }
-              this.adaptableApi.gridApi.refreshCells([params.node], this.columnDefs.map(col => col.field))
-            },
-            defaultVal: (params: ICellRendererParams) => { return params.value }
-          }
-        }
+      { field: 'useModelValuation', type: 'abColDefBoolean', cellRenderer: 'useModelValuationCheckbox', lockPinned: true, 
+        maxWidth: 180,
+        cellRendererParams: () => { return this.gridCheckboxUtilSvc.getUseModelValuationCellRendererParams() }
       },
       { field: 'forceOverride', type: 'abColDefBoolean', cellRenderer: 'forceOverrideCheckbox', lockPinned: true, maxWidth: 180,
-        cellRendererParams: () => {
-          return {
-            showCheckbox: (params: ICellRendererParams) => { return String(params.data?.['markType']).toLowerCase() === 'impaired cost' && (params.data?.['seniority']?.toLowerCase() !== 'equity' || params.data?.['assetTypeName']?.toLowerCase() !== 'equity') },
-            disableCheckbox: (params: ICellRendererParams) => { return !this.gridSvc.isEditing(params.node) },
-            checkboxChanged: (params: ICellRendererParams, boolVal: boolean) => {
-              params.data['forceOverride'] = boolVal;
-              if(boolVal){
-                params.data['oldShowIsReviewed'] = params.data?.['showIsReviewed'];
-
-                params.data['showIsReviewed'] = 0;
-                delete params.data['review']
-
-              }
-              else{
-                params.data['showIsReviewed'] = params.data['oldShowIsReviewed']; // need to reset it to the original value if useModelValuation was mistakenly ticked previously and now is being reverted back.
-              }
-              this.adaptableApi.gridApi.refreshCells([params.node], this.columnDefs.map(col => col.field))
-            },
-            defaultVal: (params: ICellRendererParams) => { return params.value }
-          }
-        }
+        cellRendererParams: () => { return this.gridCheckboxUtilSvc.getForceOverrideCellRendererParams() }
       },
       { field: 'review', type: 'abColDefBoolean', cellRenderer: 'aggridMatCheckboxCellEditor', lockPinned: true, maxWidth: 100,
-        cellRendererParams: () => {
-          return {
-            showCheckbox: (params: ICellRendererParams) => { return !(params.data?.['showIsReviewed'] === -1) },
-            disableCheckbox: (params: ICellRendererParams) => { return this.gridSvc.isEditing(params.node) || params.data?.['showIsReviewed'] === 1 },
-            checkboxChanged: (params: ICellRendererParams, boolVal: boolean) => { 
-            },
-            defaultVal: (params: ICellRendererParams) => { 
-              if(params.data?.['showIsReviewed'] === 1)
-                return true;
-              
-              else if(params.data?.['review'] && params.data?.['showIsReviewed'] === 0)
-                return true;  
-              return false;
-            }
-          }
-        }
+        cellRendererParams: () => { return this.gridCheckboxUtilSvc.getReviewCellRendererParams() }
       },
     ]
 

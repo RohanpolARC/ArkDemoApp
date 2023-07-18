@@ -61,10 +61,6 @@ export class ValuationService {
     }).pipe(
       catchError((ex) => throwError(ex))
     )
-
-    return this.http.get<any[]>(`${APIConfig.VALUATION_AUDIT_MASTER_GET_API}/?assetID=${assetID ?? ''}&marktype=${marktype ?? ''}&asofdate=${asofdate ?? ''}`).pipe(
-      catchError((ex) => throwError(ex))
-    );
   }
 
   getAuditDetail(assetID: number, marktype: string, asofdate: string, auditeventID: number){

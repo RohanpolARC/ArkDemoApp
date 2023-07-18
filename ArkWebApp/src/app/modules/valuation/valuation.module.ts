@@ -15,6 +15,7 @@ import { AggridMatCheckboxEditorModule } from 'src/app/shared/modules/aggrid-mat
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { GridCheckboxUtilService } from './service/grid-checkbox-util.service';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatTooltipModule
   ],
   providers: [
-    ValuationGridService
+    ValuationGridService,
+    GridCheckboxUtilService
   ]
 })
 export class ValuationModule { }
