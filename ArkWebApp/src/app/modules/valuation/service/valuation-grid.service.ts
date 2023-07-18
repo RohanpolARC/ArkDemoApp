@@ -130,6 +130,10 @@ export class ValuationGridService {
 
       this.setFields(context.rowNode, this.getOverrideColumns(), 'Set');
 
+      if(context.rowNode.data?.['showIsReviewed'] === 1){
+        context.rowNode.data['showIsReviewed'] = 0;
+      }
+
       this.getAdaptableApi().gridApi.refreshCells([context.rowNode], this.getColumnDefs().map(col => col.field));
     }
   }
@@ -177,6 +181,11 @@ export class ValuationGridService {
     this.valuationSvc.putValuationData([valuation]).pipe(first()).subscribe({
       next: (res: APIReponse) => {
         this.saveInProgress = false;
+
+        //Clearing intermediate states
+        delete node.data['oldOverride']
+        delete node.data['oldShowIsReviewed']
+
         if(res.isSuccess){
           this.dataSvc.setWarningMsg(`Saved Valuation information for this asset`, `Dismiss`, `ark-theme-snackbar-success`);
 
@@ -187,23 +196,14 @@ export class ValuationGridService {
           node.data['modifiedBy'] = valuation.modifiedBy;
           node.data['modifiedOn'] = new Date();
 
-          // node.data['comment'] = null;
-
           this.lockEdit = false;
           delete context.rowNode.data['editing'];
           
           let adaptableApi: AdaptableApi = this.component.readProperty<AdaptableApi>('adaptableApi');
-          adaptableApi.gridApi.refreshCells([context.rowNode], [...this.getOverrideColumns(), 'action', 'comment', 'marketValue']);
+          adaptableApi.gridApi.refreshCells([context.rowNode], [...this.getColumnDefs().map(col => col.field), 'action', 'comment', 'marketValueIssue', 'marketValueIssueFunded'])
         }
         else if(res.isSuccess === false){
           this.dataSvc.setWarningMsg(`Failed to save valuation information. Please try again.`)
-
-          // node.data['comment'] = res.returnMessage;
-
-          // this.lockEdit = false;
-          // delete context.rowNode.data['editing'];
-
-          // this.getAdaptableApi().gridApi.refreshCells([context.rowNode], [...this.getOverrideColumns(), 'action', 'comment', 'marketValue'])
         }
         else {
           this.dataSvc.setWarningMsg(`Failed to save valuation information for this asset`, 'Dismiss', 'ark-theme-snackbar-error')
