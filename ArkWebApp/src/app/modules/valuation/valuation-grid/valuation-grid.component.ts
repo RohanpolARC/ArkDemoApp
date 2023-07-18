@@ -240,7 +240,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
       { field: 'forceOverride', type: 'abColDefBoolean', cellRenderer: 'forceOverrideCheckbox', lockPinned: true, maxWidth: 180,
         cellRendererParams: () => {
           return {
-            showCheckbox: (params: ICellRendererParams) => { return String(params.data?.['markType']).toLowerCase() === 'impaired cost' },
+            showCheckbox: (params: ICellRendererParams) => { return String(params.data?.['markType']).toLowerCase() === 'impaired cost' && (params.data?.['seniority']?.toLowerCase() !== 'equity' || params.data?.['assetTypeName']?.toLowerCase() !== 'equity') },
             disableCheckbox: (params: ICellRendererParams) => { return !this.gridSvc.isEditing(params.node) },
             checkboxChanged: (params: ICellRendererParams, boolVal: boolean) => {
               params.data['forceOverride'] = boolVal;
