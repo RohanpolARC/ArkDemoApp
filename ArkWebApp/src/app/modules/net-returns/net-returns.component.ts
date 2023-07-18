@@ -43,6 +43,11 @@ export class NetReturnsComponent implements OnInit {
       this.saveNetReturns = saveNetReturns
     })
   )
+  showExtraColumns$: Observable<any> = this.netReturnsSvc.currentShowExtraColumns.pipe(
+    tap((showExtraColumns:any)=>{
+      this.showExtraColumns = showExtraColumns
+    })
+  )
 
   closeTimer$ = new Subject<any>();
   cashflows: any[] = []
@@ -53,6 +58,7 @@ export class NetReturnsComponent implements OnInit {
   fundHedging: string
   cashflowType: string
   saveNetReturns:any
+  showExtraColumns:any
   isDisabled:boolean = true
 
   constructor(private netReturnsSvc: NetReturnsService,
@@ -76,7 +82,8 @@ export class NetReturnsComponent implements OnInit {
       asOfDate:this.asOfDate,
       fundHedging:this.fundHedging,
       cashflowType:this.cashflowType,
-      calculationType:this.calcMethod
+      calculationType:this.calcMethod,
+      showExtraColumns:this.showExtraColumns
     }
     const dialogRef = this.dialog.open(SsrsReportPopupComponent,{ 
       data: {
@@ -106,8 +113,9 @@ export class NetReturnsComponent implements OnInit {
           this.netReturnsSvc.changeCashflowType(data.value?.[0]?.value)
         }else if(data.id === 235){
           this.netReturnsSvc.changeSaveNetReturns(data.value)
-        }
-        
+        }else if(data.id === 354){
+          this.netReturnsSvc.changeShowExtraColumn(data.value)
+        }       
       }
     }))
       
@@ -124,6 +132,7 @@ export class NetReturnsComponent implements OnInit {
           fundHedging: this.fundHedging,
           cashflowType: this.cashflowType,
           saveNetReturns: this.saveNetReturns,
+          showExtraColumns: this.showExtraColumns,
           runBy: this.dataSvc.getCurrentUserName()
         }
         return  this.netReturnsSvc.calculateNetIRR(m).pipe(
