@@ -225,6 +225,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
                 params.data['override'] = params.data?.['modelValuation'];
                 params.data['oldShowIsReviewed'] = params.data?.['showIsReviewed'];
                 params.data['showIsReviewed'] = 0;
+                delete params.data['review']
               }
               else{
                 params.data['override'] = params.data?.['oldOverride'];
@@ -245,7 +246,10 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
               params.data['forceOverride'] = boolVal;
               if(boolVal){
                 params.data['oldShowIsReviewed'] = params.data?.['showIsReviewed'];
+
                 params.data['showIsReviewed'] = 0;
+                delete params.data['review']
+
               }
               else{
                 params.data['showIsReviewed'] = params.data['oldShowIsReviewed']; // need to reset it to the original value if useModelValuation was mistakenly ticked previously and now is being reverted back.

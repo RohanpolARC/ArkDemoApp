@@ -130,9 +130,9 @@ export class ValuationGridService {
 
       this.setFields(context.rowNode, this.getOverrideColumns(), 'Set');
 
-      if(context.rowNode.data?.['showIsReviewed'] === 1){
-        context.rowNode.data['showIsReviewed'] = 0;
-      }
+      // After edit entries become unreviewed (as they'll need to be reviewed again)
+      context.rowNode.data['showIsReviewed'] = 0;
+      delete context.rowNode.data['review']
 
       this.getAdaptableApi().gridApi.refreshCells([context.rowNode], this.getColumnDefs().map(col => col.field));
     }
