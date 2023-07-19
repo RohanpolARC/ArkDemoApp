@@ -550,6 +550,11 @@ export class ValuationGridService {
 
   setAllAssetsForReview(){
 
+    if(this.lockEdit){
+      this.dataSvc.setWarningMsg(`Cannot review while editing`, `Dismiss`, `ark-theme-snackbar-warning`)
+      return;
+    }
+    
     let nodes: RowNode[] = this.getAdaptableApi().gridApi.getAllRowNodes({
       includeGroupRows: false,
       filterFn: (node: RowNode) => {

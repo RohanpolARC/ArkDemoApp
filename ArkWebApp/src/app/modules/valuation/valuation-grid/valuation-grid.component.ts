@@ -111,6 +111,11 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   }
 
   emitReviewingAssets(){
+    if(this.gridSvc.lockEdit){
+      this.dataSvc.setWarningMsg(`Cannot review while editing`, `Dismiss`, `ark-theme-snackbar-warning`)
+      return;
+    }
+
     let r = [];
     this.gridApi.forEachNodeAfterFilter((node) => r.push(node.data));
 
@@ -127,7 +132,6 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
 
   ngOnInit(): void {
 
-    console.log('ngoninit called')
     this.columnDefs = [
       { field: 'issuer', type: 'abColDefString', hide: true },
       { field: 'issuerShortName', type: 'abColDefString' },
