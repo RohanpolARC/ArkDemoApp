@@ -1,5 +1,5 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton } from '@adaptabletools/adaptable-angular-aggrid';
-import { CellClassParams, CellClickedEvent, CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, RowNode, ValueGetterParams } from '@ag-grid-community/core';
+import { CellClassParams, CellClickedEvent, CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, IRowNode, RowNode, ValueGetterParams } from '@ag-grid-community/core';
 import { EventEmitter, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { first } from 'rxjs/operators';
@@ -147,7 +147,7 @@ export class ValuationGridService {
     }
   }
 
-  clearReview(node: RowNode){
+  clearReview(node: IRowNode){
     node.data['showIsReviewed'] = 0;
     delete node.data['review']
   }
