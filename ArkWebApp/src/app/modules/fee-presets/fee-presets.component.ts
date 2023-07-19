@@ -1,5 +1,5 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
+import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
@@ -10,7 +10,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { FeePresetsService } from 'src/app/core/services/FeePresets/fee-presets.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy, formatDate } from 'src/app/shared/functions/formatter';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { PresetsFormComponent } from './presets-form/presets-form.component';
 
@@ -56,6 +56,7 @@ export class FeePresetsComponent implements OnInit {
     this.columnDefs = this.feePresetsSvc.columnDefs;
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       columnDefs: this.columnDefs,
       sideBar: true,
@@ -75,6 +76,9 @@ export class FeePresetsComponent implements OnInit {
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
       },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     }
 
     this.adaptableOptions = {
@@ -89,8 +93,8 @@ export class FeePresetsComponent implements OnInit {
 
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), 
+        loadSharedEntities: loadSharedEntities.bind(this)
       },
       actionOptions: {
         actionColumns: [
@@ -209,6 +213,7 @@ export class FeePresetsComponent implements OnInit {
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
+    this.adaptableApi.columnApi.autosizeAllColumns()
 
   }
 

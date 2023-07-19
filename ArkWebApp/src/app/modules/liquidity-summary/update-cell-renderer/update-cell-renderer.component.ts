@@ -116,7 +116,8 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
 
   onSave(){
     this.params.api.stopEditing(true);
-    this.params.api.recomputeAggregates();
+    this.params.api.refreshClientSideRowModel('aggregate')
+
     this.subscriptions.push(this.liquiditySummarySvc.updateLiquiditySummary(this.getModel()).subscribe({
       next: data => {
 
@@ -156,7 +157,7 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
       columns: this.componentParent.fundHedgings,
       rowNodes: [this.params.api.getRowNode(this.params.node.id)]
     });
-    this.params.api.recomputeAggregates();
+    this.params.api.refreshClientSideRowModel('aggregate')
 
   }
 

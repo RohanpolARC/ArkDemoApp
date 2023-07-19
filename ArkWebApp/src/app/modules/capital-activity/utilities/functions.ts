@@ -3,7 +3,7 @@ import { RowNode } from "@ag-grid-community/core";
 
 export function validateLinkSelect(context: ActionColumnContext){
 
-    let children = getNodes(context.rowNode);
+    let children = getNodes(context.rowNode as RowNode);
 
     let ISS: string = children[0].issuerShortName
     let POSCCY: string = children[0].positionCcy

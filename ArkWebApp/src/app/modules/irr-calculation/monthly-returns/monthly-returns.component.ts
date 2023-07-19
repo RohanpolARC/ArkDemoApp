@@ -1,4 +1,4 @@
-import { ColDef, GridOptions, GridReadyEvent, IAggFuncParams, Module, ValueFormatterParams } from '@ag-grid-community/core';
+import { ColDef, GridOptions, GridReadyEvent, IAggFuncParams, Module, RowNode, ValueFormatterParams } from '@ag-grid-community/core';
 import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
@@ -75,7 +75,7 @@ export class MonthlyReturnsComponent implements OnInit {
   aggFuncs = {
     'Return': (params: IAggFuncParams) => {
 
-      let childData: any[] = getNodes(params.rowNode, [])
+      let childData: any[] = getNodes(params.rowNode as RowNode, [])
 
       let sumPnL: number  = childData.reduce((n, {monthlyPnL}) => n + monthlyPnL, 0)
       let sumBaseMeasure: number = childData.reduce((n, {baseMeasure}) => n + baseMeasure, 0)
@@ -112,6 +112,7 @@ export class MonthlyReturnsComponent implements OnInit {
     ]
 
     this.gridOptionsMonthlyRets = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       sideBar: true,
       columnDefs: this.columnDefsMonthlyRets,

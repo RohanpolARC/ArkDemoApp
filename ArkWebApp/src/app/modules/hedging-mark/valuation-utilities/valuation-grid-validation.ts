@@ -30,7 +30,7 @@ export class ValuationValidation {
             colidref = 'markOverride';
 
         let val = p.data[colid];
-        let node: RowNode = p.node;
+        let node: RowNode = <RowNode>p.node;
 
         let childNodes: any[] = getNodes(node);
         asOfDate = formatDate(new Date(asOfDate));
@@ -54,7 +54,7 @@ export class ValuationValidation {
         let colid: string = p.column.getColId();
         let val = p.data[colid];
 
-        let node: RowNode = p.node;
+        let node: RowNode = <RowNode>p.node;
         let parent: RowNode = node.group ? node : node.parent;
 
         let childNodes: any[] = getNodes(parent);

@@ -1,5 +1,5 @@
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { CellValueChangedEvent, ColDef, EditableCallbackParams, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
+import { CellValueChangedEvent, ColDef, EditableCallbackParams, FirstDataRenderedEvent, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { MsalService } from '@azure/msal-angular';
 import { Subscription } from 'rxjs';
@@ -11,7 +11,7 @@ import { PortfolioMappingDataService } from 'src/app/core/services/PortfolioMana
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { BLANK_DATETIME_FORMATTER_CONFIG, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm } from 'src/app/shared/functions/formatter';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-renderer.component';
 import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, isFieldValid, validateAndUpdate } from './utilities/functions';
@@ -250,6 +250,7 @@ export class PortfolioManagerComponent implements OnInit {
     }
   
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       columnDefs: this.columnDefs,
       defaultColDef: this.defaultColDef,
@@ -257,7 +258,7 @@ export class PortfolioManagerComponent implements OnInit {
       // components: {
       //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
       // },
-      frameworkComponents: {
+      components: {
         updateCellRenderer: UpdateCellRendererComponent,
         autocompleteCellEditor: MatAutocompleteEditorComponent
       },
@@ -267,6 +268,9 @@ export class PortfolioManagerComponent implements OnInit {
       noRowsOverlayComponent: NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
       },
     }
 
@@ -285,8 +289,8 @@ export class PortfolioManagerComponent implements OnInit {
 
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), 
+        loadSharedEntities: loadSharedEntities.bind(this)
   
       },
 
@@ -380,8 +384,8 @@ export class PortfolioManagerComponent implements OnInit {
     if(params.rowIndex === this.actionClickedRowID) {
       
       if(isFieldValid(params.column.getColId(), params.data))
-        return { 'border-color': '#0590ca' }
-      else return { 'border-color': 'red' }
+        return { borderColor: '#0590ca' }
+      else return { borderColor: 'red' }
     }
     return null;
   }
@@ -403,7 +407,7 @@ export class PortfolioManagerComponent implements OnInit {
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApi = adaptableApi;
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
-
+    this.adapTableApi.columnApi.autosizeAllColumns()
     this.portfolioMapDataSvc.mappingsAdaptableApi = adaptableApi
   }
 

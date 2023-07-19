@@ -1,12 +1,12 @@
 import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridApi, GridOptions, GridReadyEvent, Module, ValueFormatterParams } from '@ag-grid-community/core';
+import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, Module, ValueFormatterParams } from '@ag-grid-community/core';
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { amountFormatter, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, dateFormatter, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
@@ -115,6 +115,11 @@ export class FeeCashflowsComponent implements OnInit {
     'LocalCumMgmtfees',
     'PerfFees']
 
+  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
+    adaptableApi.columnApi.autosizeAllColumns()
+
+  }
+
   ngOnInit(): void {
     
     this.columnDefs = [
@@ -186,7 +191,9 @@ export class FeeCashflowsComponent implements OnInit {
     ]
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
+      sideBar:true,
       columnDefs: this.columnDefs,
       defaultColDef: {
         resizable: true,
@@ -205,6 +212,9 @@ export class FeeCashflowsComponent implements OnInit {
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
       },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     }
 
     this.adaptableOptions = {
@@ -216,8 +226,8 @@ export class FeeCashflowsComponent implements OnInit {
       adaptableStateKey: 'Fee Cashflows Key',
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), 
+        loadSharedEntities: loadSharedEntities.bind(this)
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
       userInterfaceOptions:{

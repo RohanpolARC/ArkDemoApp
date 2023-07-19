@@ -31,7 +31,7 @@ export class BtnCellRenderer implements ICellRendererAngularComp, OnDestroy {
     this.params = params;
     this.data = params.data;
     if(this.params.node.group){
-      this.childNodes= getRowNodes(this.params.node)
+      this.childNodes= getRowNodes(this.params.node as RowNode)
       if(!this.childNodes.find(child=>child.data['isEditable']===false)){
         this.isEditable = true
       }

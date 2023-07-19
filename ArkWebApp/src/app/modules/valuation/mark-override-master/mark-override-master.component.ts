@@ -7,6 +7,7 @@ import { ValuationService } from 'src/app/core/services/Valuation/valuation.serv
 import { MasterDetailModule } from "@ag-grid-enterprise/master-detail";
 import { first, map } from 'rxjs/operators';
 import { dateFormatter, dateTimeFormatter, nonAmountNumberFormatter, nullOrZeroFormatterWithoutLocale } from 'src/app/shared/functions/formatter';
+import { autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 
 @Component({
   selector: 'app-mark-override-master',
@@ -27,7 +28,9 @@ export class MarkOverrideMasterComponent implements OnInit {
 
   detailCellRendererParams: IDetailCellRendererParams<any, any>;
 
-  onFirstDataRendered: (event: FirstDataRenderedEvent<any>) => void;
+  onFirstDataRendered: (event: FirstDataRenderedEvent<any>) => void = (event:FirstDataRenderedEvent)=>{
+    autosizeColumnExceptResized(event)
+  };
   onGridReady: (event: GridReadyEvent<any>) => void = (event: GridReadyEvent) => {
     this.rowData$ = this.valuationSvc.getAuditMaster(this.assetID, this.marktype, this.asofdate)
       .pipe(
@@ -95,6 +98,7 @@ export class MarkOverrideMasterComponent implements OnInit {
     }
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       columnDefs: this.columnDefs,
       defaultColDef: {
         resizable: true,
@@ -116,6 +120,7 @@ export class MarkOverrideMasterComponent implements OnInit {
     }
 
     this.detailCellRendererParams = {
+      ...CommonConfig.GRID_OPTIONS,
       detailGridOptions: {
         columnDefs: this.detailColumnDefs,
         defaultColDef: {

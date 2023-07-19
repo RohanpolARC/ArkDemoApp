@@ -1,5 +1,5 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableOptions, DashboardState, LayoutState, UserInterfaceOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridApi, GridOptions, GridReadyEvent, Module, RowNode } from '@ag-grid-community/core';
+import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, Module, RowNode } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { forkJoin, Observable, Subscription } from 'rxjs';
@@ -10,7 +10,7 @@ import { RefDataManagerService } from 'src/app/core/services/RefDataManager/ref-
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { createColumnDefs, GENERAL_FORMATTING_EXCEPTIONS, parseFetchedData } from 'src/app/shared/functions/dynamic.parse';
 import { BLANK_DATETIME_FORMATTER_CONFIG,  DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm } from 'src/app/shared/functions/formatter';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages, RefDataProc } from 'src/app/shared/models/GeneralModel';
 import { AddRefDataFormComponent } from './add-ref-data-form/add-ref-data-form.component';
 import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
@@ -44,6 +44,7 @@ export class RefDataManagerComponent implements OnInit {
 
 
   gridOptions:GridOptions = {
+    ...CommonConfig.GRID_OPTIONS,
     enableRangeSelection: true,
     columnDefs: this.columnDefs,
     sideBar: true,
@@ -58,6 +59,9 @@ export class RefDataManagerComponent implements OnInit {
     noRowsOverlayComponent :NoRowsOverlayComponent,
     noRowsOverlayComponentParams: {
       noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+    },
+    onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+      autosizeColumnExceptResized(event)
     },
   }
 
@@ -87,8 +91,8 @@ export class RefDataManagerComponent implements OnInit {
     adaptableStateKey: 'RefData State Key',
     teamSharingOptions: {
       enableTeamSharing: true,
-      setSharedEntities: setSharedEntities.bind(this),
-      getSharedEntities: getSharedEntities.bind(this)
+      persistSharedEntities: presistSharedEntities.bind(this), 
+      loadSharedEntities: loadSharedEntities.bind(this)
     },
     actionOptions: {
       actionColumns: [
@@ -283,6 +287,7 @@ export class RefDataManagerComponent implements OnInit {
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
+    this.adaptableApi.columnApi.autosizeAllColumns()
   }
   openDialog(action: 'ADD' | 'EDIT' | 'DELETE' = 'ADD',rowData:any=[]) { 
     
@@ -332,7 +337,7 @@ export class RefDataManagerComponent implements OnInit {
     }
     this.subscriptions.push(this.refDataManagerSvc.deleteRefData(refDataProcParams).subscribe((result:any)=>{
       if(result.isSuccess===true){
-        const rowNode:RowNode = this.adaptableApi.gridApi.getRowNodeForPrimaryKey(deleteRefDataID)
+        const rowNode:RowNode = <RowNode>this.adaptableApi.gridApi.getRowNodeForPrimaryKey(deleteRefDataID)
         this.adaptableApi.gridApi.deleteGridData([rowNode.data])
         //this.dataSvc.setWarningMsg('Deleting the Attribute','Dismiss','ark-theme-snackbar-warning')
         if(this.adaptableApi.gridApi.getRowNodeForPrimaryKey(deleteRefDataID) === undefined)
