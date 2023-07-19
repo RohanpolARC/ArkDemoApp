@@ -12,7 +12,7 @@ export class GridCheckboxUtilService implements OnInit {
     return {
       defaultVal: this.defaultValForModelValuation,
       disableCheckbox: this.disableCheckboxForUseModelValuation,
-      onCheckboxChanged: this.onCheckboxChangedForModelValuation,
+      checkboxChanged: this.checkboxChangedForModelValuation,
       showCheckbox: this.showCheckboxForUseModelValuation
     }
   }
@@ -20,7 +20,7 @@ export class GridCheckboxUtilService implements OnInit {
     return {
       defaultVal: this.defaultValForForceOverride,
       disableCheckbox: this.disableCheckboxForForceOverride,
-      onCheckboxChanged: this.onCheckboxChangedForForceOverride,
+      checkboxChanged: this.checkboxChangedForForceOverride,
       showCheckbox: this.showCheckboxForForceOverride
     }
   }
@@ -28,7 +28,7 @@ export class GridCheckboxUtilService implements OnInit {
     return {
       defaultVal: this.defaultValForReview,
       disableCheckbox: this.disableCheckboxForReview,
-      onCheckboxChanged: this.onCheckboxChangedForReview,
+      checkboxChanged: this.checkboxChangedForReview,
       showCheckbox: this.showCheckboxForReview
     }
   }
@@ -74,7 +74,7 @@ export class GridCheckboxUtilService implements OnInit {
     return this.gridSvc.isEditing(params.node) || params.data?.['showIsReviewed'] === 1 
   }
 
-  private onCheckboxChangedForModelValuation: ICheckboxChanged = (params: ICellRendererParams, boolVal: boolean) => {
+  private checkboxChangedForModelValuation: ICheckboxChanged = (params: ICellRendererParams, boolVal: boolean) => {
     if(boolVal){
       params.data['oldOverride'] = params.data?.['override'];
       params.data['override'] = params.data?.['modelValuation'];
@@ -89,7 +89,7 @@ export class GridCheckboxUtilService implements OnInit {
     this.getAdaptableApi().gridApi.refreshCells([params.node], this.getColumnDefs().map(col => col.field))
   }
 
-  private onCheckboxChangedForForceOverride: ICheckboxChanged = (params: ICellRendererParams, boolVal: boolean) => {
+  private checkboxChangedForForceOverride: ICheckboxChanged = (params: ICellRendererParams, boolVal: boolean) => {
     params.data['forceOverride'] = boolVal;
     if(boolVal){
       params.data['oldShowIsReviewed'] = params.data?.['showIsReviewed'];
@@ -104,7 +104,7 @@ export class GridCheckboxUtilService implements OnInit {
     this.getAdaptableApi().gridApi.refreshCells([params.node], this.getColumnDefs().map(col => col.field))
   }
 
-  private onCheckboxChangedForReview: ICheckboxChanged
+  private checkboxChangedForReview: ICheckboxChanged
   
   private defaultValForModelValuation: IDefaultValue = (params: ICellRendererParams) => { return params.value }
   private defaultValForForceOverride: IDefaultValue = (params: ICellRendererParams) => { return params.value }

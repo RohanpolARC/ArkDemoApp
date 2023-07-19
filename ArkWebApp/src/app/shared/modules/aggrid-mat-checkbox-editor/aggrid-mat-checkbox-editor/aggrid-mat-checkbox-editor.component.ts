@@ -15,7 +15,7 @@ export class AggridMatCheckboxEditorComponent implements ICellRendererAngularCom
 
   showCheckbox: IShowCheckbox = ((params) => true);
   disableCheckbox: IDisableCheckbox = ((params) => false);
-  onCheckboxChanged: ICheckboxChanged = ((params, boolVal) => {});
+  checkboxChanged: ICheckboxChanged = ((params, boolVal) => {});
   defaultVal: IDefaultValue = ((params) => false); 
   
   constructor() { }
@@ -27,7 +27,7 @@ export class AggridMatCheckboxEditorComponent implements ICellRendererAngularCom
     if(params?.['disableCheckbox'])
       this.disableCheckbox = params?.['disableCheckbox'];
     if(params?.['checkboxChanged'])
-      this.onCheckboxChanged = params?.['checkboxChanged'];
+      this.checkboxChanged = params?.['checkboxChanged'];
     if(params?.['defaultVal'])
       this.defaultVal = params?.['defaultVal'];
   }
@@ -55,7 +55,7 @@ export class AggridMatCheckboxEditorComponent implements ICellRendererAngularCom
     let colid: string = this.params.column.getColId();
     this.params.data[colid] = boolVal;
 
-    if(this.onCheckboxChanged)
-      this.onCheckboxChanged(this.params, boolVal);
+    if(this.checkboxChanged)
+      this.checkboxChanged(this.params, boolVal);
   }
 } 

@@ -8,7 +8,7 @@ export type IDefaultValue = (params: ICellRendererParams) => boolean
 export type ICheckboxControl = {
     showCheckbox: IShowCheckbox
     disableCheckbox: IDisableCheckbox
-    onCheckboxChanged: ICheckboxChanged
+    checkboxChanged: ICheckboxChanged
     defaultVal: IDefaultValue
 }
 export interface ICheckboxCellParams extends ICellRendererParams, ICheckboxControl { }
