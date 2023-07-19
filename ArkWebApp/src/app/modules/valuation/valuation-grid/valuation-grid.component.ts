@@ -402,7 +402,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           ]
         },
         FormatColumn: {
-          Revision: 45,
+          Revision: 46,
           FormatColumns: [
             {
               Scope: { ColumnIds: [ ...this.columnDefs.map(def => def.field), 'marketValueIssue', 'marketValueIssueFunded','currentMarketValueIssue', 'previousMarketValueIssue', 'currentMarketValueIssueFunded', 'previousMarketValueIssueFunded'] },

@@ -75,16 +75,17 @@ export class GridCheckboxUtilService implements OnInit {
   }
 
   private checkboxChangedForModelValuation: ICheckboxChanged = (params: ICellRendererParams, boolVal: boolean) => {
+    // This is useful in case the check was unmarked initially, and user then ticks it by mistake which needs to be reverted.
     if(boolVal){
       params.data['oldOverride'] = params.data?.['override'];
       params.data['override'] = params.data?.['modelValuation'];
       params.data['oldShowIsReviewed'] = params.data?.['showIsReviewed'];
-      params.data['showIsReviewed'] = 0;
-      delete params.data['review']
+      
+      this.gridSvc.clearReview(params.node)
     }
     else{
       params.data['override'] = params.data?.['oldOverride'];
-      params.data['showIsReviewed'] = params.data['oldShowIsReviewed']; // need to reset it to the original value if useModelValuation was mistakenly ticked previously and now is being reverted back.
+      params.data['showIsReviewed'] = params.data['oldShowIsReviewed'] ?? 0;   // need to reset it to the original value if useModelValuation was mistakenly ticked previously and now is being reverted back. If it was ticked initially and user unticks it, we purposely mark it as unreviewed (i.e. 0) as we won't have `oldShowIsReviewed` in this case
     }
     this.getAdaptableApi().gridApi.refreshCells([params.node], this.getColumnDefs().map(col => col.field))
   }
@@ -94,12 +95,11 @@ export class GridCheckboxUtilService implements OnInit {
     if(boolVal){
       params.data['oldShowIsReviewed'] = params.data?.['showIsReviewed'];
 
-      params.data['showIsReviewed'] = 0;
-      delete params.data['review']
+      this.gridSvc.clearReview(params.node)
 
     }
     else{
-      params.data['showIsReviewed'] = params.data['oldShowIsReviewed']; // need to reset it to the original value if useModelValuation was mistakenly ticked previously and now is being reverted back.
+      params.data['showIsReviewed'] = params.data['oldShowIsReviewed'] ?? 0; // need to reset it to the original value if useModelValuation was mistakenly ticked previously and now is being reverted back. If it was ticked initially and user unticks it, we purposely mark it as unreviewed (i.e. 0) as we won't have `oldShowIsReviewed` in this case
     }
     this.getAdaptableApi().gridApi.refreshCells([params.node], this.getColumnDefs().map(col => col.field))
   }

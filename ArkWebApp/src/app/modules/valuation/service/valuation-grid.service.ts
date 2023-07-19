@@ -131,8 +131,7 @@ export class ValuationGridService {
       this.setFields(context.rowNode, this.getOverrideColumns(), 'Set');
 
       // After edit entries become unreviewed (as they'll need to be reviewed again)
-      context.rowNode.data['showIsReviewed'] = 0;
-      delete context.rowNode.data['review']
+      this.clearReview(context.rowNode)
 
       this.getAdaptableApi().gridApi.refreshCells([context.rowNode], this.getColumnDefs().map(col => col.field));
     }
@@ -146,6 +145,11 @@ export class ValuationGridService {
     else{  
       return !!<ActionColumnContext>context.rowNode.data['editing'];
     }
+  }
+
+  clearReview(node: RowNode){
+    node.data['showIsReviewed'] = 0;
+    delete node.data['review']
   }
 
   saveActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
