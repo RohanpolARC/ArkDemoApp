@@ -1,11 +1,11 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableColumn, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridOptions, GridReadyEvent, Module, GridApi, CellValueChangedEvent, RowNode, CellClickedEvent, TabToNextCellParams } from '@ag-grid-community/core';
+import { ColDef, GridOptions, GridReadyEvent, Module, GridApi, CellValueChangedEvent, RowNode, CellClickedEvent, TabToNextCellParams, FirstDataRenderedEvent } from '@ag-grid-community/core';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { PositionScreenService } from 'src/app/core/services/PositionsScreen/positions-screen.service';
-import { getMomentDateStr, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { getMomentDateStr, presistSharedEntities,loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { CUSTOM_DISPLAY_FORMATTERS_CONFIG } from 'src/app/shared/functions/formatter';
 import { AMOUNT_COLUMNS_LIST, GRID_OPTIONS, POSITIONS_COLUMN_DEF } from '../positions-screen/grid-structure';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
@@ -117,7 +117,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
   }
 
   clearEditingState(hideWarnings: boolean = false) {
-    let rowNode: RowNode[] = this.adaptableApi.gridApi.getAllRowNodes({ 
+    let rowNode: RowNode[] = <RowNode[]>this.adaptableApi.gridApi.getAllRowNodes({ 
       includeGroupRows: true, filterFn: (rowNode: RowNode) => {
         if(rowNode.group){
           return rowNode.groupData['state'] === 'edit'
@@ -302,7 +302,10 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
 
       aggFuncs: {
         'Max': this.maxAggFunc
-      }
+      },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     }
 
     this.adaptableOptions = {
@@ -313,8 +316,8 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
       adaptableStateKey: 'Hedging Mark Key',
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), 
+        loadSharedEntities: loadSharedEntities.bind(this)
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
@@ -337,7 +340,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
 
                     let pids: number[] = [];
 
-                    let nodes = getNodes(context.rowNode);
+                    let nodes = getNodes(context.rowNode as RowNode);
                     pids = nodes.map(n => n['positionId'])
 
                     this.hedgingMarkSvc.updateAuditPositions(pids);
@@ -392,7 +395,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
                   if (context.rowNode.group) {
 
                     let parentGroups: string[] = [];
-                    let node: RowNode = context.rowNode;
+                    let node: RowNode = <RowNode>context.rowNode;
                     while(node){
                       parentGroups.push(node?.rowGroupColumn?.getColId());
                       node = node.parent
@@ -422,7 +425,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
                   button: AdaptableButton<ActionColumnContext>,
                   context: ActionColumnContext) => {
 
-                  let node: RowNode = context.rowNode
+                  let node: RowNode = <RowNode>context.rowNode
 
                   if(node.data?.['hedgingMark'] === ""){
 
@@ -481,7 +484,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
                   button: AdaptableButton<ActionColumnContext>,
                   context: ActionColumnContext) => {
 
-                  let node: RowNode = context.rowNode;
+                  let node: RowNode = <RowNode>context.rowNode;
                   this.clearRoworRowGroup(node);
 
                 },
@@ -520,7 +523,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
   }
 
   saveOverrides(context: ActionColumnContext) {
-    let node: RowNode = context.rowNode
+    let node: RowNode =<RowNode> context.rowNode
 
 
     let hedgingMarkDetails: HedgingMarkDetails = this.hedgingMarkSvc.savePreprocessor(context, this.dataSvc.getCurrentUserName());
@@ -576,7 +579,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
         levelCol = 'hedgingMarkLevel';
       }
 
-      let childNodes = getNodes(params.node)
+      let childNodes = getNodes(params.node as RowNode)
 
       childNodes = childNodes.map(cNode => {
         cNode[colid] = val;
@@ -615,7 +618,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
       let parentNode: RowNode;
 
       if (params.node.group) {
-        parentNode = params.node;
+        parentNode = <RowNode>params.node;
         childNodes = getNodes(parentNode)
 
         childNodes = childNodes.map(cNode => {
@@ -634,6 +637,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
     this.getPositionsData();
+    this.adaptableApi.columnApi.autosizeAllColumns()
   }
 
   ngOnDestroy() {

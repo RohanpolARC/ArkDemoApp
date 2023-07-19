@@ -7,7 +7,9 @@ import {
   GridOptions,
   Module,
   ColDef,
-  CellClickedEvent
+  CellClickedEvent,
+  RowNode,
+  FirstDataRenderedEvent
 } from '@ag-grid-community/core';
 import {
   AdaptableOptions,
@@ -19,14 +21,14 @@ import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/C
 
 import { Subscription } from 'rxjs';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
-import { nullOrZeroFormatter, formatDate, nonAmountNumberFormatter, BLANK_DATETIME_FORMATTER_CONFIG, DATE_FORMATTER_CONFIG_ddMMyyyy, AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, AMOUNT_FORMATTER_CONFIG_Zero, CUSTOM_DISPLAY_FORMATTERS_CONFIG } from 'src/app/shared/functions/formatter';
+import { formatDate, BLANK_DATETIME_FORMATTER_CONFIG, DATE_FORMATTER_CONFIG_ddMMyyyy, AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, AMOUNT_FORMATTER_CONFIG_Zero, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER } from 'src/app/shared/functions/formatter';
 
 import { getNodes, validateLinkSelect }from './utilities/functions';
 import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
 import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
 import { DataService } from 'src/app/core/services/data.service';
 import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import {  autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
@@ -121,17 +123,17 @@ export class CapitalActivityComponent implements OnInit {
     { field: 'fundHedging', tooltipField: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
     { field: 'fundCcy', tooltipField: 'fundCcy', headerName: 'Fund Ccy', type:'abColDefString'},
     { field: 'posCcy', tooltipField: 'posCcy', headerName: 'Position Ccy', type: 'abColDefString'},
-    { field: 'fxRate', tooltipField: 'fxRate', headerName: 'FXRate', valueFormatter: nonAmountNumberFormatter, type: 'abColDefNumber',cellClass: 'ag-right-aligned-cell'},
+    { field: 'fxRate', tooltipField: 'fxRate', headerName: 'FXRate',  type: 'abColDefNumber',cellClass: 'ag-right-aligned-cell'},
     { field: 'fxRateOverride', tooltipField: 'fxRateOverride', headerName: 'FXRate Override', type: 'abColDefBoolean' },
     { field: 'fxRateSource', tooltipField: 'fxRateSource', type: 'abColDefString' },
     { field: 'totalAmount', tooltipField: 'totalAmount', headerName: 'Total Amount', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-    { field: 'wsoIssuerID', tooltipField: 'wsoIssuerID', headerName: 'WSO Issuer ID', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
+    { field: 'wsoIssuerID', tooltipField: 'wsoIssuerID', headerName: 'WSO Issuer ID',  type: 'abColDefNumber'},
     { field: 'issuerShortName', tooltipField: 'issuerShortName', headerName: 'Issuer Short Name', type:'abColDefString'},
-    { field: 'wsoAssetID', tooltipField: 'wsoAssetID', headerName: 'WSO Asset ID', valueFormatter: nullOrZeroFormatter, type: 'abColDefNumber'},
+    { field: 'wsoAssetID', tooltipField: 'wsoAssetID', headerName: 'WSO Asset ID', type: 'abColDefString'},
     { field: 'asset', tooltipField: 'asset', headerName: 'Asset', type:'abColDefString'},
     { field: 'narrative', tooltipField: 'narrative', headerName: 'Narrative', type:'abColDefString'},
     { field: 'source', tooltipField: 'source', headerName: 'Source', type:'abColDefString'},
-    { field: 'sourceID', tooltipField: 'sourceID', headerName: 'Source ID', type:'abColDefNumber', valueFormatter: nullOrZeroFormatter},
+    { field: 'sourceID', tooltipField: 'sourceID', headerName: 'Source ID', type:'abColDefNumber'},
     { field: 'isLinked', tooltipField: 'isLinked', headerName: 'Is Linked', type:'abColDefBoolean'},
     { field: 'linkedAmount', tooltipField: 'linkedAmount', headerName: 'Linked Total Base', type:'abColDefNumber'},
     { field: 'createdOn', tooltipField: 'createdOn', headerName: 'Created On', type:'abColDefDate', cellClass: 'dateUK'},
@@ -232,6 +234,8 @@ export class CapitalActivityComponent implements OnInit {
 
   ngOnInit(): void {
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
+      context:{},
       enableRangeSelection: true,
       sideBar: true,
       suppressMenuHide: true,
@@ -247,9 +251,18 @@ export class CapitalActivityComponent implements OnInit {
             noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplay,
       },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     }
 
-    this.gridOptionsInvstmnt = JSON.parse(JSON.stringify(this.gridOptions));
+    this.gridOptionsInvstmnt = {
+      ...CommonConfig.GRID_OPTIONS,
+      ...JSON.parse(JSON.stringify(this.gridOptions)),
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
+    }
     this.gridOptionsInvstmnt.columnDefs = this.columnDefsInvstmnt;
 
     // this.gridOptionsInvstmnt.components = {
@@ -267,8 +280,8 @@ export class CapitalActivityComponent implements OnInit {
 
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), //https://docs.adaptabletools.com/guide/version-15-upgrade-guide
+        loadSharedEntities: loadSharedEntities.bind(this)
   
       },
   
@@ -311,7 +324,9 @@ export class CapitalActivityComponent implements OnInit {
 
       userInterfaceOptions:{
         customDisplayFormatters: [
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['totalAmount','linkedAmount'])
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['totalAmount','linkedAmount']),
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('nonAmountNumberFormatter',['fxRate']),
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('nullOrZeroFormatter',['wsoIssuerID','wsoAssetID','sourceID'])
           ],
       },
   
@@ -364,12 +379,13 @@ export class CapitalActivityComponent implements OnInit {
           }]
         },
         FormatColumn:{
-          Revision:5,
+          Revision:6,
           FormatColumns:[
             BLANK_DATETIME_FORMATTER_CONFIG(['callDate','valueDate','createdOn','modifiedOn']),
             DATE_FORMATTER_CONFIG_ddMMyyyy(['callDate','valueDate']),
             DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['createdOn','modifiedOn']),
-
+            CUSTOM_FORMATTER(['wsoIssuerID','wsoAssetID','sourceID'],['nullOrZeroFormatter']),
+            CUSTOM_FORMATTER(['fxRate'],['nonAmountNumberFormatter']),
             AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['totalAmount','linkedAmount'],2,['amountZeroFormat']),
             AMOUNT_FORMATTER_CONFIG_Zero(['totalAmount','linkedAmount'],2,['amountZeroFormat']),
 
@@ -394,8 +410,8 @@ export class CapitalActivityComponent implements OnInit {
 
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), //https://docs.adaptabletools.com/guide/version-15-upgrade-guide
+        loadSharedEntities: loadSharedEntities.bind(this)
   
       },
   
@@ -421,7 +437,7 @@ export class CapitalActivityComponent implements OnInit {
                   return;
                 }
 
-                let linkData = getNodes(context.rowNode);
+                let linkData = getNodes(context.rowNode as RowNode); //https://www.ag-grid.com/changelog/?fixVersion=29.0.0 AG-7352
                 this.openDialog(linkData, 'LINK-ADD');
               },
               icon: {
@@ -568,12 +584,14 @@ export class CapitalActivityComponent implements OnInit {
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApi = adaptableApi;
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
+    this.adapTableApi?.columnApi?.autosizeAllColumns()
     // use AdaptableApi for runtime access to Adaptable
   };
 
   onAdaptableInvstmntReady = ({ adaptableApi, gridOptions }) => {
     this.adapTableApiInvstmnt = adaptableApi;
     this.adapTableApiInvstmnt.toolPanelApi.closeAdapTableToolPanel();
+    this.adapTableApi?.columnApi?.autosizeAllColumns()
     // use AdaptableApi for runtime access to Adaptable
   };
 

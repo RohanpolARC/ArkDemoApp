@@ -1,4 +1,4 @@
-import { ColDef, GridOptions } from '@ag-grid-community/core';
+import { ColDef, FirstDataRenderedEvent, GridOptions } from '@ag-grid-community/core';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Observable } from 'rxjs-compat';
@@ -7,6 +7,8 @@ import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from '../../components/no-rows-overlay/no-rows-overlay.component';
 import { createColumnDefs2, GridColumnConfig, parseFetchedData } from '../../functions/dynamic.parse';
 import { DetailedView } from '../../models/GeneralModel';
+import { CommonConfig } from 'src/app/configs/common-config';
+import { autosizeColumnExceptResized } from '../../functions/utilities';
 
 @Injectable()
 export class DetailedViewService {
@@ -62,6 +64,7 @@ export class DetailedViewService {
   getGridOptions(): GridOptions {
     
     return {
+      ...CommonConfig.GRID_OPTIONS,
       columnDefs: this.columnDefs,
       defaultColDef: {
         resizable: true,
@@ -78,6 +81,9 @@ export class DetailedViewService {
       noRowsOverlayComponent: NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => `Please apply filter`,
+      },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
       },
     }  
   }

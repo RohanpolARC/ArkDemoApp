@@ -1,5 +1,5 @@
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridApi, GridOptions, GridReadyEvent, HeaderValueGetterParams, Module, ValueGetterParams } from '@ag-grid-community/core';
+import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, HeaderValueGetterParams, Module, ValueGetterParams } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs-compat';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -8,7 +8,7 @@ import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/genera
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import {  CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, formatDate, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import {  autosizeColumnExceptResized,  loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 
@@ -143,6 +143,7 @@ export class AumDeltaComponent implements OnInit {
     ]
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       defaultColDef: {
         resizable: true,
         sortable: true,
@@ -167,14 +168,15 @@ export class AumDeltaComponent implements OnInit {
         params.api.closeToolPanel()
         this.gridApi = params.api;   
       },
-
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
       noRowsOverlayComponent: NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
       },
 
     }
-
 
 
     this.adaptableOptions = {
@@ -186,8 +188,8 @@ export class AumDeltaComponent implements OnInit {
       adaptableStateKey: 'AUMDelta Key',
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), //https://docs.adaptabletools.com/guide/version-15-upgrade-guide
+        loadSharedEntities: loadSharedEntities.bind(this)
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
@@ -284,6 +286,8 @@ export class AumDeltaComponent implements OnInit {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
     this.getAUMDelta();
+
+    this.adaptableApi.columnApi.autosizeAllColumns()
   }
 
   ngOnDestroy():void{

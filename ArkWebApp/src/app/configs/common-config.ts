@@ -1,6 +1,8 @@
-import { AdaptableButton, DashboardOptions, ExportOptions } from "@adaptabletools/adaptable-angular-aggrid";
+import { AdaptableButton, DashboardOptions, ExportOptions, LayoutOptions } from "@adaptabletools/adaptable-angular-aggrid";
+import { AdaptableModuleButtons } from "@adaptabletools/adaptable/src/PredefinedConfig/Common/Types";
+import { ColDef, Column, ColumnResizedEvent, ColumnVisibleEvent, ExcelStyle, FirstDataRenderedEvent, GridOptions, Module, VirtualColumnsChangedEvent } from "@ag-grid-community/core";
+
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
-import { ExcelStyle, Module } from "@ag-grid-community/core";
 import { ClipboardModule } from "@ag-grid-enterprise/clipboard";
 import { ColumnsToolPanelModule } from "@ag-grid-enterprise/column-tool-panel";
 import { ExcelExportModule } from "@ag-grid-enterprise/excel-export";
@@ -10,10 +12,25 @@ import { RangeSelectionModule } from "@ag-grid-enterprise/range-selection";
 import { RowGroupingModule } from "@ag-grid-enterprise/row-grouping";
 import { SetFilterModule } from "@ag-grid-enterprise/set-filter";
 import { SideBarModule } from "@ag-grid-enterprise/side-bar";
-import { AdaptableModuleButtons } from "@adaptabletools/adaptable/src/PredefinedConfig/Common/Types";
 import { CsvExportModule } from "@ag-grid-community/csv-export";
+import { autosizeColumnExceptResized, getWrapWidth, handleResizedColumns } from "../shared/functions/utilities";
+
 
 export class CommonConfig{
+
+    public static GRID_OPTIONS :GridOptions ={
+      context:{
+        resizedColumnList:[]
+      },
+      tooltipShowDelay:0,
+
+      onVirtualColumnsChanged:(event:VirtualColumnsChangedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
+      onColumnResized: (params:ColumnResizedEvent)=>{
+        handleResizedColumns(params)
+      },
+    }
 
     public static AG_GRID_LICENSE_KEY: string = `CompanyName=Arcmont Asset Management,LicensedApplication=ArkWebApp,LicenseType=SingleApplication,LicensedConcurrentDeveloperCount=2,LicensedProductionInstancesCount=0,AssetReference=AG-035059,SupportServicesEnd=21_November_2023_[v2]_MTcwMDUyNDgwMDAwMA==ef536150b8d9d3fcd89f7771890b0cf1`
     
@@ -46,5 +63,5 @@ export class CommonConfig{
         RowGroupingModule
       ];
 
-    public static DASHBOARD_MODULE_BUTTONS: AdaptableModuleButtons = ['SettingsPanel', 'TeamSharing', 'Export', 'Layout', 'ConditionalStyle', 'Filter'] 
+    public static DASHBOARD_MODULE_BUTTONS: AdaptableModuleButtons = ['SettingsPanel', 'TeamSharing', 'Export', 'Layout', 'Filter'] 
 }

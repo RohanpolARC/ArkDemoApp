@@ -40,7 +40,7 @@ export class ValuationUtility {
       if(p.rowNode.group){
         
         let parentGroups: string[] = [];
-        let node: RowNode = p.rowNode;
+        let node: RowNode =<RowNode> p.rowNode;
         while(node){
           parentGroups.push(node?.rowGroupColumn?.getColId());
           node = node.parent
@@ -83,23 +83,23 @@ export class ValuationUtility {
       if(params.node.group){
 
         let parentGroups: string[] = [];
-        let node: RowNode = params.node;
+        let node: RowNode = <RowNode>params.node;
         while(node){
           parentGroups.push(node?.rowGroupColumn?.getColId());
           node = node.parent
         }
 
         if(parentGroups.includes('asset')){
-          let nodes = getNodes(params.node);
+          let nodes = getNodes(params.node as RowNode);
           let notEmptyRows = nodes.filter(n => n[colidref]);
           let notEmptyLevelRows = nodes.filter(n => n[colid])
           let uniqueVals = [...new Set(nodes.map(n => n[colidref]))].filter(n => n);
 
           if(uniqueVals.length === 1 && notEmptyRows.length === nodes.length && nodes.length === notEmptyLevelRows.length){
-            style = { ...style, 'background': 'lightgreen' }
+            style = { ...style, backgroundColor: 'lightgreen' }
           }
           else if(uniqueVals.length > 1 && nodes.length === notEmptyLevelRows.length)
-            style = { ...style, 'background': '#f79a28'}
+            style = { ...style, backgroundColor: '#f79a28'}
         }
       }
       return style;
@@ -119,7 +119,7 @@ export class ValuationUtility {
         if(params.node.group){
 
           if(params.node.groupData?.['state'] === 'edit'){
-            style = { ...style, 'border-color': '#0590ca' }
+            style = { ...style, borderColor: '#0590ca' }
           }
           
           return style;
@@ -127,20 +127,20 @@ export class ValuationUtility {
         else {
         
           if(params.data?.['state'] === 'edit'){
-            style = { 'border-color': '#0590ca' }
+            style = { borderColor: '#0590ca' }
           }
           if(value === 0){
             if(params.node.data?.[this.overrideColMap[colid].original]!== value){
-              style = {...style,'background': '#ffcc00' }
+              style = {...style,backgroundColor: '#ffcc00' }
             }else{
-              style = { ...style, 'background': '#f79a28' }
+              style = { ...style, backgroundColor: '#f79a28' }
             }
           }
           if(value != params.node.data[this.overrideColMap[colid].original]){
-            style = { ...style, 'background': '#ffcc00' }
+            style = { ...style, backgroundColor: '#ffcc00' }
           }
           else if(value){
-            style = { ...style, 'background': '#f79a28' }
+            style = { ...style, backgroundColor: '#f79a28' }
           }
           return style;
         }

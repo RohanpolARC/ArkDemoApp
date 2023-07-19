@@ -83,7 +83,7 @@ export class HedgingMarkService {
 
     let node = context.rowNode;
 
-    childNodes = getNodes(node);
+    childNodes = getNodes(node as RowNode);
     childNodes.forEach(cn => {
       hedgingMarkOverrides.push(<HedgingMarkOverride>this.getSaveModel(cn, 'Hedging Mark'));
       markOverrides.push(<MarkOverride>this.getSaveModel(cn, 'Mark Override'));
@@ -102,7 +102,7 @@ export class HedgingMarkService {
 
     let oCols: string[] = Object.keys(overrideColMap);
 
-    let node: RowNode = context.rowNode;
+    let node: RowNode = <RowNode>context.rowNode;
     let parent: RowNode;
 
     if (node.group) {

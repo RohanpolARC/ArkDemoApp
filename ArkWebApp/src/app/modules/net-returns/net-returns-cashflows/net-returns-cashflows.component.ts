@@ -1,5 +1,5 @@
 import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { GridOptions, CellValueChangedEvent, Module, ColDef, GridReadyEvent, GridApi } from '@ag-grid-community/core';
+import { GridOptions, CellValueChangedEvent, Module, ColDef, GridReadyEvent, GridApi, FirstDataRenderedEvent } from '@ag-grid-community/core';
 import { Component, Input, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -7,7 +7,7 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
@@ -57,6 +57,7 @@ export class NetReturnsCashflowsComponent implements OnInit {
     ].map((x: ColDef) => { x.type = x.type ?? 'abColDefNumber'; x.width = 175; return x; })
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       columnDefs: this.columnDefs,
       sideBar: true,
@@ -73,6 +74,9 @@ export class NetReturnsCashflowsComponent implements OnInit {
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
       },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     }
 
     this.adaptableOptions = {
@@ -84,8 +88,8 @@ export class NetReturnsCashflowsComponent implements OnInit {
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), 
+        loadSharedEntities: loadSharedEntities.bind(this)
       },
 
       userInterfaceOptions: {
@@ -125,7 +129,9 @@ export class NetReturnsCashflowsComponent implements OnInit {
     }
   }
 
-  onAdaptableReady = ({ adaptableApi: AdaptableApi, gridOptions: GridOptions }) => {}
+  onAdaptableReady = ({ adaptableApi: AdaptableApi, gridOptions: GridOptions }) => {
+    AdaptableApi.columnApi.autosizeAllColumns()
+  }
 
   onCellValueChanged(params: CellValueChangedEvent){}
 

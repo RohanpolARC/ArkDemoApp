@@ -1,41 +1,49 @@
-import { RowNode } from "@ag-grid-community/core";
+import { SharedEntitiesContext, SharedEntity } from "@adaptabletools/adaptable-angular-aggrid";
+import { ColDef, ColumnResizedEvent, FirstDataRenderedEvent, RowNode, VirtualColumnsChangedEvent } from "@ag-grid-community/core";
 import { DecimalPipe } from "@angular/common";
 import * as moment from "moment";
+import { first } from "rxjs/operators";
 
-/**
+
+  /**
  * 
  * @param adaptableId AdaptableOptions.adaptableID
  * @returns Async function to get all `team` shared adaptable resources for that `adaptableID / grid from ArkDB`
  */
-export async function getSharedEntities(adaptableId){
+export async function loadSharedEntities(context: SharedEntitiesContext){
 
-    return new Promise(resolve => {
-      this.subscriptions.push(this.dataSvc.getAdaptableState(adaptableId).subscribe({
-        next: state => {
-          try {
+  return new Promise(resolve => {
+    this.dataSvc.getAdaptableState(context.adaptableId).pipe(
+      first()
+    ).subscribe({
+      next: state => {
+        try {
 
-            state = state.split('|').join('"')
-            resolve(JSON.parse(state) ||'[]')
-          } catch (e) {
-            console.log("Failed to parse")
-            resolve([])
-          }
+          state = state.split('|').join('"')
+          resolve(JSON.parse(state) ||'[]')
+        } catch (e) {
+          console.log("Failed to parse")
+          resolve([])
         }
-      }));
-    })
-  }
+      }
+    });
+  })
+}
 
-export async function setSharedEntities(adaptableId, sharedEntities): Promise<void>{
 
-    return new Promise(resolve => {
-      this.subscriptions.push(
-        this.dataSvc.saveAdaptableState(adaptableId, JSON.stringify(sharedEntities).replace(/"/g,'|')).subscribe({
-        next: data => {
-          resolve();
-        }
-      }));
-    })
-  }
+export async function presistSharedEntities(entries: SharedEntity[], context: SharedEntitiesContext): Promise<void>{
+
+  return new Promise(resolve => {
+    
+      this.dataSvc.saveAdaptableState(context.adaptableId, JSON.stringify(entries).replace(/"/g,'|')).pipe(
+        first()
+      ).subscribe({
+      next: data => {
+        resolve();
+      }
+    });
+  })
+}
 
 /**
  * Returns supplied `amount` as comma separated string with 
@@ -139,4 +147,50 @@ export function getRowNodes(node: RowNode, rowNodes: any[] = []){
       rowNodes.push(node);
   }
   return rowNodes;
+}
+
+export function getWrapWidth(cd:ColDef):number[]{
+  if(cd.colId){
+    if(cd.colId.length<7){
+      return [cd.colId.length*0.4*14,100]
+    }
+    return [cd.colId.length*0.4*14,cd.colId.length*0.7*14]
+  }
+  return [50,150]
+}
+
+export  function autosizeColumnExceptResized(event: FirstDataRenderedEvent|VirtualColumnsChangedEvent){
+  let coldef:ColDef<any>[] = event.api.getColumnDefs()
+  let autosizeCols = coldef.map(col=>col.colId).filter(colId=>!event.context?.resizedColumnList?.includes(colId))
+  event.columnApi.autoSizeColumns(autosizeCols)
+}
+
+export function handleResizedColumns(params:ColumnResizedEvent){
+  if(params.column){
+    let coldef = params.column?.getColDef()
+    if(params.context?.resizedColumnList?.length){
+      if(!params.context.resizedColumnList?.includes(coldef.colId)){
+        params.context.resizedColumnList?.push(coldef.colId)
+      }
+    }else{
+      params.context.resizedColumnList = [coldef.colId]
+    }
+    
+    let sizes:{
+        rowHeight: number;
+        headerHeight: number;
+      } = params.api.getSizesForCurrentTheme()
+    let wrapSizes = getWrapWidth(coldef)
+    if(params.column?.getActualWidth()>wrapSizes[0] && params.column?.getActualWidth()<wrapSizes[1]){
+      coldef.headerClass = 'header-font-size-small'
+      coldef.headerTooltip=coldef.headerName
+      if(sizes.headerHeight>30 ){
+        coldef.wrapHeaderText=true
+      }
+    }else{
+      coldef.headerClass = ' '
+      coldef.wrapHeaderText=false
+    }
+    params.column.setColDef(coldef,coldef)
+  }
 }

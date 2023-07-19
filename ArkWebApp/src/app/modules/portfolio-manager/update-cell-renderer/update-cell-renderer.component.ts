@@ -161,7 +161,7 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
       this.componentParent.adapTableApi.gridApi.addGridData([nodeData])
       this.params.api.ensureNodeVisible(nodeData)
   
-      let node: RowNode = this.componentParent.adapTableApi.gridApi.getRowNodeForPrimaryKey(newRowID)
+      let node: RowNode = <RowNode>this.componentParent.adapTableApi.gridApi.getRowNodeForPrimaryKey(newRowID)
       this.componentParent.setSelectedRowID(node.rowIndex)
     }
     else{

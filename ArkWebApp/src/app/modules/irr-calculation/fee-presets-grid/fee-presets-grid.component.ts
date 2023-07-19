@@ -1,4 +1,4 @@
-import { ColDef, GridOptions } from '@ag-grid-community/core';
+import { ColDef, FirstDataRenderedEvent, GridOptions } from '@ag-grid-community/core';
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { forkJoin, Observable } from 'rxjs';
@@ -9,6 +9,7 @@ import { FeePresetsService } from 'src/app/core/services/FeePresets/fee-presets.
 import { FeeCalculationSummaryComponent } from '../../fee-calculation/fee-calculation-summary/fee-calculation-summary.component';
 import { FeeCashflowsComponent } from '../../fee-calculation/fee-cashflows/fee-cashflows.component';
 import { FeePresetsComponent } from '../../fee-presets/fee-presets.component';
+import { autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 
 @Component({
   selector: 'app-fee-presets-grid',
@@ -42,6 +43,7 @@ export class FeePresetsGridComponent implements OnInit {
     ]
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       enableRangeSelection: true,
       columnDefs: this.columnDefs,
       // onGridReady: this.onGridReady.bind(this),
@@ -55,7 +57,10 @@ export class FeePresetsGridComponent implements OnInit {
         enableValue: true,
         enableRowGroup: true  
       },
-      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES
+      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     }
 
 

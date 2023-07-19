@@ -4,7 +4,8 @@ import {
   GridOptions,
   Module,
   ColDef,
-  SelectionChangedEvent
+  SelectionChangedEvent,
+  FirstDataRenderedEvent
 } from '@ag-grid-community/core';
 import { dateFormatter, amountFormatter, nonAmountNumberFormatter, formatDate } from 'src/app/shared/functions/formatter';
 
@@ -17,8 +18,8 @@ import {
 } from '@adaptabletools/adaptable/types';
 import { AssociateInvestment, CapitalActivityModel } from 'src/app/shared/models/CapitalActivityModel';
 import { Subscription } from 'rxjs';
-import { ColumnsToolPanelModule } from '@ag-grid-enterprise/column-tool-panel';
 import { CommonConfig } from 'src/app/configs/common-config';
+import { autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 
 @Component({
   selector: 'app-link-investor-modal',
@@ -90,6 +91,7 @@ export class LinkInvestorModalComponent implements OnInit {
   };
 
   gridOptions: GridOptions = {
+    ...CommonConfig.GRID_OPTIONS,
     enableRangeSelection: true,
     sideBar: false,
     rowSelection: 'multiple',
@@ -105,8 +107,10 @@ export class LinkInvestorModalComponent implements OnInit {
     // },
     columnDefs: this.columnDefs,
     allowContextMenuWithControlKey:true,
-    onSelectionChanged: this.onSelectionChanged.bind(this)
-
+    onSelectionChanged: this.onSelectionChanged.bind(this),
+    onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+      autosizeColumnExceptResized(event)
+    },
   };
   adapTableApi: AdaptableApi;
   adaptableOptions: AdaptableOptions = {
@@ -124,7 +128,7 @@ export class LinkInvestorModalComponent implements OnInit {
     predefinedConfig: {
       Dashboard: {
         Revision: 1,
-        ModuleButtons: ['Export', 'Layout','ConditionalStyle'],
+        ModuleButtons: ['Export', 'Layout'],
         IsCollapsed: true,
         Tabs: [],
         IsHidden: true,

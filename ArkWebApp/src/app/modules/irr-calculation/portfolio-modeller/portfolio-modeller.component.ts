@@ -1,5 +1,5 @@
 import { ColumnFilter, AdaptableOptions, AdaptableApi, AdaptableButton, ActionColumnContext } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, EditableCallbackParams, GridOptions, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi, Module, CellClassParams } from '@ag-grid-community/core';
+import { ColDef, EditableCallbackParams, GridOptions, RowNode, CellValueChangedEvent, GridReadyEvent, GridApi, Module, CellClassParams, FirstDataRenderedEvent } from '@ag-grid-community/core';
 import { Component, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -12,7 +12,7 @@ import { IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams, PortfolioM
 import { EventEmitter } from '@angular/core';
 import { AggridMaterialDatepickerComponent } from '../../facility-detail/aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/portfolio-save-run-model.component';
-import { getLastBusinessDay, getMomentDateStr, getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { getLastBusinessDay, getMomentDateStr, presistSharedEntities, loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { first, switchMap, takeUntil } from 'rxjs/operators';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
@@ -102,19 +102,19 @@ export class PortfolioModellerComponent implements OnInit {
         if(row[colID] === row[this.overrideColMap[colID].local])
           // Saved override value
           return {
-            'border-color': '#0590ca',
-            'background': '#f79a28'
+            borderColor: '#0590ca',
+            backgroundColor: '#f79a28'
           }
           // Dirty override value
         else return {                   
-          'border-color': '#0590ca',
-          'background': '#ffcc00'
+          borderColor: '#0590ca',
+          backgroundColor: '#ffcc00'
         }
       }
       else
         // No override 
         return { 
-          'border-color': '#0590ca'
+          borderColor: '#0590ca'
         }     
     }
 
@@ -154,7 +154,7 @@ export class PortfolioModellerComponent implements OnInit {
   {field: 'assetID', width: 103, type:'abColDefNumber'},
   {field: 'assetTypeName', width: 153, type: 'abColDefString'},
   {field: 'fund', width: 150, tooltipField: 'fund', type: 'abColDefString'},
-  {field: 'ccy', width: 80},
+  {field: 'ccy', width: 80, type: 'abColDefString'},
   {field: 'faceValueIssue', cellClass: 'ag-right-aligned-cell', width: 150, type:'abColDefNumber'},
   {field: 'costPrice',  cellClass: 'ag-right-aligned-cell', width: 110, type:'abColDefNumber'},
   {field: 'mark',  cellClass: 'ag-right-aligned-cell', width: 86, type:'abColDefNumber'},
@@ -229,10 +229,10 @@ export class PortfolioModellerComponent implements OnInit {
   { field: 'reportingNetLeverage',  type: 'abColDefNumber', cellClass: 'ag-right-aligned-cell', headerName: 'Reporting Net Leverage' },
   { field: 'reportingNetLeverageComment', type: 'abColDefString', headerName: 'Reporting Net Leverage Comment' },
 
-  { field: 'assetClass', width: 145 },
-  { field: 'capStructureTranche', width: 145 },
-  { field: 'securedUnsecured', width: 145 },
-  { field: 'seniority', width: 145 },
+  { field: 'assetClass', width: 145 ,type: 'abColDefString'},
+  { field: 'capStructureTranche', width: 145 ,type: 'abColDefString'},
+  { field: 'securedUnsecured', width: 145 ,type: 'abColDefString'},
+  { field: 'seniority', width: 145 ,type: 'abColDefString'},
   { field: 'IsChecked', width: 50, headerName: 'Checked', type: 'abColDefBoolean', checkboxSelection: true },
   { field: 'isOverride', width: 150, headerName: 'IsOverride', type: 'abColDefString' },
   { field: 'clear_override', width: 50, headerName: 'Override', type: 'abSpecialColumn' }
@@ -291,7 +291,7 @@ export class PortfolioModellerComponent implements OnInit {
 
               this.gridApi.deselectAll();
               this.modelMap[this.selectedModelID].positionIDs?.forEach(posID => {
-                let node: RowNode = adaptable_Api.gridApi.getRowNodeForPrimaryKey(posID)
+                let node: RowNode = <RowNode>adaptable_Api.gridApi.getRowNodeForPrimaryKey(posID)
                 node.setSelected(true);
                 this.selectedPositionIDs = this.modelMap[this.selectedModelID].positionIDs
               })
@@ -504,6 +504,7 @@ export class PortfolioModellerComponent implements OnInit {
     }
     
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
       context: this.context,
       singleClickEdit: true,
       enableRangeSelection: true,
@@ -526,11 +527,14 @@ export class PortfolioModellerComponent implements OnInit {
       suppressAggFuncInHeader: true,
       enableGroupEdit: true,
       autoGroupColumnDef: this.autoGroupColumnDef,
-      frameworkComponents: frameworkComponents,
+      components: frameworkComponents,
       excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
       noRowsOverlayComponent:NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
       },
     }
 
@@ -545,8 +549,8 @@ export class PortfolioModellerComponent implements OnInit {
 
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), 
+        loadSharedEntities: loadSharedEntities.bind(this)
   
       },
 
@@ -582,7 +586,7 @@ export class PortfolioModellerComponent implements OnInit {
                   button: AdaptableButton<ActionColumnContext>,
                   context: ActionColumnContext
                 ) => {
-                  let node: RowNode = context.rowNode;
+                  let node: RowNode = <RowNode>context.rowNode;
                   let rowData = getNodes(node)
                   let oCols: string[] = Object.keys(this.overrideColMap);
                   for(let i: number = 0; i < rowData?.length; i++){
@@ -618,7 +622,7 @@ export class PortfolioModellerComponent implements OnInit {
                   button: AdaptableButton<ActionColumnContext>,
                   context: ActionColumnContext
                 ) => {
-                  let node: RowNode = context.rowNode;
+                  let node: RowNode = <RowNode>context.rowNode;
                   let rowData = getNodes(node)
                   let oCols: string[] = Object.keys(this.overrideColMap);
                   for(let i: number = 0; i < rowData?.length; i++){
@@ -811,7 +815,7 @@ export class PortfolioModellerComponent implements OnInit {
 
   onCellValueChanged(params: CellValueChangedEvent){
     /** Updating all the filtered children nodes as Ag/Adaptable isn't doing itself */
-    let node: RowNode = params.node, colID: string = params.column.getColId(), colVal = params.data[colID];
+    let node: RowNode = <RowNode>params.node, colID: string = params.column.getColId(), colVal = params.data[colID];
 
     let updates = [];
     if(node.group){
@@ -874,7 +878,7 @@ export class PortfolioModellerComponent implements OnInit {
     adaptable_Api?.gridApi?.deselectAll();
     if(positionIDs != null || positionIDs?.length != 0){
       positionIDs.forEachLeafNode(posID => {
-        let node: RowNode = adaptable_Api?.gridApi?.getRowNodeForPrimaryKey(posID);
+        let node: RowNode = <RowNode>adaptable_Api?.gridApi?.getRowNodeForPrimaryKey(posID);
         node.setSelected(posID)
       })
       this.selectedPositionIDs = positionIDs;
@@ -1102,7 +1106,7 @@ export class PortfolioModellerComponent implements OnInit {
             colName: string = overrideInfo[i].key,
             val: string = overrideInfo[i].value
 
-      let node: RowNode = adaptable_Api.gridApi.getRowNodeForPrimaryKey(posID)
+      let node: RowNode = <RowNode>adaptable_Api.gridApi.getRowNodeForPrimaryKey(posID)
       let oCols: string[] = Object.keys(this.overrideColMap);
 
       oCols.forEach(c =>  node.setDataValue(c, val))

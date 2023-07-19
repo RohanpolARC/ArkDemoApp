@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { CellClickedEvent, ColDef, GridApi, GridOptions, GridReadyEvent, Module, RowNode, ValueFormatterParams } from '@ag-grid-community/core';
+import { CellClickedEvent, ColDef,  FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, Module, RowNode, ValueFormatterParams } from '@ag-grid-community/core';
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { Observable, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { formatDate, BLANK_DATETIME_FORMATTER_CONFIG, DATE_FORMATTER_CONFIG_ddMMyyyy, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm } from 'src/app/shared/functions/formatter';
 import { AttributesFixingService } from 'src/app/core/services/AttributesFixing/attributes-fixing.service';
-import { getSharedEntities, setSharedEntities } from 'src/app/shared/functions/utilities';
+import { presistSharedEntities,loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { DataService } from 'src/app/core/services/data.service';
 import { FixingDetailsFormComponent } from './fixing-details-form/fixing-details-form.component';
 import { map } from 'rxjs/operators';
@@ -38,6 +38,7 @@ export class AttributesFixingComponent implements OnInit {
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   deleteFixingDetailID: number;
   noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
+  columnsList: string[];
 
   
 
@@ -94,6 +95,11 @@ export class AttributesFixingComponent implements OnInit {
     ]
 
     this.gridOptions = {
+      ...CommonConfig.GRID_OPTIONS,
+      context:{
+        resizedColumnList:[],
+        component:this
+      },
       enableRangeSelection: true,
       columnDefs: this.columnDefs,
       sideBar: true,
@@ -110,9 +116,12 @@ export class AttributesFixingComponent implements OnInit {
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
       },
+      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
     }
 
-    
+
     this.adaptableOptions= {
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'fixingID',
@@ -121,8 +130,8 @@ export class AttributesFixingComponent implements OnInit {
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
       teamSharingOptions: {
         enableTeamSharing: true,
-        setSharedEntities: setSharedEntities.bind(this),
-        getSharedEntities: getSharedEntities.bind(this)
+        persistSharedEntities: presistSharedEntities.bind(this), //https://docs.adaptabletools.com/guide/version-15-upgrade-guide
+        loadSharedEntities: loadSharedEntities.bind(this)
       },
       actionOptions: {
         actionColumns: [
@@ -192,7 +201,7 @@ export class AttributesFixingComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 12,
+          Revision: 14,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -271,7 +280,7 @@ export class AttributesFixingComponent implements OnInit {
   deleteFixingDetail(fixingID){
     this.subscriptions.push(this.attributeFixingSvc.deleteFixingDetails(fixingID).subscribe((result:any)=>{
       if(result.isSuccess===true){
-        const rowNode:RowNode = this.adaptableApi.gridApi.getRowNodeForPrimaryKey(fixingID)
+        const rowNode:RowNode = <RowNode>this.adaptableApi.gridApi.getRowNodeForPrimaryKey(fixingID)
         this.adaptableApi.gridApi.deleteGridData([rowNode.data])
         this.dataSvc.setWarningMsg('The Attribute deleted successfully','Dismiss','ark-theme-snackbar-success')
       }else{

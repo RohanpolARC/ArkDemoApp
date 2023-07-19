@@ -16,6 +16,7 @@ import { LinkInvestorModalComponent } from '../link-investor-modal/link-investor
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { DataService } from 'src/app/core/services/data.service';
 import { getAmountNumber } from 'src/app/shared/functions/utilities';
+import { CommonConfig } from 'src/app/configs/common-config';
 
 @Component({
   selector: 'app-add-capital-modal',
@@ -591,6 +592,7 @@ export class AddCapitalModalComponent implements OnInit{
   }
 
   gridOptions: GridOptions = {
+    ...CommonConfig.GRID_OPTIONS,
     enableRangeSelection: true,
     tooltipShowDelay: 0,
     columnDefs: this.columnDefs,

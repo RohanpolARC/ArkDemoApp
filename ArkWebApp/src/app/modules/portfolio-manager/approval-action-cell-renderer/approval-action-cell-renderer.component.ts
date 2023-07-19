@@ -1,4 +1,4 @@
-import { ICellRendererParams } from '@ag-grid-community/core';
+import {  ICellRendererParams } from '@ag-grid-community/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { Component, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -203,7 +203,7 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
       this.originalRowNodeData = this.originalRowNodeID = null;
       this.componentParent.setSelectedRowID(null);
 
-      this.params.api.recomputeAggregates();  
+      this.params.api.refreshClientSideRowModel('aggregate')
     }
     else {
       /** In case of Cloned row editing */
