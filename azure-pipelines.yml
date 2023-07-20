@@ -19,6 +19,13 @@ steps:
     command: custom
     workingDir: ArkWebApp
     verbose: false    
+    customCommand: 'set NODE_OPTIONS=--openssl-legacy-provider'
+- task: Npm@1
+  displayName: 'Angular APP Run build'  
+  inputs:    
+    command: custom
+    workingDir: ArkWebApp
+    verbose: false    
     customCommand: 'run ng build -- --configuration=uat'
 - task: ArchiveFiles@2
   displayName: 'Archive files'  
