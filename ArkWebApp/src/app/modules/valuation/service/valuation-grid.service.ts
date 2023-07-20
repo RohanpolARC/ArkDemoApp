@@ -555,9 +555,9 @@ export class ValuationGridService {
       return;
     }
     
-    let nodes: RowNode[] = this.getAdaptableApi().gridApi.getAllRowNodes({
+    let nodes: RowNode[] = <RowNode[]>this.getAdaptableApi().gridApi.getAllRowNodes({
       includeGroupRows: false,
-      filterFn: (node: RowNode) => {
+      filterFn: (node: IRowNode) => {
         return (node.data?.['showIsReviewed'] === 0)
       }
     })
