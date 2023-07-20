@@ -1,5 +1,5 @@
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
+import { ColDef, ICellRendererParams, RowNode } from '@ag-grid-community/core';
 import { Injectable, OnInit } from '@angular/core';
 import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { ICheckboxChanged, ICheckboxControl, IDefaultValue, IDisableCheckbox, IShowCheckbox } from 'src/app/shared/modules/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor.types';
@@ -63,15 +63,15 @@ export class GridCheckboxUtilService implements OnInit {
   }
 
   private disableCheckboxForUseModelValuation: IDisableCheckbox = (params: ICellRendererParams) => { 
-    return !this.gridSvc.isEditing(params.node); 
+    return !this.gridSvc.isEditing(<RowNode>params.node); 
   }
 
   private disableCheckboxForForceOverride: IDisableCheckbox = (params: ICellRendererParams) => { 
-    return !this.gridSvc.isEditing(params.node)
+    return !this.gridSvc.isEditing(<RowNode>params.node)
   }
 
   private disableCheckboxForReview: IDisableCheckbox = (params: ICellRendererParams) => { 
-    return this.gridSvc.isEditing(params.node) || params.data?.['showIsReviewed'] === 1 
+    return this.gridSvc.isEditing(<RowNode>params.node) || params.data?.['showIsReviewed'] === 1 
   }
 
   private checkboxChangedForModelValuation: ICheckboxChanged = (params: ICellRendererParams, boolVal: boolean) => {
