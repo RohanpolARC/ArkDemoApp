@@ -348,9 +348,9 @@ export class ApprovalComponent implements OnInit {
       },
       { field: "portfolioType", type: 'abColDefString',
         cellStyle: this.getCellStyle.bind(this, 'portfolioType'),
+        editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
-        cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'portfolioType'),
-
+        cellEditorParams: this.getPortFolioTypeParams.bind(this)
       },
       { field: "action", cellRenderer: 'actionCellRenderer'},
       { field: 'modifiedBy', headerName: 'Requested By',  type: 'abColDefString' },

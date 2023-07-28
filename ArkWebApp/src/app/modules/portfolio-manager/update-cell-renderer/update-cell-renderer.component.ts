@@ -100,7 +100,7 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
     m.portfolioName = data.portfolioName
     m.solvencyPortfolioName = data.solvencyPortfolioName
     m.userName = this.dataSvc.getCurrentUserName()
-debugger;
+    
     this.subscriptions.push(this.portfolioManagerSvc.putPortfolioMapping(m).pipe(
     ).subscribe({
       next: resp => {

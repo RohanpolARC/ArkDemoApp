@@ -97,7 +97,6 @@ export class PortfolioManagerComponent implements OnInit {
 
     this.subscriptions.push(this.dataSvc.getPortfolioTypeRef().subscribe({
       next: resp => {
-        debugger;
         this.portfolioMapDataSvc.setPortfolioTypeRef(resp);
       },
       error: error => {
@@ -236,7 +235,10 @@ export class PortfolioManagerComponent implements OnInit {
         field: "portfolioType",
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
-        cellEditorParams: this.getPortFolioTypeParams.bind(this),
+        cellEditorParams: () => { return {
+          ...this.getPortFolioTypeParams.bind(this),
+          isStrict: true
+        }},
         cellStyle: this.getEditableCellStyle.bind(this)
       },
       { field: "modifiedOn",  
