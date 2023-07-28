@@ -8,6 +8,7 @@ import { Injectable } from '@angular/core';
 export class PortfolioMappingDataService {
 
   private wsoPortfolioRef: any[] = null
+  private portfolioType: any[] = null
   private mappings: any[] = null
 
   mappingsAdaptableApi: AdaptableApi
@@ -32,6 +33,14 @@ export class PortfolioMappingDataService {
 
   getMappings(){
     return this.mappings;
+  }
+
+  setPortfolioTypeRef(data: any[]){
+    this.portfolioType = data
+  }
+
+  getPortfolioTypeRef(){
+    return this.portfolioType
   }
 
   

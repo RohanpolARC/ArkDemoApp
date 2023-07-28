@@ -14,7 +14,7 @@ import { BLANK_DATETIME_FORMATTER_CONFIG, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHm
 import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-renderer.component';
-import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, isFieldValid, validateAndUpdate } from './utilities/functions';
+import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, isFieldValid, validateAndUpdate, getPortfolioTypeParams } from './utilities/functions';
 
 @Component({
   selector: 'app-portfolio-manager',
@@ -92,6 +92,17 @@ export class PortfolioManagerComponent implements OnInit {
       error: error => {
         this.portfolioMapDataSvc.setWSOPortfolioRef([]);
         console.error(`Failed to load WSO Portfolio Ref Data: ${error}`)
+      }
+    }))
+
+    this.subscriptions.push(this.dataSvc.getPortfolioTypeRef().subscribe({
+      next: resp => {
+        debugger;
+        this.portfolioMapDataSvc.setPortfolioTypeRef(resp);
+      },
+      error: error => {
+        this.portfolioMapDataSvc.setPortfolioTypeRef([]);
+        console.error(`Failed to load Portfolio Type Ref Data: ${error}`)
       }
     }))
 
@@ -221,6 +232,13 @@ export class PortfolioManagerComponent implements OnInit {
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'excludeFxExposure'),
         cellStyle: this.getEditableCellStyle.bind(this)  
       },
+      { 
+        field: "portfolioType",
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: this.getPortFolioTypeParams.bind(this),
+        cellStyle: this.getEditableCellStyle.bind(this)
+      },
       { field: "modifiedOn",  
         type:"abColDefDate"
       },
@@ -307,7 +325,7 @@ export class PortfolioManagerComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 15,
+          Revision: 16,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -332,6 +350,7 @@ export class PortfolioManagerComponent implements OnInit {
               "lei",
               "isCoinvestment",
               "excludeFxExposure",
+              "portfolioType",
               "modifiedOn",
               "modifiedBy",
               'action'
@@ -374,6 +393,7 @@ export class PortfolioManagerComponent implements OnInit {
 
   getPortfolioIDParams = getPortfolioIDParams.bind(this)
   getPortfolioNameParams = getPortfolioNameParams.bind(this)
+  getPortFolioTypeParams = getPortfolioTypeParams.bind(this)
   getUniqueParamsFromGrid = getUniqueParamsFromGrid.bind(this)
   
   isEditable (params: EditableCallbackParams)  {

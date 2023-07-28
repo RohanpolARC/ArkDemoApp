@@ -21,6 +21,7 @@ export interface PortfolioMapping {
     lei: string,
     isCoinvestment: boolean,
     excludeFxExposure: boolean,
+    portfolioType: string,
     portfolioName: string,
     solvencyPortfolioName: string,
     userName: string

@@ -164,6 +164,12 @@ export function getPortfolioNameParams(){
   }
 }
 
+export function getPortfolioTypeParams(){
+  return {
+    options: this.portfolioMapDataSvc.getPortfolioTypeRef().map(e => e['portfolioTypeName'])
+  }
+}
+
 /**
  * For mappings grid only.
  * 
