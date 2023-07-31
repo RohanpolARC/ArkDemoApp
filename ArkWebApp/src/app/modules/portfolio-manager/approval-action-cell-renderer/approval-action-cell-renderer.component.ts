@@ -133,7 +133,7 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
     // Check if the mapping is incomplete
 
     if(!(data.wsoPortfolioID && data.fund && data.fundLegalEntity && data.fundHedging && data.fundStrategy && (data.fundSMA === true || data.fundSMA === false) && 
-    data.fundInvestor && data.fundCcy && data.fundAdmin && data.portfolioAUMMethod && data.valuationMethod &&
+    data.fundInvestor && data.fundCcy && data.fundAdmin && data.portfolioAUMMethod && data.valuationMethod && data.portfolioType &&
     (data.isCoinvestment === true || data.isCoinvestment === false) && 
     (data.excludeFxExposure === true || data.excludeFxExposure === false))){
       this.dataSvc.setWarningMsg('Please finish editing the mapping first', 'Dismiss', 'ark-theme-snackbar-warning')
@@ -171,6 +171,7 @@ export class ApprovalActionCellRendererComponent implements ICellRendererAngular
     m.lei = data.lei
     m.isCoinvestment = data.isCoinvestment
     m.excludeFxExposure = data.excludeFxExposure
+    m.portfolioType = data.portfolioType
     m.portfolioName = data.portfolioName
     m.solvencyPortfolioName = data.solvencyPortfolioName
     m.userName = this.dataSvc.getCurrentUserName()

@@ -12,7 +12,7 @@ import { BLANK_DATETIME_FORMATTER_CONFIG, dateTimeFormatter, DATETIME_FORMATTER_
 import { presistSharedEntities, loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { ApprovalActionCellRendererComponent } from '../approval-action-cell-renderer/approval-action-cell-renderer.component';
-import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, validateAndUpdate } from '../utilities/functions';
+import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, validateAndUpdate, getPortfolioTypeParams } from '../utilities/functions';
 
 @Component({
   selector: 'app-approval',
@@ -77,6 +77,7 @@ export class ApprovalComponent implements OnInit {
 
   getPortfolioIDParams = getPortfolioIDParams.bind(this)
   getPortfolioNameParams = getPortfolioNameParams.bind(this)
+  getPortFolioTypeParams = getPortfolioTypeParams.bind(this)
   getUniqueParamsFromGrid = getUniqueParamsFromGrid.bind(this)
 
   /**
@@ -345,6 +346,15 @@ export class ApprovalComponent implements OnInit {
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: this.getUniqueParamsFromGrid.bind(this, 'excludeFxExposure'),
       },
+      { field: "portfolioType", type: 'abColDefString',
+        cellStyle: this.getCellStyle.bind(this, 'portfolioType'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: () => { return {
+          ...this.getPortFolioTypeParams(),
+          isStrict: true
+        }},
+      },
       { field: "action", cellRenderer: 'actionCellRenderer'},
       { field: 'modifiedBy', headerName: 'Requested By',  type: 'abColDefString' },
       { field: 'modifiedOn', headerName: 'Requested On', type: 'abColDefDate', cellClass: 'dateUK'},
@@ -427,7 +437,7 @@ export class ApprovalComponent implements OnInit {
         },
         
         Layout: {
-          Revision: 20,
+          Revision: 21,
           CurrentLayout: 'Default Approval Layout',
           Layouts: [{
             Name: 'Default Approval Layout',
@@ -453,6 +463,7 @@ export class ApprovalComponent implements OnInit {
               "lei",
               "isCoinvestment",
               "excludeFxExposure",
+              "portfolioType",
               'modifiedBy',
               'modifiedOn',
               'remark',

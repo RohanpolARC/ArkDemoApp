@@ -93,5 +93,10 @@ export class DataService {
           panelClass: [type]
         });
       }
+
+      getPortfolioTypeRef(){
+        return this.http.get<any[]>(`${APIConfig.REFDATA_GET_PORTFOLIOTYPE_API}`).pipe(
+            catchError((ex) => throwError(ex)));
+    }
     
 }
