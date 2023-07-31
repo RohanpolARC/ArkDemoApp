@@ -350,7 +350,10 @@ export class ApprovalComponent implements OnInit {
         cellStyle: this.getCellStyle.bind(this, 'portfolioType'),
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
-        cellEditorParams: this.getPortFolioTypeParams.bind(this)
+        cellEditorParams: () => { return {
+          ...this.getPortFolioTypeParams(),
+          isStrict: true
+        }},
       },
       { field: "action", cellRenderer: 'actionCellRenderer'},
       { field: 'modifiedBy', headerName: 'Requested By',  type: 'abColDefString' },

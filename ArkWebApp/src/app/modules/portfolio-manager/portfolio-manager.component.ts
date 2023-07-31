@@ -236,7 +236,7 @@ export class PortfolioManagerComponent implements OnInit {
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: () => { return {
-          ...this.getPortFolioTypeParams.bind(this),
+          ...this.getPortFolioTypeParams(),
           isStrict: true
         }},
         cellStyle: this.getEditableCellStyle.bind(this)
