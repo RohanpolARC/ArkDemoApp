@@ -272,7 +272,7 @@ export class FacilityDetailComponent implements OnInit {
       {field: 'assetID', width: 103, type: 'abColDefNumber'},
       {field: 'assetTypeName', width: 153, type: 'abColDefString'},
       {field: 'ccy', width: 80, type: 'abColDefString'},
-      {field: 'faceValueIssue', cellClass: 'ag-right-aligned-cell', width: 150, type: 'abColDefNumber'},
+      {field: 'faceValueIssue',headerName: 'Face Value Issue / Quantity', cellClass: 'ag-right-aligned-cell', width: 150, type: 'abColDefNumber'},
       {field: 'costPrice',  cellClass: 'ag-right-aligned-cell', width: 110, type: 'abColDefNumber'},
       {field: 'mark',  cellClass: 'ag-right-aligned-cell', width: 86, type: 'abColDefNumber'},
       {field: 'maturityDate', //valueFormatter: dateFormatter,
