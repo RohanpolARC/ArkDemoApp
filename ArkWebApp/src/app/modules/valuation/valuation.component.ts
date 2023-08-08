@@ -6,7 +6,7 @@ import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
-import { AsOfDateRange, FilterIdValuePair } from 'src/app/shared/models/FilterPaneModel';
+import { AsOfDateRange, FilterValueChangeParams } from 'src/app/shared/models/FilterPaneModel';
 import { SpreadBenchmarkIndex, YieldCurve } from 'src/app/shared/models/ValuationModel';
 import { MarkOverrideMasterComponent } from './mark-override-master/mark-override-master.component';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
@@ -114,7 +114,7 @@ export class ValuationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe((data:FilterIdValuePair)=>{
+    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe((data:FilterValueChangeParams)=>{
       if(data){
         if(data.id===351){
           let funds = []

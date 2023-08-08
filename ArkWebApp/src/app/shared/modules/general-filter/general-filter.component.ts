@@ -7,6 +7,7 @@ import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { DataService } from 'src/app/core/services/data.service';
 import { debounceTime, distinctUntilChanged, first } from 'rxjs/operators';
 import { FormControl, FormGroup } from '@angular/forms';
+import { FilterValueChangeParams } from '../../models/FilterPaneModel';
 
 @Component({
   selector: 'app-general-filter',
@@ -54,7 +55,7 @@ export class GeneralFilterComponent implements OnInit {
           this.filters.forEach(filter=>{
             if(filter.type==='date'){
               filter.value = this.setDefaultDateValue(filter.default)
-              this.onChange(filter.value,filter.id) //event emitter call to notify default values are set
+              this.onChange(filter.value,filter.id,filter.isReport,filter.reportParamName) //event emitter call to notify default values are set
   
             }else if(filter.type === 'multi-select'){
               //filter.options has field values (fund,fundhedging) to retrieve the drop down data
@@ -77,7 +78,8 @@ export class GeneralFilterComponent implements OnInit {
                   filter.value = []
                 }
                 filter.optionsList = data
-                this.onChange(filter.value,filter.id)
+                this.onChange(filter.value,filter.id,filter.isReport,filter.reportParamName) //event emitter call to notify default values are set
+
                   
               }}))
             }else if(filter.type === 'single-select'){
@@ -92,12 +94,14 @@ export class GeneralFilterComponent implements OnInit {
 
                 filter.value  = data.filter(x=> preselectedList.includes(x?.['value']))
                 filter.optionsList = data
-                this.onChange(filter.value,filter.id)
+                this.onChange(filter.value,filter.id,filter.isReport,filter.reportParamName) //event emitter call to notify default values are set
+
                   
               }}))
             } else if (filter.type==='toggle'){
               filter.value = this.setDefaultBooleanValue(filter.default)
-              this.onChange(filter.value,filter.id)
+              this.onChange(filter.value,filter.id,filter.isReport,filter.reportParamName) //event emitter call to notify default values are set
+
   
             }else if(filter.type ==='date-range'){
               let defaultValues  = []
@@ -117,7 +121,7 @@ export class GeneralFilterComponent implements OnInit {
               this.onChange({
                 start:defaultStartDate,
                 end:defaultEndDate
-              },filter.id)
+              },filter.id,filter.isReport,filter.reportParamName)
   
   
               this.subscriptions.push(this.dateRange.valueChanges.pipe(
@@ -128,7 +132,7 @@ export class GeneralFilterComponent implements OnInit {
                 this.onChange({
                 start: getMomentDateStr(dtRange.start),
                 end: getMomentDateStr(dtRange.end)
-                },filter.id)
+                },filter.id,filter.isReport,filter.reportParamName)
   
               }))
   
@@ -137,7 +141,7 @@ export class GeneralFilterComponent implements OnInit {
   
             }else{
               filter.value = filter.default
-              this.onChange(filter.value,filter.id)
+              this.onChange(filter.value,filter.id,filter.isReport,filter.reportParamName)
   
             }
           })
@@ -176,11 +180,22 @@ export class GeneralFilterComponent implements OnInit {
   }
 
 
-  onChange(value,id){
-
-    this.filterSvc.changeFilterValues({value:value,id:id})
-
-
+  onChange(
+    value : any,
+    id : number,
+    isReport : boolean,
+    reportParamName : string)
+  {
+    
+    let filterValueChange:FilterValueChangeParams = {
+      id : id,
+      value : value
+    }
+    if(isReport){
+      filterValueChange.reportParamName = reportParamName
+    }
+    this.filterSvc.changeFilterValues(filterValueChange) 
+    
   }
 
   ngOnDestroy():void{

@@ -3,6 +3,7 @@ import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, M
 import { Component, Input, OnInit, SimpleChange, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
+import { FeeCalculationService } from 'src/app/core/services/FeeCalculation/fee-calculation.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import {  BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,   DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
@@ -133,7 +134,10 @@ NON_AMOUNT_2DEC_COLUMNS=['GrossMOM',
 
   noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
 
-  constructor(private dataSvc: DataService) { }
+  constructor(
+    private dataSvc: DataService,
+    private feeCalcSvc: FeeCalculationService
+  ) { }
 
   percentFormatter(params : ValueFormatterParams) {
     if(params.node.group)
@@ -296,6 +300,7 @@ NON_AMOUNT_2DEC_COLUMNS=['GrossMOM',
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel();
         this.gridApi = params.api;   
+        this.feeCalcSvc.feeCalcSummaryGridApi = params.api
         if(this.status === 'Loading'){
           this.gridApi.showLoadingOverlay();
         }     

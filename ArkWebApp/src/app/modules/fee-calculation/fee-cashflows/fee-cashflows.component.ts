@@ -3,6 +3,7 @@ import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, M
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
+import { FeeCalculationService } from 'src/app/core/services/FeeCalculation/fee-calculation.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { amountFormatter, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, dateFormatter, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
@@ -28,7 +29,10 @@ export class FeeCashflowsComponent implements OnInit {
   gridApi: GridApi
   noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
 
-  constructor(private dataSvc: DataService) { }
+  constructor(
+    private dataSvc: DataService,
+    private feeCalcSvc: FeeCalculationService
+  ) { }
 
   percentFormatter(params : ValueFormatterParams) {
     if(params.node.group)
@@ -202,7 +206,8 @@ export class FeeCashflowsComponent implements OnInit {
       },
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel();
-        this.gridApi = params.api;       
+        this.gridApi = params.api;   
+        this.feeCalcSvc.feeCalcCashflowsGridApi = params.api;    
         if(this.status === 'Loading'){
           this.gridApi.showLoadingOverlay();
         } 

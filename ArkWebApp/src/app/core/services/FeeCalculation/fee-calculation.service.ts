@@ -1,10 +1,11 @@
 import { HttpClient, HttpContext, HttpHeaders } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
 import { BehaviorSubject, Subject, Subscription, throwError, timer } from 'rxjs';
-import { catchError, switchMap, takeUntil } from 'rxjs/operators';
+import { catchError, filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
 import { FeeCalcParams } from 'src/app/shared/models/FeeCalculationModel';
 import { RESOURCE_CONTEXT } from '../../interceptors/msal-http.interceptor';
+import { GridApi } from '@ag-grid-community/core';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,9 @@ export class FeeCalculationService {
   terminateUri: string
   closeTimer: Subject<any> = new Subject<any>();
   isCalculationLoaded: EventEmitter<{ feeSmy: any[] | null, feeCashflows: any[] | null }> = new EventEmitter();
+
+  feeCalcSummaryGridApi: GridApi
+  feeCalcCashflowsGridApi: GridApi
 
   private entityMessage = new BehaviorSubject<any>(null)
   currententityValue = this.entityMessage.asObservable();
@@ -67,8 +71,17 @@ export class FeeCalculationService {
 
       this.terminateUri = response?.['terminatePostUri']
       timer(0, 10000).pipe(
+        tap(()=>{
+          this.feeCalcSummaryGridApi?.showLoadingOverlay()
+          this.feeCalcCashflowsGridApi?.showLoadingOverlay()
+        }),
         switchMap(() => this.getFeeCalcStatus(response?.['statusQueryGetUri'])),
-        takeUntil(this.closeTimer)
+        takeUntil(this.closeTimer),
+        filter((response)=>{
+          return (
+            ['Terminated', 'Completed', 'Failed'].includes(response?.['runtimeStatus']) 
+          )
+        })
       ).subscribe({
         next: (res: any) => {
 

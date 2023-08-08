@@ -8,6 +8,8 @@ import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/liquidity-summary.service';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { SsrsReportPopupComponent } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-popup/ssrs-report-popup.component';
+import { ReportServerParams, UnfundedAssetsReportParams } from 'src/app/shared/models/ReportParamsModel';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-update-cell-renderer',
@@ -166,16 +168,19 @@ export class UpdateCellRendererComponent implements OnInit, ICellRendererAngular
     this.params.context.componentParent.fundHedgings.forEach(element => {
       fundHedgingString =fundHedgingString+element+','
     });
-    let ReportParams:any={
+    let ReportParams:UnfundedAssetsReportParams={
       asOfDate:this.params.context.componentParent.asOfDate,
       fundHedgings:fundHedgingString,
       assetId:this.params.context.componentParent.getAssetId(this.params.data['subAttr']),
     }
+    let reportData:ReportServerParams = {
+      reportHeader : "Unfunded Assets",
+      reportServer: environment.ssrsUrl,
+      reportUrl : "Reports/UnfundedAssets",
+      parameters : ReportParams
+    }
     this.dialog.open(SsrsReportPopupComponent,{ 
-      data: {
-        reportName:"UnfundedAssets",
-        ReportParams:ReportParams
-        },
+      data: reportData,
         width: '95vw',
         height: '95vh',
         maxWidth:'100vw'

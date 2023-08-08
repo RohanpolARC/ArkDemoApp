@@ -3,7 +3,7 @@ import { BehaviorSubject, of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
 import { HttpClient } from '@angular/common/http';
-import { FilterIdValuePair } from 'src/app/shared/models/FilterPaneModel';
+import { FilterValueChangeParams } from 'src/app/shared/models/FilterPaneModel';
 
 
 @Injectable({
@@ -13,7 +13,7 @@ export class GeneralFilterService {
 
   private filterValueChanges = new BehaviorSubject<any>(null)
   currentFilterValues = this.filterValueChanges.asObservable();
-  changeFilterValues(values:FilterIdValuePair){
+  changeFilterValues(values:FilterValueChangeParams){
     this.filterValueChanges.next(values)
   }
 

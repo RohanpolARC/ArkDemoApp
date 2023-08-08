@@ -4,11 +4,15 @@ import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
 import { RESOURCE_CONTEXT } from '../../interceptors/msal-http.interceptor';
+import { GridApi } from '@ag-grid-community/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NetReturnsService {
+
+  public netSmyGridApi:GridApi
+  public netCashflowsGridApi:GridApi
 
   private fundHedgingMessage = new BehaviorSubject<any>(null)
   currentfundHedgingValues = this.fundHedgingMessage.asObservable();
@@ -24,9 +28,6 @@ export class NetReturnsService {
 
   private saveNetReturns = new BehaviorSubject<any>(null)
   currentSaveNetReturns = this.saveNetReturns.asObservable();
-
-  private showExtraColumns = new BehaviorSubject<any>(null)
-  currentShowExtraColumns = this.showExtraColumns.asObservable();
   
   constructor(private http: HttpClient) { }
 
@@ -50,10 +51,6 @@ export class NetReturnsService {
     this.saveNetReturns.next(saveNetReturns);
   }
 
-  changeShowExtraColumn(showExtraColumns:any){
-    this.showExtraColumns.next(showExtraColumns);
-  }
-
   calculateNetIRR(
       model: {
         asOfDate: string, 
@@ -61,7 +58,6 @@ export class NetReturnsService {
         calcMethod: string,
         cashflowType: string,
         saveNetReturns: any,
-        showExtraColumns: any,
         runBy:string
       }
     ): Observable<any[]>{

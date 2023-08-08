@@ -4,6 +4,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
+import { NetReturnsService } from 'src/app/core/services/NetReturns/net-returns.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER } from 'src/app/shared/functions/formatter';
@@ -42,7 +43,10 @@ export class NetReturnsSummaryComponent implements OnInit {
   FORMAT_COLUMNS: string[];
 
 
-  constructor(private dataSvc: DataService) { }
+  constructor(
+    private dataSvc: DataService,
+    public netReturnsSvc: NetReturnsService  
+  ) { }
 
   ngOnInit(): void {
 
@@ -136,6 +140,7 @@ export class NetReturnsSummaryComponent implements OnInit {
 
   onGridReady(params: GridReadyEvent){
     params.api.showNoRowsOverlay()
+    this.netReturnsSvc.netSmyGridApi = params.api
     
     this.gridApi = params.api;
   }

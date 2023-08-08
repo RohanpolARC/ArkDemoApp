@@ -1,6 +1,6 @@
-import { AdaptableButton, DashboardOptions, ExportOptions, LayoutOptions } from "@adaptabletools/adaptable-angular-aggrid";
+import {  ExportOptions } from "@adaptabletools/adaptable-angular-aggrid";
 import { AdaptableModuleButtons } from "@adaptabletools/adaptable/src/PredefinedConfig/Common/Types";
-import { ColDef, Column, ColumnResizedEvent, ColumnVisibleEvent, ExcelStyle, FirstDataRenderedEvent, GridOptions, Module, VirtualColumnsChangedEvent } from "@ag-grid-community/core";
+import {  ColumnResizedEvent,  ExcelStyle, GridOptions, Module, ProcessCellForExportParams, VirtualColumnsChangedEvent } from "@ag-grid-community/core";
 
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
 import { ClipboardModule } from "@ag-grid-enterprise/clipboard";
@@ -13,7 +13,7 @@ import { RowGroupingModule } from "@ag-grid-enterprise/row-grouping";
 import { SetFilterModule } from "@ag-grid-enterprise/set-filter";
 import { SideBarModule } from "@ag-grid-enterprise/side-bar";
 import { CsvExportModule } from "@ag-grid-community/csv-export";
-import { autosizeColumnExceptResized, getWrapWidth, handleResizedColumns } from "../shared/functions/utilities";
+import { autosizeColumnExceptResized,  getMomentDateStrFormat,  handleResizedColumns } from "../shared/functions/utilities";
 
 
 export class CommonConfig{
@@ -30,6 +30,11 @@ export class CommonConfig{
       onColumnResized: (params:ColumnResizedEvent)=>{
         handleResizedColumns(params)
       },
+      processCellForClipboard(params: ProcessCellForExportParams) {
+        if(params.column.getColDef().type === 'abColDefDate' || params.column.getColDef().cellClass === 'dateUK' )
+          return getMomentDateStrFormat(params.value,'DD/MM/YYYY')
+        return params.value;
+      }
     }
 
     public static AG_GRID_LICENSE_KEY: string = `CompanyName=Arcmont Asset Management,LicensedApplication=ArkWebApp,LicenseType=SingleApplication,LicensedConcurrentDeveloperCount=2,LicensedProductionInstancesCount=0,AssetReference=AG-035059,SupportServicesEnd=21_November_2023_[v2]_MTcwMDUyNDgwMDAwMA==ef536150b8d9d3fcd89f7771890b0cf1`

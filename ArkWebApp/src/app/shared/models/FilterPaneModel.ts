@@ -10,7 +10,8 @@ export interface AsOfDateRange{
     end: string;
 }
 
-export interface FilterIdValuePair{
-    id:number,
-    value:any
+export interface FilterValueChangeParams{
+    id:                     number,
+    value:                  any,
+    reportParamName?:       string
   }

@@ -1,11 +1,13 @@
 
+<div class="d-flex flex-column" style="height: 100%;">
+    <app-ssrs-report-viewer 
+    [reportServerParams]="params" style="height: 100%;">
+    </app-ssrs-report-viewer>
+    
+    <mat-dialog-actions align="end" >
+        <div>
+            <button type="button" mat-raised-button (click)="onClose()">Close</button>
+        </div>
+    </mat-dialog-actions>
 
-<app-ssrs-report-viewer 
-[reportServerParams]="params">
-</app-ssrs-report-viewer>
-
-<mat-dialog-actions align="end" >
-    <div>
-        <button type="button" class="mt-3" mat-raised-button (click)="onClose()">Close</button>
-    </div>
-</mat-dialog-actions>
+</div>

@@ -32,15 +32,6 @@ export interface RefDataProc{
     param5: string,
 }
 
-export type ReportServerParams={
-    reportServer: string 
-    reportUrl: string 
-    showParameters: string 
-    language: string 
-    toolbar: string 
-    parameters: any
-  }
-
   export type ConfirmComponentConfigure={
     headerText?:string,
     displayConfirmButton?:boolean,
@@ -59,7 +50,9 @@ export type FilterConfig={
         default:string,
         options?:string,
         optionsList?:any,
-        value?:any
+        value?:any,
+        isReport:boolean,
+        reportParamName?:string
 }
 
 

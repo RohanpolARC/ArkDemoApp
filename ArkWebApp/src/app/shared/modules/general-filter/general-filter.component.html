@@ -3,14 +3,23 @@
     <div *ngSwitchCase="'number'" class="element">
         <mat-form-field appearance="outline">
           <mat-label>{{filter.label}}</mat-label>
-          <input type="number" autocomplete="off" matInput [(ngModel)]="filter.value" (ngModelChange) = "onChange($event,filter.id)">
+          <input 
+                type="number" 
+                autocomplete="off" 
+                matInput 
+                [(ngModel)]="filter.value" 
+                (ngModelChange) = "onChange($event,filter.id,filter.isReport,filter.reportParamName)">
         </mat-form-field>
     </div>
 
     <div *ngSwitchCase="'date'" class="element">
         <mat-form-field appearance="outline">
             <mat-label>{{filter.label}}</mat-label>
-            <input autocomplete="off"  matInput [matDatepicker]="i" [(ngModel)]="filter.value" (ngModelChange) = "onChange($event,filter.id)">
+            <input autocomplete="off"  
+                    matInput 
+                    [matDatepicker]="i" 
+                    [(ngModel)]="filter.value" 
+                    (ngModelChange) = "onChange($event,filter.id,filter.isReport,filter.reportParamName)">
             <mat-datepicker-toggle matSuffix [for]="i"></mat-datepicker-toggle>
             <mat-datepicker #i></mat-datepicker>
         </mat-form-field>
@@ -23,7 +32,7 @@
             [settings] = "dropdownSettingsMultiple"
             [dropdownData] = "filter.optionsList"
             [selectedDropdownData] = "filter.value"
-            (onNgModelChangeCallback) = "onChange($event,filter.id)"
+            (onNgModelChangeCallback) = "onChange($event,filter.id,filter.isReport,filter.reportParamName)"
             >
         </app-multi-select>
     </div>
@@ -35,7 +44,7 @@
             [settings] = "dropdownSettingsSingle"
             [dropdownData] = "filter.optionsList"
             [selectedDropdownData] = "filter.value"
-            (onNgModelChangeCallback) = "onChange($event,filter.id)"
+            (onNgModelChangeCallback) = "onChange($event,filter.id,filter.isReport,filter.reportParamName)"
             >
         </app-multi-select>
     </div>
@@ -45,7 +54,7 @@
         <mat-slide-toggle
             [color] = "'primary'"
             [(ngModel)] = "filter.value"
-            (ngModelChange) = "onChange($event,filter.id)"
+            (ngModelChange) = "onChange($event,filter.id,filter.isReport,filter.reportParamName)"
         >
         </mat-slide-toggle>
     </div>

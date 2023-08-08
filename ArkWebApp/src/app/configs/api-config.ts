@@ -113,4 +113,6 @@ export class APIConfig {
     public static VALUATION_AUDIT_DETAIL_GET_API: string = APIConfig.BASEURL + "/api/Valuation/GetDetailRows";
     public static VALUATION_SPREAD_BENCHMARK_INDEXES_GET_API: string = APIConfig.BASEURL + "/api/Valuation/GetBenchmarkIndexes";
     public static VALUATION_YIELD_CURVES_GET_API: string = APIConfig.BASEURL + "/api/Valuation/GetYieldCurveData";
+
+    public static GET_REPORT_API:string = APIConfig.BASEURL + "/api/ReportViewer/GetReport";
 }

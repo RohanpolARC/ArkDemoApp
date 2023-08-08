@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SsrsReportViewerComponent } from '../ssrs-report-viewer.component';
-import { environment } from 'src/environments/environment';
+import { ReportServerParams } from 'src/app/shared/models/ReportParamsModel';
 
 @Component({
   selector: 'app-ssrs-report-popup',
@@ -10,35 +10,15 @@ import { environment } from 'src/environments/environment';
 })
 export class SsrsReportPopupComponent implements OnInit {
 
-  params:any
+  params:ReportServerParams
   constructor(
     public dialogRef: MatDialogRef<SsrsReportViewerComponent>,
-    @Inject(MAT_DIALOG_DATA) public data:{
-      reportName:string,
-      ReportParams:any
-    }
+    @Inject(MAT_DIALOG_DATA) public data:ReportServerParams
   ) { }
 
-  reportServer:string
-  reportUrl:string
-  showParameters:string
-  language:string
-  toolbar:string
 
   ngOnInit(): void {
-    this.reportServer = environment.ssrsUrl
-    this.reportUrl = `Reports/${this.data.reportName}`;
-    this.showParameters = "false"; 
-    this.language = "en-us";
-    this.toolbar = "true";
-    this.params = {
-      reportServer:this.reportServer,
-      reportUrl:this.reportUrl,
-      toolbar:this.toolbar,
-      language:this.language,
-      showParameters:this.showParameters,
-      parameters:this.data.ReportParams
-    }
+    this.params = this.data
   }
 
   onClose(){

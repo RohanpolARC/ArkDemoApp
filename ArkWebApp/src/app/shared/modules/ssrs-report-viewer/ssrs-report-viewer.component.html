@@ -1,12 +1,39 @@
-<div>
-    <ssrs-reportviewer
-    [reportserver]="reportServerParams.reportServer"
-    [reporturl]="reportServerParams.reportUrl"
-    [showparameters]="reportServerParams.showParameters" 
-    [parameters]="reportServerParams.parameters" 
-    [language]="reportServerParams.language" 
-    [toolbar]="reportServerParams.toolbar"
-      >
-    </ssrs-reportviewer>
+<div class="d-flex flex-column" style="height: 100%;">
+      <div class="row" style="height: 10%;">
+        <div class="col-9 my-2">
+          <h2>
+            {{header}}
+          </h2>
+        </div>
+        <mat-form-field appearance="outline" class="edit col-2 my-2">
+          <mat-label>Format</mat-label>
+          <mat-select [(value)]="formatType">
+            <mat-option
+              *ngFor="let format of formatTypes"
+              [value]="format"
+            >
+              {{format}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="col-1 my-2">
+            <button type="button" class="my-2" mat-raised-button (click)="onExport()">Export</button>
+        </div>
+      </div>
 
+      <div *ngIf="reportFilterConfigKey">
+        <div class="row" style="height: 10%;">
+          <div class="col-11 my-2">
+            <app-general-filter class="d-flex flex-row justify-content-between" [screen] = "reportFilterConfigKey"></app-general-filter>
+          </div>
+          <div class="col-1 my-2">
+            <button type="button" class="my-2 mx-1" mat-raised-button (click)="onApply()">Apply</button>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row" [style]="customIframeHeight">
+        <iframe class="w-100 h-100 my-1" [src]="reportIFrameURL" ></iframe>
+      </div>
 </div>

@@ -102,6 +102,14 @@ export function getMomentDate(date: Date): Date{
   return new Date(moment(date).format('YYYY-MM-DD'));
 }
 
+export function getMomentDateStrFormat(date: Date,format:string): string{
+  if(moment(date).format(format)==='Invalid date'){
+    return null
+  }
+  return moment(date).format(format);
+
+}
+
 export function getMomentDateStr(date: Date): string{
   return moment(date).format('YYYY-MM-DD');
 }

@@ -6,7 +6,9 @@ import { DataService } from 'src/app/core/services/data.service';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { NetReturnsService } from 'src/app/core/services/NetReturns/net-returns.service';
 import { getMomentDateStr } from 'src/app/shared/functions/utilities';
+import { NetReturnReportParams, ReportServerParams } from 'src/app/shared/models/ReportParamsModel';
 import { SsrsReportPopupComponent } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-popup/ssrs-report-popup.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-net-returns',
@@ -43,11 +45,6 @@ export class NetReturnsComponent implements OnInit {
       this.saveNetReturns = saveNetReturns
     })
   )
-  showExtraColumns$: Observable<any> = this.netReturnsSvc.currentShowExtraColumns.pipe(
-    tap((showExtraColumns:any)=>{
-      this.showExtraColumns = showExtraColumns
-    })
-  )
 
   closeTimer$ = new Subject<any>();
   cashflows: any[] = []
@@ -58,7 +55,6 @@ export class NetReturnsComponent implements OnInit {
   fundHedging: string
   cashflowType: string
   saveNetReturns:any
-  showExtraColumns:any
   isDisabled:boolean = true
 
   constructor(private netReturnsSvc: NetReturnsService,
@@ -78,18 +74,22 @@ export class NetReturnsComponent implements OnInit {
       this.dataSvc.setWarningMsg("Please run the calculations first.","Dismiss","ark-theme-snackbar-warning");
       return
     }
-    let ReportParams:any  ={
+    let ReportParams:NetReturnReportParams  ={
       asOfDate:this.asOfDate,
       fundHedging:this.fundHedging,
       cashflowType:this.cashflowType,
       calculationType:this.calcMethod,
-      showExtraColumns:this.showExtraColumns
+      showExtraColumns:false
+    }
+    let reportData:ReportServerParams = {
+      reportHeader : "Net Returns",
+      reportServer: environment.ssrsUrl,
+      reportUrl : "Reports/NetReturns",
+      reportFilterConfigKey:"net-returns-report",
+      parameters : ReportParams
     }
     const dialogRef = this.dialog.open(SsrsReportPopupComponent,{ 
-      data: {
-        reportName:"NetReturns",
-        ReportParams:ReportParams
-        },
+      data: reportData,
         width: '95vw',
         height: '95vh',
         maxWidth:'100vw'
@@ -113,9 +113,7 @@ export class NetReturnsComponent implements OnInit {
           this.netReturnsSvc.changeCashflowType(data.value?.[0]?.value)
         }else if(data.id === 235){
           this.netReturnsSvc.changeSaveNetReturns(data.value)
-        }else if(data.id === 354){
-          this.netReturnsSvc.changeShowExtraColumn(data.value)
-        }       
+        }     
       }
     }))
       
@@ -132,7 +130,6 @@ export class NetReturnsComponent implements OnInit {
           fundHedging: this.fundHedging,
           cashflowType: this.cashflowType,
           saveNetReturns: this.saveNetReturns,
-          showExtraColumns: this.showExtraColumns,
           runBy: this.dataSvc.getCurrentUserName()
         }
         return  this.netReturnsSvc.calculateNetIRR(m).pipe(
@@ -142,6 +139,13 @@ export class NetReturnsComponent implements OnInit {
               takeUntil(this.closeTimer$),
               switchMap(
                 () => this.netReturnsSvc.getIRRStatus(pollingEndpoint).pipe(
+                tap((pollResp)=>{
+                  this.netReturnsSvc.netSmyGridApi?.showLoadingOverlay()
+                  this.netReturnsSvc.netCashflowsGridApi?.showLoadingOverlay()
+                }),
+                filter((pollResp)=>{
+                  return (['Terminated', 'Completed', 'Failed'].includes(pollResp?.['runtimeStatus']))
+                }),
                 map((pollResp) => { return { 
                   ...{ 
                       summary: pollResp?.['output']?.['Summary'], 
