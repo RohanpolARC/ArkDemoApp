@@ -89,12 +89,10 @@ export class ValuationComponent implements OnInit {
     switchMap((isHit) => {
       return this.valuationSvc.getValuationData(this.asofdate, this.funds?.join(','), this.marktypes?.join(',')).pipe(
         tap((data: any[]) => { 
-          // console.log(data)
           let formatDateCols = ['overrideDate', 'expectedDate', 'modifiedOn', 'reviewedOn', 'effectiveDate']
           data.map(row=>{
             formatDateCols.forEach(dateCol=>{
               let dateFormated =   formatDate(row[dateCol]);
-              console.log(dateFormated)
               if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(dateFormated)){
                 row[dateCol] = null;
               }

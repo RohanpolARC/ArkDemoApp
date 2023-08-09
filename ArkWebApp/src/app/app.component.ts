@@ -62,6 +62,7 @@ export class AppComponent {
   AUMDeltaStyle: any = {};
   MarkChangeStyle:any = {};
   ValuationStyle: any = {};
+  FeeAttributionStyle: any = {};
 
   funds
   fundHedgings
@@ -221,6 +222,9 @@ export class AppComponent {
     else if(this.location.path() === '/valuation'){
       this.updateSelection('Valuation')
     }
+    else if(this.location.path() === '/fee-attribution'){
+      this.updateSelection('Fee Attribution')
+    }
     else this.updateSelection('')
   }
 
@@ -236,7 +240,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle = this.AUMDeltaStyle = this.NetReturnsStyle = this.MarkChangeStyle = this.ValuationStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle = this.AUMDeltaStyle = this.NetReturnsStyle = this.MarkChangeStyle = this.ValuationStyle = this.FeeAttributionStyle = this.notSelectedElement;
 
     if(screen === 'GIREditor'){
       this.GIREditorStyle = this.selectedElement;
@@ -329,6 +333,10 @@ export class AppComponent {
     else if(screen === 'Valuation'){
       this.ValuationStyle = this.selectedElement;
       this.router.navigate(['/valuation'])
+    }
+    else if(screen === 'Fee Attribution'){
+      this.FeeAttributionStyle = this.selectedElement;
+      this.router.navigate(['/fee-attribution'])
     }
   }
 }

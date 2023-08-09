@@ -121,6 +121,9 @@
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Management Fee')" [ngStyle]="ManagementFeeStyle">
           <div class="list-item-text">Management Fees</div>
         </mat-list-item>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Fee Attribution')" [ngStyle]="FeeAttributionStyle">
+          <div class="list-item-text">Fee Attribution</div>
+        </mat-list-item>
       </mat-list>
     </mat-expansion-panel>
   </mat-accordion>
@@ -181,7 +184,7 @@
       <button mat-raised-button id="apply-button"  
         *ngIf="[
         '/facility-detail', '/liquidity-summary', '/fee-calculation', '/management-fee',
-        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/aum-delta', '/net-returns','/mark-changes','/valuation'].includes(location.path())" 
+        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/aum-delta', '/net-returns','/mark-changes','/valuation','/fee-attribution'].includes(location.path())" 
         (click)="filterApply()">Apply</button>
     </div>
 
@@ -236,7 +239,10 @@
 
     <div *ngIf="location.path() === '/valuation'" class="filter-element">
       <app-general-filter [screen] = "'valuation'"></app-general-filter>
+    </div>
 
+    <div *ngIf="location.path() === '/fee-attribution'" class="filter-element">
+      <app-general-filter [screen] = "'Fee Attribution'"></app-general-filter>
     </div>
 
 
