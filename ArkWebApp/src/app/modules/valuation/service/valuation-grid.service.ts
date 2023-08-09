@@ -7,6 +7,7 @@ import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
 import { getFinalDate } from 'src/app/shared/functions/utilities';
+import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { APIReponse, DetailedView, IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { SpreadBenchmarkIndex, Valuation, YieldCurve } from 'src/app/shared/models/ValuationModel';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
@@ -83,8 +84,8 @@ export class ValuationGridService {
     return this.component.readProperty<ColDef[]>('columnDefs');
   }
 
-  getAsOfDate(): string {
-    return this.component.readProperty<string>('asOfDate');
+  getAsOfDate(): AsOfDateRange {
+    return this.component.readProperty<AsOfDateRange>('asOfDate');
   }
 
   getFunds(): string[] {
@@ -179,7 +180,7 @@ export class ValuationGridService {
     // To clear up hedging mark by setting it to NULL in DB.
     valuation.override = (node.data?.['override'] === "") ? null : node.data?.['override'];
     valuation.overrideSource = (node.data?.['useModelValuation']) ? 'Model Valuation' : 'New Mark';
-    valuation.overrideDate = getFinalDate(new Date(this.getAsOfDate())); 
+    valuation.overrideDate = getFinalDate(new Date(this.getAsOfDate().end)); 
     valuation.modifiedBy = this.dataSvc.getCurrentUserName();
 
     this.valuationSvc.putValuationData([valuation]).pipe(first()).subscribe({
@@ -249,7 +250,6 @@ export class ValuationGridService {
         data: {
           assetID: node.data?.['assetID'],
           marktype: node.data?.['markType'],
-          asofdate: this.getAsOfDate()
         },
         width: '90vw',
         height: '80vh'
@@ -344,7 +344,7 @@ export class ValuationGridService {
     this.checkValidations(event, 5.0);
 
     let node: RowNode = <RowNode>event.node;
-    node.data['overrideDate'] = getFinalDate(new Date(this.getAsOfDate()));
+    node.data['overrideDate'] = getFinalDate(new Date(this.getAsOfDate().end));
 
     let marktype: string = node.data?.['markType'].toLowerCase();
 
@@ -600,7 +600,7 @@ export class ValuationGridService {
     req.screen = 'Valuation-Positions';
     req.param1 = String(params.data?.['assetID']);
     req.param2 = params.data?.['markType'];
-    req.param3 = this.getAsOfDate();
+    req.param3 = this.getAsOfDate().end;
     req.param4 = this.getFunds().join(',');
     req.param5 = ''; 
     req.strParam1 = this.getFunds();

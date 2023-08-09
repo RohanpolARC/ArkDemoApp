@@ -53,18 +53,18 @@ export class ValuationService {
     )
   }
 
-  getAuditMaster(assetID: number, marktype: string, asofdate: string){
+  getAuditMaster(assetID: number, marktype: string, startDate: string, endDate: string){
     return this.http.get<any[]>(`${APIConfig.VALUATION_AUDIT_MASTER_GET_API}`, {
       params: {
-        assetID: assetID ?? '', marktype: marktype ?? '', asofdate: asofdate ?? ''
+        assetID: assetID ?? '', marktype: marktype ?? '', startDate: startDate ?? '', endDate: endDate ?? ''
       }
     }).pipe(
       catchError((ex) => throwError(ex))
     )
   }
 
-  getAuditDetail(assetID: number, marktype: string, asofdate: string, auditeventID: number){
-    return this.http.get<any[]>(`${APIConfig.VALUATION_AUDIT_DETAIL_GET_API}/?assetID=${assetID}&marktype=${marktype}&asofdate=${asofdate}&auditeventID=${auditeventID}`).pipe(
+  getAuditDetail(assetID: number, marktype: string, startDate: string, endDate: string, auditeventID: number){
+    return this.http.get<any[]>(`${APIConfig.VALUATION_AUDIT_DETAIL_GET_API}/?assetID=${assetID}&marktype=${marktype}&startDate=${startDate}&endDate=${endDate}&auditeventID=${auditeventID}`).pipe(
       catchError((ex) => throwError(ex))
     );
   }
@@ -91,6 +91,12 @@ export class ValuationService {
         context: new HttpContext().set(RESOURCE_CONTEXT, 'IRRCalculatorFunction') 
       }).pipe(catchError((ex) => throwError(ex)));
   }
+
+  private dateRangeApplyBtn = new BehaviorSubject<boolean>(false);
+  dateRangeApplyBtnState = this.dateRangeApplyBtn.asObservable();
+    changeDateRangeApplyBtnState(isHit: boolean){
+        this.dateRangeApplyBtn.next(isHit);
+    }
 
   constructor(private http: HttpClient) { }
 }

@@ -1,13 +1,20 @@
-import { ColDef, DetailGridInfo, FirstDataRenderedEvent, GetRowIdFunc, GetRowIdParams, GridOptions, GridReadyEvent, IDetailCellRendererParams, IsRowMaster, Module, RowGroupOpenedEvent } from '@ag-grid-community/core';
+import { ColDef, DetailGridInfo, FirstDataRenderedEvent, GetRowIdFunc, GetRowIdParams, GridApi, GridOptions, GridReadyEvent, IDetailCellRendererParams, IsRowMaster, Module, RowGroupOpenedEvent } from '@ag-grid-community/core';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
 import { MasterDetailModule } from "@ag-grid-enterprise/master-detail";
-import { first, map } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, first, map, switchMap, startWith, filter, tap } from 'rxjs/operators';
 import { dateFormatter, dateTimeFormatter, nonAmountNumberFormatter, nullOrZeroFormatterWithoutLocale } from 'src/app/shared/functions/formatter';
-import { autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
+import { autosizeColumnExceptResized, getLastBusinessDay, getLastQuarterEnd, getLastToLastQuarterEnd, getMomentDate, getMomentDateStr } from 'src/app/shared/functions/utilities';
+import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
+import { FormControl, FormGroup } from '@angular/forms';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
+import { FilterConfig } from '../../../shared/models/GeneralModel';
+import * as moment from 'moment';
+
+
 
 @Component({
   selector: 'app-mark-override-master',
@@ -18,29 +25,43 @@ export class MarkOverrideMasterComponent implements OnInit {
 
   assetID: number
   marktype: string
-  asofdate: string
+  startDate: string
+  endDate: string
 
   columnDefs: ColDef[]
   detailColumnDefs: ColDef[]
   gridOptions: GridOptions
   rowData$: Observable<any[]>
   agGridModules: Module[] = [...CommonConfig.AG_GRID_MODULES, MasterDetailModule];
+  subscriptions : Subscription[]=[]
 
   detailCellRendererParams: IDetailCellRendererParams<any, any>;
-
+  markOverrideMasterGridApi: GridApi
+  
+  dateRange: FormGroup
   onFirstDataRendered: (event: FirstDataRenderedEvent<any>) => void = (event:FirstDataRenderedEvent)=>{
     autosizeColumnExceptResized(event)
   };
   onGridReady: (event: GridReadyEvent<any>) => void = (event: GridReadyEvent) => {
-    this.rowData$ = this.valuationSvc.getAuditMaster(this.assetID, this.marktype, this.asofdate)
-      .pipe(
-        map((rowData: any[]) => { 
-          for(let i: number = 0; i < rowData.length; i+= 1){
-            rowData[i] = { ...rowData[i], 'uniqueID': i+1 }
-          }
-          return rowData;
-        })
-    )
+    this.markOverrideMasterGridApi = event.api
+    this.rowData$ = this.valuationSvc.dateRangeApplyBtnState.pipe(
+      tap(() => {
+        this.markOverrideMasterGridApi?.showLoadingOverlay();
+      }),
+      startWith(true),
+      switchMap((isHit: boolean) => {   
+        return this.valuationSvc.getAuditMaster(this.assetID, this.marktype, this.startDate, this.endDate)
+        .pipe(
+          
+          map((rowData: any[]) => { 
+            for(let i: number = 0; i < rowData.length; i+= 1){
+              rowData[i] = { ...rowData[i], 'uniqueID': i+1 }
+            }
+            return rowData;
+          })
+        )
+      })
+    )    
   }
 
   public getRowId: GetRowIdFunc = (params: GetRowIdParams) => {
@@ -51,17 +72,15 @@ export class MarkOverrideMasterComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public params: {
       assetID?: number,   // Can be empty, in case of global audit
       marktype?: string,  // Can be empty, in case of global audit
-
-      // This will be the date (likely current date) for which its positions will be used to check the mark (not markDate).
-      asofdate: string  //'YYYY-MM-DD'
     },
     private valuationSvc: ValuationService) { }
+  
 
   ngOnInit(): void {
 
     this.assetID = this.params.assetID;
     this.marktype = this.params.marktype;
-    this.asofdate = this.params.asofdate;
+    this.initializeDateRangeField()
 
     this.columnDefs = [
       { field: 'assetID', cellRenderer: 'agGroupCellRenderer' },
@@ -138,7 +157,7 @@ export class MarkOverrideMasterComponent implements OnInit {
         let assetID: number = params.data?.['assetID'];
         let marktype: string = params.data?.['valuationMethod']; 
 
-        this.valuationSvc.getAuditDetail(assetID, marktype, this.asofdate, auditeventID).pipe(first()).subscribe({
+        this.valuationSvc.getAuditDetail(assetID, marktype, this.startDate, this.endDate, auditeventID).pipe(first()).subscribe({
           next: (detail) => {
             params.successCallback(detail)
           },
@@ -149,7 +168,7 @@ export class MarkOverrideMasterComponent implements OnInit {
       },
     } as IDetailCellRendererParams
   }
-
+  
   gridCellStyle(params){
     return { 'background': params.data?.['colour'] };
   }
@@ -161,6 +180,24 @@ export class MarkOverrideMasterComponent implements OnInit {
   onClose(){
     this.dialogRef.close()
   }
+
+  initializeDateRangeField(){
+    let date = moment()
+    this.dateRange = new FormGroup({
+      start: new FormControl(getMomentDateStr(getLastQuarterEnd())),
+      end: new FormControl(getMomentDateStr(date.toDate())),
+    });
+    this.startDate =  this.dateRange.controls["start"].value;
+    this.endDate = this.dateRange.controls["end"].value;
+  }
+
+  filterRangeApply(){
+    this.startDate = getMomentDateStr(this.dateRange.value["start"]);
+    this.endDate = getMomentDateStr(this.dateRange.value["end"]);
+    this.valuationSvc.changeDateRangeApplyBtnState(true);
+  }
+
+  
 
   onRowGroupOpened: (event: RowGroupOpenedEvent<any>) => void = (params: RowGroupOpenedEvent) => {
 

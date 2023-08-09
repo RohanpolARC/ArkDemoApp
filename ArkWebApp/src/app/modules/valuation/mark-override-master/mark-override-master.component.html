@@ -1,7 +1,28 @@
-<h3>Audit Log - Mark Overrides</h3>
 
+<div class="row">
+    <div class="col-8">
+        <h2 class="my-2">Audit Log - Mark Overrides</h2>
+    </div>
+    
+   
+        <mat-form-field appearance="outline" class="date-form-field col-3" color="primary">
+         <mat-label>Audit Date Range</mat-label>
+         <mat-date-range-input  [formGroup]="dateRange" [rangePicker]="i">
+           <input matStartDate formControlName="start" placeholder="Start date">
+           <input matEndDate   formControlName="end" placeholder="End date">
+         </mat-date-range-input>
+         <mat-datepicker-toggle matSuffix [for]="i"></mat-datepicker-toggle>
+         <mat-date-range-picker #i></mat-date-range-picker>
+         <!-- <mat-error *ngIf="filter.value?.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error> -->
+         <!-- <mat-error *ngIf="filter.value?.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error> -->
+        </mat-form-field>
+
+    <div class="col-1">
+        <button type="button" class="my-2" mat-raised-button (click)="filterRangeApply()">Apply</button>
+    </div> 
+</div>
 <ag-grid-angular
-    style="width: 100%; height: calc(100% - 100px);"
+    style="width: 100%; height: calc(100% - 130px);"
     class="ag-theme-alpine"
     [modules]="agGridModules"
     [gridOptions]="gridOptions"

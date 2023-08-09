@@ -254,7 +254,6 @@ export class ValuationComponent implements OnInit {
       data: {
         assetID: null,
         marktype: null,
-        asofdate: this.asofdate.end
       },
       width: '90vw',
       height: '80vh'

@@ -13,6 +13,8 @@ import { AggridMatCheckboxEditorComponent } from 'src/app/shared/modules/aggrid-
 import { ValuationGridService } from '../service/valuation-grid.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { GridCheckboxUtilService } from '../service/grid-checkbox-util.service';
+import { DateRange } from '@angular/material/datepicker';
+import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 
 @Component({
   selector: 'app-valuation-grid',
@@ -28,7 +30,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
   @Input() rowData;
   @Input() benchmarkIndexes: { [index: string]: SpreadBenchmarkIndex }
   @Input() yieldCurves: YieldCurve[]
-  @Input() asOfDate: string
+  @Input() asOfDate: AsOfDateRange
   @Input() funds: string[]
   @Input() showLoadingOverlayReq: { show: 'Yes' | 'No' }
   @Input() clearEditingStateReq: { clear: 'Yes' | 'No' }

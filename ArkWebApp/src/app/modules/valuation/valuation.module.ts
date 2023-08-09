@@ -16,6 +16,11 @@ import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detaile
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { GridCheckboxUtilService } from './service/grid-checkbox-util.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [
@@ -35,7 +40,14 @@ import { GridCheckboxUtilService } from './service/grid-checkbox-util.service';
     MatDialogModule,
     AggridMatCheckboxEditorModule, 
     DetailedViewModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
+    MatDatepickerModule,
+    MatSelectModule,
+    ReactiveFormsModule   
+    
   ],
   providers: [
     ValuationGridService,
