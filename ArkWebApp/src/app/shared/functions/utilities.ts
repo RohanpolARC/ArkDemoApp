@@ -157,6 +157,10 @@ export function getRowNodes(node: RowNode, rowNodes: any[] = []){
   return rowNodes;
 }
 
+export function getCurrentDate(){
+  return moment().toDate();
+}
+
 export function getWrapWidth(cd:ColDef):number[]{
   if(cd.colId){
     if(cd.colId.length<7){

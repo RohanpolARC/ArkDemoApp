@@ -1,4 +1,4 @@
-import { ColDef, DetailGridInfo, FirstDataRenderedEvent, GetRowIdFunc, GetRowIdParams, GridApi, GridOptions, GridReadyEvent, IDetailCellRendererParams, IsRowMaster, Module, RowGroupOpenedEvent } from '@ag-grid-community/core';
+import { ColDef, DetailGridInfo, FirstDataRenderedEvent, GetRowIdFunc, GetRowIdParams, GridApi, GridOptions, GridReadyEvent, IDetailCellRendererParams, IsRowMaster, Module, RowDataUpdatedEvent, RowGroupOpenedEvent } from '@ag-grid-community/core';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
@@ -7,12 +7,11 @@ import { ValuationService } from 'src/app/core/services/Valuation/valuation.serv
 import { MasterDetailModule } from "@ag-grid-enterprise/master-detail";
 import { debounceTime, distinctUntilChanged, first, map, switchMap, startWith, filter, tap } from 'rxjs/operators';
 import { dateFormatter, dateTimeFormatter, nonAmountNumberFormatter, nullOrZeroFormatterWithoutLocale } from 'src/app/shared/functions/formatter';
-import { autosizeColumnExceptResized, getLastBusinessDay, getLastQuarterEnd, getLastToLastQuarterEnd, getMomentDate, getMomentDateStr } from 'src/app/shared/functions/utilities';
+import { autosizeColumnExceptResized, getCurrentDate, getLastBusinessDay, getLastQuarterEnd, getLastToLastQuarterEnd, getMomentDate, getMomentDateStr } from 'src/app/shared/functions/utilities';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { FormControl, FormGroup } from '@angular/forms';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { FilterConfig } from '../../../shared/models/GeneralModel';
-import * as moment from 'moment';
 
 
 
@@ -135,7 +134,8 @@ export class MarkOverrideMasterComponent implements OnInit {
       headerHeight: 30,
       rowHeight: 30,
       enableRangeSelection: true,
-      onRowGroupOpened: this.onRowGroupOpened
+      onRowGroupOpened: this.onRowGroupOpened,
+      onRowDataUpdated: this.onRowUpdated
     }
 
     this.detailCellRendererParams = {
@@ -181,11 +181,10 @@ export class MarkOverrideMasterComponent implements OnInit {
     this.dialogRef.close()
   }
 
-  initializeDateRangeField(){
-    let date = moment()
+  initializeDateRangeField(){  
     this.dateRange = new FormGroup({
       start: new FormControl(getMomentDateStr(getLastQuarterEnd())),
-      end: new FormControl(getMomentDateStr(date.toDate())),
+      end: new FormControl(getMomentDateStr(getCurrentDate())),
     });
     this.startDate =  this.dateRange.controls["start"].value;
     this.endDate = this.dateRange.controls["end"].value;
@@ -195,6 +194,10 @@ export class MarkOverrideMasterComponent implements OnInit {
     this.startDate = getMomentDateStr(this.dateRange.value["start"]);
     this.endDate = getMomentDateStr(this.dateRange.value["end"]);
     this.valuationSvc.changeDateRangeApplyBtnState(true);
+  }
+
+  onRowUpdated: (event: RowDataUpdatedEvent<any>) => void = (params: RowDataUpdatedEvent) => {
+    params.api.redrawRows();
   }
 
   
