@@ -18,6 +18,7 @@
     "@ag-grid-community/styles": "29.3.0",
     "@ag-grid-enterprise/clipboard": "29.3.0",
     "@ag-grid-enterprise/column-tool-panel": "29.3.0",
+    "@ag-grid-enterprise/core": "29.3.0",
     "@ag-grid-enterprise/excel-export": "29.3.0",
     "@ag-grid-enterprise/filter-tool-panel": "29.3.0",
     "@ag-grid-enterprise/master-detail": "29.3.0",
