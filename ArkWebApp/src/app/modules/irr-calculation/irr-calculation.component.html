@@ -2,16 +2,31 @@
 
             <mat-tab-group [selectedIndex]="selected.value" 
                (selectedIndexChange)="selected.setValue($event)" style="margin-right: 32px; width: 100vw;" >
-                <mat-tab *ngFor="let parentTab of irrCalcSvc?.parentTabs; let index = index" [label]="parentTab.parentDisplayName">
+
+               <mat-tab>
+                    <ng-template mat-tab-label>
+                        Portfolio Modeller
+                        <br>
+
+                        ({{ asOfDate | date:"dd/MM/yyyy" }}) 
+
+                    </ng-template>
+                   
+                    <app-portfolio-modeller
+                        style = "display: block; height: calc(100vh - 64px - 50px); width: 100%;"
+                        (calcParamsEmitter) = "calcParamsReceived($event)"
+                    ></app-portfolio-modeller>
+               </mat-tab>
+
+                <mat-tab *ngFor="let parentTab of irrCalcSvc?.parentTabs; let i = index" [label]="parentTab.parentDisplayName">
                     <ng-template mat-tab-label>
                         
-                        <ng-container *ngIf="index !== 0 && irrCalcSvc?.parentTabs[index].tabset[0].status === 'Loading'">
+                        <ng-container *ngIf="irrCalcSvc?.parentTabs[i].tabset[0].status === 'Loading'">
                             <mat-spinner [diameter] = "20"></mat-spinner>
                         </ng-container>
 
-                        <ng-container *ngIf="index !== 0 && irrCalcSvc?.parentTabs[index].tabset[0].status === 'Failed'">
-                            <mat-icon class="failed-refresh" (click)="reRun(index)" *ngIf="index !== 0">error</mat-icon>
-                            
+                        <ng-container *ngIf="irrCalcSvc?.parentTabs[i].tabset[0].status === 'Failed'">
+                            <mat-icon class="failed-refresh" (click)="reRun(i)">error</mat-icon>
                         </ng-container>
 
                         &nbsp;
@@ -22,26 +37,17 @@
                         ({{ asOfDate | date:"dd/MM/yyyy" }}) 
 
                         <mat-icon (click)="removeTab({
-                            index: index,
+                            index: i,
                             pDisplayName: parentTab.parentDisplayName
-                        })" *ngIf="index !== 0">close</mat-icon>
-
+                        })">close</mat-icon>
 
                     </ng-template>
 
-                    <app-portfolio-modeller
-                        *ngIf = "index === 0" 
-                        style = "display: block; height: calc(100vh - 64px - 50px); width: 100%;"
-                        (calcParamsEmitter) = "calcParamsReceived($event)"
-                    ></app-portfolio-modeller>
-
-
-                    <app-tab-group-wrapper
-                        *ngIf = "index !== 0" 
+                    <app-tab-group-wrapper 
                         [parentTab] = "parentTab"
                         style = "display: block; height: calc(100vh - 64px - 50px); width: 100%;"
                         (noSubTabs) = "removeTab($event)"
-                        (status) = "statusReceived($event,index)"
+                        (status) = "statusReceived($event,i)"
                     ></app-tab-group-wrapper>
                </mat-tab>
             </mat-tab-group>

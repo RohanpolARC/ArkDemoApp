@@ -1,14 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ParentTabType } from '../irr-calculation.component';
-import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
-
-type tabset = {
-  displayName: string,
-  status: string,    // Loaded, Loading, Failed
-  resultType: string,    //'IRR' | 'MonthlyReturn' | 'PortfolioModeller'
-  calcParams?: any//IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams
-}[]
+import { LoadStatus, MonthlyReturnsCalcParams, ParentTabType, PerfFeesCalcParams, ResultTab } from 'src/app/shared/models/IRRCalculationsModel';
+import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 
 @Component({
   selector: 'app-tab-group-wrapper',
@@ -17,12 +10,16 @@ type tabset = {
 })
 export class TabGroupWrapperComponent implements OnInit {
 
+  IRRCalcParamsInterface: IRRCalcParams
+  MonthlyReturnsCalcParamsInterface: MonthlyReturnsCalcParams
+  PerfFeesCalcParamsInterface: PerfFeesCalcParams
+
   @Input() parentTab: ParentTabType
-  @Output() status = new EventEmitter<LoadStatusType>();
+  @Output() status = new EventEmitter<LoadStatus>();
   @Output() noSubTabs = new EventEmitter<{index?:number,pDisplayName:string}>();
 
-  pDisplayName
-  subtabs: tabset
+  pDisplayName: string
+  subtabs: ResultTab[]
   selected = new FormControl(0);
 
   constructor() { }
@@ -50,7 +47,7 @@ export class TabGroupWrapperComponent implements OnInit {
 
   }
 
-  statusReceived(status: LoadStatusType, index: number){
+  statusReceived(status: LoadStatus, index: number){
     this.subtabs[index].status = status
     let completeCount = this.subtabs.filter(_ => _.status === 'Loaded').length
     if(status === 'Failed'){
@@ -69,5 +66,4 @@ export class TabGroupWrapperComponent implements OnInit {
       this.noSubTabs.emit({pDisplayName:this.pDisplayName})
     }
   }
-
 }

@@ -8,11 +8,10 @@ import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
-import { amountFormatter, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, noDecimalAmountFormatter, nonAmountNumberFormatter2Dec } from 'src/app/shared/functions/formatter';
+import { CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, noDecimalAmountFormatter, nonAmountNumberFormatter2Dec } from 'src/app/shared/functions/formatter';
 import { presistSharedEntities, loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
-import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
-import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
+import { IRRCalcParams, LoadStatus } from 'src/app/shared/models/IRRCalculationsModel';
 
 @Component({
   selector: 'app-irr-result',
@@ -22,7 +21,7 @@ import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.compone
 export class IrrResultComponent implements OnInit {
 
   @Input() calcParams: IRRCalcParams;
-  @Output() status = new EventEmitter<LoadStatusType>();
+  @Output() status = new EventEmitter<LoadStatus>();
 
   runID: string
   closeStream: Subject<any> = new Subject<any>();
@@ -151,6 +150,9 @@ export class IrrResultComponent implements OnInit {
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
       },
+      rowHeight: 30,
+      headerHeight: 30,
+      groupHeaderHeight: 30,
       onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
         autosizeColumnExceptResized(event)
       },
@@ -372,13 +374,12 @@ export class IrrResultComponent implements OnInit {
           )
         }
       }
-      
-)
+    )
     
     return formatCols;
   }
 
-  /* Re-arraning map-group columns based the aggregation order  */
+  /* Re-arranging map-group columns based the aggregation order  */
   rearrangeMapgroupColDefs(aggrStr: string[]) {
 
     let coldefs: ColDef[] = [];

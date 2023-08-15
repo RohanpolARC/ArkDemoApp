@@ -3,34 +3,23 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
-import { IRRCalcParams, PortfolioModellerCalcParams, VPortfolioModel } from 'src/app/shared/models/IRRCalculationsModel';
+import { IRRCalcParams, LoadStatus, ParentTabType, PortfolioModellerCalcParams, VPortfolioModel, VPositionModel } from 'src/app/shared/models/IRRCalculationsModel';
 import { BehaviorSubject } from 'rxjs';
 import { RESOURCE_CONTEXT } from '../../interceptors/msal-http.interceptor';
-import { LoadStatusType } from 'src/app/modules/irr-calculation/portfolio-modeller/portfolio-modeller.component';
-import { ParentTabType } from 'src/app/modules/irr-calculation/irr-calculation.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class IRRCalcService {
 
-  parentTabs: ParentTabType[] = [{
-    parentDisplayName: 'Portfolio Modeller',
-    parentActualName: 'Portfolio Modeller',
-    status: 'Loaded',
-    tabset: [{
-      displayName: 'Portfolio Modeller',
-      status: 'Loaded',
-      resultType: 'PortfolioModeller'
-    }]
-  }]
+  parentTabs: ParentTabType[] = []
 
   // Mapping the cashflow load status against it's runID for result based tabs to trigger the corresponding calculation engine. 
   cashflowStatusMap: { 
-    [RunID: string]: LoadStatusType
+    [RunID: string]: LoadStatus
   }
   
-  cashflowLoadStatusEvent: EventEmitter<{ runID: string, status: LoadStatusType }> = new EventEmitter();
+  cashflowLoadStatusEvent: EventEmitter<{ runID: string, status: LoadStatus }> = new EventEmitter();
   terminateCashflowSaveUri: string
   
   private asOfDateMessage = new BehaviorSubject<string>(null)
@@ -48,6 +37,12 @@ export class IRRCalcService {
 
   public putPortfolioModels(model: VPortfolioModel){
     return this.http.post<any>(`${APIConfig.IRR_PORTFOLIO_MODEL_PUT_API}`, model).pipe(
+      catchError((ex) => throwError(ex))
+    );
+  }
+
+  public putVPositionModel(model:VPositionModel){
+    return this.http.post<any>(`${APIConfig.IRR_POSITION_MODEL_PUT_API}`, model).pipe(
       catchError((ex) => throwError(ex))
     );
   }

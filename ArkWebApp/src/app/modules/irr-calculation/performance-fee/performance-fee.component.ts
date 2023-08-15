@@ -1,10 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { first, takeUntil } from 'rxjs/operators';
 import { FeeCalculationService } from 'src/app/core/services/FeeCalculation/fee-calculation.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
-import { IRRCalcParams, PerfFeesCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
-import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
+import { LoadStatus, PerfFeesCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 
 @Component({
   selector: 'app-performance-fee',
@@ -14,12 +13,12 @@ import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.compone
 export class PerformanceFeeComponent implements OnInit {
 
   @Input() calcParams: PerfFeesCalcParams;
-  @Output() status = new EventEmitter<LoadStatusType>();
+  @Output() status = new EventEmitter<LoadStatus>();
 
   feeSmy: any[] | null
   feeCashflows: any[] | null
 
-  loadingStatus: LoadStatusType = 'Loading';
+  loadingStatus: LoadStatus = 'Loading';
   runID: string
   asOfDate: string
   feePreset: string

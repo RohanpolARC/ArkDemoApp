@@ -1,0 +1,262 @@
+<h3>Virtual Position Editor</h3>
+
+<ng-container *ngIf="form">
+    <mat-vertical-stepper #stepper>
+        <form [formGroup]="form">
+            <mat-step [stepControl]="form.controls['position']" errorMessage="{{stepperError}}">
+                <ng-template matStepLabel>Position</ng-template>
+                <div>
+                    <div class="row" formGroupName="position">
+    
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Issuer Short Name</mat-label>
+                            <input matInput required type="text" formControlName="issuerShortName" [matAutocomplete]="autoIssuer" matAutocompletePosition="below">
+                            <mat-autocomplete #autoIssuer="matAutocomplete"
+                            panelWidth="auto"
+                            class="capital-autocomplete-panel"
+                            classList="capital-autocomplete-panel"
+                            >
+                                <mat-option
+                                *ngFor="let iss of filteredISSOptions | async"
+                                [value] = "iss"
+                                >
+                                {{iss}}
+                                </mat-option>
+                            </mat-autocomplete>
+                            <mat-error *ngIf="form.controls.position.get('issuerShortName').invalid">Please enter valid Issuer short name</mat-error>
+                        </mat-form-field>
+    
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Asset</mat-label>
+                            <input matInput required type="text" formControlName="asset" [matAutocomplete]="autoAsset" matAutocompletePosition="below">
+                            <mat-error *ngIf="form.controls.position.get('asset').invalid">Please enter valid Asset</mat-error>
+                            <mat-autocomplete #autoAsset="matAutocomplete"
+                            panelWidth="auto"
+                            class="capital-autocomplete-panel"
+                            classList="capital-autocomplete-panel"
+                            >
+                                <mat-option
+                                    *ngFor="let asset of filteredAssetsOptions | async"
+                                    [value] = "asset"
+                                >
+                                    {{asset}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+    
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Asset Type Name</mat-label>
+                            <input matInput required type="text" formControlName="assetTypeName" [matAutocomplete]="autoAssetTypeName" matAutocompletePosition="below">
+                            <mat-error *ngIf="form.controls.position.get('assetTypeName').invalid">Please enter valid Asset Type Name</mat-error>
+                            <mat-autocomplete #autoAssetTypeName="matAutocomplete"
+                            panelWidth="auto"
+                            class="capital-autocomplete-panel"
+                            classList="capital-autocomplete-panel"
+                            >
+                                <mat-option
+                                *ngFor="let assetTypeName of filteredAssetTypeNameOptions | async"
+                                [value] = "assetTypeName"
+                                >
+                                    {{assetTypeName}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+    
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Ccy</mat-label>
+                            <input matInput required type="text" formControlName="ccy" [matAutocomplete]="autoCurrency" matAutocompletePosition="below">
+                            <mat-error *ngIf="form.controls.position.get('ccy').invalid">Please enter valid Currency</mat-error>
+                            <mat-autocomplete #autoCurrency="matAutocomplete"
+                            panelWidth="auto"
+                            class="capital-autocomplete-panel"
+                            classList="capital-autocomplete-panel"
+                            >
+                                <mat-option
+                                    *ngFor="let ccy of filteredCurrencyOptions | async"
+                                    [value] = "ccy"
+                                >
+                                    {{ccy}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+    
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Face Value Issue / Quantity</mat-label>
+                            <input matInput required InputAmountNumber type="text" formControlName="faceValueIssue"
+                            autocomplete="off">
+                            <mat-error *ngIf="form.controls.position.get('faceValueIssue').invalid">Please enter valid face value issue</mat-error>
+                        </mat-form-field>
+    
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Cost Price</mat-label>
+                            <input matInput required type="text" formControlName="costPrice"
+                            autocomplete="off">
+                            <mat-error *ngIf="form.controls.position.get('costPrice').invalid">Please enter valid cost price</mat-error>
+    
+                        </mat-form-field>
+    
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Expected Exit Price</mat-label>
+                            <input matInput required type="number" formControlName="expectedExitPrice"
+                            autocomplete="off">
+                            <mat-error *ngIf="form.controls.position.get('expectedExitPrice').invalid">Please enter valid expected exit price</mat-error>
+                        </mat-form-field>
+    
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Fund Ccy</mat-label>
+                            <input matInput required type="text" formControlName="fundCcy" [matAutocomplete]="autoFundCurrency" matAutocompletePosition="below">
+                            <mat-error *ngIf="form.controls.position.get('fundCcy').invalid">Please enter valid Currency</mat-error>
+                            <mat-autocomplete #autoFundCurrency="matAutocomplete"
+                            panelWidth="auto"
+                            class="capital-autocomplete-panel"
+                            classList="capital-autocomplete-panel"
+                            >
+                                <mat-option
+                                    *ngFor="let ccy of filteredFundCcyOptions | async"
+                                    [value] = "ccy"
+                                >
+                                    {{ccy}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                        
+                        <div class="col-3"></div>
+    
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Entry Date</mat-label>
+                            <input matInput required [matDatepicker]="entryDatePicker"  formControlName="entryDate"
+                            autocomplete="off">
+                            <mat-datepicker-toggle matSuffix [for]="entryDatePicker"></mat-datepicker-toggle>
+                            <mat-datepicker #entryDatePicker></mat-datepicker>
+                            <mat-error *ngIf="form.controls.position.get('entryDate').invalid">Please enter valid entry date</mat-error>
+    
+                        </mat-form-field>
+    
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Expected Exit Date</mat-label>
+                            <input matInput required [matDatepicker]="expectedDatePicker" type="text" formControlName="expectedExitDate"
+                            autocomplete="off">
+                            <mat-datepicker-toggle matSuffix [for]="expectedDatePicker"></mat-datepicker-toggle>
+                            <mat-datepicker #expectedDatePicker></mat-datepicker>
+                            <mat-error *ngIf="form.controls.position.get('expectedExitDate').invalid">Please enter valid expected exit date</mat-error>
+                        </mat-form-field>
+    
+                    </div>
+                </div>
+            </mat-step>
+    
+            <mat-step [stepControl]="form.controls['static']" errorMessage="{{stepperError}}">
+                <ng-template matStepLabel>Static</ng-template>
+                <div>
+                    <div class="row" formGroupName="static">
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Maturity Date</mat-label>
+                            <input matInput [matDatepicker]="maturityDatePicker"  formControlName="maturityDate"
+                            autocomplete="off">
+                            <mat-datepicker-toggle matSuffix [for]="maturityDatePicker"></mat-datepicker-toggle>
+                            <mat-datepicker #maturityDatePicker></mat-datepicker>
+                            <mat-error *ngIf="form.controls.static.get('maturityDate').invalid">Please enter valid maturity date</mat-error>
+    
+                        </mat-form-field>
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Benchmark Index</mat-label>
+                            <input matInput type="text" formControlName="benchMarkIndex"  [matAutocomplete]="autobenchMarkIndex" matAutocompletePosition="below">
+                            <mat-error *ngIf="form.controls.static.get('benchMarkIndex').invalid">Please select valid benchmark index from list</mat-error>
+                            <mat-autocomplete #autobenchMarkIndex="matAutocomplete"
+                            panelWidth="auto"
+                            class="capital-autocomplete-panel"
+                            classList="capital-autocomplete-panel"
+                            >
+                                <mat-option
+                                    *ngFor="let benchmark of filteredBenchmarkIndexOptions | async"
+                                    [value] = "benchmark"
+                                >
+                                    {{benchmark}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Spread</mat-label>
+                            <input matInput type="number" formControlName="spread"
+                            autocomplete="off">
+                        </mat-form-field>
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>PIK Margin</mat-label>
+                            <input matInput type="number" formControlName="pikMargin"
+                            autocomplete="off">
+                        </mat-form-field>
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Unfunded Margin</mat-label>
+                            <input matInput type="number" formControlName="unfundedMargin"
+                            autocomplete="off">
+                        </mat-form-field>
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Floor Rate</mat-label>
+                            <input matInput type="number" formControlName="floorRate"
+                            autocomplete="off">
+                        </mat-form-field>
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Deal Type CS</mat-label>
+                            <input matInput type="text" formControlName="dealTypeCS" [matAutocomplete]="autoDealTypeCS" matAutocompletePosition="below">
+                            <mat-error *ngIf="form.controls.static.get('dealTypeCS').invalid">Please enter valid deal type CS</mat-error>
+                            <mat-autocomplete #autoDealTypeCS="matAutocomplete"
+                            panelWidth="auto"
+                            class="capital-autocomplete-panel"
+                            classList="capital-autocomplete-panel"
+                            >
+                                <mat-option
+                                *ngFor="let dealTypeCS of filteredDealTypeCSOptions | async"
+                                [value] = "dealTypeCS"
+                                >
+                                    {{dealTypeCS}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Deal Type</mat-label>
+                            <input matInput type="text" formControlName="dealType" [matAutocomplete]="autoDealType" matAutocompletePosition="below">
+                            <mat-error *ngIf="form.controls.static.get('dealType').invalid">Please enter valid deal type</mat-error>
+                            <mat-autocomplete #autoDealType="matAutocomplete"
+                            panelWidth="auto"
+                            class="capital-autocomplete-panel"
+                            classList="capital-autocomplete-panel"
+                            >
+                                <mat-option
+                                *ngFor="let dealType of filteredDealTypeOptions | async"
+                                [value] = "dealType"
+                                >
+                                    {{dealType}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                        <mat-form-field class="col-3" appearance="outline">
+                            <mat-label>Seniority</mat-label>
+                            <input matInput type="text" formControlName="seniority" [matAutocomplete]="autoSeniority" matAutocompletePosition="below">
+                            <mat-error *ngIf="form.controls.static.get('seniority').invalid">Please enter valid seniority</mat-error>
+                            <mat-autocomplete #autoSeniority="matAutocomplete"
+                            panelWidth="auto"
+                            class="capital-autocomplete-panel"
+                            classList="capital-autocomplete-panel"
+                            >
+                                <mat-option
+                                *ngFor="let seniority of filteredSeniorityOptions | async"
+                                [value] = "seniority"
+                                >
+                                    {{seniority}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+    
+                    </div>
+                </div>
+            </mat-step>
+        </form>
+    </mat-vertical-stepper>
+</ng-container>
+
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary"
+            [disabled]="disableSave" 
+            (click)="save()">Save</button>
+    <button mat-raised-button (click)="cancel()">Cancel</button>
+</mat-dialog-actions>

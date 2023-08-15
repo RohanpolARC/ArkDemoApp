@@ -304,7 +304,10 @@ NON_AMOUNT_2DEC_COLUMNS=['GrossMOM',
         if(this.status === 'Loading'){
           this.gridApi.showLoadingOverlay();
         }     
-      },
+      },      
+      rowHeight: 30,
+      groupHeaderHeight: 30,
+      headerHeight: 30,
       excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
       noRowsOverlayComponent : NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {

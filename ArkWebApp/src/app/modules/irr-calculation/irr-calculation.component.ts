@@ -3,24 +3,9 @@ import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
-import { CashFlowParams, IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
-import { LoadStatusType } from './portfolio-modeller/portfolio-modeller.component';
+import { CashFlowParams, IRRCalcParams, LoadStatus, MonthlyReturnsCalcParams, ParentTabType, PerfFeesCalcParams, ResultTab, TabType } from 'src/app/shared/models/IRRCalculationsModel';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { getMomentDateStr } from 'src/app/shared/functions/utilities';
-
-type tabset = {
-  displayName: string,
-  status: string,    // Loaded, Loading, Failed
-  resultType: string,    //'IRR' | 'MonthlyReturn' | 'PortfolioModeller'
-  calcParams?: any//IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams
-}[]
-
-export type ParentTabType = {
-  parentDisplayName: string,
-  parentActualName:string,
-  status: LoadStatusType,
-  tabset:tabset
-}
 
 @Component({
   selector: 'app-irr-calculation',
@@ -39,7 +24,7 @@ export class IrrCalculationComponent implements OnInit {
   subscriptions: Subscription[] = []
   selected = new FormControl(0);
   calcParamsMap = {} //<model name, IRRCalcParams>
-  cashflowLoadStatus: LoadStatusType = 'Loading';
+  cashflowLoadStatus: LoadStatus = 'Loading';
 
   removeTab(params:{index?: number,pDisplayName:string}) {
     if(params.index){
@@ -67,24 +52,16 @@ export class IrrCalculationComponent implements OnInit {
 
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if(isHit){
-        this.irrCalcSvc.parentTabs = [{
-          parentDisplayName: 'Portfolio Modeller',
-          parentActualName: 'Portfolio Modeller',
-          status: 'Loaded',
-          tabset: [{
-          displayName: 'Portfolio Modeller',
-          status: 'Loaded',
-          resultType: 'PortfolioModeller'
-        }]
-        }]
+        console.log(this.irrCalcSvc.parentTabs)
+        this.irrCalcSvc.parentTabs = []
+        console.log(this.irrCalcSvc.parentTabs)
+
       }
     }))
 
   }
-  statusReceived(status: LoadStatusType, index: number){
-    if(index >= 1){
-      this.irrCalcSvc.parentTabs[index].status = status 
-    }
+  statusReceived(status: LoadStatus, index: number){
+    this.irrCalcSvc.parentTabs[index].status = status 
 
     // Update parent tabs in IRR Service
     this.irrCalcSvc.parentTabs = this.irrCalcSvc.parentTabs;
@@ -100,13 +77,13 @@ export class IrrCalculationComponent implements OnInit {
       parentDisplayName: string,
       tabs: {
         tabName: string, 
-        tabType: string, 
+        tabType: TabType, 
         calcParams: IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams | CashFlowParams}[]
       }
     ){
       let p = params.tabs
 
-    let newTabSet:tabset =[]
+    let newTabSet:ResultTab[] =[]
     p.forEach((tabData)=>{
 
       newTabSet.push({
@@ -140,11 +117,11 @@ export class IrrCalculationComponent implements OnInit {
       tabset: newTabSet
     }
     this.irrCalcSvc.parentTabs.push(newParentTab);    
-    this.selected.setValue(this.irrCalcSvc.parentTabs.indexOf(newParentTab))
+    this.selected.setValue(this.irrCalcSvc.parentTabs.indexOf(newParentTab)+1)
 
   }
 
-  cashflowLoadStatusReceived(status: LoadStatusType){
+  cashflowLoadStatusReceived(status: LoadStatus){
     this.cashflowLoadStatus = status;
   }
 

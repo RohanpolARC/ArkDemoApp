@@ -50,6 +50,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   feePresets: { feePreset: string, id: number }[]
   calculationTypes: string[]= ['Monthly Returns','Fee Model','IRR']
   curveRates: { curveRateName: string, rate: number }[]
+  currencies: { currency: string, id: number }[]
   readMore: boolean = false;
   isIRRDisabled: boolean = true;
   isFeePresetDisabled: boolean = true;
@@ -77,13 +78,15 @@ export class PortfolioSaveRunModelComponent implements OnInit {
         this.dataService.getUniqueValuesForField('Returns-Base-Measures'),
         this.dataService.getUniqueValuesForField('PortfolioModeller-Fee-Calculation-Entities'),
         this.dataService.getRefDatatable('[ArkUI].[IRRAggregationLevelRef]'),
-        this.dataService.getUniqueValuesForField('BaseCurve-Rates')
+        this.dataService.getUniqueValuesForField('BaseCurve-Rates'),
+        this.dataService.getUniqueValuesForField('currency')
       ]).subscribe({
         next: (d: any[]) => {
           let bm = d[0]
           let fp = d[1]
           let aggrRefDt = d[2]
           let bcr = d[3]
+          let curr = d[4]
 
           if(typeof aggrRefDt === 'string')
             aggrRefDt = JSON.parse(aggrRefDt)
@@ -93,6 +96,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
           this.allAggrCols = aggrRefDt.map(x => x?.['Fields'])
           this.mapGroupCols = aggrRefDt.filter(x => x?.['IsResultColumn']).map(x => x?.['Fields'])
           this.curveRates = bcr.map(item => { return { curveRateName: item.value, rate: item.id } })
+          this.currencies = curr.map(item => { return { currency: item.value, id: item.id } })
 
           this.Init();
           this.changeListeners();
@@ -167,8 +171,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       feePreset: new FormControl(this.feePresets[0]?.feePreset, Validators.required),
       calculationType: new FormControl([], Validators.required),
       curveRateName: new FormControl(this.curveRates.filter(cr => cr.rate === 0)[0].curveRateName, Validators.required),
-      aggrStr: new FormControl('')
-    })
+      aggrStr: new FormControl('')    })
 
     this.updateAggregationOrder(aggrStr);
   }

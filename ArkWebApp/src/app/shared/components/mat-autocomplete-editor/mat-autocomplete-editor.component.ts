@@ -21,6 +21,12 @@ export class MatAutocompleteEditorComponent implements ICellEditorAngularComp, O
   oldValRestoreOnStrict: boolean = false
   oldVal
 
+  themeSizes:{
+    rowHeight: number;
+    headerHeight: number;
+  }
+  customMatAutoCompleteStyle: string = ''
+
   constructor() { }
 
   agInit(params: ICellEditorParams): void {
@@ -31,6 +37,12 @@ export class MatAutocompleteEditorComponent implements ICellEditorAngularComp, O
     this.isStrict = params?.['isStrict'] ? true : false;
     this.oldValRestoreOnStrict = params?.['oldValRestoreOnStrict'] ? true : false;
     this.field.setValue(params.value, { emitEvent: false })
+    this.themeSizes =  params.api.getSizesForCurrentTheme()
+    if(this.themeSizes.rowHeight<40){
+      this.customMatAutoCompleteStyle = 'font-size: 0.3rem;'
+    }else if(this.themeSizes.rowHeight>40){
+      this.customMatAutoCompleteStyle = 'font-size: 0.55rem;'
+    }
   }
 
   getValue() {

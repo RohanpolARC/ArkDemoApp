@@ -45,7 +45,7 @@ export class NetReturnsSummaryComponent implements OnInit {
 
   constructor(
     private dataSvc: DataService,
-    public netReturnsSvc: NetReturnsService  
+    public netReturnsSvc: NetReturnsService
   ) { }
 
   ngOnInit(): void {
