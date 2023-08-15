@@ -1,27 +1,36 @@
 pool:  
   name: Azure Pipelines
   demands: npm
-trigger:
-  branches:
-    include:
-    - main
+
 steps:
 - task: NodeTool@0
   inputs:
-    versionSpec: '14.x'
+    versionSpec: '16.x'
   displayName: 'Install Node.js'
 
 - task: Npm@1
-  displayName: 'npm install'  
+  displayName: 'npm ci'  
   inputs:    
     workingDir: ArkWebApp
-    verbose: false
+    verbose: true
+- task: Npm@1
+  displayName: 'npm list'  
+  inputs:    
+    workingDir: ArkWebApp
+    verbose: true
 - task: Npm@1
   displayName: 'Angular APP Run build'  
   inputs:    
     command: custom
     workingDir: ArkWebApp
     verbose: false    
+    customCommand: 'set NODE_OPTIONS=--openssl-legacy-provider'
+- task: Npm@1
+  displayName: 'Angular APP Run build'  
+  inputs:    
+    command: custom
+    workingDir: ArkWebApp
+    verbose: true    
     customCommand: 'run ng build -- --configuration=production'
 - task: ArchiveFiles@2
   displayName: 'Archive files'  
