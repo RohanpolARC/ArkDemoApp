@@ -9,10 +9,15 @@ steps:
   displayName: 'Install Node.js'
 
 - task: Npm@1
-  displayName: 'npm install'  
+  displayName: 'npm ci'  
   inputs:    
     workingDir: ArkWebApp
-    verbose: false
+    verbose: true
+- task: Npm@1
+  displayName: 'npm list'  
+  inputs:    
+    workingDir: ArkWebApp
+    verbose: true
 - task: Npm@1
   displayName: 'Angular APP Run build'  
   inputs:    
@@ -25,7 +30,7 @@ steps:
   inputs:    
     command: custom
     workingDir: ArkWebApp
-    verbose: false    
+    verbose: true    
     customCommand: 'run ng build -- --configuration=uat'
 - task: ArchiveFiles@2
   displayName: 'Archive files'  
