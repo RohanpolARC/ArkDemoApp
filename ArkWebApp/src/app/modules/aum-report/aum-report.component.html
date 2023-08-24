@@ -1,0 +1,26 @@
+<div class="parent">
+    <div class="header">
+        <div class="title">
+            AUM Report
+        </div>
+
+
+
+    </div>
+
+    <div class="content">
+        <mat-card class="mat-content">
+            <ag-grid-angular
+            [gridOptions] = "gridOptions"
+            [modules] = "agGridModules"
+            [detailCellRendererParams]="detailCellRendererParams"
+            [rowData] = "rowData"
+            class="ag-theme-alpine ag-grid"
+            [adaptableOptions] = "adaptableOptions"
+            (adaptableReady)="onAdaptableReady($event)"
+            >
+            </ag-grid-angular>
+        </mat-card>
+    </div>
+
+</div>

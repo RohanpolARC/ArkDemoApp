@@ -103,6 +103,7 @@ export class APIConfig {
     public static HEDGING_MARK_PUT_API: string = APIConfig.BASEURL + "/api/PositionsScreen/PutHedgingMark";
 
     public static AUM_DELTA_GET_API: string = APIConfig.BASEURL + "/api/AUMDelta/GetAUMDelta";
+    public static AUM_REPORT_GET_API: string = APIConfig.BASEURL + "/api/AUMDelta/GetAUMDeltaReport";
 
     public static MARK_CHANGES_GET_API: string = APIConfig.BASEURL + "/api/MarkChanges/GetMarkChanges";
 

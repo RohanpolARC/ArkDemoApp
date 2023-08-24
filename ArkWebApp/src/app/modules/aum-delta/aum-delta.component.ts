@@ -78,6 +78,7 @@ export class AumDeltaComponent implements OnInit {
           this.sDate = data.value
           if(this.sDate.end === 'Invalid date')
             this.sDate.end = this.sDate.start;
+          debugger;
           this.aumDeltaSvc.changeSearchDateRange(this.sDate)
         }
       }
@@ -278,6 +279,7 @@ export class AumDeltaComponent implements OnInit {
     }))
 
     this.subscriptions.push(this.aumDeltaSvc.currentSearchDateRange.subscribe(sDate => {
+      debugger
       this.sDate = sDate;
     }))
   }
