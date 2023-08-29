@@ -200,6 +200,7 @@ export class AumReportComponent implements OnInit {
           detailAdaptableOptions: {
             adaptableId: 'AumReportDetails',
             primaryKey: 'PositionId',
+            licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
             userInterfaceOptions:{
               customDisplayFormatters:[
                 CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',this.AMOUNT_COLUMNS),
@@ -332,9 +333,9 @@ export class AumReportComponent implements OnInit {
           {field: "aumEurAdjustmentCurrent",type:'abColDefNumber', headerName:"AUM Eur Adjustment Current"},
           {field: "aumEurAdjustmentLast",type:'abColDefNumber', headerName: "AUM Eur Adjustment Last"},
           {field: "aumEurAdjustmentDiff",type:'abColDefNumber', headerName: "AUM Eur Adjustment Diff"},
-          {field: "issuerType",type:'abColDefString'},
-          {field: "moveType",type:'abColDefString'},
-          {field: "comment",type:'abColDefString'}
+          // {field: "issuerType",type:'abColDefString'},
+          // {field: "moveType",type:'abColDefString'},
+          // {field: "comment",type:'abColDefString'}
         ]
         let detailGridInfo: DetailGridInfo = params.api.getDetailGridInfo(`detail_${params.data?.['__ADAPTABLE_PK__']}`);
         if(detailGridInfo){
