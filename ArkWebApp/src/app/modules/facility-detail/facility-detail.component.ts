@@ -617,7 +617,6 @@ export class FacilityDetailComponent implements OnInit {
 
 
    onAdaptableReady = ({ adaptableApi, gridOptions }) => {
-    console.log("ready")
     this.adapTableApi = adaptableApi;
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
     this.adapTableApi.columnApi.autosizeAllColumns()

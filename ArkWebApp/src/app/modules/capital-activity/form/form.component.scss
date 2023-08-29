@@ -1,26 +1,3 @@
-
-.input-field {
-    font-size: 14px;
-    display: flex;
-    justify-content: space-between;
-    height: 100%
-}
-
-.input-field > div {
-    display: flex;
-    flex-direction: column;
-    // justify-content: space-between;
-}
-
-// .edit{
-//     width: 250px;
-//     margin-right: 17px;
-// }
-  
-.edit .mat-form-field-wrapper{
-    padding: 10px;
-}
-
 .title{
     padding-bottom: 5px;
     font-size: 16px;
@@ -56,7 +33,7 @@
     margin-top: 4px;
 }
 
-#header-investment{
-    font-weight: 500;
-}
+// #header-investment{
+//     font-weight: 500;
+// }
 // capital-autocomplete-panel defined in styles.scss.  

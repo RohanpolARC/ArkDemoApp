@@ -6,9 +6,6 @@ let actualCols: string[] = [
     'Call Date',
     'Fund Hedging',
     'Fund Currency',
-    'Position Currency',
-    'GIR (Pos - Fund ccy)',
-    'GIR Override',
     'Amount (in Fund Ccy)',
     'Capital Type',
     'Capital Subtype',
@@ -44,7 +41,7 @@ export function validateRowForEmptiness(row: any): void{
             // 'Wso Issuer ID', 
             'Wso Asset ID',
             // 'Fund Currency',
-            'GIR Override'
+            // 'GIR Override'
         ].indexOf(actualCols[i]) === -1){
             invalidMsg += (invalidMsg === '') ? `${actualCols[i]} cannot be empty` :  `, ${actualCols[i]} cannot be empty`;
         }
@@ -68,15 +65,15 @@ export function validateRowValueRange(row: any): void{
         invalidMsg += ` Amount (in Fund Ccy) cannot be 0`
     }
 
-    if(Number(row['GIR (Pos - Fund ccy)']) <= 0){
-        invalidMsg += (invalidMsg === '') ? '' : ','
-        invalidMsg += ` GIR should be > 0`
-    }
+    // if(Number(row['GIR (Pos - Fund ccy)']) <= 0){
+    //     invalidMsg += (invalidMsg === '') ? '' : ','
+    //     invalidMsg += ` GIR should be > 0`
+    // }
         
-    if(!['Yes', 'No'].includes(String(row['GIR Override']))){
-        invalidMsg += (invalidMsg === '') ? '' : ','
-        invalidMsg += ` GIR Override can be either Yes/No`
-    }
+    // if(!['Yes', 'No'].includes(String(row['GIR Override']))){
+    //     invalidMsg += (invalidMsg === '') ? '' : ','
+    //     invalidMsg += ` GIR Override can be either Yes/No`
+    // }
 
     if(!!row['Fund Hedging'] && (refOptions.fundHedgings.indexOf(String(row['Fund Hedging']).trim()) === -1)){
         invalidMsg += (invalidMsg === '') ? '' : ','
@@ -89,10 +86,10 @@ export function validateRowValueRange(row: any): void{
         invalidMsg += ` Fund Currency ${String(row['Fund Currency'])} not in range`
     }
 
-    if(!!row['Position Currency'] && (refOptions.posCcys.indexOf(String(row['Position Currency']).trim()) === -1)){
-        invalidMsg += (invalidMsg === '') ? '' : ','
-        invalidMsg += ` Position Currency ${String(row['Position Currency'])} not in range`
-    }
+    // if(!!row['Position Currency'] && (refOptions.posCcys.indexOf(String(row['Position Currency']).trim()) === -1)){
+    //     invalidMsg += (invalidMsg === '') ? '' : ','
+    //     invalidMsg += ` Position Currency ${String(row['Position Currency'])} not in range`
+    // }
 
     if(!!row['Capital Type'] && (refOptions.capitalTypes.indexOf(String(row['Capital Type']).trim()) === -1)){     
         invalidMsg += (invalidMsg === '') ? '' : ','
@@ -116,13 +113,13 @@ export function validateRowValueMappings(row:any):void{
         let filteredAssetData = refData.filter((rdata) => {
             return (Number(rdata['wsoAssetID']) ===  Number(row['Wso Asset ID'])) && 
                 (rdata['fundHedging'] === row['Fund Hedging']) && 
-                (rdata['fundCcy']===row['Fund Currency']) && 
-                (rdata['positionCcy'] === row['Position Currency'])
+                (rdata['fundCcy']===row['Fund Currency']) 
+                // && (rdata['positionCcy'] === row['Position Currency'])
         })
     
         if(filteredAssetData.length === 0){
             invalidMsg += (invalidMsg === '') ? '' : ','
-            invalidMsg += `WSO Asset ID ${String(row['Wso Asset ID'])} doesn't exist for fund hedging ${String(row['Fund Hedging'])} and fund currency ${String(row['Fund Currency'])} and position currency ${String(row['Position Currency'])}`
+            invalidMsg += `WSO Asset ID ${String(row['Wso Asset ID'])} doesn't exist for fund hedging ${String(row['Fund Hedging'])} and fund currency ${String(row['Fund Currency'])}`
         }    
     }
 }

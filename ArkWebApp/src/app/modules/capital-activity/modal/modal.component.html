@@ -1,0 +1,46 @@
+<div class="title">{{ header }}</div>
+
+<ng-template #validationMessage>
+    <div class="update-msg"
+    [ngClass]="{'success': getSaveState() === 'SUCCESS', 'failure': getSaveState() === 'FAILURE', 'update-msg': '1'==='1'}">
+        {{ validationMessage$ | async }}
+    </div>
+</ng-template>
+
+<ng-container *ngIf="!(isAlreadyLinked$ | async) as t">
+    {{ data?.actionType }}
+
+    <div>
+        <ng-container *ngIf="data?.actionType !== 'LINK-ADD'; then validationMessage"></ng-container>
+    </div>
+    
+    <app-form
+        [investmentData]="data.rowData"
+    ></app-form>
+</ng-container>
+
+<ng-container *ngIf="data?.actionType != 'ADD'">
+    <app-investments-preview [rowData]="investmentData">
+    </app-investments-preview>
+</ng-container>
+
+
+<ng-container *ngIf="data?.actionType === 'LINK-ADD'">
+
+        <ng-container *ngTemplateOutlet="validationMessage"></ng-container>
+    
+    <app-link-investor-modal #linkComponent
+        [investmentData]="data.rowData"
+    >
+    </app-link-investor-modal>
+</ng-container>
+
+
+
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" type="submit" 
+            [disabled]="(disableSubmit$ | async)" 
+            (click)="onSubmit(data.actionType)"
+    >{{ submitBtnText$ | async }}</button>
+    <button mat-raised-button (click)="close()">Close</button>
+</mat-dialog-actions>

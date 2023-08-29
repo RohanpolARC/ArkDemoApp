@@ -1,0 +1,14 @@
+
+<ng-container *ngIf="(gridInfo?.gridData?.length) > 0">
+    <ag-grid-angular class="ag-grid ag-theme-alpine"
+        [adaptableOptions]="adaptableOptions"
+        [gridOptions]="gridOptions"
+        [modules]="agGridModules"
+        [columnDefs]="columnDefs"
+        [rowData]="gridInfo?.gridData"
+        [tooltipShowDelay]="tooltipShowDelay"
+        [sideBar]="'columns'"
+        (adaptableReady)="onAdaptableReady($event)"
+    >
+    </ag-grid-angular>
+</ng-container>

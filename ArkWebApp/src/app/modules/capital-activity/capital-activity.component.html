@@ -4,13 +4,17 @@
     <br>
     <div class="capital-action">
 
-        <button mat-icon-button (click)="openBulkUploadDialog()"
+        <button mat-icon-button (click)="utilSvc.updateInvestmentLinking()" matTooltip="Linking selected investments to investor cashflows" matTooltipClass="tooltip-capital">
+            <mat-icon class="material-icons-outlined">link</mat-icon>
+        </button>
+
+        <button mat-icon-button (click)="utilSvc.openBulkUploadDialog()"
             matTooltip="Bulk Upload"
             matTooltipClass="tooltip-capital">
             <mat-icon class="material-icons-outlined">file_upload</mat-icon>
         </button>
             
-        <button mat-icon-button (click)="openDialog()"
+        <button mat-icon-button (click)="utilSvc.openDialog()"
             matTooltip="Add"
             matTooltipClass="tooltip-capital">
             <mat-icon class="material-icons-outlined">add_circle_outline</mat-icon>
@@ -36,16 +40,10 @@
                     </mat-panel-description>
                 </mat-expansion-panel-header>
 
-                <ag-grid-angular style="height: calc(100vh - 64px - 40px - 64px - 40px - 48px - 10px);"
-                [adaptableOptions]="adaptableOptionsInvstmnt"
-                [gridOptions]="gridOptionsInvstmnt"
-                [rowGroupPanelShow]="'always'"
-                [defaultColDef]="defaultColDef"
-                [modules]="agGridModules"
-                [rowData]="rowDataInvstmnt"
-                (adaptableReady)="onAdaptableInvstmntReady($event)"
-                class="ag-theme-alpine ag-grid"
-                ></ag-grid-angular>
+                <app-investment [rowData]="investmentData$ | async" 
+                    style="height: calc(100vh - 64px - 40px - 64px - 40px - 48px - 10px);">
+                </app-investment>
+
             </mat-expansion-panel>
         </mat-accordion>
 
@@ -64,16 +62,10 @@
                     </mat-panel-description>
                 </mat-expansion-panel-header>
 
-                <ag-grid-angular style="height: calc(100vh - 64px - 40px - 48px - 64px - 40px - 10px);"
-                [adaptableOptions]="adaptableOptions"
-                [gridOptions]="gridOptions"
-                [rowGroupPanelShow]="'always'"
-                [defaultColDef]="defaultColDef"
-                [modules]="agGridModules"
-                [rowData]="rowData"
-                (adaptableReady)="onAdaptableReady($event)"
-                class="ag-theme-alpine ag-grid"
-                ></ag-grid-angular>
+                <app-investor [rowData]="investorData$ | async" 
+                    style="height: calc(100vh - 64px - 40px - 48px - 64px - 40px - 10px);">
+                </app-investor>
+
             </mat-expansion-panel>
         </mat-accordion> 
         

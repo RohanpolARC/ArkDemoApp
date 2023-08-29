@@ -7,7 +7,7 @@ import { AgGridModule } from '@ag-grid-community/angular';
 import { CapitalActivityComponent } from './capital-activity.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { AddCapitalModalComponent } from './add-capital-modal/add-capital-modal.component';
+import { FormComponent } from './form/form.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,32 +15,47 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
-import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { LinkInvestorModalComponent } from './link-investor-modal/link-investor-modal.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
 import { CapitalActivityRoutingModule } from './capital-activity-routing.module';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { InputAmountNumberModule } from 'src/app/shared/modules/input-amount-number/input-amount-number.module';
 import { FileDropzoneModule } from 'src/app/shared/modules/file-dropzone/file-dropzone.module';
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
+import { InvestmentComponent } from './investment/investment.component';
+import { InvestorComponent } from './investor/investor.component';
+import { InvestorGridConfigService } from './services/investor-grid-config.service';
+import { InvestorGridUtilService } from './services/investor-grid-util.service';
+import { InvestmentGridConfigService } from './services/investment-grid-config.service';
+import { InvestmentGridUtilService } from './services/investment-grid-util.service';
+import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
+import { UtilService } from './services/util.service';
+import { ComponentReaderService } from './services/component-reader.service';
+import { ModalComponent } from './modal/modal.component';
+import { InvestmentsPreviewComponent } from './investments-preview/investments-preview.component';
+import { ModalService } from './services/modal.service';
+import { UploadComponent } from './bulk-upload/upload/upload.component';
+import { ActivitiesGridComponent } from './bulk-upload/activities-grid/activities-grid.component';
+import { NavQuarterlyGridComponent } from './bulk-upload/nav-quarterly-grid/nav-quarterly-grid.component';
 
 @NgModule({
   declarations: [
     CapitalActivityComponent,
-    AddCapitalModalComponent,
-    UpdateConfirmComponent,
+    FormComponent,
     LinkInvestorModalComponent,
-    BulkUploadComponent,
+    InvestorComponent,
+    InvestmentComponent,
+    ModalComponent,
+    InvestmentsPreviewComponent,
+    UploadComponent,
+    ActivitiesGridComponent,
+    NavQuarterlyGridComponent,
   ],
-  /** Add all pop-up modal components here, for this module */
-  entryComponents: [AddCapitalModalComponent, UpdateConfirmComponent, BulkUploadComponent],
   imports: [
     CommonModule,
     CapitalActivityRoutingModule,
-
     MatIconModule,
     MatButtonModule,
     MatDialogModule,
@@ -63,6 +78,16 @@ import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detaile
 
     DetailedViewModule
   ],
-  exports:[CapitalActivityComponent]
+  exports:[ CapitalActivityComponent ],
+  providers: [
+    ComponentReaderService,
+    CapitalActivityService,
+    UtilService,
+    InvestorGridUtilService,
+    InvestmentGridUtilService,
+    InvestorGridConfigService,
+    InvestmentGridConfigService,
+    ModalService,
+  ]
 })
 export class CapitalActivityModule { }
