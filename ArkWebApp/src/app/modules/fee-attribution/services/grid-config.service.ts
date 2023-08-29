@@ -101,7 +101,7 @@ export class GridConfigService {
           ]
         },
         Layout: {
-          Revision: 3,
+          Revision: 4,
           CurrentLayout: 'Basic',
           Layouts:[
             {
@@ -110,7 +110,7 @@ export class GridConfigService {
               RowGroupedColumns: [ 'issuerShortName', 'asset', 'type' ],
               AggregationColumns: {
                 'fees': 'sum',
-                'tradeDate': 'first'
+                'tradeDate': 'last'
               }
             }
           ]

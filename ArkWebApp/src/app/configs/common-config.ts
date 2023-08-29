@@ -14,6 +14,7 @@ import { SetFilterModule } from "@ag-grid-enterprise/set-filter";
 import { SideBarModule } from "@ag-grid-enterprise/side-bar";
 import { CsvExportModule } from "@ag-grid-community/csv-export";
 import { autosizeColumnExceptResized,  getMomentDateStrFormat,  handleResizedColumns } from "../shared/functions/utilities";
+import { StatusBarModule } from "@ag-grid-enterprise/status-bar";
 
 
 export class CommonConfig{
@@ -65,7 +66,8 @@ export class CommonConfig{
         ClipboardModule,
         SideBarModule,
         RangeSelectionModule,
-        RowGroupingModule
+        RowGroupingModule,
+        StatusBarModule
       ];
 
     public static DASHBOARD_MODULE_BUTTONS: AdaptableModuleButtons = ['SettingsPanel', 'TeamSharing', 'Export', 'Layout', 'Filter'] 

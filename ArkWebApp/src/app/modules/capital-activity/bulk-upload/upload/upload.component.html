@@ -1,0 +1,57 @@
+<app-file-dropzone 
+    [header]="'Upload'"
+    [hideDropzone]="hideDropzone"
+    (fileEmitter)="onFileReceived($event)"
+>
+
+
+    <ng-template #fileTemplate>
+        <div class="d-flex flex-row align-items-center action">
+            <div class="p-2">
+                <mat-form-field appearance="fill">
+                    <mat-label>Template</mat-label>
+                    <mat-select [(ngModel)]="selectedTemplate" (ngModelChange)="selectedTemplateChange($event)" [disabled]="hideDropzone">
+                        <mat-option value="Activities">Activities</mat-option>
+                        <mat-option value="NAV Quarterly">NAV Quarterly</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="p-2">
+                <a
+                class="ag-grid"
+                matTooltip="Download template" target="_blank"
+                href="{{ URL }}">
+                    <mat-icon class="icon-color">download</mat-icon>
+                </a>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #message>
+        <div class="update-msg"
+            [ngClass]="{'success': getSaveState() === 'SUCCESS', 'failure': getSaveState() === 'FAILURE', 'update-msg': '1'==='1'}">
+            {{ validationMessage$ | async }}
+        </div>
+    </ng-template>
+
+    <ng-template #grid>
+        <ng-container *ngIf="selectedTemplate === 'Activities'">
+            <app-activities-grid [gridInfo]="gridInfo"></app-activities-grid>
+        </ng-container>
+
+        <ng-container *ngIf="selectedTemplate === 'NAV Quarterly'">
+            <app-nav-quarterly-grid [gridInfo]="gridInfo"></app-nav-quarterly-grid>
+        </ng-container>
+    </ng-template>
+
+    <ng-template #submit>
+        <button mat-raised-button color="primary"
+            [disabled]="disableSubmit$ | async"
+            (click)="onSave()">Submit
+        </button>
+    
+        <button mat-raised-button (click)="closeDialog()">Close</button>
+    </ng-template>
+
+</app-file-dropzone>

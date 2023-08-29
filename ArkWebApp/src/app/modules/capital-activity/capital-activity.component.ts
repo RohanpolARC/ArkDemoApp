@@ -1,598 +1,67 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import {MatAccordion} from '@angular/material/expansion';
+import { MatAccordion } from '@angular/material/expansion';
 import { MatDialog } from '@angular/material/dialog';
-import { AddCapitalModalComponent } from './add-capital-modal/add-capital-modal.component';
-
-import {
-  GridOptions,
-  Module,
-  ColDef,
-  CellClickedEvent,
-  RowNode,
-  FirstDataRenderedEvent
-} from '@ag-grid-community/core';
-import {
-  AdaptableOptions,
-  AdaptableApi,
-  AdaptableButton,
-  ActionColumnContext,
-} from '@adaptabletools/adaptable/types';
+import { Module } from '@ag-grid-community/core';
 import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/CapitalActivityModel';
-
-import { Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
-import { formatDate, BLANK_DATETIME_FORMATTER_CONFIG, DATE_FORMATTER_CONFIG_ddMMyyyy, AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, AMOUNT_FORMATTER_CONFIG_Zero, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER } from 'src/app/shared/functions/formatter';
-
-import { getNodes, validateLinkSelect }from './utilities/functions';
-import { UpdateConfirmComponent } from './update-confirm/update-confirm.component';
-import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
-import { DataService } from 'src/app/core/services/data.service';
-import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
-import {  autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
+import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { CommonConfig } from 'src/app/configs/common-config';
-import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
-import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
+import { UtilService } from './services/util.service';
+import { ComponentReaderService } from './services/component-reader.service';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-capital-activity',
   templateUrl: './capital-activity.component.html',
   styleUrls: ['./capital-activity.component.scss']
 })
-export class CapitalActivityComponent implements OnInit {
+export class CapitalActivityComponent implements OnInit, IPropertyReader {
 
   @ViewChild(MatAccordion) accordion: MatAccordion;
-
-  subscriptions: Subscription[] = [];
-  rowData: CapitalActivityModel[];
-  rowDataInvstmnt: CapitalInvestment[];
-  rowGroupPanelShow:string = 'always';
-
+  investorData$: Observable<CapitalActivityModel[]>;
+  investmentData$: Observable<CapitalInvestment[]>;
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
-  noRowsToDisplay: NoRowsCustomMessages = 'No data found.';
   
-
-  onTotalBaseClick(event: CellClickedEvent){
-    if(event.node.group){
- 
-      let leafNodes: any[] = event.node.allLeafChildren.map(row => row?.['data']);      
-      let pIDcashDtTypeStr: string = '';
-      leafNodes.forEach(investment => {
-        pIDcashDtTypeStr += `${investment.positionID}|${formatDate(investment.cashDate, true)}:${investment.type},`
-      })
-      
-      if(pIDcashDtTypeStr.length)
-        pIDcashDtTypeStr = pIDcashDtTypeStr.slice(0, -1);
-  
-      let model: DetailedView = <DetailedView> {};
-      model.screen = 'Investment Cashflows';
-      model.param1 = pIDcashDtTypeStr;
-      model.param2 = model.param3 = model.param4 = model.param5 = '';
-      model.strParam1 = [];
-
-      const dialogRef = this.dialog.open(DefaultDetailedViewPopupComponent, {
-        data: {
-          detailedViewRequest: model,
-          failureMsg: leafNodes.length > 50 ? `Please select group having lesser child rows (Max 50)` : null,
-          noFilterSpace: true,
-          grid: 'Investment Cashflows'
-        },
-        width: '90vw',
-        height: '80vh'
-      })
-
-    }
-  }
-
-  columnDefsInvstmnt: ColDef[] = [
-    { field: 'uniqueID', tooltipField: 'uniqueID', type: 'abColDefNumber'},
-    { field: 'positionID', tooltipField: 'positionID', headerName: 'Position ID', type: 'abColDefNumber'},
-    { field: 'cashDate', tooltipField: 'cashDate', headerName: 'Cash Date', type: 'abColDefDate', cellClass: 'dateUK'},
-    { field: 'fund', tooltipField: 'fund', headerName: 'Fund', type: 'abColDefString'},
-    { field: 'fundHedging', tooltipField: 'fundHedging', headerName: 'Fund Hedging', type: 'abColDefString'},
-    { field: 'portfolio', tooltipField: 'portfolio', headerName: 'Portfolio', type: 'abColDefString'},
-    { field: 'issuerShortName', tooltipField: 'issuerShortName', headerName: 'Issuer', type: 'abColDefString'},
-    { field: 'issuerID', tooltipField: 'issuerID', headerName: 'Issuer ID', type: 'abColDefNumber'},
-    { field: 'asset', tooltipField: 'asset', headerName: 'Asset', type: 'abColDefString'},
-    { field: 'assetID', tooltipField: 'assetID', headerName: 'AssetID', type: 'abColDefNumber'},
-    { field: 'fundCcy', tooltipField: 'fundCcy', headerName: 'Fund Ccy', type: 'abColDefString'},
-    { field: 'positionCcy', tooltipField: 'positionCcy', headerName: 'Position Ccy', type: 'abColDefString'},
-    { field: 'amount', tooltipField: 'amount', headerName: 'Total', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-    { field: 'linkedAmount', tooltipField: 'linkedAmount', headerName: 'Linked Amount', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-    { field: 'linkedAmountBase', tooltipField: 'linkedAmountBase', headerName: 'Linked Amount Base', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
-    { field: 'totalBase', tooltipValueGetter: (params) => { return "Detailed View" }, headerName: 'Total Base', cellClass: 'ag-right-aligned-cell', onCellClicked: this.onTotalBaseClick.bind(this), 
-      cellStyle: (params) => {
-        if(params.node.group)
-          return { color: '#0590ca' };
-        return null;
-      }, type: 'abColDefNumber'},
-    { field: 'totalEur', headerName: 'Total Eur', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-    { field: 'break', headerName: 'Break',  cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
-    { field: 'breakBase', headerName: 'Break Base', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
-    { field: 'groupBreak', headerName: 'Group Break', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
-    { field: 'groupBreakBase', headerName: 'Group Break Base', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
-    { field: 'type', type: 'abColDefString'},
-    { field: 'groupID', type: 'abColDefNumber' }
-  ]
-
-  columnDefs: ColDef[] = [
-    { field: 'capitalID', tooltipField: 'capitalID', headerName: 'Capital ID', type: 'abColDefNumber'},
-    { field: 'callDate', tooltipField: 'callDate', headerName: 'Call Date', type: 'abColDefDate', cellClass: 'dateUK' },
-    { field: 'valueDate', tooltipField: 'valueDate', headerName: 'Value Date', type: 'abColDefDate', cellClass: 'dateUK'},
-    { field: 'capitalType', tooltipField: 'capitalType', headerName: 'Capital Type', type:'abColDefString'},
-    { field: 'capitalSubType', tooltipField: 'capitalSubType', headerName: 'Capital Subtype', type:'abColDefString'},
-    { field: 'fundHedging', tooltipField: 'fundHedging', headerName: 'Fund Hedging', type:'abColDefString'},
-    { field: 'fundCcy', tooltipField: 'fundCcy', headerName: 'Fund Ccy', type:'abColDefString'},
-    { field: 'posCcy', tooltipField: 'posCcy', headerName: 'Position Ccy', type: 'abColDefString'},
-    { field: 'fxRate', tooltipField: 'fxRate', headerName: 'FXRate',  type: 'abColDefNumber',cellClass: 'ag-right-aligned-cell'},
-    { field: 'fxRateOverride', tooltipField: 'fxRateOverride', headerName: 'FXRate Override', type: 'abColDefBoolean' },
-    { field: 'fxRateSource', tooltipField: 'fxRateSource', type: 'abColDefString' },
-    { field: 'totalAmount', tooltipField: 'totalAmount', headerName: 'Total Amount', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-    { field: 'wsoIssuerID', tooltipField: 'wsoIssuerID', headerName: 'WSO Issuer ID',  type: 'abColDefNumber'},
-    { field: 'issuerShortName', tooltipField: 'issuerShortName', headerName: 'Issuer Short Name', type:'abColDefString'},
-    { field: 'wsoAssetID', tooltipField: 'wsoAssetID', headerName: 'WSO Asset ID', type: 'abColDefString'},
-    { field: 'asset', tooltipField: 'asset', headerName: 'Asset', type:'abColDefString'},
-    { field: 'narrative', tooltipField: 'narrative', headerName: 'Narrative', type:'abColDefString'},
-    { field: 'source', tooltipField: 'source', headerName: 'Source', type:'abColDefString'},
-    { field: 'sourceID', tooltipField: 'sourceID', headerName: 'Source ID', type:'abColDefNumber'},
-    { field: 'isLinked', tooltipField: 'isLinked', headerName: 'Is Linked', type:'abColDefBoolean'},
-    { field: 'linkedAmount', tooltipField: 'linkedAmount', headerName: 'Linked Total Base', type:'abColDefNumber'},
-    { field: 'createdOn', tooltipField: 'createdOn', headerName: 'Created On', type:'abColDefDate', cellClass: 'dateUK'},
-    { field: 'createdBy', tooltipField: 'createdBy', headerName: 'Created By', type:'abColDefString'},
-    { field: 'modifiedOn', tooltipField: 'modifiedOn', headerName: 'Modified On', type:'abColDefDate', cellClass: 'dateUK'},
-    { field: 'modifiedBy', tooltipField: 'modifiedBy', headerName: 'Modified By', type:'abColDefString'},
-  ]
-
-  defaultColDef = {
-    resizable: true,
-    enableValue: true,
-    enableRowGroup: true,
-    enablePivot: true,
-    sortable: true,
-    filter: true,
-    autosize:true,
-  };
-  gridOptions: GridOptions;
-  adapTableApi: AdaptableApi;
-  adaptableOptions: AdaptableOptions;
-
-  gridOptionsInvstmnt: GridOptions;
-  adapTableApiInvstmnt: AdaptableApi;
-  adaptableOptionsInvstmnt: AdaptableOptions;
-
   constructor(public dialog:MatDialog, 
     private capitalActivityService: CapitalActivityService,
-    private dataSvc: DataService) { 
+    private compReaderSvc: ComponentReaderService,
+    public utilSvc: UtilService) {
+      this.utilSvc.registerComponent(this)
+    }
+
+  /**
+   * Implementing the visitor pattern to read component properties in the service.
+      https://stackoverflow.com/a/56975850
+   */
+  readProperty<T>(prop: string): T {
+    if(!(prop in this)){
+      throw Error(`Property ${prop} does not exist`);
+    }
+    return this[prop];
   }
 
+  loadInvestorData(){
+    this.investorData$ = this.capitalActivityService.getCapitalActivity().pipe(take(1));
+    setTimeout(() => {
+      this.compReaderSvc.investorGridApi().showLoadingOverlay();
+    })
+  }
 
-  capitalTypeOptions: string[] = [];
-  capitalSubTypeOptions: string[] = [];
-  capitalTypeSubtypeAssociation = [];
-  refData = [];
-
+  loadInvestmentData(){
+    this.investmentData$ = this.capitalActivityService.getCapitalInvestment().pipe(take(1));
+    setTimeout(() => {
+      this.compReaderSvc.investmentGridApi().showLoadingOverlay();
+    })
+  }
   invstmntPanelOpenState = false;
   investorPanelOpenState = false;
 
-  fetchInvestmentData(): void{
-    this.gridOptionsInvstmnt.api?.showLoadingOverlay();
-    this.subscriptions.push(this.capitalActivityService.getCapitalInvestment().subscribe({
-      next: (data: any[]) => {
-        this.gridOptionsInvstmnt.api?.hideOverlay();
-        this.rowDataInvstmnt = data;
-        this.adapTableApiInvstmnt.gridApi.loadGridData(this.rowDataInvstmnt);
-      },
-      error: error => {
-        this.rowDataInvstmnt = [];
-        this.gridOptionsInvstmnt.api?.hideOverlay();
-        console.error("Capital Investment Data fetch failed" + error);
-      }
-    }))
-  }
-
-  fetchCapitalActivityData(): void{
-    this.gridOptions?.api?.showLoadingOverlay();
-    this.subscriptions.push(this.capitalActivityService.getCapitalActivity().subscribe({
-      next: data => {
-        this.gridOptions?.api?.hideOverlay();
-        this.rowData = data;
-        this.adapTableApi.gridApi.loadGridData(this.rowData);
-      },
-      error: error => {
-        this.rowData = [];
-        this.gridOptions?.api?.hideOverlay();
-        console.error("Capital Activity Data fetch failed");
-      }
-    }));
-  }
-
-  fetchCapitalRefData(): void{
-    this.subscriptions.push(this.capitalActivityService.getCapitalRefData().subscribe({
-      next: data => {
-        data.capitalType.forEach(x => { this.capitalTypeOptions.push(x) });
-        data.capitalSubType.forEach(x => { this.capitalSubTypeOptions.push(x) });
-
-        this.refData = data.portfolio_Info;
-      },
-      error: error => {
-        console.error("Couldn't fetch refData. Form dropdown fields not available");
-      }
-    }));
-  }
-  
-  fetchCapitalTypeSubtypeAssociation(): void {
-    this.subscriptions.push(this.dataSvc.getRefDatatable('[ArkUI].[CapitalTypeSubtypeAssociation]').subscribe({
-      next: data => {
-        if(typeof data === 'string')
-            data = JSON.parse(data)
-        this.capitalTypeSubtypeAssociation = data
-      },
-      error: error => {
-        console.error("Couldn't fetch capitaltype-subtype association")
-      }
-    }))
-  }
-
   ngOnInit(): void {
-    this.gridOptions = {
-      ...CommonConfig.GRID_OPTIONS,
-      context:{},
-      enableRangeSelection: true,
-      sideBar: true,
-      suppressMenuHide: true,
-      singleClickEdit: false,
-      // components: {
-      //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-      // },
-      columnDefs: this.columnDefs,
-      allowContextMenuWithControlKey:false,
-      suppressScrollOnNewData: true,
-      excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
-      noRowsOverlayComponent: NoRowsOverlayComponent,
-            noRowsOverlayComponentParams: {
-        noRowsMessageFunc: () => this.noRowsToDisplay,
-      },
-      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
-        autosizeColumnExceptResized(event)
-      },
-    }
 
-    this.gridOptionsInvstmnt = {
-      ...CommonConfig.GRID_OPTIONS,
-      ...JSON.parse(JSON.stringify(this.gridOptions)),
-      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
-        autosizeColumnExceptResized(event)
-      },
-    }
-    this.gridOptionsInvstmnt.columnDefs = this.columnDefsInvstmnt;
-
-    // this.gridOptionsInvstmnt.components = {
-    //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
-    // },
-
-    this.adaptableOptions = {
-      licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
-      primaryKey: 'capitalID',
-      userName: this.dataSvc.getCurrentUserName(),
-      adaptableId: 'Capital Activity - Investor Cashflows',
-      adaptableStateKey: `Capital Activity Key`,
-
-      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
-
-      teamSharingOptions: {
-        enableTeamSharing: true,
-        persistSharedEntities: presistSharedEntities.bind(this), //https://docs.adaptabletools.com/guide/version-15-upgrade-guide
-        loadSharedEntities: loadSharedEntities.bind(this)
-  
-      },
-  
-      // toolPanelOptions: {
-      //   toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
-      // },
-  
-      actionOptions: {
-        actionColumns: [
-          {
-            columnId: 'ActionEdit',
-            actionColumnButton: {
-              onClick: (
-                button: AdaptableButton<ActionColumnContext>,
-                context: ActionColumnContext
-              ) => {
-  
-                let rowData =  context.rowNode?.data;
-                let investments = [];
-                this.capitalActivityService.getCapitalInvestment(rowData.capitalID).subscribe({
-                  next: data => {
-                    investments = data;
-                    this.openDialog(rowData, 'EDIT', investments);
-                  },
-                  error: error => {
-                    console.error("Couldn't fetch investments for this capitalID");
-                  }
-                })
-              },
-              icon: {
-                src: '../assets/img/edit.svg',
-                style: {
-                  height: 25, width: 25
-                }
-              },
-            },
-          }
-        ]
-      },
-
-      userInterfaceOptions:{
-        customDisplayFormatters: [
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['totalAmount','linkedAmount']),
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('nonAmountNumberFormatter',['fxRate']),
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('nullOrZeroFormatter',['wsoIssuerID','wsoAssetID','sourceID'])
-          ],
-      },
-  
-      predefinedConfig: {
-        Dashboard: {
-          Revision: 3,
-          ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
-          IsCollapsed: true,
-          Tabs: [{
-            Name:'Layout',
-            Toolbars: ['Layout']
-          }],  
-          IsHidden: false,
-          DashboardTitle: ' '
-        },
-        Layout: {
-          Revision: 5,
-          CurrentLayout: 'Basic Capital Activity',
-          Layouts: [{
-            Name: 'Basic Capital Activity',
-            Columns: [
-              'callDate',
-              'valueDate',
-              'capitalType',
-              'capitalSubType',
-              'fundHedging',
-              'issuerShortName',
-              'asset',
-              'fundCcy',
-              'posCcy',
-              'totalAmount',
-              'localAmount',
-              'fxRate',
-              'wsoAssetID',
-              'narrative',
-              'source',
-              'isLinked',
-              'linkedAmount',
-              'capitalID',
-              'ActionEdit',
-            ],
-            RowGroupedColumns: [],
-            ColumnWidthMap:{
-              ActionEdit: 50,
-            },
-            PinnedColumnsMap: {
-              ActionEdit: 'right',
-            },
-  
-          }]
-        },
-        FormatColumn:{
-          Revision:6,
-          FormatColumns:[
-            BLANK_DATETIME_FORMATTER_CONFIG(['callDate','valueDate','createdOn','modifiedOn']),
-            DATE_FORMATTER_CONFIG_ddMMyyyy(['callDate','valueDate']),
-            DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['createdOn','modifiedOn']),
-            CUSTOM_FORMATTER(['wsoIssuerID','wsoAssetID','sourceID'],['nullOrZeroFormatter']),
-            CUSTOM_FORMATTER(['fxRate'],['nonAmountNumberFormatter']),
-            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['totalAmount','linkedAmount'],2,['amountZeroFormat']),
-            AMOUNT_FORMATTER_CONFIG_Zero(['totalAmount','linkedAmount'],2,['amountZeroFormat']),
-
-          ]
-        }
-      }
-    }
-
-    this.adaptableOptionsInvstmnt = {
-      licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
-      primaryKey: 'uniqueID',
-      userName: this.dataSvc.getCurrentUserName(),
-      adaptableId: 'Capital Activity - Investment Cashflows',
-      adaptableStateKey: `Investment CashFlow Key`,
-      
-      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
-
-
-      // toolPanelOptions: {
-      //   toolPanelOrder: [ 'filters', 'columns','AdaptableToolPanel',],
-      // },
-
-      teamSharingOptions: {
-        enableTeamSharing: true,
-        persistSharedEntities: presistSharedEntities.bind(this), //https://docs.adaptabletools.com/guide/version-15-upgrade-guide
-        loadSharedEntities: loadSharedEntities.bind(this)
-  
-      },
-  
-      actionOptions: {
-        actionColumns: [
-          {
-            columnId: 'ActionLink',
-            includeGroupedRows: true,
-            actionColumnButton: {
-              onClick: (
-                button: AdaptableButton<ActionColumnContext>,
-                context: ActionColumnContext
-              ) => {
-
-                let error: string = validateLinkSelect(context);
-                if(error !== null){
-                  const errorDialog = this.dialog.open(UpdateConfirmComponent, {
-                    data: {
-                      actionType: 'ERROR-MSG',
-                      errorMsg: error
-                    }
-                  })
-                  return;
-                }
-
-                let linkData = getNodes(context.rowNode as RowNode); //https://www.ag-grid.com/changelog/?fixVersion=29.0.0 AG-7352
-                this.openDialog(linkData, 'LINK-ADD');
-              },
-              icon: {
-                src: '../assets/img/sync_alt_black_24dp.svg',
-                style: {
-                  height: 25, width: 25
-                }
-              },
-            },
-          }
-        ]
-      },
-  
-      userInterfaceOptions:{
-        customDisplayFormatters:[
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['amount','linkedAmount','totalBase','totalEur', 'linkedAmountBase', 'break', 'breakBase', 'groupBreak', 'groupBreakBase'])
-
-        ]
-      },
-
-      predefinedConfig: {
-        Dashboard: {
-          Revision: 3,
-          ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
-          IsCollapsed: true,
-          Tabs: [{
-            Name:'Layout',
-            Toolbars: ['Layout']
-          }],
-          IsHidden: false,
-          DashboardTitle: ' '
-        },
-        Layout: {
-          Revision: 13,
-          Layouts:[{
-            Name: 'Basic Investment Cashflow',
-            Columns: [
-              'positionID',
-              'cashDate',
-              'type',
-              'fund',
-              'fundHedging',
-              'portfolio',
-              'issuerShortName',
-              'asset',
-              'fundCcy',
-              'positionCcy',
-              'amount',
-              'linkedAmount',
-              'linkedAmountBase',
-              'totalBase',
-              'totalEur',
-              'break',
-              'breakBase',
-              'groupBreak','groupBreakBase','groupID',
-              'ActionLink'
-            ],
-            ColumnWidthMap:{
-              ActionLink: 50,
-            },
-            RowGroupedColumns: ['fundHedging', 'cashDate', 'issuerShortName', 'positionCcy', 'type'],
-            PinnedColumnsMap: {
-              'ActionLink': 'right'
-            },
-            AggregationColumns: {
-              total: 'sum',
-              totalBase: 'sum',
-              totalEur: 'sum',
-              linkedAmount: 'sum',
-              linkedAmountBase: 'sum',
-            }
-          }]
-        },
-        FormatColumn:{
-          Revision: 8,
-          FormatColumns:[
-            DATE_FORMATTER_CONFIG_ddMMyyyy(['cashDate']),
-
-            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['amount','linkedAmount','totalBase','totalEur', 'linkedAmountBase', 'break', 'breakBase', 'groupBreak', 'groupBreakBase'],2,['amountZeroFormat']),
-            AMOUNT_FORMATTER_CONFIG_Zero(['amount','linkedAmount','totalBase','totalEur', 'linkedAmountBase', 'break', 'breakBase', 'groupBreak', 'groupBreakBase'],2,['amountZeroFormat'])
-          ]
-        }  
-      }
-    }
-
-    this.fetchCapitalActivityData();
-    this.fetchInvestmentData();
-    this.fetchCapitalRefData();
-    this.fetchCapitalTypeSubtypeAssociation();
+    setTimeout(() => {
+      this.loadInvestorData();
+      this.loadInvestmentData();
+    }, 0)
   }
-
-  ngOnDestroy(): void{
-    this.subscriptions.forEach(subscription => subscription.unsubscribe())
-  }
-
-  openBulkUploadDialog(): void {
-    const dialogRef = this.dialog.open(BulkUploadComponent, {
-      data: {
-        adaptableApiInvestor: this.adapTableApi,
-        capitalTypes: this.capitalTypeOptions,
-        capitalSubTypes: this.capitalSubTypeOptions,
-        refData: this.refData
-
-      },
-      width: '90vw',
-      maxWidth: '90vw',
-      height: '80vh',
-    })
-    this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
-      // Bulk Upload Dialog Closed.
-      if(result?.isSuccess){
-        this.fetchCapitalActivityData();
-      }
-    }))
-  }
-
-  openDialog(data? , actionType = 'ADD', gridData = null):void{
-
-    const dialogRef = this.dialog.open(AddCapitalModalComponent, {
-      data: {
-        rowData : data,
-        adapTableApi: this.adapTableApi,
-        adapTableApiInvstmnt: this.adapTableApiInvstmnt,
-        actionType: actionType,
-        capitalTypes: this.capitalTypeOptions,
-        capitalSubTypes: this.capitalSubTypeOptions,
-        capitalTypeSubtypeAssociation: this.capitalTypeSubtypeAssociation,
-        refData: this.refData,
-        gridData: gridData
-      },
-      width: '90vw',
-      maxWidth: '2000px',
-      maxHeight: '99vh'
-    });
-
-    this.subscriptions.push(dialogRef.afterClosed().subscribe((result) => {
-      if(actionType === 'LINK-ADD' && result.event === 'Close with Success'){
-        this.fetchCapitalActivityData();
-        this.fetchInvestmentData();
-      }
-    }))
-  }
-
-  onAdaptableReady = ({ adaptableApi, gridOptions }) => {
-    this.adapTableApi = adaptableApi;
-    this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
-    this.adapTableApi?.columnApi?.autosizeAllColumns()
-    // use AdaptableApi for runtime access to Adaptable
-  };
-
-  onAdaptableInvstmntReady = ({ adaptableApi, gridOptions }) => {
-    this.adapTableApiInvstmnt = adaptableApi;
-    this.adapTableApiInvstmnt.toolPanelApi.closeAdapTableToolPanel();
-    this.adapTableApi?.columnApi?.autosizeAllColumns()
-    // use AdaptableApi for runtime access to Adaptable
-  };
-
 }

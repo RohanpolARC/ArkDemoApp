@@ -1,3 +1,5 @@
+import { AdaptableApi } from "@adaptabletools/adaptable-angular-aggrid";
+
 export interface CapitalActivityModel{
     capitalID: number,
     asset: string;
@@ -20,22 +22,17 @@ export interface CapitalActivityModel{
     wsoIssuerID: number;
     wsoAssetID: number;
     action: string;
-    localAmount: number;
-    fxRate: number;
-    
-    posCcy: string;
     linkedAmount: number;
     isLinked: boolean;
     
     positionIDCashdateTypeStr: string;
-    fxRateOverride: boolean;
-    fxRateSource: string;
 }
 
-export interface CapitalInvestment{
+export interface CapitalInvestment{ 
     positionID: number;
-    amount: number;
     cashDate: Date;
+    type: string;
+    amount: number;
     issuerShortName: string;
     asset: string;
     fundHedging: string;
@@ -57,9 +54,38 @@ export interface CapitalInvestment{
 
 }
 
-
+export interface InvestmentSmall {
+    positionID: number,
+    cashDate: Date,
+    type: string
+}
 export interface AssociateInvestment{
-    positionIDCashdateTypeStr: string,
+    investments: InvestmentSmall[],
     capitalIDs: number[],
+    username: string
+}
+
+export interface IModal {
+    rowData: CapitalInvestment[],
+    adaptableApi: AdaptableApi,
+    adaptableApiInvstmnt: AdaptableApi,
+    actionType: string,
+    capitalTypes: string[],
+    capitalSubTypes: string[],
+    gridData: CapitalInvestment[]
+}
+
+export interface INAVQuarterly {
+    fundHedging: string,
+    quarterEnd: Date,
+    navPerFS: number,
+    deferredLoanOriginationFeeIncome: number,
+    currentPeriodRebates: number,
+    organisationalCostsUnamortised: number,
+    subscriptionCostsUnamortised: number,
+    advancedTax: number,
+    carriedInterestProvision: number,
+    rebateITD: number,
+    netRealisedAndUnrealisedGainsAndLossesITD: number,
     username: string
 }

@@ -44,7 +44,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NoRowsOverlayComponent } from './shared/components/no-rows-overlay/no-rows-overlay.component';
 import { GeneralFilterModule } from './shared/modules/general-filter/general-filter.module';
 
-
 export const protectedResourceMap: any =  
   [  
     // ["https://graph.microsoft.com/v1.0/me", ["user.read", "profile"]],
