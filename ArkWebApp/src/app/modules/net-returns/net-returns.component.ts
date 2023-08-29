@@ -144,12 +144,12 @@ export class NetReturnsComponent implements OnInit {
                   this.netReturnsSvc.netCashflowsGridApi?.showLoadingOverlay()
                 }),
                 filter((pollResp)=>{
-                  return (['Terminated', 'Completed', 'Failed'].includes(pollResp?.['runtimeStatus']))
+                  return (['Terminated', 'Completed', 'Failed'].includes(pollResp?.['runtimeStatus']) && pollResp?.['output']?.['Summary'] && pollResp?.['output']?.['Cashflows'])
                 }),
                 map((pollResp) => { return { 
                   ...{ 
                       summary: pollResp?.['output']?.['Summary'], 
-                      cashflows: pollResp?.['output']?.['Cashflows']  
+                      cashflows: pollResp?.['output']?.['Cashflows'] 
                     }
                   , 'runtimeStatus': pollResp?.['runtimeStatus'] 
                 }}),

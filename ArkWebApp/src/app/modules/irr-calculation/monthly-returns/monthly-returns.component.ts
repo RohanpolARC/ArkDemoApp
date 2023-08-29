@@ -7,9 +7,8 @@ import { MonthlyReturnsService } from 'src/app/core/services/MonthlyReturns/mont
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { amountFormatter } from 'src/app/shared/functions/formatter';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
-import { MonthlyReturnsCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
+import { LoadStatus, MonthlyReturnsCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 import { getNodes } from '../../capital-activity/utilities/functions';
-import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
 
 @Component({
   selector: 'app-monthly-returns',
@@ -20,7 +19,7 @@ import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.compone
 export class MonthlyReturnsComponent implements OnInit {
 
   @Input() calcParams: MonthlyReturnsCalcParams;
-  @Output() status = new EventEmitter<LoadStatusType>();
+  @Output() status = new EventEmitter<LoadStatus>();
   
   subscriptions: Subscription[] = []
   columnDefsMonthlyRets: ColDef[]
@@ -121,6 +120,9 @@ export class MonthlyReturnsComponent implements OnInit {
       autoGroupColumnDef: {
         sort: 'desc'
       },
+      rowHeight: 30,
+      groupHeaderHeight: 30,
+      headerHeight: 30,
       excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
       aggFuncs: this.aggFuncs,
       defaultColDef: {

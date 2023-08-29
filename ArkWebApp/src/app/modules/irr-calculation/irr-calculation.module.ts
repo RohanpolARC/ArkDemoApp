@@ -32,6 +32,18 @@ import { TabGroupWrapperComponent } from './tab-group-wrapper/tab-group-wrapper.
 import { CashFlowsComponent } from './cash-flows/cash-flows.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import {MatChipsModule} from '@angular/material/chips';
+import { VirtualPositionFormComponent } from './virtual-position-form/virtual-position-form.component';
+import { MatStepperModule } from '@angular/material/stepper';
+import { PortfolioModellerService } from './service/portfolio-modeller.service';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { InputAmountNumberModule } from 'src/app/shared/modules/input-amount-number/input-amount-number.module';
+import { AsPipeModule } from 'src/app/shared/modules/as-pipe/as-pipe.module';
+import { GridUtilService } from './portfolio-modeller/grid/grid-util.service';
+import { ModelUtilService } from './portfolio-modeller/model/model-util.service';
+import { TabUtilService } from './portfolio-modeller/tab/tab-util.service';
+import { GridConfigService } from './portfolio-modeller/grid/grid-config.service';
+import { ComponentReaderService } from './service/component-reader.service';
+import { RefService } from './portfolio-modeller/ref/ref.service';
 
 @NgModule({
   declarations: [
@@ -43,7 +55,8 @@ import {MatChipsModule} from '@angular/material/chips';
     PerformanceFeeComponent,
     FeePresetsGridComponent,
     TabGroupWrapperComponent,
-    CashFlowsComponent
+    CashFlowsComponent,
+    VirtualPositionFormComponent
   ],
   imports: [
     CommonModule,
@@ -69,13 +82,26 @@ import {MatChipsModule} from '@angular/material/chips';
     MatSelectModule,
     MatExpansionModule,
     MatAutocompleteModule,
-    MatChipsModule
+    MatChipsModule,
+    MatStepperModule,
+    MatDatepickerModule,
+
+    InputAmountNumberModule,
+    AsPipeModule
+
   ],
   providers: [
     FeeCalculationService,
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  
     {provide: DateAdapter, useClass: InputDateAdapter, deps: [MAT_DATE_LOCALE, Platform]},
-    DatePipe
+    DatePipe,
+    PortfolioModellerService,
+    GridUtilService,
+    GridConfigService,
+    ModelUtilService,
+    TabUtilService,
+    ComponentReaderService,
+    RefService
   ],
   exports: []
 })

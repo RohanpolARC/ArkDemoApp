@@ -204,6 +204,9 @@ export class FeeCashflowsComponent implements OnInit {
         sortable: true,
         filter: true
       },
+      rowHeight: 30,
+      groupHeaderHeight: 30,
+      headerHeight: 30,
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel();
         this.gridApi = params.api;   

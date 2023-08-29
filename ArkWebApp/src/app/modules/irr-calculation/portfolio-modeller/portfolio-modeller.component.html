@@ -25,13 +25,20 @@
                 <ng-multiselect-dropdown
                 [placeholder]="'Model name'"
                 [settings]="dropdownSettings"
-                [data]="modelData"
+                [data]="modelSvc?.modelData"
                 [(ngModel)]="selectedDropdownData"
                 (onSelect)="onPortfolioModelSelect($event)"
                 >
                 </ng-multiselect-dropdown>
         
             </div>
+
+            <button mat-icon-button (click)="portfolioModellerSvc.openVirtualPositionsForm('ADD')"
+            matTooltip="Add virtual position"
+            matTooltipClass="tooltip-style">
+                <mat-icon class="material-icons-outlined">add_circle_outline</mat-icon>
+            </button>
+
             <button mat-raised-button (click)="onSavePortfolio()">
                 Save/Run
             </button>
@@ -51,7 +58,6 @@
             [rowData]="rowData"
             class="ag-theme-alpine ag-grid"
             (adaptableReady)="onAdaptableReady($event)"
-            (cellValueChanged)="onCellValueChanged($event)"
             (gridReady)="onGridReady($event)"
             >
             </ag-grid-angular>

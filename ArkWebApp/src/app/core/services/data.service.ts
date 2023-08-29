@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 import { APIConfig } from 'src/app/configs/api-config';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { DetailedView } from 'src/app/shared/models/GeneralModel';
+import { DetailedView, IUniqueValuesForField } from 'src/app/shared/models/GeneralModel';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 
@@ -52,7 +52,7 @@ export class DataService {
     }
 
     getUniqueValuesForField(field: string){
-        return this.http.get<{id: number, value: string}[]>(`${APIConfig.REFDATA_GET_UNIQUE_VALUES_API}/?field=${field}`).pipe(
+        return this.http.get<IUniqueValuesForField[]>(`${APIConfig.REFDATA_GET_UNIQUE_VALUES_API}/?field=${field}`).pipe(
             catchError((ex) => throwError(ex)));
     }
 

@@ -1,6 +1,6 @@
 
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridOptions,GridApi, GridReadyEvent, Module, FirstDataRenderedEvent } from '@ag-grid-community/core';
+import { ColDef, GridOptions,GridApi, GridReadyEvent, Module, FirstDataRenderedEvent, ProcessCellForExportParams } from '@ag-grid-community/core';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
@@ -9,10 +9,10 @@ import { CashFlowService } from 'src/app/core/services/CashFlows/cash-flow.servi
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
-import {  BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,  DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
+import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,  DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
+import { autosizeColumnExceptResized,  getMomentDateStrFormat, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
-import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.component';
+import { LoadStatus } from 'src/app/shared/models/IRRCalculationsModel';
 
 @Component({
   selector: 'app-cash-flows',
@@ -22,7 +22,7 @@ import { LoadStatusType } from '../portfolio-modeller/portfolio-modeller.compone
 export class CashFlowsComponent implements OnInit {
 
   @Input() runID: string;
-  @Output() status = new EventEmitter<LoadStatusType>();
+  @Output() status = new EventEmitter<LoadStatus>();
   
   subscriptions: Subscription[] = []
   columnDefs: ColDef[]
@@ -154,24 +154,24 @@ export class CashFlowsComponent implements OnInit {
       { field: 'fxRate', type: 'abColDefNumber' },
       { field: 'fxRateCapital', type: 'abColDefNumber' },
       { field: 'fxRateIncome', type: 'abColDefNumber' },
-      { field: 'fxRateMethod', type: 'abColDefNumber' },
-      { field: 'fxRateBase', type: 'abColDefNumber' },
-      { field: 'fxRateBaseCapital', type: 'abColDefNumber' },
-      { field: 'fxRateBaseIncome', type: 'abColDefNumber' },
-      { field: 'baseGIR', type: 'abColDefNumber' },
-      { field: 'baseGIRAsOfDate', type: 'abColDefNumber' },
-      { field: 'baseGIRTradeDate', type: 'abColDefNumber' },
-      { field: 'baseGIRWtAvgCommited', type: 'abColDefNumber' },
-      { field: 'baseGIRWtAvgFunded', type: 'abColDefNumber' },
-      { field: 'fxRateEur', type: 'abColDefNumber' },
-      { field: 'fxRateEurCapital', type: 'abColDefNumber' },
-      { field: 'fxRateEurIncome', type: 'abColDefNumber' },
-      { field: 'eurGIR', type: 'abColDefNumber' },
-      { field: 'eurGIRAsOfDate', type: 'abColDefNumber' },
-      { field: 'eurGIRTradeDate', type: 'abColDefNumber' },
-      { field: 'eurGIRWtAvgCommited', type: 'abColDefNumber' },
-      { field: 'eurGIRWtAvgFunded', type: 'abColDefNumber' },
-      { field: 'fxFWDRate', type: 'abColDefNumber', headerName: 'FX Forward Rate' },
+      { field: 'fxRateMethod', type: 'abColDefNumber', hide: true },
+      { field: 'fxRateBase', type: 'abColDefNumber', hide: true },
+      { field: 'fxRateBaseCapital', type: 'abColDefNumber', hide: true },
+      { field: 'fxRateBaseIncome', type: 'abColDefNumber', hide: true },
+      { field: 'baseGIR', type: 'abColDefNumber', hide: true },
+      { field: 'baseGIRAsOfDate', type: 'abColDefNumber', hide: true },
+      { field: 'baseGIRTradeDate', type: 'abColDefNumber', hide: true },
+      { field: 'baseGIRWtAvgCommited', type: 'abColDefNumber', hide: true },
+      { field: 'baseGIRWtAvgFunded', type: 'abColDefNumber', hide: true },
+      { field: 'fxRateEur', type: 'abColDefNumber', hide: true },
+      { field: 'fxRateEurCapital', type: 'abColDefNumber', hide: true },
+      { field: 'fxRateEurIncome', type: 'abColDefNumber', hide: true },
+      { field: 'eurGIR', type: 'abColDefNumber', hide: true },
+      { field: 'eurGIRAsOfDate', type: 'abColDefNumber', hide: true },
+      { field: 'eurGIRTradeDate', type: 'abColDefNumber', hide: true },
+      { field: 'eurGIRWtAvgCommited', type: 'abColDefNumber', hide: true },
+      { field: 'eurGIRWtAvgFunded', type: 'abColDefNumber', hide: true },
+      { field: 'fxFWDRate', type: 'abColDefNumber', hide: true, headerName: 'FX Forward Rate' },
       { field: 'principal', type: 'abColDefNumber' },
       { field: 'principalIndexed', type: 'abColDefNumber' },
       { field: 'pik', type: 'abColDefNumber', headerName: 'PIK' },
@@ -239,6 +239,9 @@ export class CashFlowsComponent implements OnInit {
         lockPosition: true,
         enableValue: true
       },
+      rowHeight: 30,
+      groupHeaderHeight: 30,
+      headerHeight: 30,
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel()
         this.gridApi = params.api;   
@@ -250,6 +253,11 @@ export class CashFlowsComponent implements OnInit {
       onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
         autosizeColumnExceptResized(event)
       },
+      processCellForClipboard(params: ProcessCellForExportParams) {
+        if(params.column.getColId()==='cashDate')
+          return getMomentDateStrFormat(params.value,'DD/MM/YYYY')
+        return params.value;
+      }
     }
 
     this.adaptableOptions = {
@@ -286,10 +294,10 @@ export class CashFlowsComponent implements OnInit {
         },
         Layout:{
           CurrentLayout: 'Basic Cashflows Layout',
-          Revision: 3,
+          Revision: 4,
           Layouts: [{
             Name: 'Basic Cashflows Layout',
-            Columns: this.columnDefs.map(def => def.field)
+            Columns: this.columnDefs.filter(def => !def.hide).map(def => def.field)
           }]
         },
         FormatColumn:{

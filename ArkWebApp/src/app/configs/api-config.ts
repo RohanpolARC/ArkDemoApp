@@ -63,6 +63,8 @@ export class APIConfig {
     public static IRR_LOCAL_OVERRIDES_GET_API: string = APIConfig.BASEURL + "/api/IRRCalculation/GetLocalOverrides";
     public static IRR_RUN_CALCS_API: string = APIConfig.ARK_IRR_FUNCTION_BASEURL + "/api/IRRCalculatorFunction_HttpTrigger";
 
+    public static IRR_POSITION_MODEL_PUT_API: string = APIConfig.BASEURL + "/api/IRRCalculation/PutVPositionData";
+
     public static PORTFOLIO_MAPPING_GET_API: string = APIConfig.BASEURL + "/api/PortfolioManager/GetPortfolioMapping";
     public static PORTFOLIO_MAPPING_PUT_API: string = APIConfig.BASEURL + "/api/PortfolioManager/PutPortfolioMapping";
     public static PORTFOLIO_MAPPING_STAGING_GET_API: string = APIConfig.BASEURL + "/api/PortfolioManager/GetPortfolioMappingStaging";

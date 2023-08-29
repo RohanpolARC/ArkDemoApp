@@ -3,6 +3,7 @@ import { ColDef, ColumnResizedEvent, FirstDataRenderedEvent, RowNode, VirtualCol
 import { DecimalPipe } from "@angular/common";
 import * as moment from "moment";
 import { first } from "rxjs/operators";
+import { formatDate } from "./formatter";
 
 
   /**
@@ -84,6 +85,16 @@ export function _filter(options: string[], value:string): string []{
   return options.filter(op => op?.toLowerCase().includes(filterValue));
 }
 
+export function preprocessEditableDateFields(row: any, fields: string[]){
+  for(let i = 0; i < fields.length; i+= 1){
+    row[fields[i]] = formatDate(row[fields[i]]);
+    if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(row[fields[i]]))
+      row[fields[i]] = null;
+  }
+
+  return row;
+}
+
 /**
  * API Requests can convert date parameters unknowingly due to undesired timezone conversion.
  * Moment date conversion stabilises the date and keeps the date intact. 
@@ -112,6 +123,10 @@ export function getMomentDateStrFormat(date: Date,format:string): string{
 
 export function getMomentDateStr(date: Date): string{
   return moment(date).format('YYYY-MM-DD');
+}
+
+export function getDateFromStr(date: string, format: 'DD-MM-YYYY' | 'YYYY-MM-DD' | 'DD/MM/YYYY' | 'YYYY/MM/DD' = 'YYYY-MM-DD'): Date {
+  return moment(date, format).toDate();
 }
 
 export function getFinalDate(date: Date): Date | null{
@@ -155,6 +170,10 @@ export function getRowNodes(node: RowNode, rowNodes: any[] = []){
       rowNodes.push(node);
   }
   return rowNodes;
+}
+
+export function getCurrentDate(){
+  return moment().toDate();
 }
 
 export function getWrapWidth(cd:ColDef):number[]{

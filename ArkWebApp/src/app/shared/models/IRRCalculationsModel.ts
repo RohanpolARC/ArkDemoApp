@@ -1,4 +1,13 @@
-export interface VPortfolioModel{
+import { ColumnFilter } from "@adaptabletools/adaptable-angular-aggrid"
+
+export type OverrideColumnMap =
+    {
+        [col: string] : {
+        local: string, global: string
+        }
+    }
+
+export type VPortfolioModel = {
     modelName: string,
     modelDesc: string,
     rules: string,
@@ -13,14 +22,14 @@ export interface VPortfolioModel{
     curveRateDelta: number   // percentage with direction (+/-)
 }
 
-export interface VPortfolioLocalOverrideModel{
+export type VPortfolioLocalOverrideModel = {
     assetID: number,
     positionID: number,
     key: string,
     value: string
 }
 
-export interface IRRCalcParams{
+export interface IRRCalcParams  {
     runID: string,
     asOfDate: string,
     positionIDs: number[],
@@ -35,7 +44,7 @@ export interface IRRCalcParams{
     mapGroupCols?: string[]
 }
 
-export interface MonthlyReturnsCalcParams {
+export interface MonthlyReturnsCalcParams  {
     runID: string,
     positionIDs: string,
     baseMeasure: string,
@@ -46,11 +55,11 @@ export interface MonthlyReturnsCalcParams {
     asOfDate?: string
 }
 
-export interface CashFlowParams {
+export interface CashFlowParams  {
     runID: string
 }
 
-export interface PerfFeesCalcParams {
+export interface PerfFeesCalcParams  {
     runID: string,
     positionIDs: number[],
     feePreset: string,
@@ -71,3 +80,65 @@ export interface PortfolioModellerCalcParams {
     curveRateDelta: number,
     runBy: string
 }
+
+export type VPositionModel = {
+    positionID? :number,
+    fundHedging:string
+    assetID? :number,
+    issuerShortName :string,
+    asset :string,
+    fund :string,
+    assetTypeName:string,
+    fundCcy: string,
+    ccy :string,
+    faceValueIssue :number,
+    costPrice :number,
+    entryDate :string,
+    expectedExitDate:string,
+    expectedExitPrice:number,
+    benchMarkIndex:string,
+    maturityDate:string,
+    createdBy? :string,
+    modifiedBy? :string,
+    spread ?: number,
+    pikMargin ?: number,
+    unfundedMargin ?: number,
+    floorRate ?: number, 
+    dealTypeCS ?: string,
+    dealType ?: string,
+    seniority ?: string
+}
+
+export type VModel = {
+    modelID: number, modelName: string, displayName: string, modelDesc: string, 
+    rules: ColumnFilter[], positionIDs: number[], 
+    isLocal: boolean, isManual: boolean, username: string, isShared: boolean, aggregationType: string
+}
+
+export type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`  | `Portfolio Modeller` | `Cashflows`
+
+export type EmitParams = {
+  parentDisplayName: string,
+  tabs:{
+    tabName: string,
+    tabType: TabType,
+    calcParams: ResultCalcParams
+  }[]
+}
+export type LoadStatus = `Loading` | `Loaded` | `Failed`;
+
+export type ResultTab = {
+    displayName: string,
+    status: LoadStatus,
+    resultType: TabType,
+    calcParams?: ResultCalcParams
+} 
+
+export type ResultCalcParams = IRRCalcParams | MonthlyReturnsCalcParams | PerfFeesCalcParams | CashFlowParams
+
+export type ParentTabType = {
+    parentDisplayName: string,
+    parentActualName: string,
+    status: LoadStatus,
+    tabset: ResultTab[]
+}  

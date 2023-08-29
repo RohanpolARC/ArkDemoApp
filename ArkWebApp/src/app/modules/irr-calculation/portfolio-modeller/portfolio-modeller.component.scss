@@ -61,6 +61,7 @@
 
 .dropdown{
     min-width: 200px;
+    width: 325px;
 }
 
 .dropdown > ng-multiselect-dropdown{
@@ -76,4 +77,9 @@
     vertical-align: top;
     display: inline-block;
     line-height: 24px; // this is defined in .mat-slide-toggle
+}
+
+::ng-deep .multiselect-dropdown .dropdown-btn .selected-item-container .selected-item
+{
+  max-width: 225px !important; //ng-deep is required to select the element and !important is required to override the element's max-width
 }

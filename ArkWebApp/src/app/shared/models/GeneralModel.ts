@@ -2,6 +2,11 @@ export interface IPropertyReader {
     readProperty<T>(prop: string): T
 }
 
+export interface IUniqueValuesForField {
+    id: number, 
+    value: string
+}
+
 export interface APIReponse {
     isSuccess: boolean,
     returnMessage: string,
@@ -33,13 +38,13 @@ export interface RefDataProc{
 }
 
   export type ConfirmComponentConfigure={
-    headerText?:string,
-    displayConfirmButton?:boolean,
-    showTextField?:boolean,
-    textFieldValue?:string,
-    textFieldLabelValue?:string,
-    showCustomForm?:boolean
-    data?:any
+    headerText?:            string,
+    displayConfirmButton?:  boolean,
+    showTextField?:         boolean,
+    textFieldValue?:        string,
+    textFieldLabelValue?:   string,
+    showCustomForm?:        boolean
+    data?:                  any
   }
 
 export type FilterConfig={

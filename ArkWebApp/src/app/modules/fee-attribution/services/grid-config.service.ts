@@ -23,11 +23,8 @@ export class GridConfigService {
       { field: 'positionID', type: 'abColDefNumber' },
       { field: 'type', type: 'abColDefString' },
       { field: 'fees', type: 'abColDefNumber' },
-      // { field: 'currentFees', type: 'abColDefNumber' },
-      // { field: 'previousFees', type: 'abColDefNumber' },
-      // { field: 'feesDelta', type: 'abColDefNumber' },
       { field: 'tradeDate', type: 'abColDefDate' },
-      { field: 'settleDate', type: 'abColDefDate' },
+      { field: 'settleDate', type: 'abColDefDate', hide: true },
       { field: 'fund', type: 'abColDefString' },
       { field: 'fundHedging', type: 'abColDefString' },
       { field: 'issuer', type: 'abColDefString' },
@@ -61,7 +58,7 @@ export class GridConfigService {
         enableRowGroup: true,
         enableValue: true,
         enablePivot: true,
-        valueGetter: this.gridUtilSvc.valueGetter
+        // valueGetter: this.gridUtilSvc.valueGetter
       },
       suppressAggFuncInHeader: true
     };
@@ -104,15 +101,16 @@ export class GridConfigService {
           ]
         },
         Layout: {
-          Revision: 1,
+          Revision: 4,
           CurrentLayout: 'Basic',
           Layouts:[
             {
               Name: 'Basic',
-              Columns: [ ...this.columnDefs.map(c => c.field) ],
+              Columns: [ ...this.columnDefs.filter(c => !c.hide).map(c => c.field) ],
               RowGroupedColumns: [ 'issuerShortName', 'asset', 'type' ],
               AggregationColumns: {
-                'fees': 'sum'
+                'fees': 'sum',
+                'tradeDate': 'last'
               }
             }
           ]

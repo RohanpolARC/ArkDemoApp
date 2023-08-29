@@ -26,6 +26,13 @@ export class AggridMaterialDatepickerComponent implements OnInit, ICellEditorAng
   @ViewChild(MatDatepicker, { static: true })
   datepicker: MatDatepicker<Date>
 
+  themeSizes:{
+    rowHeight: number;
+    headerHeight: number;
+  }
+
+  customMatDatePickerStyle :string = 'width: 100%;'
+
   ngAfterViewInit(): void {
     // this.datepicker.open();
   }
@@ -41,6 +48,10 @@ export class AggridMaterialDatepickerComponent implements OnInit, ICellEditorAng
     )
 
     this.val = this.dateControl.value;
+    this.themeSizes =  params.api.getSizesForCurrentTheme()
+    if(this.themeSizes.rowHeight===30){
+      this.customMatDatePickerStyle = 'font-size: 0.75rem; width: 100%;'
+    }
   }
 
   ngOnDestroy(): void {

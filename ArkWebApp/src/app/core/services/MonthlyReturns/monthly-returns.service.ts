@@ -1,10 +1,9 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
 import { MonthlyReturnsCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
-import { MsalUserService } from '../Auth/msaluser.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +11,7 @@ import { MsalUserService } from '../Auth/msaluser.service';
 export class MonthlyReturnsService {
   
   constructor(
-    private http: HttpClient,
-    private msalService: MsalUserService) { }
+    private http: HttpClient) { }
 
   public getMonthlyReturns(params: MonthlyReturnsCalcParams){
 
