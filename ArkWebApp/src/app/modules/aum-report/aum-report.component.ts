@@ -1,5 +1,5 @@
-import { AdaptableApi, AdaptableOptions, DetailInitContext } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, HeaderValueGetterParams, IDetailCellRendererParams, Module, ValueGetterParams, IsRowMaster, DetailGridInfo, RowGroupOpenedEvent } from '@ag-grid-community/core';
+import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, IDetailCellRendererParams, Module, DetailGridInfo, RowGroupOpenedEvent } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs-compat';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -7,9 +7,8 @@ import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/genera
 import { AumReportService } from 'src/app/core/services/aum-report/aum-report.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
-import {  CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, formatDate, DATE_FORMATTER_CONFIG_ddMMyyyy, nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
+import {  CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
 import {  autosizeColumnExceptResized,  loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
-import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { MasterDetailModule } from "@ag-grid-enterprise/master-detail";
 import masterDetailAgGridPlugin from '@adaptabletools/adaptable-plugin-master-detail-aggrid';
