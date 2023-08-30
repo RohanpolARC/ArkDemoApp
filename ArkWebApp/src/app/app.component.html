@@ -101,6 +101,9 @@
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Mark Changes')" [ngStyle]="MarkChangeStyle">
           <div class="list-item-text">Mark Changes</div>
         </mat-list-item>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('AUM Report')" [ngStyle]="AumReportStyle">
+          <div class="list-item-text">AUM Report</div>
+        </mat-list-item>
       </mat-list>
     </mat-expansion-panel>
   </mat-accordion>
@@ -184,7 +187,7 @@
       <button mat-raised-button id="apply-button"  
         *ngIf="[
         '/facility-detail', '/liquidity-summary', '/fee-calculation', '/management-fee',
-        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/aum-delta', '/net-returns','/mark-changes','/valuation','/fee-attribution'].includes(location.path())" 
+        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/aum-delta', '/net-returns','/mark-changes','/valuation','/fee-attribution','/aum-report'].includes(location.path())" 
         (click)="filterApply()">Apply</button>
     </div>
 
@@ -243,6 +246,10 @@
 
     <div *ngIf="location.path() === '/fee-attribution'" class="filter-element">
       <app-general-filter [screen] = "'Fee Attribution'"></app-general-filter>
+    </div>
+
+    <div *ngIf="location.path() === '/aum-report'" class="filter-element">
+      <app-general-filter [screen] = "'Aum Report'"></app-general-filter>
     </div>
 
 
