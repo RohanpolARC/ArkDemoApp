@@ -104,7 +104,7 @@ export class InvestorGridConfigService {
           {
             columnId: 'Edit',
             actionColumnButton: {
-              onClick: this.gridUtilSvc.editActionColumn,
+              onClick: this.gridUtilSvc.editActionColumn.bind(this.gridUtilSvc),
               icon: {
                 src: '../assets/img/edit.svg',
                 style: {
