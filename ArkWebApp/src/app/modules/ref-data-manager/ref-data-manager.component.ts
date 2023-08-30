@@ -267,7 +267,7 @@ export class RefDataManagerComponent implements OnInit {
             this.gridApi?.setRowData(this.rowRefData)
           },
           error:error=>{
-            console.log(error)
+            console.error(error)
             this.gridApi?.hideOverlay();
           }
         }))

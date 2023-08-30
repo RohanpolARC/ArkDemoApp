@@ -453,7 +453,6 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
 
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     adaptable_Api = adaptableApi;
-    console.log('Adaptable is now ready', adaptable_Api)
     this.adapTableApi = adaptableApi
     adaptable_Api.toolPanelApi.closeAdapTableToolPanel();
     adaptable_Api.filterApi.clearColumnFilters();

@@ -52,9 +52,7 @@ export class IrrCalculationComponent implements OnInit {
 
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if(isHit){
-        console.log(this.irrCalcSvc.parentTabs)
         this.irrCalcSvc.parentTabs = []
-        console.log(this.irrCalcSvc.parentTabs)
 
       }
     }))

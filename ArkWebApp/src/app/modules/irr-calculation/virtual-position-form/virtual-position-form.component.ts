@@ -218,8 +218,6 @@ export class VirtualPositionFormComponent implements OnInit {
 
     let row: any = this.params.row
 
-    console.log(this.params.row)
-
     if(this.params.context === 'UPDATE'){
       this.form.patchValue({
         position: {

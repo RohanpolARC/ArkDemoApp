@@ -46,7 +46,7 @@ export class RefService {
         this.dealTypeList = ref[6].map(item=>item.value)
       },
       error:(err)=>{
-        console.log(err)
+        console.error(err)
         this.refDataLoadFailed = true
       }
     })
