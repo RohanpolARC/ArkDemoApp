@@ -11,6 +11,7 @@
   "private": true,
   "dependencies": {
     "@adaptabletools/adaptable-angular-aggrid": "15.4.3",
+    "@adaptabletools/adaptable-plugin-master-detail-aggrid": "^15.4.3",
     "@ag-grid-community/angular": "29.3.0",
     "@ag-grid-community/client-side-row-model": "29.3.0",
     "@ag-grid-community/core": "29.3.0",
@@ -44,6 +45,7 @@
     "bootstrap": "^5.1.3",
     "moment": "^2.29.1",
     "ng-multiselect-dropdown": "^0.3.8",
+    "ngx-ssrs-reportviewer": "^3.1.1",
     "rxjs": "^6.6.0",
     "rxjs-compat": "^6.6.7",
     "typescript": "^4.3.5",
