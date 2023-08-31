@@ -9,12 +9,24 @@ import { APIReponse } from 'src/app/shared/models/GeneralModel';
 @Injectable()
 export class CapitalActivityService {
 
-  constructor(private http:HttpClient) { }
+  constructor(private http: HttpClient) { }
 
   private linkSubject = new Subject<boolean>();
   linkEvent$ = this.linkSubject.asObservable();
   updateLinkEvent(link: boolean){
     this.linkSubject.next(link);
+  }
+
+  private investorGridLoaded = new Subject<boolean>();
+  investorGridLoaded$ = this.investorGridLoaded.asObservable();
+  updateInvestorGridLoaded(loaded: boolean){
+    this.investorGridLoaded.next(loaded);
+  }
+
+  private investmentGridLoaded = new Subject<boolean>();
+  investmentGridLoaded$ = this.investmentGridLoaded.asObservable();
+  updateInvestmentGridLoaded(loaded: boolean){
+    this.investmentGridLoaded.next(loaded);
   }
 
   public putCapitalActivity(capitalAct: CapitalActivityModel){

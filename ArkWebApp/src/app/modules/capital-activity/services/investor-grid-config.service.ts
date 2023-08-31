@@ -92,6 +92,10 @@ export class InvestorGridConfigService {
 
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
+      searchOptions: {
+        clearSearchesOnStartUp: true
+      },
+
       teamSharingOptions: {
         enableTeamSharing: true,
         persistSharedEntities: presistSharedEntities.bind(this), //https://docs.adaptabletools.com/guide/version-15-upgrade-guide

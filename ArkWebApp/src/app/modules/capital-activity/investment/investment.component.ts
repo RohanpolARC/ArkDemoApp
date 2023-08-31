@@ -5,6 +5,7 @@ import { InvestmentGridConfigService } from '../services/investment-grid-config.
 import { ComponentReaderService } from '../services/component-reader.service';
 import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { CommonConfig } from 'src/app/configs/common-config';
+import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
 
 @Component({
   selector: 'app-investment',
@@ -27,6 +28,7 @@ export class InvestmentComponent implements OnInit, IPropertyReader {
     return this[prop];
   }
   constructor(public gridConfigSvc: InvestmentGridConfigService,
+    private capitalActivitySvc: CapitalActivityService,
     private componentReaderSvc: ComponentReaderService) {
       this.componentReaderSvc.registerInvestmentComponent(this)
     }
@@ -44,5 +46,7 @@ export class InvestmentComponent implements OnInit, IPropertyReader {
     
     api.toolPanelApi.closeAdapTableToolPanel();
     api.columnApi.autosizeAllColumns()
+
+    this.capitalActivitySvc.updateInvestmentGridLoaded(true);
   };
 }

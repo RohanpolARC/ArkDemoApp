@@ -3,13 +3,13 @@ import { MatAccordion } from '@angular/material/expansion';
 import { MatDialog } from '@angular/material/dialog';
 import { Module } from '@ag-grid-community/core';
 import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/CapitalActivityModel';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
 import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { UtilService } from './services/util.service';
 import { ComponentReaderService } from './services/component-reader.service';
-import { take } from 'rxjs/operators';
+import { map, take, filter, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-capital-activity',
@@ -42,26 +42,36 @@ export class CapitalActivityComponent implements OnInit, IPropertyReader {
   }
 
   loadInvestorData(){
-    this.investorData$ = this.capitalActivityService.getCapitalActivity().pipe(take(1));
-    setTimeout(() => {
-      this.compReaderSvc.investorGridApi().showLoadingOverlay();
-    })
+    this.compReaderSvc.investorGridApi().showLoadingOverlay();
+    this.investorData$ = this.capitalActivityService.getCapitalActivity().pipe(take(1),
+      tap(() => { this.compReaderSvc.investorGridApi().hideOverlay() })
+    );
+    // setTimeout(() => {
+    //   this.compReaderSvc.investorGridApi().showLoadingOverlay();
+    // })
   }
 
   loadInvestmentData(){
-    this.investmentData$ = this.capitalActivityService.getCapitalInvestment().pipe(take(1));
-    setTimeout(() => {
-      this.compReaderSvc.investmentGridApi().showLoadingOverlay();
-    })
+    this.compReaderSvc.investmentGridApi().showLoadingOverlay();
+    this.investmentData$ = this.capitalActivityService.getCapitalInvestment().pipe(take(1),
+      tap(() => { this.compReaderSvc.investmentGridApi().hideOverlay() })
+    );
+    // setTimeout(() => {
+    //   this.compReaderSvc.investmentGridApi().showLoadingOverlay();
+    // })
   }
   invstmntPanelOpenState = false;
   investorPanelOpenState = false;
 
   ngOnInit(): void {
 
-    setTimeout(() => {
-      this.loadInvestorData();
-      this.loadInvestmentData();
-    }, 0)
+    combineLatest([this.capitalActivityService.investorGridLoaded$, this.capitalActivityService.investmentGridLoaded$]).pipe(
+      map(([investorGridLoaded, investmentGridLoaded]) => investorGridLoaded && investmentGridLoaded),
+      filter(loaded => loaded),
+      take(1)
+    ).subscribe((loaded) => {
+        this.loadInvestorData();
+        this.loadInvestmentData();  
+    })
   }
 }

@@ -59,8 +59,8 @@ export class FormUtilService {
     let currency: string = this.validateField(this.fundCcyOptions, control, 'fundCcy');
     let totalAmount: number = getAmountNumber(control.get('totalAmount').value);
 
-    let CD: boolean = (callDate !== null && callDate !== 'Invalid date')
-    let VD: boolean = (valueDate !== null && valueDate !== 'Invalid date')
+    let CD: boolean = (callDate !== null && callDate !== 'Invalid date' && callDate > '2000/01/01')
+    let VD: boolean = (valueDate !== null && valueDate !== 'Invalid date' && valueDate > '2000/01/01')
     let FH: boolean = (fundHedging !== null && fundHedging !== '')
     let CT: boolean = (capitalType !== null && capitalType !== '')
     let CST: boolean = (capitalSubType !== null && capitalSubType !== '')

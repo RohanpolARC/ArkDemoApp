@@ -4,6 +4,7 @@ import { GridApi, Module } from '@ag-grid-community/core';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { AdaptableApi, AdaptableReadyInfo } from '@adaptabletools/adaptable-angular-aggrid';
 import { ComponentReaderService } from '../services/component-reader.service';
+import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
 
 @Component({
   selector: 'app-investor',
@@ -26,6 +27,7 @@ export class InvestorComponent implements OnInit {
     return this[prop];
   }    
   constructor(public gridConfigSvc: InvestorGridConfigService,
+    private capitalActivitySvc: CapitalActivityService,
     private componentReaderSvc: ComponentReaderService) {
       this.componentReaderSvc.registerInvestorComponent(this);
     }
@@ -41,5 +43,7 @@ export class InvestorComponent implements OnInit {
     
     api.toolPanelApi.closeAdapTableToolPanel();
     api.columnApi.autosizeAllColumns()
+
+    this.capitalActivitySvc.updateInvestorGridLoaded(true);
   };
 }
