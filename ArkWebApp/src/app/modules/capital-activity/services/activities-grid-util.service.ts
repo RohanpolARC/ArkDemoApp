@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { getAmountNumber, getMomentDate } from 'src/app/shared/functions/utilities';
+import { getAmountNumber, getDateFromStr, getMomentDate } from 'src/app/shared/functions/utilities';
 import { validateExcelRows } from '../bulk-upload/validation';
 export type ValidateColumn = {isValid: boolean, col?: string};
 
@@ -43,7 +43,7 @@ export class ActivitiesGridUtilService {
         if(['Amount (in Fund Ccy)'].includes(headers[j]))
           obj[headers[j]] = getAmountNumber(data[i][j])
         else if(['Call Date', 'Cash Flow Date'].includes(headers[j])){
-          obj[headers[j]] = getMomentDate(data[i][j])
+          obj[headers[j]] = getDateFromStr(data[i][j], 'DD/MM/YYYY');
           if(obj[headers[j]] == 'Invalid Date')
             obj[headers[j]] = null 
         }

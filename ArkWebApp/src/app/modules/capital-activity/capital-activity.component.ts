@@ -42,23 +42,23 @@ export class CapitalActivityComponent implements OnInit, IPropertyReader {
   }
 
   loadInvestorData(){
-    this.compReaderSvc.investorGridApi().showLoadingOverlay();
+    // this.compReaderSvc.investorGridApi().showLoadingOverlay();
     this.investorData$ = this.capitalActivityService.getCapitalActivity().pipe(take(1),
       tap(() => { this.compReaderSvc.investorGridApi().hideOverlay() })
     );
-    // setTimeout(() => {
-    //   this.compReaderSvc.investorGridApi().showLoadingOverlay();
-    // })
+    setTimeout(() => {
+      this.compReaderSvc.investorGridApi().showLoadingOverlay();
+    })
   }
 
   loadInvestmentData(){
-    this.compReaderSvc.investmentGridApi().showLoadingOverlay();
+    // this.compReaderSvc.investmentGridApi().showLoadingOverlay();
     this.investmentData$ = this.capitalActivityService.getCapitalInvestment().pipe(take(1),
       tap(() => { this.compReaderSvc.investmentGridApi().hideOverlay() })
     );
-    // setTimeout(() => {
-    //   this.compReaderSvc.investmentGridApi().showLoadingOverlay();
-    // })
+    setTimeout(() => {
+      this.compReaderSvc.investmentGridApi().showLoadingOverlay();
+    })
   }
   invstmntPanelOpenState = false;
   investorPanelOpenState = false;
