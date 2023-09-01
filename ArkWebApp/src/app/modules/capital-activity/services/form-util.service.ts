@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { DataService } from 'src/app/core/services/data.service';
 import { formatDate } from 'src/app/shared/functions/formatter';
 import { getAmountNumber, getMomentDate } from 'src/app/shared/functions/utilities';
 import { CapitalActivityModel } from 'src/app/shared/models/CapitalActivityModel';
@@ -9,7 +10,7 @@ export type NetAsset = [string, number]
 
 @Injectable()
 export class FormUtilService {
-  constructor() { }
+  constructor(private dataSvc: DataService) { }
   refData: any[]
   capitalTypeSubtypeAssociation: any[]
   actionType: 'LINK-ADD' | 'ADD' | 'EDIT'
@@ -128,7 +129,11 @@ export class FormUtilService {
       model.source = 'ArkUI - manual';
       model.sourceID = 1;
     }
-
+    else if(this.actionType === 'LINK-ADD'){
+      model.source = 'ArkUI - link';
+      model.sourceID = 4;
+    }
+    model.modifiedBy = this.dataSvc.getCurrentUserName();
     return model;
   }
 
