@@ -135,7 +135,7 @@
           </button>
         </mat-form-field>
 
-        <ng-container *ngIf="hideNonNAVFields; then totalAmount else empty">
+        <ng-container *ngIf="hideIssuerAndAsset(); then totalAmount else empty">
         </ng-container>
 
     </div>
@@ -179,18 +179,16 @@
           </button>
         </mat-form-field>
 
-        <ng-container *ngIf="hideNonNAVFields; then narrative else totalAmount">          
+        <ng-container *ngIf="hideIssuerAndAsset(); then narrative else totalAmount">          
         </ng-container>
 
     </div>
-
     <div class="row">
+        <ng-container *ngIf="!hideIssuerAndAsset(); then issuer"></ng-container>
 
-        <ng-container *ngIf="!hideNonNAVFields; then issuer"></ng-container>
+        <ng-container *ngIf="!hideIssuerAndAsset(); then asset"></ng-container>
 
-        <ng-container *ngIf="!hideNonNAVFields; then asset"></ng-container>
-
-        <ng-container *ngIf="!hideNonNAVFields; then narrative"></ng-container>
+        <ng-container *ngIf="!hideIssuerAndAsset(); then narrative"></ng-container>
     
     </div>
   </form>

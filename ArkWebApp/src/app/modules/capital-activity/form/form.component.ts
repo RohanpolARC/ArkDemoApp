@@ -47,7 +47,8 @@ export class FormComponent implements OnInit{
   posCcyFilteredOptions: Observable<string[]>;
   actionType: 'LINK-ADD' | 'ADD' | 'EDIT'
   gridData: any[] = [];  
-  hideNonNAVFields: boolean;
+  isNAVType: boolean;  // Hiding issuer and asset when CapitalType = 'NAV' or multiple issuers have been selected during linking
+  isMultipleIssuers: boolean;
 
   form = new FormGroup({
     valueDate: new FormControl(null, Validators.required),
@@ -112,10 +113,10 @@ export class FormComponent implements OnInit{
           this.form.get('issuerShortName').reset();
           this.form.get('asset').reset();
 
-          this.hideNonNAVFields = true;
+          this.isNAVType = true;
         }
         else 
-          this.hideNonNAVFields = false;
+          this.isNAVType = false;
       }),
       map(value => this.formUtilSvc._filter(this.formUtilSvc.capitalTypeOptions, value)),
 
@@ -157,17 +158,30 @@ export class FormComponent implements OnInit{
       this.gridData = this.data.rowData;
 
       let FH: string = this.data.rowData[0].fundHedging;
-      let ISN: string = this.data.rowData[0].issuerShortName;
       let FundCcy: string = this.data.rowData[0].fundCcy;
 
-      this.formUtilSvc.selectedIssuerID = this.data.rowData[0].issuerID;
+      let ISN: string = null, narrative: string = null;
+
+      let issuers: string[] = [...new Set(<string[]>this.data.rowData?.map(investment =><string> investment?.['issuerShortName']))];
+
       this.formUtilSvc.setDynamicOptions(FH, null, null); // This line sets Issuer options.
-      this.formUtilSvc.setDynamicOptions(FH, ISN, null);  // This only sets asset options.
+
+      if(issuers?.length > 1){
+        narrative = issuers.join(', ');
+        this.isMultipleIssuers = true;       // Hiding issuer and asset fields
+      }
+      else if(issuers?.length === 1){
+        ISN = issuers[0];
+
+        this.formUtilSvc.selectedIssuerID = this.data.rowData[0].issuerID;
+        this.formUtilSvc.setDynamicOptions(FH, ISN, null);  // This only sets asset options.
+      }
+
 
       let investmentsBaseAmount: number = this.gridData?.map(inv => inv?.['totalBase']).reduce((total, amount) => total + amount) || 0.0;
 
       this.form.patchValue({
-        narrative: null,
+        narrative: narrative,
         capitalType: null,
         capitalSubType: null,
         fundCcy: FundCcy,
@@ -210,6 +224,9 @@ export class FormComponent implements OnInit{
     }
   }
 
+  hideIssuerAndAsset(): boolean {
+    return this.isMultipleIssuers || this.isNAVType;
+  }
   ngOnDestroy(): void{
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
