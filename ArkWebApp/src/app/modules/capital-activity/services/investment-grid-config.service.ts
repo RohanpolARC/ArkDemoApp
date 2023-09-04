@@ -38,14 +38,11 @@ export class InvestmentGridConfigService {
       { field: 'fundCcy', tooltipField: 'fundCcy', headerName: 'Fund Ccy', type: 'abColDefString'},
       { field: 'positionCcy', tooltipField: 'positionCcy', headerName: 'Position Ccy', type: 'abColDefString'},
       { field: 'amount', tooltipField: 'amount', headerName: 'Total', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-      { field: 'linkedAmount', tooltipField: 'linkedAmount', headerName: 'Linked Amount', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
       { field: 'linkedAmountBase', tooltipField: 'linkedAmountBase', headerName: 'Linked Amount Base', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
       { field: 'totalBase', tooltipValueGetter: this.gridUtilSvc.tooltipValueGetter, headerName: 'Total Base', cellClass: 'ag-right-aligned-cell', onCellClicked: this.gridUtilSvc.onTotalBaseClick.bind(this), 
         cellStyle: this.gridUtilSvc.cellStyle, type: 'abColDefNumber'},
       { field: 'totalEur', headerName: 'Total Eur', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
-      { field: 'break', headerName: 'Break',  cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
       { field: 'breakBase', headerName: 'Break Base', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
-      { field: 'groupBreak', headerName: 'Group Break', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
       { field: 'groupBreakBase', headerName: 'Group Break Base', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
       { field: 'type', type: 'abColDefString'},
       { field: 'groupID', type: 'abColDefNumber' },
@@ -102,7 +99,7 @@ export class InvestmentGridConfigService {
   
       userInterfaceOptions:{
         customDisplayFormatters:[
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['amount','linkedAmount','totalBase','totalEur', 'linkedAmountBase', 'break', 'breakBase', 'groupBreak', 'groupBreakBase'])
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['amount','totalBase','totalEur', 'linkedAmountBase', 'breakBase', 'groupBreakBase'])
 
         ]
       },
@@ -120,7 +117,7 @@ export class InvestmentGridConfigService {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 18,
+          Revision: 19,
           Layouts:[{
             Name: 'Basic Investment Cashflow',
             Columns: [
@@ -135,13 +132,11 @@ export class InvestmentGridConfigService {
               'fundCcy',
               'positionCcy',
               'amount',
-              'linkedAmount',
               'linkedAmountBase',
               'totalBase',
               'totalEur',
-              'break',
               'breakBase',
-              'groupBreak','groupBreakBase','groupID',
+              'groupBreakBase','groupID',
               'link'
             ],
             ColumnWidthMap:{
@@ -155,18 +150,17 @@ export class InvestmentGridConfigService {
               total: 'sum',
               totalBase: 'sum',
               totalEur: 'sum',
-              linkedAmount: 'sum',
               linkedAmountBase: 'sum',
             }
           }]
         },
         FormatColumn:{
-          Revision: 8,
+          Revision: 9,
           FormatColumns:[
             DATE_FORMATTER_CONFIG_ddMMyyyy(['cashDate']),
 
-            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['amount','linkedAmount','totalBase','totalEur', 'linkedAmountBase', 'break', 'breakBase', 'groupBreak', 'groupBreakBase'],2,['amountZeroFormat']),
-            AMOUNT_FORMATTER_CONFIG_Zero(['amount','linkedAmount','totalBase','totalEur', 'linkedAmountBase', 'break', 'breakBase', 'groupBreak', 'groupBreakBase'],2,['amountZeroFormat'])
+            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['amount','totalBase','totalEur', 'linkedAmountBase', 'breakBase', 'groupBreakBase'],2,['amountZeroFormat']),
+            AMOUNT_FORMATTER_CONFIG_Zero(['amount','totalBase','totalEur', 'linkedAmountBase', 'breakBase', 'groupBreakBase'],2,['amountZeroFormat'])
           ]
         }  
       }
