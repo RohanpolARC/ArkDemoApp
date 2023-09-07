@@ -74,7 +74,16 @@ export class FormComponent implements OnInit{
       this.modalSvc.updateFormStatus(isValid)
 
       
-      this.modalSvc.capitalActivity = this.model = this.formUtilSvc.getCapitalActivityForm(this.form);      
+      this.modalSvc.capitalActivity = this.model = this.formUtilSvc.getCapitalActivityForm(this.form);
+      let capitalID: number = this.data.rowData?.['capitalID'];
+      if(capitalID && this.actionType === 'EDIT'){
+        this.modalSvc.capitalActivity.capitalID = capitalID;
+        this.model.capitalID = capitalID;
+      }
+      else {
+        this.modalSvc.capitalActivity.capitalID = this.model.capitalID = null;
+      }
+
     }))
 
     /** Listening for changing the autocomplete options, based on search */
