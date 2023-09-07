@@ -126,7 +126,7 @@ export function getMomentDateStr(date: Date): string{
 }
 
 export function getDateFromStr(date: string, format: 'DD-MM-YYYY' | 'YYYY-MM-DD' | 'DD/MM/YYYY' | 'YYYY/MM/DD' = 'YYYY-MM-DD'): Date {
-  return moment(date, format).toDate();
+  return new Date(moment(date, format).format('YYYY-MM-DD'));
 }
 
 export function getFinalDate(date: Date): Date | null{
