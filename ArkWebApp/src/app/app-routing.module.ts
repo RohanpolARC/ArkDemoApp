@@ -67,7 +67,7 @@ const routes: Routes = [
   { path: 'management-fee', loadChildren: () => import('./modules/management-fee/management-fee.module').then(m => m.ManagementFeeModule) },
   { path: 'positions-screen', loadChildren: () => import('./modules/positions-screen/positions-screen.module').then(m => m.PositionsScreenModule) },
   // { path: 'hedging-mark', loadChildren: () => import('./modules/hedging-mark/hedging-mark.module').then(m => m.HedgingMarkModule) },
-  { path: 'aum-delta', loadChildren: () => import('./modules/aum-delta/aum-delta.module').then(m => m.AumDeltaModule) },
+  // { path: 'aum-delta', loadChildren: () => import('./modules/aum-delta/aum-delta.module').then(m => m.AumDeltaModule) },
   { path: 'net-returns', loadChildren: () => import('./modules/net-returns/net-returns.module').then(m => m.NetReturnsModule) },
   { path: 'mark-changes', loadChildren: () => import('./modules/mark-changes/mark-changes.module').then(m => m.MarkChangesModule) },
   { path: 'valuation', loadChildren: () => import('./modules/valuation/valuation.module').then(m => m.ValuationModule) },

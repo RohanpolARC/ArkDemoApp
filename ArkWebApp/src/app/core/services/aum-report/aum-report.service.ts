@@ -18,11 +18,21 @@ export class AumReportService {
   }
   constructor(private http: HttpClient,private msalService: MsalUserService) { }
 
-  public getAUMReportMasterRows(requestedDate: AsOfDateRange){
-    return this.http.get<any[]>(`${APIConfig.AUM_REPORT_GET_API}/?fromDate=${requestedDate.start}&toDate=${requestedDate.end}`).pipe(catchError((ex) => throwError(ex)));
+  public getAUMReportMasterRows(requestedDate: AsOfDateRange,funds: String[]){
+    let fundString = ''
+    funds.forEach((fund:string) =>{
+      fundString += fund + ','
+    })
+
+    return this.http.get<any[]>(`${APIConfig.AUM_REPORT_GET_API}/?fromDate=${requestedDate.start}&toDate=${requestedDate.end}&funds=${fundString.slice(0,fundString.length-1)}`).pipe(catchError((ex) => throwError(ex)));
   }
-  public getAUMReportDetailRows(requestedDate: AsOfDateRange, issuerShortName: string){
-    return this.http.get<any[]>(`${APIConfig.AUM_REPORT_GET_API}/?fromDate=${requestedDate.start}&toDate=${requestedDate.end}&IssuerShortName=${issuerShortName}`).pipe(catchError((ex) => throwError(ex)));
+  public getAUMReportDetailRows(requestedDate: AsOfDateRange, issuerShortName: string,funds: String[]){
+    let fundString = ''
+    funds.forEach((fund:string) =>{
+      fundString += fund + ','
+    })
+
+    return this.http.get<any[]>(`${APIConfig.AUM_REPORT_GET_API}/?fromDate=${requestedDate.start}&toDate=${requestedDate.end}&IssuerShortName=${encodeURIComponent(issuerShortName)}&funds=${fundString.slice(0,fundString.length-1)}`).pipe(catchError((ex) => throwError(ex)));
   }
 
 }
