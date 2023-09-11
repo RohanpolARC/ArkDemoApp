@@ -1,9 +1,14 @@
 <div class="parent">
-    <div class="header">
+    <div class="header d-flex flex-row justify-content-start">
         <div class="title">
             AUM Report
         </div>
-
+        <div class="action mx-3">
+            <div class="date-cont">
+                <mat-icon class="date-range">date_range</mat-icon>
+                <mat-label matTooltip="Please visit Filter Pane to change As Of Date" matTooltipClass="date-tooltip">From: {{sDate?.start | date:"dd/MM/yyyy"}}  - To: {{sDate?.end | date:"dd/MM/yyyy"}}</mat-label>
+            </div>
+        </div>
 
 
     </div>

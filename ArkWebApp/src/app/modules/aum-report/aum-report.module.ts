@@ -5,6 +5,8 @@ import { AUMReportRoutingModule } from './aum-report.routing.module';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 
 
@@ -21,7 +23,9 @@ import { MatCardModule } from '@angular/material/card';
     AdaptableAngularAgGridModule,
     AgGridModule,
 
-    MatCardModule
+    MatCardModule,
+    MatIconModule,
+    MatFormFieldModule
   ]
 })
 export class AumReportModule { }

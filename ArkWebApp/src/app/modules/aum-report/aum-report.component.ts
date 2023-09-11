@@ -9,7 +9,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import {  CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
 import {  autosizeColumnExceptResized,  loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
-import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
+import { AsOfDateRange, FilterValueChangeParams } from 'src/app/shared/models/FilterPaneModel';
 import { MasterDetailModule } from "@ag-grid-enterprise/master-detail";
 import masterDetailAgGridPlugin from '@adaptabletools/adaptable-plugin-master-detail-aggrid';
 
@@ -32,6 +32,7 @@ export class AumReportComponent implements OnInit {
   sDate: AsOfDateRange = null;
   noRowsToDisplayMsg = 'Please select the filter.'
   detailCellRendererParams: IDetailCellRendererParams<any, any>;
+  funds: string[] = []
 
   AMOUNT_COLUMNS = [
     "aumLast",
@@ -66,13 +67,17 @@ export class AumReportComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
-      if(data){
-        if(data.id === 622){
-          this.sDate = data.value
+    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe((filter:FilterValueChangeParams)=>{
+      if(filter){
+        if(filter.id === 622){
+          this.sDate = filter.value
           if(this.sDate.end === 'Invalid date')
             this.sDate.end = this.sDate.start;
           this.aumReportSvc.changeSearchDateRange(this.sDate)
+        }
+        else if(filter.id === 623){
+          this.funds = filter?.value?.map(fund => fund?.value);
+
         }
       }
     }))
@@ -119,10 +124,13 @@ export class AumReportComponent implements OnInit {
         },
         enableRangeSelection: true, 
         rowHeight: 30,
-        headerHeight: 30          
+        headerHeight: 30,
+        onGridReady: (params: GridReadyEvent) => {
+          params.api.closeToolPanel()
+        },
       },
       getDetailRowData: (params) => {
-        this.subscriptions.push(this.aumReportSvc.getAUMReportDetailRows(this.sDate, params.data?.["issuerShortName"]).subscribe({
+        this.subscriptions.push(this.aumReportSvc.getAUMReportDetailRows(this.sDate, params.data?.["issuerShortName"],this.funds).subscribe({
           next: (detail) => {
             params.successCallback(detail)
           },
@@ -198,7 +206,7 @@ export class AumReportComponent implements OnInit {
         masterDetailAgGridPlugin({
           detailAdaptableOptions: {
             adaptableId: 'AumReportDetails',
-            primaryKey: 'PositionId',
+            primaryKey: 'positionId',
             licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
             userInterfaceOptions:{
               customDisplayFormatters:[
@@ -207,7 +215,7 @@ export class AumReportComponent implements OnInit {
             },
             predefinedConfig: { 
               Dashboard: {
-                Revision:1,
+                Revision:2,
                 ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
                 IsCollapsed: true,
                 Tabs: [{
@@ -217,6 +225,40 @@ export class AumReportComponent implements OnInit {
                 IsHidden: false,
                 DashboardTitle: ' '
               },             
+              Layout:{
+                CurrentLayout:"Basic AUM Report Detail Layout",
+                Revision:1,
+                Layouts:[{
+                  Name: "Basic AUM Report Detail Layout",
+                  Columns: [
+                    "positionId"
+                    ,"fund"
+                    ,"fundHedging"
+                    ,"portfolio"
+                    ,"aumLatest"
+                    ,"aumLast"
+                    ,"aumDiff"
+                    ,"grossCostAmountEurCurrent"
+                    ,"grossCostAmountEurLast"
+                    ,"grossCostAmountEurDiff"
+                    ,"grossFundedCostAmountEurCurrent"
+                    ,"grossFundedCostAmountEurLast"
+                    ,"grossFundedCostAmountEurDiff"
+                    ,"costAmountEurCurrent"
+                    ,"costAmountEurLast"
+                    ,"costAmountEurDiff"
+                    ,"fundedCostAmountEurCurrent"
+                    ,"fundedCostAmountEurLast"
+                    ,"fundedCostAmountEurDiff"
+                    ,"costAmountLocalCurrent"
+                    ,"costAmountLocalLast"
+                    ,"costAmountLocalDiff"
+                    ,"aumEurAdjustmentCurrent"
+                    ,"aumEurAdjustmentLast"
+                    ,"aumEurAdjustmentDiff"
+                  ],
+                }]
+              },
               FormatColumn:{
                 Revision :1,
                 FormatColumns:[
@@ -265,9 +307,9 @@ export class AumReportComponent implements OnInit {
   getAumReport(){
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if(isHit){
-        if(this.sDate !== null){
+        if(this.sDate !== null && this.funds.length > 0){
           this.gridApi?.showLoadingOverlay();
-          this.subscriptions.push(this.aumReportSvc.getAUMReportMasterRows(this.sDate).subscribe({
+          this.subscriptions.push(this.aumReportSvc.getAUMReportMasterRows(this.sDate,this.funds).subscribe({
             next: data => {
               if(data.length === 0){
                 this.noRowsToDisplayMsg = 'No data found for applied filter.'
@@ -311,6 +353,9 @@ export class AumReportComponent implements OnInit {
       onRowGroupOpened: (event: RowGroupOpenedEvent<any>) => void = (params: RowGroupOpenedEvent) => {
         this.detailColumnDefs = [
           {field: "positionId",type:"abColDefNumber"},
+          {field: "fund", type:"abColDefString"},
+          {field: "fundHedging", type:"abColDefString"},
+          {field: "portfolio", type:"abColDefString"},
           {field: "aumLatest",type:"abColDefNumber", valueFormatter: nonAmountNumberFormatter, headerName:"AUM Latest"},
           {field: "aumLast",type:"abColDefNumber", headerName:"AUM Last"},
           {field: "aumDiff",type:"abColDefNumber", headerName:"AUM Diff"},
