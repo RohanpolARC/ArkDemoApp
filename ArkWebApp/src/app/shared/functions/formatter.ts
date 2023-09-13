@@ -401,6 +401,31 @@ export function CUSTOM_DISPLAY_FORMATTERS_CONFIG(id,columnIds:any[]=[]){
 
         }
 
+    }else if(id ==='amountMillionFormatter'){
+        handlerFunc = (customDisplayFormatterContext: CustomDisplayFormatterContext)=>{
+            const currentValue:any = Number(customDisplayFormatterContext.cellValue)*0.000001;
+            // const currentValue:any = customDisplayFormatterContext.cellValue;
+
+            if(customDisplayFormatterContext.cellValue != undefined && Number(Number(currentValue).toFixed(1)) != 0){
+                if(Number.isInteger(Number(Number(currentValue).toFixed(1)))){
+                    return Number(currentValue).toLocaleString(undefined,{
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }) + "m"
+                }else{
+                    return Number(currentValue).toLocaleString(undefined,{
+                        minimumFractionDigits: 1,
+                        maximumFractionDigits: 1
+                    }) + "m"
+                }
+            }else if(Number(Number(currentValue).toFixed(1)) == 0){
+                return "-"
+            }else{
+                return ""
+            }
+
+        }
+
     }
 
     let scope

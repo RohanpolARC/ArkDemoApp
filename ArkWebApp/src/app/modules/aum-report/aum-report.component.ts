@@ -7,7 +7,7 @@ import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/genera
 import { AumReportService } from 'src/app/core/services/aum-report/aum-report.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
-import {  AMOUNT_FORMATTER_CONFIG_MILLIONS,   nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
+import {     CUSTOM_DISPLAY_FORMATTERS_CONFIG,   CUSTOM_FORMATTER,   nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
 import {  autosizeColumnExceptResized,  loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { AsOfDateRange, FilterValueChangeParams } from 'src/app/shared/models/FilterPaneModel';
 import { MasterDetailModule } from "@ag-grid-enterprise/master-detail";
@@ -86,6 +86,7 @@ export class AumReportComponent implements OnInit {
 
     this.columnDefs = [
       {field: "issuerShortName", cellRenderer: 'agGroupCellRenderer'},
+      {field: "issuer", type:"abColDefString"},
       {field: "aumLatest",type:"abColDefNumber", headerName:"AUM Latest" },
       {field: "aumLast",type:"abColDefNumber", headerName:"AUM Last"},
       {field: "aumDiff",type:"abColDefNumber", headerName:"AUM Diff"},
@@ -127,6 +128,7 @@ export class AumReportComponent implements OnInit {
         rowHeight: 30,
         headerHeight: 30,
         rowGroupPanelShow: 'always',
+        sideBar: true,
         suppressAggFuncInHeader: true,
         onGridReady: (params: GridReadyEvent) => {
           params.api.closeToolPanel()
@@ -165,6 +167,7 @@ export class AumReportComponent implements OnInit {
       columnDefs: this.columnDefs,
       rowData: this.rowData,
       suppressAggFuncInHeader: true,
+      detailRowHeight: 450,
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel()
         this.gridApi = params.api; 
@@ -209,12 +212,23 @@ export class AumReportComponent implements OnInit {
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
+      userInterfaceOptions: {
+        customDisplayFormatters: [
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG("amountMillionFormatter",this.AMOUNT_COLUMNS)
+        ]
+      },
+
       plugins: [
         masterDetailAgGridPlugin({
           detailAdaptableOptions: {
             adaptableId: 'AumReportDetails',
             primaryKey: 'positionId',
             licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
+            userInterfaceOptions: {
+              customDisplayFormatters: [
+                CUSTOM_DISPLAY_FORMATTERS_CONFIG("amountMillionFormatter",this.AMOUNT_COLUMNS)
+              ]
+            },
             predefinedConfig: { 
               Dashboard: {
                 Revision:2,
@@ -229,14 +243,14 @@ export class AumReportComponent implements OnInit {
               },             
               Layout:{
                 CurrentLayout:"Basic AUM Report Detail Layout",
-                Revision:2,
+                Revision:5,
                 Layouts:[{
                   Name: "Basic AUM Report Detail Layout",
                   Columns: [
-                    "positionId"
-                    ,"fund"
+                    "fund"
                     ,"fundHedging"
                     ,"portfolio"
+                    ,"asset"
                     ,"aumLatest"
                     ,"aumLast"
                     ,"aumDiff"
@@ -259,6 +273,9 @@ export class AumReportComponent implements OnInit {
                     ,"aumEurAdjustmentLast"
                     ,"aumEurAdjustmentDiff"
                   ],
+                  RowGroupedColumns: [
+                    "fund"
+                  ],
                   AggregationColumns: {
                     aumLatest: "sum",
                     aumLast: "sum",
@@ -273,9 +290,9 @@ export class AumReportComponent implements OnInit {
                 }],
               },
               FormatColumn:{
-                Revision :4,
+                Revision :5,
                 FormatColumns:[
-                  AMOUNT_FORMATTER_CONFIG_MILLIONS(this.AMOUNT_COLUMNS)
+                  CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountMillionFormatter')
                 ]
               },
             },
@@ -344,9 +361,9 @@ export class AumReportComponent implements OnInit {
           
         },
         FormatColumn:{
-          Revision :4,
+          Revision :5,
           FormatColumns:[
-            AMOUNT_FORMATTER_CONFIG_MILLIONS(this.AMOUNT_COLUMNS)
+            CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountMillionFormatter')
           ]
         },
         
@@ -387,7 +404,7 @@ export class AumReportComponent implements OnInit {
               let unpackedData = []
               data.forEach(k => { 
                 unpackedData.push(
-                  {...{fund: k.fund, positionId: k.positionId, aumLatest: k.aumLatest, aumLast:k.aumLast,aumDiff:k.aumDiff,issuerShortName:k.issuerShortName,
+                  {...{fund: k.fund, issuer: k.issuer, positionId: k.positionId, aumLatest: k.aumLatest, aumLast:k.aumLast,aumDiff:k.aumDiff,issuerShortName:k.issuerShortName,
                     grossCostAmountEurCurrent: k.grossCostAmountEurCurrent, grossCostAmountEurLast:k.grossCostAmountEurLast,
                     grossCostAmountEurDiff: k.grossCostAmountEurDiff, grossFundedCostAmountEurCurrent:k.grossFundedCostAmountEurCurrent,
                     grossFundedCostAmountEurLast: k.grossFundedCostAmountEurLast, grossFundedCostAmountEurDiff: k.grossFundedCostAmountEurDiff,
@@ -423,9 +440,12 @@ export class AumReportComponent implements OnInit {
       onRowGroupOpened: (event: RowGroupOpenedEvent<any>) => void = (params: RowGroupOpenedEvent) => {
         this.detailColumnDefs = [
           {field: "positionId",type:"abColDefNumber"},
+          {field: "issuerShortName", type:"abColDefString"},
           {field: "fund", type:"abColDefString"},
           {field: "fundHedging", type:"abColDefString"},
           {field: "portfolio", type:"abColDefString"},
+          {field: "issuer", type:"abColDefString"},
+          {field: "asset", type:"abColDefString"},
           {field: "aumLatest",type:"abColDefNumber", valueFormatter: nonAmountNumberFormatter, headerName:"AUM Latest"},
           {field: "aumLast",type:"abColDefNumber", headerName:"AUM Last"},
           {field: "aumDiff",type:"abColDefNumber", headerName:"AUM Diff"},
