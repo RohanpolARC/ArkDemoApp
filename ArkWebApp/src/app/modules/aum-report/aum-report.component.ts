@@ -1,5 +1,5 @@
-import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, IDetailCellRendererParams, Module, DetailGridInfo, RowGroupOpenedEvent } from '@ag-grid-community/core';
+import { AdaptableApi, AdaptableOptions, DetailInitContext } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, IDetailCellRendererParams, Module, DetailGridInfo, RowGroupOpenedEvent, RowDataUpdatedEvent, FilterChangedEvent, ColumnRowGroupChangedEvent, ValueGetterParams } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs-compat';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -7,7 +7,7 @@ import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/genera
 import { AumReportService } from 'src/app/core/services/aum-report/aum-report.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
-import {  CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
+import {     CUSTOM_DISPLAY_FORMATTERS_CONFIG,   CUSTOM_FORMATTER,   nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
 import {  autosizeColumnExceptResized,  loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { AsOfDateRange, FilterValueChangeParams } from 'src/app/shared/models/FilterPaneModel';
 import { MasterDetailModule } from "@ag-grid-enterprise/master-detail";
@@ -86,6 +86,7 @@ export class AumReportComponent implements OnInit {
 
     this.columnDefs = [
       {field: "issuerShortName", cellRenderer: 'agGroupCellRenderer'},
+      {field: "issuer", type:"abColDefString"},
       {field: "aumLatest",type:"abColDefNumber", headerName:"AUM Latest" },
       {field: "aumLast",type:"abColDefNumber", headerName:"AUM Last"},
       {field: "aumDiff",type:"abColDefNumber", headerName:"AUM Diff"},
@@ -121,13 +122,17 @@ export class AumReportComponent implements OnInit {
           resizable: true,
           filter: true,
           sortable: true,
+          enableRowGroup: true,
         },
         enableRangeSelection: true, 
         rowHeight: 30,
         headerHeight: 30,
+        rowGroupPanelShow: 'always',
+        sideBar: true,
+        suppressAggFuncInHeader: true,
         onGridReady: (params: GridReadyEvent) => {
           params.api.closeToolPanel()
-        },
+        }
       },
       getDetailRowData: (params) => {
         this.subscriptions.push(this.aumReportSvc.getAUMReportDetailRows(this.sDate, params.data?.["issuerShortName"],this.funds).subscribe({
@@ -153,7 +158,7 @@ export class AumReportComponent implements OnInit {
       },
       autoGroupColumnDef:{
         minWidth:200,
-        sortable:true,
+        sortable:true
       },
       enableRangeSelection: true,
       rowGroupPanelShow: "always",
@@ -162,6 +167,7 @@ export class AumReportComponent implements OnInit {
       columnDefs: this.columnDefs,
       rowData: this.rowData,
       suppressAggFuncInHeader: true,
+      detailRowHeight: 450,
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel()
         this.gridApi = params.api; 
@@ -173,6 +179,15 @@ export class AumReportComponent implements OnInit {
       noRowsOverlayComponent: NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
+      },
+      onRowDataUpdated: (params : RowDataUpdatedEvent) => {
+        params.api.setPinnedBottomRowData(this.getAggBottomRow())
+      },
+      onFilterChanged: (params : FilterChangedEvent) => {
+        params.api.setPinnedBottomRowData(this.getAggBottomRow())
+      },
+      onColumnRowGroupChanged: (params: ColumnRowGroupChangedEvent) => {
+        params.api.setPinnedBottomRowData(this.getAggBottomRow())
       },
       masterDetail: true,
       keepDetailRows: true,
@@ -197,20 +212,21 @@ export class AumReportComponent implements OnInit {
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
-      userInterfaceOptions:{
-        customDisplayFormatters:[
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',this.AMOUNT_COLUMNS),
+      userInterfaceOptions: {
+        customDisplayFormatters: [
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG("amountMillionFormatter",this.AMOUNT_COLUMNS)
         ]
       },
+
       plugins: [
         masterDetailAgGridPlugin({
           detailAdaptableOptions: {
             adaptableId: 'AumReportDetails',
             primaryKey: 'positionId',
             licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
-            userInterfaceOptions:{
-              customDisplayFormatters:[
-                CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',this.AMOUNT_COLUMNS),
+            userInterfaceOptions: {
+              customDisplayFormatters: [
+                CUSTOM_DISPLAY_FORMATTERS_CONFIG("amountMillionFormatter",this.AMOUNT_COLUMNS)
               ]
             },
             predefinedConfig: { 
@@ -227,14 +243,14 @@ export class AumReportComponent implements OnInit {
               },             
               Layout:{
                 CurrentLayout:"Basic AUM Report Detail Layout",
-                Revision:1,
+                Revision:5,
                 Layouts:[{
                   Name: "Basic AUM Report Detail Layout",
                   Columns: [
-                    "positionId"
-                    ,"fund"
+                    "fund"
                     ,"fundHedging"
                     ,"portfolio"
+                    ,"asset"
                     ,"aumLatest"
                     ,"aumLast"
                     ,"aumDiff"
@@ -257,16 +273,33 @@ export class AumReportComponent implements OnInit {
                     ,"aumEurAdjustmentLast"
                     ,"aumEurAdjustmentDiff"
                   ],
-                }]
+                  RowGroupedColumns: [
+                    "fund"
+                  ],
+                  AggregationColumns: {
+                    aumLatest: "sum",
+                    aumLast: "sum",
+                    aumDiff: "sum",
+                    grossCostAmountEurCurrent: "sum",
+                    grossCostAmountEurLast: "sum",
+                    grossCostAmountEurDiff: "sum",
+                    grossFundedCostAmountEurCurrent: "sum",
+                    grossFundedCostAmountEurLast: "sum",
+                    grossFundedCostAmountEurDiff: "sum"
+                  }
+                }],
               },
               FormatColumn:{
-                Revision :1,
+                Revision :5,
                 FormatColumns:[
-                  CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountFormatter'),
+                  CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountMillionFormatter')
                 ]
               },
             },
           },
+          onDetailInit: (context: DetailInitContext)=>{
+            context.adaptableApi.toolPanelApi.closeAdapTableToolPanel()
+          }
         }),
       ],
       
@@ -284,17 +317,56 @@ export class AumReportComponent implements OnInit {
         },
         Layout:{
           CurrentLayout: 'Basic AUM Report Layout',
-          Revision: 1.1,
+          Revision: 2,
           Layouts: [{
             Name: 'Basic AUM Report Layout',
-            Columns: [ ...this.columnDefs.map(c => c.field)].filter(c => !["positionID"].includes(c)),
+            Columns: [
+              "issuerShortName",
+              "moveType",
+              "aumLatest",
+              "aumLast",
+              "aumDiff",
+              "grossCostAmountEurCurrent",
+              "grossCostAmountEurLast",
+              "grossCostAmountEurDiff",
+              "grossFundedCostAmountEurCurrent",
+              "grossFundedCostAmountEurLast",
+              "grossFundedCostAmountEurDiff",
+              "costAmountEurCurrent",
+              "costAmountEurLast",
+              "costAmountEurDiff",
+              "fundedCostAmountEurCurrent",
+              "fundedCostAmountEurLast",
+              "fundedCostAmountEurDiff",
+              "costAmountLocalCurrent",
+              "costAmountLocalLast",
+              "costAmountLocalDiff",
+              "aumEurAdjustmentCurrent",
+              "aumEurAdjustmentLast",
+              "aumEurAdjustmentDiff",
+              "comment"
+            ],
+            RowGroupedColumns: [
+              "issuerType"
+            ],
+            AggregationColumns: {
+              aumLatest: "sum",
+              aumLast: "sum",
+              aumDiff: "sum",
+              grossCostAmountEurCurrent: "sum",
+              grossCostAmountEurLast: "sum",
+              grossCostAmountEurDiff: "sum",
+              grossFundedCostAmountEurCurrent: "sum",
+              grossFundedCostAmountEurLast: "sum",
+              grossFundedCostAmountEurDiff: "sum"
+            }
           }]
           
         },
         FormatColumn:{
-          Revision :1,
+          Revision :5,
           FormatColumns:[
-            CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountFormatter'),
+            CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountMillionFormatter')
           ]
         },
         
@@ -302,6 +374,24 @@ export class AumReportComponent implements OnInit {
 
     }
 
+  }
+
+  getAggBottomRow(){
+    if(this.rowData.length === 0){
+      return []
+    }
+    let columns = this.columnDefs.filter(coldef => coldef.type === 'abColDefNumber').map(coldef => coldef.field)
+    let aggRow = {}
+    columns.forEach(col => {
+      
+      let sum = 0
+      this.gridApi.forEachNodeAfterFilter(node => {
+        sum += node.data?.[col] ?? 0
+      })
+      aggRow[col] = sum
+    })
+
+    return [aggRow];
   }
 
   getAumReport(){
@@ -317,7 +407,7 @@ export class AumReportComponent implements OnInit {
               let unpackedData = []
               data.forEach(k => { 
                 unpackedData.push(
-                  {...{fund: k.fund, positionId: k.positionId, aumLatest: k.aumLatest, aumLast:k.aumLast,aumDiff:k.aumDiff,issuerShortName:k.issuerShortName,
+                  {...{fund: k.fund, issuer: k.issuer, positionId: k.positionId, aumLatest: k.aumLatest, aumLast:k.aumLast,aumDiff:k.aumDiff,issuerShortName:k.issuerShortName,
                     grossCostAmountEurCurrent: k.grossCostAmountEurCurrent, grossCostAmountEurLast:k.grossCostAmountEurLast,
                     grossCostAmountEurDiff: k.grossCostAmountEurDiff, grossFundedCostAmountEurCurrent:k.grossFundedCostAmountEurCurrent,
                     grossFundedCostAmountEurLast: k.grossFundedCostAmountEurLast, grossFundedCostAmountEurDiff: k.grossFundedCostAmountEurDiff,
@@ -353,9 +443,12 @@ export class AumReportComponent implements OnInit {
       onRowGroupOpened: (event: RowGroupOpenedEvent<any>) => void = (params: RowGroupOpenedEvent) => {
         this.detailColumnDefs = [
           {field: "positionId",type:"abColDefNumber"},
+          {field: "issuerShortName", type:"abColDefString"},
           {field: "fund", type:"abColDefString"},
           {field: "fundHedging", type:"abColDefString"},
           {field: "portfolio", type:"abColDefString"},
+          {field: "issuer", type:"abColDefString"},
+          {field: "asset", type:"abColDefString"},
           {field: "aumLatest",type:"abColDefNumber", valueFormatter: nonAmountNumberFormatter, headerName:"AUM Latest"},
           {field: "aumLast",type:"abColDefNumber", headerName:"AUM Last"},
           {field: "aumDiff",type:"abColDefNumber", headerName:"AUM Diff"},
