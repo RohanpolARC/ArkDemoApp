@@ -1,4 +1,4 @@
-import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
+import { AdaptableApi, AdaptableOptions, DetailInitContext } from '@adaptabletools/adaptable-angular-aggrid';
 import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, IDetailCellRendererParams, Module, DetailGridInfo, RowGroupOpenedEvent, RowDataUpdatedEvent, FilterChangedEvent, ColumnRowGroupChangedEvent, ValueGetterParams } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs-compat';
@@ -297,6 +297,9 @@ export class AumReportComponent implements OnInit {
               },
             },
           },
+          onDetailInit: (context: DetailInitContext)=>{
+            context.adaptableApi.toolPanelApi.closeAdapTableToolPanel()
+          }
         }),
       ],
       
