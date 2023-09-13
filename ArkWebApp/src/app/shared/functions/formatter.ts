@@ -250,6 +250,26 @@ export function AMOUNT_FORMATTER_CONFIG_Zero(fields: string[], decimalPoints: nu
     }   
 }
 
+export function AMOUNT_FORMATTER_CONFIG_MILLIONS(fields: string[]){
+    return <FormatColumn>{
+        Scope: {
+            ColumnIds: fields
+        },
+        DisplayFormat: {
+            Formatter: "NumberFormatter",
+            Options: {
+                FractionDigits: 1,
+                Suffix: "m",
+                Multiplier: 0.000001,
+                FractionSeparator: ".",
+                IntegerSeparator: ","
+            }
+        },
+        CellAlignment: 'Right',
+        IncludeGroupedRows: true
+    }
+}
+
 
 export function CUSTOM_DISPLAY_FORMATTERS_CONFIG(id,columnIds:any[]=[]){
     let handlerFunc
