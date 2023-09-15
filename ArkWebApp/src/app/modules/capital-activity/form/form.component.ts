@@ -187,7 +187,7 @@ export class FormComponent implements OnInit{
       }
 
 
-      let investmentsBaseAmount: number = this.gridData?.map(inv => inv?.['totalBase']).reduce((total, amount) => total + amount) || 0.0;
+      let investmentsBaseAmount: number = -this.gridData?.map(inv => inv?.['totalBase']).reduce((total, amount) => total + amount) || 0.0;
 
       this.form.patchValue({
         narrative: narrative,
