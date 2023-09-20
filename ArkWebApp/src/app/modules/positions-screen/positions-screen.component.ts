@@ -150,11 +150,19 @@ export class PositionsScreenComponent implements OnInit {
           FormatColumns: [
           BLANK_DATETIME_FORMATTER_CONFIG([...DATE_COLUMNS_LIST]),
           DATE_FORMATTER_CONFIG_ddMMyyyy([...DATE_COLUMNS_LIST]),
-          //AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(AMOUNT_COLUMNS_LIST,2,['amountFormatter']),
           CUSTOM_FORMATTER(AMOUNT_COLUMNS_LIST,['amountFormatter'])
-          //AMOUNT_FORMATTER_CONFIG_Zero(AMOUNT_COLUMNS_LIST,2,['amountZeroFormat'])
         ]
-      }}
+      },
+      StatusBar: {
+        Revision:1,
+        StatusBars: [
+          {
+            Key: 'Right Panel',
+            StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+          },
+        ],
+      }
+    }
 
     }
 

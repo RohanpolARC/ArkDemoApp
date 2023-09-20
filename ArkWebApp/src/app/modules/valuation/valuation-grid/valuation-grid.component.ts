@@ -429,6 +429,15 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
             'benchmarkIndexPrice', 'initialYCYield', 'currentYCYield', 'initialSpread', 'initialBenchmarkYield', 'currentBenchmarkYield', 'currentSpread',   'deltaSpreadDiscount', 'modelValuation', 'modelValuationMinus100', 'modelValuationPlus100', 'usedSpreadDiscount', 'marketValueIssue', 'marketValueIssueFunded', 'currentMarketValueIssue', 'previousMarketValueIssue', 'currentMarketValueIssueFunded', 'previousMarketValueIssueFunded'], 'amountFormatter')
           ]
         },
+        StatusBar: {
+          Revision:1,
+          StatusBars: [
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
+        },
         CalculatedColumn: {
           Revision: 30,
           CalculatedColumns: [

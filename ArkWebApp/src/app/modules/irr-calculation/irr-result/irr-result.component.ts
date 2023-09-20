@@ -209,6 +209,15 @@ export class IrrResultComponent implements OnInit {
           FormatColumns:[
             CUSTOM_FORMATTER([...this.calcColDefs.filter(x => x.type === 'abColDefNumber').map(x => x.field)], ['amountFormatter']),
            ]
+        },
+        StatusBar: {
+          Revision:1,
+          StatusBars: [
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
         }
       }
     }

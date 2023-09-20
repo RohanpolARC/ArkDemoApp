@@ -148,8 +148,15 @@ export class MarkChangesComponent implements OnInit {
 
           ]
         },
-
-        
+        StatusBar: {
+          Revision:1,
+          StatusBars: [
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
+        }
         }
 
     }

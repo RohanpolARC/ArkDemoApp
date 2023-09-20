@@ -170,6 +170,15 @@ export class CashBalanceComponent implements OnInit {
             CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,['amountFormatter']),
             
           ]
+        },
+        StatusBar: {
+          Revision:1,
+          StatusBars: [
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
         }
       }
     }

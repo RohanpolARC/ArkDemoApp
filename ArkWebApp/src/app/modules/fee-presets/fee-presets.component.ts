@@ -200,6 +200,15 @@ export class FeePresetsComponent implements OnInit {
             CUSTOM_FORMATTER(this.feePresetsSvc.NON_AMOUNT_2DEC_COLUMNS,['nonAmountNumberFormatter2Dec'])
 
           ]
+        },
+        StatusBar: {
+          Revision:1,
+          StatusBars: [
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
         }
       }
     }

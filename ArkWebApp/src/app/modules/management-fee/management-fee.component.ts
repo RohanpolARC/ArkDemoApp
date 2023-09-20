@@ -270,6 +270,15 @@ export class ManagementFeeComponent implements OnInit {
             AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['wtAvgGIR','gir'], 8),
             CUSTOM_FORMATTER([...this.AMOUNT_COLUMNS,'wtAvgGIR','gir'],['amountFormatter'])
           ]
+        },
+        StatusBar: {
+          Revision:1,
+          StatusBars: [
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
         }
       }
     }

@@ -24,6 +24,25 @@ export class CommonConfig{
         resizedColumnList:[]
       },
       tooltipShowDelay:0,
+      statusBar:{
+        statusPanels:[
+          {
+            key: 'Left Panel',
+            statusPanel: 'AdaptableStatusPanel',
+            align: 'left',
+          },
+          {
+            key: 'Center Panel',
+            statusPanel: 'AdaptableStatusPanel',
+            align: 'center',
+          },
+          {
+            key: 'Right Panel',
+            statusPanel: 'AdaptableStatusPanel',
+            align: 'right',
+          },
+        ]
+      },
 
       onVirtualColumnsChanged:(event:VirtualColumnsChangedEvent)=>{
         autosizeColumnExceptResized(event)

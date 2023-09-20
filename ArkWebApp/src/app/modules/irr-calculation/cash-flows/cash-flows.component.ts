@@ -308,6 +308,15 @@ export class CashFlowsComponent implements OnInit {
             BLANK_DATETIME_FORMATTER_CONFIG(['cashDate']),
             DATE_FORMATTER_CONFIG_ddMMyyyy(['cashDate'])
           ]
+        },
+        StatusBar: {
+          Revision:1,
+          StatusBars: [
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
         }
       }
     }

@@ -237,6 +237,15 @@ export class AumDeltaComponent implements OnInit {
             DATE_FORMATTER_CONFIG_ddMMyyyy(this.DATE_COLUMNS)
           ]
         },
+        StatusBar: {
+          Revision:1,
+          StatusBars: [
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
+        }
         
         }
 

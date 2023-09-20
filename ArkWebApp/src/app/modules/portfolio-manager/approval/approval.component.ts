@@ -495,6 +495,15 @@ export class ApprovalComponent implements OnInit {
             BLANK_DATETIME_FORMATTER_CONFIG(['reviewedOn','modifiedOn']),
             DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['reviewedOn','modifiedOn'])
           ]
+        },
+        StatusBar: {
+          Revision:1,
+          StatusBars: [
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
         }
       }
     }

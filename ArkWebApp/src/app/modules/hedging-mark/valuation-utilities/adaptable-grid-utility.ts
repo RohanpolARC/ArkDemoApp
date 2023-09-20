@@ -77,6 +77,15 @@ export class ValutationAdaptableGridUtility {
                 AMOUNT_FORMATTER_CONFIG_Zero(AMOUNT_COLUMNS_LIST, 2, ['amountFormatter']),
     
               ]
+            },
+            StatusBar: {
+              Revision:1,
+              StatusBars: [
+                {
+                  Key: 'Right Panel',
+                  StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+                },
+              ],
             }
           }
     }

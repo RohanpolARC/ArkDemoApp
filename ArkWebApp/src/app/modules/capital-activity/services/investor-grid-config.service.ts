@@ -185,6 +185,15 @@ export class InvestorGridConfigService {
             AMOUNT_FORMATTER_CONFIG_Zero(['totalAmount','linkedAmount'],2,['amountZeroFormat']),
 
           ]
+        },
+        StatusBar: {
+          Revision:1,
+          StatusBars: [
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
         }
       }
     }

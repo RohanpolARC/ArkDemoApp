@@ -373,6 +373,15 @@ export class PortfolioManagerComponent implements OnInit {
             BLANK_DATETIME_FORMATTER_CONFIG(['modifiedOn','createdOn']),
             DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(['modifiedOn','createdOn'])
           ]
+        },
+        StatusBar: {
+          Revision:1,
+          StatusBars: [
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
         }
       }
     }

@@ -128,6 +128,15 @@ export class NetReturnsCashflowsComponent implements OnInit {
             CUSTOM_FORMATTER(['amount'], ['amountFormatter']),
             DATE_FORMATTER_CONFIG_ddMMyyyy(['valueDate']),
           ]
+        },
+        StatusBar: {
+          Revision:1,
+          StatusBars: [
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
         }
       }
     }

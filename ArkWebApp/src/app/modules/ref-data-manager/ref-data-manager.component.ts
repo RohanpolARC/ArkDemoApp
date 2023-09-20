@@ -262,6 +262,15 @@ export class RefDataManagerComponent implements OnInit {
                 BLANK_DATETIME_FORMATTER_CONFIG([...this.DATETIME_COLUMNS]),
                 DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm([...this.DATETIME_COLUMNS]),
                 ]
+              },
+              StatusBar: {
+                Revision:1,
+                StatusBars: [
+                  {
+                    Key: 'Right Panel',
+                    StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+                  },
+                ],
               }
             })
             this.gridApi?.setRowData(this.rowRefData)

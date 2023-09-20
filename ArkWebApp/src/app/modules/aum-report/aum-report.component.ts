@@ -55,7 +55,9 @@ export class AumReportComponent implements OnInit {
     "costAmountLocalDiff",
     "aumEurAdjustmentCurrent",
     "aumEurAdjustmentLast",
-    "aumEurAdjustmentDiff"
+    "aumEurAdjustmentDiff",
+    "coinvestCostChange",
+    "smaCostChange"
   ]
 
 
@@ -90,6 +92,8 @@ export class AumReportComponent implements OnInit {
       {field: "aumLatest",type:"abColDefNumber", headerName:"AUM Latest" },
       {field: "aumLast",type:"abColDefNumber", headerName:"AUM Last"},
       {field: "aumDiff",type:"abColDefNumber", headerName:"AUM Diff"},
+      {field: "coinvestCostChange",type:"abColDefNumber", headerName:"Co-Invest Cost Change"},
+      {field: "smaCostChange",type:"abColDefNumber", headerName:"SMA Cost Change"},
       {field: "grossCostAmountEurCurrent",type:'abColDefNumber'},
       {field: "grossCostAmountEurLast",type:'abColDefNumber'},
       {field: "grossCostAmountEurDiff",type:'abColDefNumber'},
@@ -158,7 +162,13 @@ export class AumReportComponent implements OnInit {
       },
       autoGroupColumnDef:{
         minWidth:200,
-        sortable:true
+        sortable:true,
+        cellRendererSelector: (params) => {
+          if(params.value === undefined){
+            return undefined //This hides the extra row group expand icon '>' in empty cells of group column.
+          }
+          return { component: 'agGroupCellRenderer' };      
+        },
       },
       enableRangeSelection: true,
       rowGroupPanelShow: "always",
@@ -168,6 +178,7 @@ export class AumReportComponent implements OnInit {
       rowData: this.rowData,
       suppressAggFuncInHeader: true,
       detailRowHeight: 450,
+     
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel()
         this.gridApi = params.api; 
@@ -224,6 +235,7 @@ export class AumReportComponent implements OnInit {
             adaptableId: 'AumReportDetails',
             primaryKey: 'positionId',
             licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
+            exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
             userInterfaceOptions: {
               customDisplayFormatters: [
                 CUSTOM_DISPLAY_FORMATTERS_CONFIG("amountMillionFormatter",this.AMOUNT_COLUMNS)
@@ -243,17 +255,20 @@ export class AumReportComponent implements OnInit {
               },             
               Layout:{
                 CurrentLayout:"Basic AUM Report Detail Layout",
-                Revision:5,
+                Revision:8,
                 Layouts:[{
                   Name: "Basic AUM Report Detail Layout",
                   Columns: [
                     "fund"
-                    ,"fundHedging"
-                    ,"portfolio"
-                    ,"asset"
                     ,"aumLatest"
                     ,"aumLast"
                     ,"aumDiff"
+                    ,"coinvestCostChange"
+                    ,"smaCostChange"
+                    ,"fundHedging"
+                    ,"portfolio"
+                    ,"asset"
+                    ,"fundStrategy"
                     ,"grossCostAmountEurCurrent"
                     ,"grossCostAmountEurLast"
                     ,"grossCostAmountEurDiff"
@@ -285,16 +300,18 @@ export class AumReportComponent implements OnInit {
                     grossCostAmountEurDiff: "sum",
                     grossFundedCostAmountEurCurrent: "sum",
                     grossFundedCostAmountEurLast: "sum",
-                    grossFundedCostAmountEurDiff: "sum"
+                    grossFundedCostAmountEurDiff: "sum",
+                    coinvestCostChange : "sum",
+                    smaCostChange : "sum"
                   }
                 }],
               },
               FormatColumn:{
-                Revision :5,
+                Revision :6,
                 FormatColumns:[
                   CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountMillionFormatter')
                 ]
-              },
+              }
             },
           },
           onDetailInit: (context: DetailInitContext)=>{
@@ -317,7 +334,7 @@ export class AumReportComponent implements OnInit {
         },
         Layout:{
           CurrentLayout: 'Basic AUM Report Layout',
-          Revision: 2,
+          Revision: 5,
           Layouts: [{
             Name: 'Basic AUM Report Layout',
             Columns: [
@@ -326,6 +343,8 @@ export class AumReportComponent implements OnInit {
               "aumLatest",
               "aumLast",
               "aumDiff",
+              "coinvestCostChange",
+              "smaCostChange",
               "grossCostAmountEurCurrent",
               "grossCostAmountEurLast",
               "grossCostAmountEurDiff",
@@ -358,19 +377,30 @@ export class AumReportComponent implements OnInit {
               grossCostAmountEurDiff: "sum",
               grossFundedCostAmountEurCurrent: "sum",
               grossFundedCostAmountEurLast: "sum",
-              grossFundedCostAmountEurDiff: "sum"
+              grossFundedCostAmountEurDiff: "sum",
+              coinvestCostChange : "sum",
+              smaCostChange : "sum"
             }
           }]
           
         },
         FormatColumn:{
-          Revision :5,
+          Revision :6,
           FormatColumns:[
             CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountMillionFormatter')
           ]
         },
-        
+        StatusBar: {
+          Revision:5,
+          StatusBars: [
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
         }
+        
+      }
 
     }
 
@@ -415,7 +445,8 @@ export class AumReportComponent implements OnInit {
                     fundedCostAmountEurCurrent: k.fundedCostAmountEurCurrent, fundedCostAmountEurLast: k.fundedCostAmountEurLast, 
                     fundedCostAmountEurDiff: k.fundedCostAmountEurDiff, costAmountLocalCurrent: k.costAmountLocalCurrent, costAmountLocalLast: k.costAmountLocalLast
                     ,costAmountLocalDiff: k.costAmountLocalDiff, aumEurAdjustmentCurrent: k.aumEurAdjustmentCurrent, aumEurAdjustmentLast: k.aumEurAdjustmentLast
-                    ,aumEurAdjustmentDiff: k.aumEurAdjustmentDiff, issuerType: k.issuerType, moveType: k.moveType, comment: k.comment
+                    ,aumEurAdjustmentDiff: k.aumEurAdjustmentDiff, issuerType: k.issuerType, moveType: k.moveType, comment: k.comment, smaCostChange: k.smaCostChange,
+                    coinvestCostChange: k.coinvestCostChange
                   }})
                 }
               )
@@ -447,11 +478,14 @@ export class AumReportComponent implements OnInit {
           {field: "fund", type:"abColDefString"},
           {field: "fundHedging", type:"abColDefString"},
           {field: "portfolio", type:"abColDefString"},
+          {field: "fundStrategy", type: "abColDefString"},
           {field: "issuer", type:"abColDefString"},
           {field: "asset", type:"abColDefString"},
           {field: "aumLatest",type:"abColDefNumber", valueFormatter: nonAmountNumberFormatter, headerName:"AUM Latest"},
           {field: "aumLast",type:"abColDefNumber", headerName:"AUM Last"},
           {field: "aumDiff",type:"abColDefNumber", headerName:"AUM Diff"},
+          {field: "coinvestCostChange",type:"abColDefNumber", headerName:"Co-Invest Cost Change"},
+          {field: "smaCostChange",type:"abColDefNumber", headerName:"SMA Cost Change"},
           {field: "grossCostAmountEurCurrent",type:'abColDefNumber'},
           {field: "grossCostAmountEurLast",type:'abColDefNumber'},
           {field: "grossCostAmountEurDiff",type:'abColDefNumber'},

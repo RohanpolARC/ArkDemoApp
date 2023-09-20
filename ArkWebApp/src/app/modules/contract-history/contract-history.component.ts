@@ -105,6 +105,15 @@ export class ContractHistoryComponent implements OnInit {
         }],
         IsHidden: false,
         DashboardTitle: ' '
+      },
+      StatusBar: {
+        Revision:1,
+        StatusBars: [
+          {
+            Key: 'Right Panel',
+            StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+          },
+        ],
       }
     }
   }

@@ -370,6 +370,15 @@ export class GridConfigService {
           FormatColumns:[
             CUSTOM_FORMATTER(['maturityPrice','expectedPrice','floorRate','faceValueIssue','costPrice','mark','adjustedEBITDAatInv','ebitda','ltmRevenues','netLeverage','netLeverageAtInv','netLTV','netLTVatInv','revenueatInv','revenuePipeline','reportingEBITDA','reportingNetLeverage','unfundedMargin', 'floorRate'],['amountFormatter']),
             ]
+        },
+        StatusBar: {
+          Revision:1,
+          StatusBars: [
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
         }
       }
 

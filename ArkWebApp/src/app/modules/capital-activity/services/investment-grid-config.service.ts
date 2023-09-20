@@ -162,6 +162,15 @@ export class InvestmentGridConfigService {
             AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['amount','totalBase','totalEur', 'linkedAmountBase', 'breakBase', 'groupBreakBase'],2,['amountZeroFormat']),
             AMOUNT_FORMATTER_CONFIG_Zero(['amount','totalBase','totalEur', 'linkedAmountBase', 'breakBase', 'groupBreakBase'],2,['amountZeroFormat'])
           ]
+        },
+        StatusBar: {
+          Revision:1,
+          StatusBars: [
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
         }  
       }
     }

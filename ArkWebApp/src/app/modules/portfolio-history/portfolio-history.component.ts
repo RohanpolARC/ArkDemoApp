@@ -133,12 +133,6 @@ export class PortfolioHistoryComponent implements OnInit {
       sideBar:  true,
       suppressMenuHide: true,
       singleClickEdit: true,
-      statusBar: {
-        statusPanels: [
-          { statusPanel: 'agTotalRowCountComponent', align: 'left' },
-          { statusPanel: 'agFilteredRowCountComponent' },
-        ],
-      },
       columnDefs: this.columnDefs,
       allowContextMenuWithControlKey: true,
       context: {
@@ -565,6 +559,16 @@ export class PortfolioHistoryComponent implements OnInit {
           AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['amount','parAmount', 'parAmountLocal', 'fundedParAmountLocal', 'costAmountLocal', 'fundedCostAmountLocal'] ),
           AMOUNT_FORMATTER_CONFIG_Zero(['amount','parAmount', 'parAmountLocal', 'fundedParAmountLocal', 'costAmountLocal', 'fundedCostAmountLocal','fxRateBaseEffective', 'pgh_FXRateBaseEffective'],2,['amountZeroFormat'])
         ]
+      },
+
+      StatusBar: {
+        Revision:2,
+        StatusBars: [
+          {
+            Key: 'Right Panel',
+            StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+          },
+        ],
       }
     }
   }
