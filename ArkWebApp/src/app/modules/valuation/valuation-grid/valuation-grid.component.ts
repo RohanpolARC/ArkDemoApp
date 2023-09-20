@@ -238,6 +238,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
 
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
+      ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
       enableRangeSelection: true,
       sideBar: true,
       columnDefs: this.columnDefs,

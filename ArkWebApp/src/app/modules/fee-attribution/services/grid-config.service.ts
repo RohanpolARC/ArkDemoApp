@@ -40,6 +40,7 @@ export class GridConfigService {
 
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
+      ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
       columnDefs: this.columnDefs,
       enableRangeSelection: true,
       sideBar: true,

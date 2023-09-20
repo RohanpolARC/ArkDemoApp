@@ -152,6 +152,7 @@ export class AumReportComponent implements OnInit {
 
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
+      ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
       defaultColDef: {
         resizable: true,
         sortable: true,

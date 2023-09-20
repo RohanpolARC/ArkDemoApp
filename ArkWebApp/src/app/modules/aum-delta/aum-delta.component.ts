@@ -144,6 +144,7 @@ export class AumDeltaComponent implements OnInit {
 
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
+      statusBar: CommonConfig.GENERAL_STATURS_BAR_CONFIG,
       defaultColDef: {
         resizable: true,
         sortable: true,

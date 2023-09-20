@@ -45,6 +45,7 @@ export class RefDataManagerComponent implements OnInit {
 
   gridOptions:GridOptions = {
     ...CommonConfig.GRID_OPTIONS,
+    ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
     enableRangeSelection: true,
     columnDefs: this.columnDefs,
     sideBar: true,

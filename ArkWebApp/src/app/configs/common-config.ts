@@ -24,6 +24,22 @@ export class CommonConfig{
         resizedColumnList:[]
       },
       tooltipShowDelay:0,
+      
+
+      onVirtualColumnsChanged:(event:VirtualColumnsChangedEvent)=>{
+        autosizeColumnExceptResized(event)
+      },
+      onColumnResized: (params:ColumnResizedEvent)=>{
+        handleResizedColumns(params)
+      },
+      processCellForClipboard(params: ProcessCellForExportParams) {
+        if(params.column.getColDef().type === 'abColDefDate' || params.column.getColDef().cellClass === 'dateUK' )
+          return getMomentDateStrFormat(params.value,'DD/MM/YYYY')
+        return params.value;
+      }
+    }
+
+    public static ADAPTABLE_GRID_OPTIONS : GridOptions = {
       statusBar:{
         statusPanels:[
           {
@@ -42,18 +58,6 @@ export class CommonConfig{
             align: 'right',
           },
         ]
-      },
-
-      onVirtualColumnsChanged:(event:VirtualColumnsChangedEvent)=>{
-        autosizeColumnExceptResized(event)
-      },
-      onColumnResized: (params:ColumnResizedEvent)=>{
-        handleResizedColumns(params)
-      },
-      processCellForClipboard(params: ProcessCellForExportParams) {
-        if(params.column.getColDef().type === 'abColDefDate' || params.column.getColDef().cellClass === 'dateUK' )
-          return getMomentDateStrFormat(params.value,'DD/MM/YYYY')
-        return params.value;
       }
     }
 
@@ -65,6 +69,8 @@ export class CommonConfig{
         // exportDateFormat: 'yyyy/MM/dd',
         exportFormatType: 'formattedValue'
     }
+
+
 
     public static GENERAL_EXCEL_STYLES: ExcelStyle[] = [{
         id: 'dateUK',

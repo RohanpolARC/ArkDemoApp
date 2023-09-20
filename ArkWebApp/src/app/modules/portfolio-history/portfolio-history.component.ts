@@ -129,6 +129,7 @@ export class PortfolioHistoryComponent implements OnInit {
     }
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
+      ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
       enableRangeSelection: true,
       sideBar:  true,
       suppressMenuHide: true,

@@ -196,6 +196,7 @@ export class FeeCashflowsComponent implements OnInit {
 
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
+      ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
       enableRangeSelection: true,
       sideBar:true,
       columnDefs: this.columnDefs,

@@ -96,6 +96,7 @@ export class AttributesFixingComponent implements OnInit {
 
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
+      ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
       context:{
         resizedColumnList:[],
         component:this

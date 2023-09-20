@@ -128,6 +128,7 @@ export class GridConfigService {
 
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
+      ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
       context: {
         componentParent: this.compReaderSvc.component
       },

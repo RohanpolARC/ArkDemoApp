@@ -55,6 +55,7 @@ export class ActivitiesGridComponent implements OnInit {
   }
   gridOptions: GridOptions = {
     ...CommonConfig.GRID_OPTIONS,
+    ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
     enableRangeSelection: true,
     sideBar: true,
     suppressMenuHide: true,
