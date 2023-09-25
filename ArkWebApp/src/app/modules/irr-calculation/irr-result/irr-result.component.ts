@@ -1,5 +1,5 @@
-import { AdaptableApi, AdaptableOptions, ColumnSort, FormatColumn } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, ColGroupDef, FirstDataRenderedEvent, GridOptions, Module, SortController, ValueFormatterParams } from '@ag-grid-community/core';
+import { AdaptableApi, AdaptableOptions, FormatColumn } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColDef, ColGroupDef, FirstDataRenderedEvent, GridOptions, Module, ValueFormatterParams } from '@ag-grid-community/core';
 import { Component, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
 import { Subject, Subscription, timer } from 'rxjs';
 import { first, switchMap, takeUntil } from 'rxjs/operators';
@@ -8,7 +8,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
-import { CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, noDecimalAmountFormatter, nonAmountNumberFormatter2Dec } from 'src/app/shared/functions/formatter';
+import { CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER } from 'src/app/shared/functions/formatter';
 import { presistSharedEntities, loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { IRRCalcParams, LoadStatus } from 'src/app/shared/models/IRRCalculationsModel';
@@ -61,6 +61,9 @@ export class IrrResultComponent implements OnInit {
     { field: 'YTW', headerName: 'YTW', minWidth: 88, type: 'abColDefNumber'},
     { field: 'CurrentYTW', minWidth: 136, type: 'abColDefNumber'},
     { field: 'YTWHedged', headerName: 'YTW Hedged', minWidth: 136, type: 'abColDefNumber'},
+    { field: 'CurrentSTE', minWidth:  130, type: 'abColDefNumber', headerName: 'Current STE' },
+    { field: 'EffectiveYieldCurve', type: 'abColDefNumber', minWidth: 180 },
+    { field: 'EffectiveBaseRateNormalised', minWidth: 180, type: 'abColDefNumber' },
     { field: 'DiscountPriceE', type: 'abColDefNumber', minWidth: 154 },
     { field: 'DiscountPriceW', type: 'abColDefNumber', minWidth: 154 },
     { field: 'NPVE', headerName: 'NPVE', type: 'abColDefNumber', minWidth: 140 },
@@ -498,6 +501,9 @@ export class IrrResultComponent implements OnInit {
     'YTEHedged',
     'YTW',
     'CurrentYTW',
+    'CurrentSTE',
+    'EffectiveBaseRateNormalised',
+    'EffectiveYieldCurve',
     'YTWHedged',
     'CashYield',
     'NetLTV',
