@@ -156,6 +156,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       { type: 'Firmwide > Issuer Short Name > Seniority', levels: ['Firmwide', 'Issuer Short Name', 'Seniority'] },
       { type: 'Firmwide > Realised/Unrealised > Issuer Seniority', levels: ['Firmwide', 'RealisedUnrealised', 'Issuer Short Name', 'Seniority'] },
       { type: 'Fund > Realised/Unrealised > Issuer Seniority', levels: ['Fund', 'RealisedUnrealised', 'Issuer Short Name', 'Seniority'] },
+      { type: 'Issuer Short Name > Asset', levels: ['Issuer Short Name', 'Asset'] },
       { type: 'Custom', levels: [] }
     ]
 

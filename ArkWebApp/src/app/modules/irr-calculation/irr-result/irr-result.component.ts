@@ -54,13 +54,15 @@ export class IrrResultComponent implements OnInit {
     { field: 'RealizedProceedsEur', type: 'abColDefNumber', minWidth: 185 },
     { field: 'GrossCostAmountEur', type: 'abColDefNumber', minWidth: 180, hide: true },
     { field: 'CashCarryingValueEur', type: 'abColDefNumber', minWidth: 200 },
+    { field: 'RemainingValueE', type: 'abColDefNumber', minWidth: 180 },
+    { field: 'RemainingValueW', type: 'abColDefNumber', minWidth: 180 },
     { field: 'CashIRR', minWidth: 110, type: 'abColDefNumber'},
     { field: 'YTE', headerName: 'YTE', minWidth: 95,type: 'abColDefNumber'},
     { field: 'CurrentYTE', headerName: 'Current YTE', minWidth: 130, type: 'abColDefNumber'},
-    { field: 'YTEHedged', headerName: 'YTE Hedged', minWidth: 135, type: 'abColDefNumber'},
+    { field: 'YTEHedged', hide: true, headerName: 'YTE Hedged', minWidth: 135, type: 'abColDefNumber'},
     { field: 'YTW', headerName: 'YTW', minWidth: 88, type: 'abColDefNumber'},
     { field: 'CurrentYTW', minWidth: 136, type: 'abColDefNumber'},
-    { field: 'YTWHedged', headerName: 'YTW Hedged', minWidth: 136, type: 'abColDefNumber'},
+    { field: 'YTWHedged', hide: true, headerName: 'YTW Hedged', minWidth: 136, type: 'abColDefNumber'},
     { field: 'CurrentSTE', minWidth:  130, type: 'abColDefNumber', headerName: 'Current STE' },
     { field: 'EffectiveYieldCurve', type: 'abColDefNumber', minWidth: 180 },
     { field: 'EffectiveBaseRateNormalised', minWidth: 180, type: 'abColDefNumber' },
@@ -446,67 +448,14 @@ export class IrrResultComponent implements OnInit {
     this.gridOptions.columnApi.autoSizeColumns([ ...this.calcColDefs, ...this.paggrColDefs ].filter(x => x.minWidth).map(x => x.filter));
   }
 
-  NO_DECIMAL_AMOUNT_COLUMNS=[
-    'CapitalInvestedEur',
-    'RealizedProceedsEur',
-    'GrossCostAmountEur',
-    'CashCarryingValueEur',
-    'FaceValue',
-    'FaceValueExpected'
+  NO_DECIMAL_AMOUNT_COLUMNS = [
+    'CapitalInvestedEur', 'RemainingValueE', 'RemainingValueW', 'RealizedProceedsEur', 'GrossCostAmountEur', 'CashCarryingValueEur', 'FaceValue', 'FaceValueExpected'
     ]
-    
-    AMOUNT_COLUMNS = [
-    'DiscountPriceE',
-    'DiscountPriceW',
-    'NPVE',
-    'NPVEActual',
-    'NPVEMinus100',
-    'NPVEPlus100',
-    'Cost',
-    'Mark',
-    'ExpectedPrice',
-    'AccInterest',
-    // 'AverageCashMargin',
-    'CashMargin',
-    'PIKMargin',
-    'UnfundedMargin',
-    'NetLeverage',
-    'NetLeverageAtInvestment',
-    'EBITDA',
-    'EBITDAAtInvestment',
-    'ReportingEBITDA',
-    'ReportingNetLeverage',
-    'Revenue',
-    'RevenueAtInvestment',
-    'SeniorityRevenue',
-    'SeniorityRevenueAtInvestment',
-    'AllInRate',
-    'CostValue',
-    'ExitPrice',
-    'TotalRealizedIncome',
-    'AccFees']
-    
-    NON_AMOUNT_2DEC_COLUMNS = ['ExpectedAge',
-    'AverageLifeE',
-    'AverageLifeW',
-    'CashMOM',
-    'MOME',
-    'MOMW',
-    'PaybackE',
-    'PaybackW']
-    
-    PERCENT_COLUMNS = ['CashIRR',
-    'YTE',
-    'CurrentYTE',
-    'YTEHedged',
-    'YTW',
-    'CurrentYTW',
-    'CurrentSTE',
-    'EffectiveBaseRateNormalised',
-    'EffectiveYieldCurve',
-    'YTWHedged',
-    'CashYield',
-    'NetLTV',
-    'NetLTVAtInvestement']
   
+  AMOUNT_COLUMNS = [
+  'DiscountPriceE','DiscountPriceW','NPVE','NPVEActual','NPVEMinus100','NPVEPlus100','Cost','Mark','ExpectedPrice','AccInterest','CashMargin','PIKMargin','UnfundedMargin','NetLeverage','NetLeverageAtInvestment','EBITDA','EBITDAAtInvestment','ReportingEBITDA','ReportingNetLeverage','Revenue','RevenueAtInvestment','SeniorityRevenue','SeniorityRevenueAtInvestment','AllInRate','CostValue','ExitPrice','TotalRealizedIncome','AccFees']
+  
+  NON_AMOUNT_2DEC_COLUMNS = ['ExpectedAge','AverageLifeE','AverageLifeW','CashMOM','MOME','MOMW','PaybackE','PaybackW']
+  
+  PERCENT_COLUMNS = ['CashIRR','YTE','CurrentYTE','YTEHedged','YTW','CurrentYTW','CurrentSTE','EffectiveBaseRateNormalised','EffectiveYieldCurve','YTWHedged','CashYield','NetLTV','NetLTVAtInvestement']
 }
