@@ -268,6 +268,7 @@ export class FacilityDetailComponent implements OnInit {
     
     this.columnDefs = [
       {field: 'issuerShortName', pinned: 'left', width: 170, tooltipField: 'issuerShortName', type: 'abColDefString'},
+      {field: 'dealName', pinned: 'left', width: 170, tooltipField: 'dealName', type: 'abColDefString'},
       {field: 'asset', pinned: 'left', width: 240, tooltipField: 'asset', type: 'abColDefString'},
       {field: 'assetID', width: 103, type: 'abColDefNumber'},
       {field: 'assetTypeName', width: 153, type: 'abColDefString'},
@@ -544,12 +545,13 @@ export class FacilityDetailComponent implements OnInit {
           Revision: 3
         },
         Layout:{
-          Revision: 9,
+          Revision: 10,
           CurrentLayout: 'Basic Facility Detail',
           Layouts: [{
             Name: 'Basic Facility Detail',
             Columns: [
               'issuerShortName',
+              'dealName',
               'asset',
               'assetID',
               'assetTypeName',
@@ -593,6 +595,7 @@ export class FacilityDetailComponent implements OnInit {
             ],
             PinnedColumnsMap:{
               issuerShortName: 'left',
+              dealName: 'left',
               asset: 'left',
               Action: 'right',
               Audit:'right'
