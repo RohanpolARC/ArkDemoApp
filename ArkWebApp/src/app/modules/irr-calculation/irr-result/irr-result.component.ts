@@ -95,6 +95,12 @@ export class IrrResultComponent implements OnInit {
     { field: 'SeniorityRevenue', headerName: 'Revenue(\u20AC)', type: 'abColDefNumber', minWidth: 125},
     { field: 'RevenueAtInvestment', headerName: 'Revenue at Inv(\u20AC)', type: 'abColDefNumber', minWidth: 200 },
     { field: 'SeniorityRevenueAtInvestment',  headerName: 'Revenue at Inv(\u20AC)', type: 'abColDefNumber', minWidth: 200 },
+
+    { field: 'CashMarginCS', type: 'abColDefNumber', minWidth: 130 },
+    { field: 'PIKMarginCS', type: 'abColDefNumber', minWidth: 130 },
+    { field: 'PIKMarginAtInv',headerName:'PIK Margin At Inv CS', type: 'abColDefNumber', minWidth: 130 },
+    { field: 'CashMarginAtInv',headerName:'Cash Margin At Inv CS', type: 'abColDefNumber', minWidth: 130 },
+
     { field: 'ReportingNetLeverageComment', headerName: 'Reporting Net Leverage Comment', type: 'abColDefString', cellClass: '', minWidth: 300 },
     { field: 'AllInRate', hide:true,  type: 'abColDefNumber',},
     { field: 'CostValue', hide:true, type: 'abColDefNumber' },
@@ -453,7 +459,7 @@ export class IrrResultComponent implements OnInit {
     ]
   
   AMOUNT_COLUMNS = [
-  'DiscountPriceE','DiscountPriceW','NPVE','NPVEActual','NPVEMinus100','NPVEPlus100','Cost','Mark','ExpectedPrice','AccInterest','CashMargin','PIKMargin','UnfundedMargin','NetLeverage','NetLeverageAtInvestment','EBITDA','EBITDAAtInvestment','ReportingEBITDA','ReportingNetLeverage','Revenue','RevenueAtInvestment','SeniorityRevenue','SeniorityRevenueAtInvestment','AllInRate','CostValue','ExitPrice','TotalRealizedIncome','AccFees']
+  'DiscountPriceE','DiscountPriceW','NPVE','NPVEActual','NPVEMinus100','NPVEPlus100','Cost','Mark','ExpectedPrice','AccInterest','CashMargin','PIKMargin','UnfundedMargin','NetLeverage','NetLeverageAtInvestment','EBITDA','EBITDAAtInvestment','ReportingEBITDA','ReportingNetLeverage','Revenue','RevenueAtInvestment','SeniorityRevenue','SeniorityRevenueAtInvestment','AllInRate','CostValue','ExitPrice','TotalRealizedIncome','AccFees','CashMarginCS','PIKMarginCS','PIKMarginAtInv','CashMarginAtInv']
   
   NON_AMOUNT_2DEC_COLUMNS = ['ExpectedAge','AverageLifeE','AverageLifeW','CashMOM','MOME','MOMW','PaybackE','PaybackW']
   
