@@ -117,8 +117,12 @@ export class GridConfigService {
           ]
         },
         StatusBar: {
-          Revision:1,
+          Revision: 2,
           StatusBars: [
+            {
+              Key: 'Center Panel',
+              StatusBarPanels: ['Filter']
+            },
             {
               Key: 'Right Panel',
               StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],

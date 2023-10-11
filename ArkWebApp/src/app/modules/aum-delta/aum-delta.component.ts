@@ -144,7 +144,8 @@ export class AumDeltaComponent implements OnInit {
 
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
-      statusBar: CommonConfig.GENERAL_STATURS_BAR_CONFIG,
+      ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
+      //statusBar: CommonConfig.GENERAL_STATURS_BAR_CONFIG,
       defaultColDef: {
         resizable: true,
         sortable: true,
@@ -239,8 +240,12 @@ export class AumDeltaComponent implements OnInit {
           ]
         },
         StatusBar: {
-          Revision:1,
+          Revision: 2,
           StatusBars: [
+            {
+              Key: 'Center Panel',
+              StatusBarPanels: ['Filter']
+            },
             {
               Key: 'Right Panel',
               StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],

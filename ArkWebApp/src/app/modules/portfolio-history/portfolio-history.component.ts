@@ -563,8 +563,12 @@ export class PortfolioHistoryComponent implements OnInit {
       },
 
       StatusBar: {
-        Revision:2,
+        Revision: 4,
         StatusBars: [
+          {
+            Key: 'Center Panel',
+            StatusBarPanels: ['Filter']
+          },
           {
             Key: 'Right Panel',
             StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
