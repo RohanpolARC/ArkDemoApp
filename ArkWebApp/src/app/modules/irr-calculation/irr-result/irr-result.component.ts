@@ -54,8 +54,8 @@ export class IrrResultComponent implements OnInit {
     { field: 'RealizedProceedsEur', type: 'abColDefNumber', minWidth: 185 },
     { field: 'GrossCostAmountEur', type: 'abColDefNumber', minWidth: 180, hide: true },
     { field: 'CashCarryingValueEur', type: 'abColDefNumber', minWidth: 200 },
-    { field: 'RemainingValueE', type: 'abColDefNumber', minWidth: 180 },
-    { field: 'RemainingValueW', type: 'abColDefNumber', minWidth: 180 },
+    { field: 'RemainingValueEEur', type: 'abColDefNumber', headerName: 'Remaining Value E Eur', minWidth: 180 },
+    { field: 'RemainingValueWEur', type: 'abColDefNumber', headerName: 'Remaining Value W Eur', minWidth: 180 },
     { field: 'CashIRR', minWidth: 110, type: 'abColDefNumber'},
     { field: 'YTE', headerName: 'YTE', minWidth: 95,type: 'abColDefNumber'},
     { field: 'CurrentYTE', headerName: 'Current YTE', minWidth: 130, type: 'abColDefNumber'},
@@ -87,20 +87,15 @@ export class IrrResultComponent implements OnInit {
     { field: 'NetLTVAtInvestement', headerName: 'Net LTV at Inv', type: 'abColDefNumber', minWidth: 145 },
     { field: 'NetLeverage', headerName: 'Net Leverage', type: 'abColDefNumber', minWidth: 136 },
     { field: 'NetLeverageAtInvestment', headerName: 'Net Leverage at Inv', type: 'abColDefNumber', minWidth: 180 },
+    { field: 'EBITDADeal', headerName: 'EBITDA', type: 'abColDefNumber', minWidth: 150 },
     { field: 'EBITDA', headerName: 'EBITDA(\u20AC)', type: 'abColDefNumber', minWidth: 120 },
     { field: 'EBITDAAtInvestment', headerName: 'EBITDA at Inv(\u20AC)', type: 'abColDefNumber', minWidth: 155 },
     { field: 'ReportingEBITDA', headerName: 'Reporting EBITDA(\u20AC)', type: 'abColDefNumber', minWidth: 185 },
+    { field: 'EV', type: 'abColDefNumber', minWidth: 120 },
+    { field: 'EVatInv', headerName: 'EV At Inv', type: 'abColDefNumber', minWidth: 120 },
     { field: 'ReportingNetLeverage', headerName: 'Reporting Net Leverage', type: 'abColDefNumber', minWidth: 200 },
     { field: 'Revenue', headerName: 'Revenue(\u20AC)', type: 'abColDefNumber', minWidth: 125 },
-    { field: 'SeniorityRevenue', headerName: 'Revenue(\u20AC)', type: 'abColDefNumber', minWidth: 125},
     { field: 'RevenueAtInvestment', headerName: 'Revenue at Inv(\u20AC)', type: 'abColDefNumber', minWidth: 200 },
-    { field: 'SeniorityRevenueAtInvestment',  headerName: 'Revenue at Inv(\u20AC)', type: 'abColDefNumber', minWidth: 200 },
-
-    { field: 'CashMarginCS', type: 'abColDefNumber', minWidth: 130 },
-    { field: 'PIKMarginCS', type: 'abColDefNumber', minWidth: 130 },
-    { field: 'PIKMarginAtInv',headerName:'PIK Margin At Inv CS', type: 'abColDefNumber', minWidth: 130 },
-    { field: 'CashMarginAtInv',headerName:'Cash Margin At Inv CS', type: 'abColDefNumber', minWidth: 130 },
-
     { field: 'ReportingNetLeverageComment', headerName: 'Reporting Net Leverage Comment', type: 'abColDefString', cellClass: '', minWidth: 300 },
     { field: 'AllInRate', hide:true,  type: 'abColDefNumber',},
     { field: 'CostValue', hide:true, type: 'abColDefNumber' },
@@ -217,7 +212,7 @@ export class IrrResultComponent implements OnInit {
           Revision: 14,
         },
         FormatColumn:{
-          Revision:4,
+          Revision:5,
           FormatColumns:[
             CUSTOM_FORMATTER([...this.calcColDefs.filter(x => x.type === 'abColDefNumber').map(x => x.field)], ['amountFormatter']),
            ]
@@ -358,12 +353,12 @@ export class IrrResultComponent implements OnInit {
     if(!mapGroupCols.includes("Issuer Short Name")){
       excludePaggrCols = [...excludePaggrCols, ...['DealName', 'DealCcy']]
     }
-    if(mapGroupCols.includes("Seniority")){
-      excludeCalcCols = [...excludeCalcCols, ...['Revenue', 'RevenueAtInvestment']]
-    }
-    else{
-      excludeCalcCols = [...excludeCalcCols, ...['SeniorityRevenue', 'SeniorityRevenueAtInvestment']]
-    }
+    // if(mapGroupCols.includes("Seniority")){
+    //   excludeCalcCols = [...excludeCalcCols, ...['Revenue', 'RevenueAtInvestment']]
+    // }
+    // else{
+    //   excludeCalcCols = [...excludeCalcCols, ...['SeniorityRevenue', 'SeniorityRevenueAtInvestment']]
+    // }
 
     this.columnDefs = [ 
       ...this.mapGroupColDefs.filter(c => mapGroupCols.includes(c.field)),
@@ -455,11 +450,11 @@ export class IrrResultComponent implements OnInit {
   }
 
   NO_DECIMAL_AMOUNT_COLUMNS = [
-    'CapitalInvestedEur', 'RemainingValueE', 'RemainingValueW', 'RealizedProceedsEur', 'GrossCostAmountEur', 'CashCarryingValueEur', 'FaceValue', 'FaceValueExpected'
+    'CapitalInvestedEur', 'RemainingValueEEur', 'RemainingValueWEur', 'RealizedProceedsEur', 'GrossCostAmountEur', 'CashCarryingValueEur', 'FaceValue', 'FaceValueExpected'
     ]
   
   AMOUNT_COLUMNS = [
-  'DiscountPriceE','DiscountPriceW','NPVE','NPVEActual','NPVEMinus100','NPVEPlus100','Cost','Mark','ExpectedPrice','AccInterest','CashMargin','PIKMargin','UnfundedMargin','NetLeverage','NetLeverageAtInvestment','EBITDA','EBITDAAtInvestment','ReportingEBITDA','ReportingNetLeverage','Revenue','RevenueAtInvestment','SeniorityRevenue','SeniorityRevenueAtInvestment','AllInRate','CostValue','ExitPrice','TotalRealizedIncome','AccFees','CashMarginCS','PIKMarginCS','PIKMarginAtInv','CashMarginAtInv']
+  'DiscountPriceE','DiscountPriceW','NPVE','NPVEActual','NPVEMinus100','NPVEPlus100','Cost','Mark','ExpectedPrice','AccInterest','CashMargin','PIKMargin','UnfundedMargin','NetLeverage','NetLeverageAtInvestment','EBITDA', 'EBITDADeal', 'EBITDAAtInvestment','ReportingEBITDA','ReportingNetLeverage','Revenue','RevenueAtInvestment','AllInRate','CostValue','ExitPrice','TotalRealizedIncome','AccFees', 'EV', 'EVatInv']
   
   NON_AMOUNT_2DEC_COLUMNS = ['ExpectedAge','AverageLifeE','AverageLifeW','CashMOM','MOME','MOMW','PaybackE','PaybackW']
   
