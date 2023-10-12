@@ -323,14 +323,28 @@ export function CUSTOM_DISPLAY_FORMATTERS_CONFIG(id,columnIds:any[]=[]){
         }
     }else if(id==='percentFormatter'){
         handlerFunc =(customDisplayFormatterContext: CustomDisplayFormatterContext)=>{
-            let curretValue: any = customDisplayFormatterContext.cellValue
+            let currentValue: any = customDisplayFormatterContext.cellValue
             if(customDisplayFormatterContext.rowNode.group)
                 return " "
             else{
-                return `${Number(curretValue * 100).toFixed(2)}%`
+                return `${Number(currentValue * 100).toFixed(2)}%`
             }
         }
-    }else if(id==='nonAmountNumberFormatter'){
+    }
+    else if(id === 'zeroPercentFormatter'){
+        handlerFunc =(customDisplayFormatterContext: CustomDisplayFormatterContext)=>{
+            let currentValue: any = customDisplayFormatterContext.cellValue
+            if(customDisplayFormatterContext.rowNode.group)
+                return " "
+            else if(currentValue === 0.0){
+                return '-'
+            }
+            else {
+                return `${Number(currentValue * 100).toFixed(2)}%`
+            }
+        }
+    }
+    else if(id==='nonAmountNumberFormatter'){
         handlerFunc = (customDisplayFormatterContext: CustomDisplayFormatterContext) =>{
             let currentValue : any = customDisplayFormatterContext.cellValue
             if(currentValue == null || Number(currentValue) == 0)
