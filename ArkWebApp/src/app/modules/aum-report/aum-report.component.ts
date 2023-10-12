@@ -392,8 +392,12 @@ export class AumReportComponent implements OnInit {
           ]
         },
         StatusBar: {
-          Revision:5,
+          Revision:6,
           StatusBars: [
+            {
+              Key: 'Center Panel',
+              StatusBarPanels: ['Filter']
+            },
             {
               Key: 'Right Panel',
               StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
