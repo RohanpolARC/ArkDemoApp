@@ -79,10 +79,13 @@ export class IrrResultComponent implements OnInit {
     { field: 'AccFees', headerName: 'Accrued Fees', type: 'abColDefNumber', minWidth: 133 },
     { field: 'AccInterest', headerName: 'Accrued Interest', type: 'abColDefNumber', minWidth: 153  },
     { field: 'CashYield', minWidth: 117, type: 'abColDefString'},   
-    // { field: 'AverageCashMargin', type: 'abColDefNumber', minWidth: 180 },
     { field: 'CashMargin', type: 'abColDefNumber', minWidth: 130 },
     { field: 'PIKMargin', headerName: 'PIK Margin', type: 'abColDefNumber', minWidth: 121 },
     { field: 'UnfundedMargin', headerName: 'Unfunded Margin', type: 'abColDefNumber', minWidth: 170 }, 
+    { field: 'CashMarginCS', headerName: 'Cash Margin CS', type: 'abColDefNumber', minWidth: 130 },
+    { field: 'PIKMarginCS', headerName: 'PIK Margin CS', type: 'abColDefNumber', minWidth: 130 },
+    { field: 'PIKMarginAtInv',headerName:'PIK Margin At Inv CS', type: 'abColDefNumber', minWidth: 130 },
+    { field: 'CashMarginAtInv',headerName:'Cash Margin At Inv CS', type: 'abColDefNumber', minWidth: 130 },
     { field: 'NetLTV', headerName: 'Net LTV', type: 'abColDefNumber', minWidth: 110 },
     { field: 'NetLTVAtInvestement', headerName: 'Net LTV at Inv', type: 'abColDefNumber', minWidth: 145 },
     { field: 'NetLeverage', headerName: 'Net Leverage', type: 'abColDefNumber', minWidth: 136 },
@@ -454,7 +457,8 @@ export class IrrResultComponent implements OnInit {
     ]
   
   AMOUNT_COLUMNS = [
-  'DiscountPriceE','DiscountPriceW','NPVE','NPVEActual','NPVEMinus100','NPVEPlus100','Cost','Mark','ExpectedPrice','AccInterest','CashMargin','PIKMargin','UnfundedMargin','NetLeverage','NetLeverageAtInvestment','EBITDA', 'EBITDADeal', 'EBITDAAtInvestment','ReportingEBITDA','ReportingNetLeverage','Revenue','RevenueAtInvestment','AllInRate','CostValue','ExitPrice','TotalRealizedIncome','AccFees', 'EV', 'EVatInv']
+  'DiscountPriceE','DiscountPriceW','NPVE','NPVEActual','NPVEMinus100','NPVEPlus100','Cost','Mark','ExpectedPrice','AccInterest','CashMargin','PIKMargin','UnfundedMargin','NetLeverage','NetLeverageAtInvestment','EBITDA', 'EBITDADeal', 'EBITDAAtInvestment','ReportingEBITDA','ReportingNetLeverage','Revenue','RevenueAtInvestment','AllInRate','CostValue','ExitPrice','TotalRealizedIncome','AccFees', 'EV', 'EVatInv', 'CashMarginCS','PIKMarginCS', 'PIKMarginAtInv', 'CashMarginAtInv'
+  ]
   
   NON_AMOUNT_2DEC_COLUMNS = ['ExpectedAge','AverageLifeE','AverageLifeW','CashMOM','MOME','MOMW','PaybackE','PaybackW']
   
