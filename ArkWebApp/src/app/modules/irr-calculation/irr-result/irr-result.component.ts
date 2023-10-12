@@ -84,18 +84,19 @@ export class IrrResultComponent implements OnInit {
     { field: 'UnfundedMargin', headerName: 'Unfunded Margin', type: 'abColDefNumber', minWidth: 170 }, 
     { field: 'CashMarginCS', headerName: 'Cash Margin CS', type: 'abColDefNumber', minWidth: 130 },
     { field: 'PIKMarginCS', headerName: 'PIK Margin CS', type: 'abColDefNumber', minWidth: 130 },
-    { field: 'CashMarginAtInv',headerName:'Cash Margin At Inv CS', type: 'abColDefNumber', minWidth: 130 },
-    { field: 'PIKMarginAtInv',headerName:'PIK Margin At Inv CS', type: 'abColDefNumber', minWidth: 130 },
+    { field: 'CashMarginAtInvCS',headerName:'Cash Margin At Inv CS', type: 'abColDefNumber', minWidth: 130 },
+    { field: 'PIKMarginAtInvCS',headerName:'PIK Margin At Inv CS', type: 'abColDefNumber', minWidth: 130 },
     { field: 'NetLTV', headerName: 'Net LTV', type: 'abColDefNumber', minWidth: 110 },
     { field: 'NetLTVAtInvestement', headerName: 'Net LTV at Inv', type: 'abColDefNumber', minWidth: 145 },
     { field: 'NetLeverage', headerName: 'Net Leverage', type: 'abColDefNumber', minWidth: 136 },
     { field: 'NetLeverageAtInvestment', headerName: 'Net Leverage at Inv', type: 'abColDefNumber', minWidth: 180 },
     { field: 'EBITDADeal', headerName: 'EBITDA', type: 'abColDefNumber', minWidth: 150 },
+    { field: 'EBITDAatInvDeal', headerName: 'EBITDA at Inv', type: 'abColDefNumber', minWidth: 150 },
     { field: 'EBITDA', headerName: 'EBITDA(\u20AC)', type: 'abColDefNumber', minWidth: 120 },
     { field: 'EBITDAAtInvestment', headerName: 'EBITDA at Inv(\u20AC)', type: 'abColDefNumber', minWidth: 155 },
     { field: 'ReportingEBITDA', headerName: 'Reporting EBITDA(\u20AC)', type: 'abColDefNumber', minWidth: 185 },
-    { field: 'EV', type: 'abColDefNumber', minWidth: 120 },
-    { field: 'EVatInv', headerName: 'EV At Inv', type: 'abColDefNumber', minWidth: 120 },
+    { field: 'EV', headerName: 'EV(\u20AC)', type: 'abColDefNumber', minWidth: 120 },
+    { field: 'EVatInv', headerName: 'EV At Inv(\u20AC)', type: 'abColDefNumber', minWidth: 120 },
     { field: 'ReportingNetLeverage', headerName: 'Reporting Net Leverage', type: 'abColDefNumber', minWidth: 200 },
     { field: 'Revenue', headerName: 'Revenue(\u20AC)', type: 'abColDefNumber', minWidth: 125 },
     { field: 'RevenueAtInvestment', headerName: 'Revenue at Inv(\u20AC)', type: 'abColDefNumber', minWidth: 200 },
@@ -191,6 +192,7 @@ export class IrrResultComponent implements OnInit {
         customDisplayFormatters:[
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', this.AMOUNT_COLUMNS),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('percentFormatter', this.PERCENT_COLUMNS),
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('zeroPercentFormatter', this.FORMAT_ZERO_AS_DASH_COLUMNS),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('nonAmountNumberFormatter2Dec', this.NON_AMOUNT_2DEC_COLUMNS),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('noDecimalAmountFormatter', this.NO_DECIMAL_AMOUNT_COLUMNS),
         ]
@@ -343,6 +345,7 @@ export class IrrResultComponent implements OnInit {
       ...[
         CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,['amountFormatter']),
         CUSTOM_FORMATTER(this.PERCENT_COLUMNS,['percentFormatter']),
+        CUSTOM_FORMATTER(this.FORMAT_ZERO_AS_DASH_COLUMNS, ['zeroPercentFormatter']),
         CUSTOM_FORMATTER(this.NON_AMOUNT_2DEC_COLUMNS,['nonAmountNumberFormatter2Dec']),
         CUSTOM_FORMATTER(this.NO_DECIMAL_AMOUNT_COLUMNS,['noDecimalAmountFormatter'])
       ]
@@ -461,10 +464,13 @@ export class IrrResultComponent implements OnInit {
     ]
   
   AMOUNT_COLUMNS = [
-  'DiscountPriceE','DiscountPriceW','NPVE','NPVEActual','NPVEMinus100','NPVEPlus100','Cost','Mark','ExpectedPrice','AccInterest','CashMargin','PIKMargin','UnfundedMargin','NetLeverage','NetLeverageAtInvestment','EBITDA', 'EBITDADeal', 'EBITDAAtInvestment','ReportingEBITDA','ReportingNetLeverage','Revenue','RevenueAtInvestment','AllInRate','CostValue','ExitPrice','TotalRealizedIncome','AccFees', 'EV', 'EVatInv', 'CashMarginCS','PIKMarginCS', 'PIKMarginAtInv', 'CashMarginAtInv'
+  'DiscountPriceE','DiscountPriceW','NPVE','NPVEActual','NPVEMinus100','NPVEPlus100','Cost','Mark','ExpectedPrice','AccInterest','CashMargin','PIKMargin','UnfundedMargin','NetLeverage','NetLeverageAtInvestment','EBITDA', 'EBITDADeal', 'EBITDAAtInvestment', 'EBITDAatInvDeal','ReportingEBITDA','ReportingNetLeverage','Revenue','RevenueAtInvestment','AllInRate','CostValue','ExitPrice','TotalRealizedIncome','AccFees', 'EV', 'EVatInv', 'CashMarginCS','PIKMarginCS', 'PIKMarginAtInvCS', 'CashMarginAtInvCS'
   ]
   
   NON_AMOUNT_2DEC_COLUMNS = ['ExpectedAge','AverageLifeE','AverageLifeW','CashMOM','MOME','MOMW','PaybackE','PaybackW']
   
-  PERCENT_COLUMNS = ['CashIRR','YTE','CurrentYTE','YTEHedged','YTW','CurrentYTW','CurrentSTE','EffectiveBaseRateNormalised','EffectiveYieldCurve','YTWHedged','CashYield','NetLTV','NetLTVAtInvestement']
+  PERCENT_COLUMNS = ['CashIRR','YTE','CurrentYTE','YTEHedged','YTW','CurrentYTW','CurrentSTE','EffectiveBaseRateNormalised','EffectiveYieldCurve','YTWHedged','CashYield']
+
+  // LTV values for equities will come as 0 which should be shown as blank(-)
+  FORMAT_ZERO_AS_DASH_COLUMNS = ['NetLTV','NetLTVAtInvestement']
 }
