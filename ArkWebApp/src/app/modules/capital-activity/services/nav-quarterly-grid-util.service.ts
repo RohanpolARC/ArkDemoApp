@@ -10,7 +10,9 @@ export class NavQuarterlyGridUtilService {
   allowedHeaders: string[] = [         
     'Fund Hedging', 'Quarter End', 'NAV per FS', 'Deferred loan origination fee income',
     'Current Period Rebates', 'Organisational costs unamortised', 'Subscription costs & leverage costs unamortised', 'Carried Interest Provision ',
-    'Rebate ITD','Net realised and unrealised gains and losses ITD', 'Advanced Tax'
+    'Rebate ITD', 'Advanced Tax', 'Total foreign exchange movements ITD', 'Net forward contract movements ITD', 'Total Operating exp (excluded GPS) ITD',
+    'Performance fee paid', 'GPS ITD'
+
   ]
 
   validateHeaders(actualColumns: string[], fileColumns: string[]): ValidateColumn {
@@ -34,7 +36,7 @@ export class NavQuarterlyGridUtilService {
     for(let i: number = 0; i < data.length; i+=1){
       let obj = {}
       for(let j: number= 0; j < headers.length; j+= 1){
-        if(['NAV per FS', 'Deferred loan origination fee income', 'Current Period Rebates', 'Organisational costs unamortised', 'Subscription costs & leverage costs unamortised', 'Carried Interest Provision ', 'Rebate ITD', 'Net realised and unrealised gains and losses ITD', 'Advanced Tax'].includes(headers[j]))
+        if(['NAV per FS', 'Deferred loan origination fee income', 'Current Period Rebates', 'Organisational costs unamortised', 'Subscription costs & leverage costs unamortised', 'Carried Interest Provision ', 'Rebate ITD', 'Advanced Tax', 'Total foreign exchange movements ITD', 'Net forward contract movements ITD', 'Total Operating exp (excluded GPS) ITD', 'Performance fee paid', 'GPS ITD'].includes(headers[j]))
           obj[headers[j]] = getAmountNumber(data[i][j])
         else if(['Quarter End'].includes(headers[j])){
           obj[headers[j]] = getDateFromStr(data[i][j], 'DD/MM/YYYY')

@@ -157,8 +157,12 @@ export class UploadService {
     m.subscriptionCostsUnamortised = row['Subscription costs & leverage costs unamortised'];
     m.carriedInterestProvision = row['Carried Interest Provision '];
     m.rebateITD = row['Rebate ITD'];
-    m.netRealisedAndUnrealisedGainsAndLossesITD = row['Net realised and unrealised gains and losses ITD'];
     m.advancedTax = row['Advanced Tax'];
+    m.netForwardContractMovementsITD= row['Net forward contract movements ITD'];
+    m.totalForeignExchangeMovementsITD= row['Total foreign exchange movements ITD'];
+    m.totalOperatingExpITD= row['Total Operating exp (excluded GPS) ITD'];
+    m.performanceFeePaid= row['Performance fee paid'];
+    m.GPSITD= row['GPS ITD'];
     m.username = this.dataSvc.getCurrentUserName();
 
     return m;

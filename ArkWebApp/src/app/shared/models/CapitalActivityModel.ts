@@ -86,6 +86,10 @@ export interface INAVQuarterly {
     advancedTax: number,
     carriedInterestProvision: number,
     rebateITD: number,
-    netRealisedAndUnrealisedGainsAndLossesITD: number,
+    netForwardContractMovementsITD: number,
+    totalForeignExchangeMovementsITD: number,
+    totalOperatingExpITD: number,
+    performanceFeePaid: number,
+    GPSITD: number,
     username: string
 }
