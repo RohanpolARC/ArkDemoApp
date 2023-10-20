@@ -83,9 +83,11 @@ export class IrrResultComponent implements OnInit {
     { field: 'PIKMargin', headerName: 'PIK Margin', type: 'abColDefNumber', minWidth: 121 },
     { field: 'UnfundedMargin', headerName: 'Unfunded Margin', type: 'abColDefNumber', minWidth: 170 }, 
     { field: 'CashMarginCS', headerName: 'Cash Margin CS', type: 'abColDefNumber', minWidth: 130 },
-    { field: 'PIKMarginCS', headerName: 'PIK Margin CS', type: 'abColDefNumber', minWidth: 130 },
     { field: 'CashMarginAtInvCS',headerName:'Cash Margin At Inv CS', type: 'abColDefNumber', minWidth: 130 },
+    { field: 'PIKMarginCS', headerName: 'PIK Margin CS', type: 'abColDefNumber', minWidth: 130 },
     { field: 'PIKMarginAtInvCS',headerName:'PIK Margin At Inv CS', type: 'abColDefNumber', minWidth: 130 },
+    { field: 'UpfrontFeesCS', headerName: 'Upfront Fees CS', type: 'abColDefNumber', minWidth: 130 },
+    { field: 'UpfrontFeesCSAtInv', headerName: 'Upfront Fees CS At Inv', type: 'abColDefNumber', minWidth: 145 },
     { field: 'NetLTV', headerName: 'Net LTV', type: 'abColDefNumber', minWidth: 110 },
     { field: 'NetLTVAtInvestement', headerName: 'Net LTV at Inv', type: 'abColDefNumber', minWidth: 145 },
     { field: 'NetLeverage', headerName: 'Net Leverage', type: 'abColDefNumber', minWidth: 136 },
@@ -363,12 +365,6 @@ export class IrrResultComponent implements OnInit {
     if(!mapGroupCols.includes("Issuer Short Name")){
       excludePaggrCols = [...excludePaggrCols, ...['DealName', 'DealCcy']]
     }
-    // if(mapGroupCols.includes("Seniority")){
-    //   excludeCalcCols = [...excludeCalcCols, ...['Revenue', 'RevenueAtInvestment']]
-    // }
-    // else{
-    //   excludeCalcCols = [...excludeCalcCols, ...['SeniorityRevenue', 'SeniorityRevenueAtInvestment']]
-    // }
 
     this.columnDefs = [ 
       ...this.mapGroupColDefs.filter(c => mapGroupCols.includes(c.field)),
@@ -464,7 +460,7 @@ export class IrrResultComponent implements OnInit {
     ]
   
   AMOUNT_COLUMNS = [
-  'DiscountPriceE','DiscountPriceW','NPVE','NPVEActual','NPVEMinus100','NPVEPlus100','Cost','Mark','ExpectedPrice','AccInterest','CashMargin','PIKMargin','UnfundedMargin','NetLeverage','NetLeverageAtInvestment','EBITDA', 'EBITDADeal', 'EBITDAAtInvestment', 'EBITDAatInvDeal','ReportingEBITDA','ReportingNetLeverage','Revenue','RevenueAtInvestment','AllInRate','CostValue','ExitPrice','TotalRealizedIncome','AccFees', 'EV', 'EVatInv', 'CashMarginCS','PIKMarginCS', 'PIKMarginAtInvCS', 'CashMarginAtInvCS'
+  'DiscountPriceE','DiscountPriceW','NPVE','NPVEActual','NPVEMinus100','NPVEPlus100','Cost','Mark','ExpectedPrice','AccInterest','CashMargin','PIKMargin','UnfundedMargin','NetLeverage','NetLeverageAtInvestment','EBITDA', 'EBITDADeal', 'EBITDAAtInvestment', 'EBITDAatInvDeal','ReportingEBITDA','ReportingNetLeverage','Revenue','RevenueAtInvestment','AllInRate','CostValue','ExitPrice','TotalRealizedIncome','AccFees', 'EV', 'EVatInv', 'CashMarginCS','PIKMarginCS', 'PIKMarginAtInvCS', 'CashMarginAtInvCS', 'UpfrontFeesCS', 'UpfrontFeesCSAtInv'
   ]
   
   NON_AMOUNT_2DEC_COLUMNS = ['ExpectedAge','AverageLifeE','AverageLifeW','CashMOM','MOME','MOMW','PaybackE','PaybackW']
