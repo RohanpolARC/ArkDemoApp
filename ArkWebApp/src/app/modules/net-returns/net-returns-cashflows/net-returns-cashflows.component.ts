@@ -1,6 +1,7 @@
 import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { GridOptions, CellValueChangedEvent, Module, ColDef, GridReadyEvent, GridApi, FirstDataRenderedEvent } from '@ag-grid-community/core';
+import { GridOptions, CellValueChangedEvent, Module, ColDef, GridReadyEvent, GridApi, FirstDataRenderedEvent, CellClickedEvent } from '@ag-grid-community/core';
 import { Component, Input, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -9,7 +10,8 @@ import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
-import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
+import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
+import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
 
 @Component({
   selector: 'app-net-returns-cashflows',
@@ -18,8 +20,10 @@ import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 })
 export class NetReturnsCashflowsComponent implements OnInit {
 
-  @Input() cashflows
-  @Input() cashflowCount
+  @Input() cashflows: any[]
+  @Input() cashflowCount: number
+  @Input() fundHedging: string
+  @Input() asOfDate: string
 
   filterApply$: Observable<boolean> = this.dataSvc.filterApplyBtnState.pipe(
     tap((isHit: boolean) => {
@@ -30,7 +34,6 @@ export class NetReturnsCashflowsComponent implements OnInit {
     })
   )
 
-  asOfDate: string;
   agGridModules: Module[]
   columnDefs: ColDef[]
   gridOptions: GridOptions
@@ -43,7 +46,8 @@ export class NetReturnsCashflowsComponent implements OnInit {
 
   constructor(
     private dataSvc: DataService,
-    public netReturnsSvc: NetReturnsService
+    public netReturnsSvc: NetReturnsService,
+    public dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -53,7 +57,11 @@ export class NetReturnsCashflowsComponent implements OnInit {
     this.columnDefs = <ColDef[]>[
       { field: 'category', type: 'abColDefString',sortable:false},
       { field: 'valueDate', type: 'abColDefDate' },
-      { field: 'amount', type: 'abColDefNumber' },
+      { field: 'amount', type: 'abColDefNumber', 
+        onCellClicked: this.onAmountClicked.bind(this), 
+        cellStyle: this.clickableAmountStyle,
+        tooltipValueGetter: this.amountTooltipGetter
+      },
       { field: 'capitalSubType', type: 'abColDefString' },
       { field: 'capitalType', type: 'abColDefString' },
       { field: 'narrative', type: 'abColDefString' },
@@ -151,8 +159,40 @@ export class NetReturnsCashflowsComponent implements OnInit {
     AdaptableApi.columnApi.autosizeAllColumns()
   }
 
-  onCellValueChanged(params: CellValueChangedEvent){}
+  onAmountClicked(params: CellClickedEvent){
+    let data = params.data;
+    if(data?.['capitalType'] === 'NAV' && data?.['capitalSubType'] === 'Performance Fee'){
 
+      let req: DetailedView = <DetailedView>{};
+      req.screen = 'Net Returns - Performance Fee Accrual'
+      req.param1 = this.asOfDate;
+      req.param2 = this.fundHedging;
+      req.param3 = req.param4 = req.param5 = '';
+      req.strParam1 = [];
+
+      const dialogRef = this.dialog.open(DefaultDetailedViewPopupComponent, {
+        data: {
+          detailedViewRequest: req,
+          failureMessage: `Failed to load the performance fee details`,
+          noFilterSpace: true,
+          grid: 'Net Returns - Performance Fee Accrual',
+          header: `Accrued performance fee details for ${this.asOfDate} - ${this.fundHedging}` 
+        },
+        width: '90vw',
+        height: '80vh'
+      });
+    }
+  }
+  clickableAmountStyle (params) {
+    if(params.data?.['capitalType'] === 'NAV' && params.data?.['capitalSubType'] === 'Performance Fee')
+      return { color: '#0590ca' };
+    return null;
+  }
+  amountTooltipGetter (params) {
+    if(params.data?.['capitalType'] === 'NAV' && params.data?.['capitalSubType'] === 'Performance Fee')
+      return 'View accrual calculation';
+    return null;
+  }
   onGridReady(params: GridReadyEvent){
     params.api.showNoRowsOverlay()
     params.api.closeToolPanel()

@@ -10,6 +10,8 @@ import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MatButtonModule } from '@angular/material/button';
 import { SsrsReportViewerModule } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-viewer.module';
+import { MatDialogModule } from '@angular/material/dialog';
+import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
 
 
 
@@ -28,8 +30,9 @@ import { SsrsReportViewerModule } from 'src/app/shared/modules/ssrs-report-viewe
 
     MatButtonModule,
 
-    SsrsReportViewerModule
-
+    SsrsReportViewerModule,
+    MatDialogModule,
+    DetailedViewModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 
