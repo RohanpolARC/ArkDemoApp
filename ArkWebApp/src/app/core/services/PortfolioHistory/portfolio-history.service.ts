@@ -24,6 +24,12 @@ export class PortfolioHistoryService {
       catchError((ex) => throwError(ex)));
   }
 
+  public putAssetGIRReview(model:AssetGIRModel[]){
+    return this.http.post<any>(APIConfig.PORTFOLIO_HISTORY_PUT_REVIEW_API,model).pipe(
+      catchError((ex)=>throwError(ex))
+    )
+  }
+
   public deleteAssetGIR(assetGIRModel: AssetGIRModel){
     return this.http.post<any>(APIConfig.PORTFOLIO_HISTORY_DELETE_API, assetGIRModel).pipe(catchError((ex) => throwError(ex)));
   }
@@ -32,14 +38,14 @@ export class PortfolioHistoryService {
     return this.http.post<any>(APIConfig.PORTFOLIO_HISTORY_BULK_PUT_API, bulkAssetGIRModel).pipe(catchError((ex) => throwError(ex)));
   }
 
-  public getModel(data:any){
+  public getModel(data:any):AssetGIRModel{
       // `this.data.rowData` holds the data of the selected row.
 
       let AssetGIR: AssetGIRModel = new AssetGIRModel();
       AssetGIR.WSOAssetid = data.assetId;
       AssetGIR.AsOfDate = data.asOfDate;
       AssetGIR.Ccy = 0;    // ?
-      AssetGIR.Rate = (data.fxRateBaseEffective===0)  ? null  : data.fxRateBaseEffective;       // Updated GIR.
+      AssetGIR.Rate = (data.staging_FXRateBase===0)  ? null  : data.staging_FXRateBase;       // Updated GIR.
       AssetGIR.last_update = new Date();
       AssetGIR.CcyName = data.fundCcy;
       AssetGIR.Text = data.asset;

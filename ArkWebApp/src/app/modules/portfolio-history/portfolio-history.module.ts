@@ -14,6 +14,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { PortfolioHistoryRoutingModule } from './portfolio-history-routing.module';
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
+import { PortfolioHistoryComponentReaderService } from './service/portfolio-history-component-reader.service';
+import { PortfolioHistoryGridConfigService } from './service/portfolio-history-grid-config.service';
+import { PortfolioHistoryGridUtilService } from './service/portfolio-history-grid-util.service';
+import { PortfolioHistoryBusinessLogicService } from './service/portfolio-history-business-logic.service';
 
 @NgModule({
   declarations: [
@@ -37,6 +41,12 @@ import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detaile
   ],
   exports:[
     PortfolioHistoryComponent
+  ],
+  providers: [
+    PortfolioHistoryComponentReaderService,
+    PortfolioHistoryGridConfigService,
+    PortfolioHistoryGridUtilService,
+    PortfolioHistoryBusinessLogicService
   ]
 })
 export class PortfolioHistoryModule { }

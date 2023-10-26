@@ -53,7 +53,11 @@ export class AggridMatCheckboxEditorComponent implements ICellRendererAngularCom
     this.checked = boolVal;
 
     let colid: string = this.params.column.getColId();
-    this.params.data[colid] = boolVal;
+    if(this.params.node.group){
+      this.params.node.groupData[colid] = boolVal;
+    }else{
+      this.params.data[colid] = boolVal;
+    }
 
     if(this.checkboxChanged)
       this.checkboxChanged(this.params, boolVal);

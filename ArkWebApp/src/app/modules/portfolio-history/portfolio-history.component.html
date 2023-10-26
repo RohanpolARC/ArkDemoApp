@@ -3,7 +3,8 @@
       <div class="title">
         Portfolio History - Going In Rates Editor
       </div>
-      <div class="action">
+      <div class="action mx-5">
+        <button type="button" mat-raised-button (click)="pushReviewed()">Review</button>
       </div>
   </div>
 
@@ -15,9 +16,7 @@
           [columnDefs]="columnDefs"
           [defaultColDef]="defaultColDef"
           [modules]="modules"
-          [autoGroupColumnDef]="autoGroupColumnDef"
           [suppressClickEdit]="true"
-          [rowGroupPanelShow]="rowGroupPanelShow"
           (adaptableReady)="onAdaptableReady($event)"
           [adaptableOptions]="adaptableOptions"
           [gridOptions]="gridOptions"

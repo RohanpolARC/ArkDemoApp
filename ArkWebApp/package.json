@@ -11,7 +11,7 @@
   "private": true,
   "dependencies": {
     "@adaptabletools/adaptable-angular-aggrid": "15.4.3",
-    "@adaptabletools/adaptable-plugin-master-detail-aggrid": "^15.4.3",
+    "@adaptabletools/adaptable-plugin-master-detail-aggrid": "15.4.3",
     "@ag-grid-community/angular": "29.3.0",
     "@ag-grid-community/client-side-row-model": "29.3.0",
     "@ag-grid-community/core": "29.3.0",

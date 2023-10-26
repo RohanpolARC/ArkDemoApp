@@ -22,6 +22,7 @@ export class APIConfig {
     public static PORTFOLIO_HISTORY_PUT_API: string = APIConfig.BASEURL + "/api/AssetGIR/put";
     public static PORTFOLIO_HISTORY_BULK_PUT_API: string = APIConfig.BASEURL + "/api/AssetGIR/putbulk";
     public static PORTFOLIO_HISTORY_DELETE_API: string = APIConfig.BASEURL + "/api/AssetGIR/delete";
+    public static PORTFOLIO_HISTORY_PUT_REVIEW_API: string = APIConfig.BASEURL + "/api/AssetGIR/putReview";
 
     public static GRID_DYNAMIC_COLUMNS_GET_API: string = APIConfig.BASEURL + "/api/General/GetGridDynamicColumns";
     public static SAVE_ADAPTABLE_STATE_API: string = APIConfig.BASEURL + "/api/General/SaveAdaptableState";

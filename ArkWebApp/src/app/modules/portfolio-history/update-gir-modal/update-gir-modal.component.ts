@@ -85,7 +85,11 @@ export class UpdateGirModalComponent implements OnInit {
     this.issuer=this.rowData.issuerShortName
     this.fundhedging=this.rowData.fundHedging
     this.fundCcy=this.rowData.fundCcy
-    this.goingInRate=this.rowData.fxRateBaseEffective
+    if(this.rowData.staging_FXRateBase == 0){
+      this.goingInRate = this.rowData.pgh_FXRateBaseEffective
+    }else{
+      this.goingInRate = this.rowData.staging_FXRateBase
+    }
     this.tradeDate=new Date(this.rowData.tradeDate).toLocaleDateString('en-GB')
     this.positionCcy=this.rowData.positionCcy
 
@@ -133,8 +137,13 @@ export class UpdateGirModalComponent implements OnInit {
       this.initLeafChildrenData();
       this.isGroupSelectedValid = this.isGroupValid(this.allLeafChildrenData);
       
-      if(this.isGroupSelectedValid)
-        this.goingInRate = this.allLeafChildrenData[0].fxRateBaseEffective;
+      if(this.isGroupSelectedValid){
+        if(this.allLeafChildrenData[0].staging_FXRateBase == 0){
+          this.goingInRate = this.allLeafChildrenData[0].pgh_FXRateBaseEffective
+        }else{
+          this.goingInRate = this.allLeafChildrenData[0].staging_FXRateBase
+        }
+      }
 
     }
     if(this.allLeafChildrenData[0].fundCcy !== this.allLeafChildrenData[0].positionCcy)
@@ -176,16 +185,16 @@ export class UpdateGirModalComponent implements OnInit {
         model.ModifiedOn = new Date();
         model.TradeDate = this.allLeafChildrenData[i].tradeDate;
         model.FundHedging = this.allLeafChildrenData[i].fundHedging;
-        model.isReviewed = true;    
-        model.ReviewedBy = this.currentUserName;
-        model.ReviewedOn =    new Date(); 
+        model.isReviewed = false;    
+        model.ReviewedBy = null;
+        model.ReviewedOn =    null; 
 
         this.allLeafChildrenData[i].goingInRate = this.goingInRate;
 
         bulkAssetGIR.push(model);
       }
       
-      this.subscriptions.push(this.portfolioHistoryService.putAssetGIR(bulkAssetGIR).subscribe({
+      this.subscriptions.push(this.portfolioHistoryService.putAssetGIRReview(bulkAssetGIR).subscribe({
         next: data => {
 
           this.isSuccess = true;
@@ -193,15 +202,14 @@ export class UpdateGirModalComponent implements OnInit {
           this.updateMsg = "Updated going in rate for " + this.allLeafChildrenData.length + " assets"
 
           let updatedData = this.allLeafChildrenData.map(nodeData => {
-            nodeData['fxRateBaseEffective'] = this.goingInRate,
+            nodeData['staging_FXRateBase'] = this.goingInRate,
             nodeData['modifiedOn'] = new Date();
             nodeData['modifiedBy'] = this.currentUserName;
-            nodeData['isOverride'] = 'Yes',
-            nodeData['colour'] = ' '
+            nodeData['isOverride'] = (nodeData['isReviewed'] === true) ? 'Yes' : 'No',
             
-            nodeData['reviewedOn']= new Date(),
-            nodeData['reviewedBy']= this.currentUserName,
-            nodeData['isReviewed'] = true
+            nodeData['reviewedOn']= null,
+            nodeData['reviewedBy']= null,
+            nodeData['isReviewed'] = false
 
 
             return nodeData
@@ -220,18 +228,18 @@ export class UpdateGirModalComponent implements OnInit {
     else{
     this.action='Update'
 
-    this.rowData.fxRateBaseEffective=this.goingInRate
+    this.rowData.staging_FXRateBase=this.goingInRate
 
     this.assetGIR.id = 0;
     this.assetGIR.WSOAssetid = this.rowData.assetId;
     this.assetGIR.AsOfDate = this.rowData.asOfDate;
     this.assetGIR.Ccy = 0;
-    this.assetGIR.Rate = this.rowData.fxRateBaseEffective;
+    this.assetGIR.Rate = this.rowData.staging_FXRateBase;
     this.assetGIR.fxRateOverride = true;            // GIR is always overriden if update happens from GIREditor.
     
-    this.assetGIR.isReviewed = true;    
-    this.assetGIR.ReviewedBy = this.currentUserName;
-    this.assetGIR.ReviewedOn =    new Date(); 
+    this.assetGIR.isReviewed = false;    
+    this.assetGIR.ReviewedBy = null;
+    this.assetGIR.ReviewedOn =    null; 
 
     this.assetGIR.last_update = new Date();
     this.assetGIR.CcyName = this.rowData.fundCcy;   // Changed from positionCcy based on request.
@@ -244,7 +252,7 @@ export class UpdateGirModalComponent implements OnInit {
 
     this.assetGIR.FundHedging = this.rowData.fundHedging;
 
-    this.subscriptions.push(this.portfolioHistoryService.putAssetGIR([this.assetGIR]).subscribe({
+    this.subscriptions.push(this.portfolioHistoryService.putAssetGIRReview([this.assetGIR]).subscribe({
           next: data => {     
             
             this.isSuccess = true;
@@ -252,14 +260,14 @@ export class UpdateGirModalComponent implements OnInit {
             this.updateMsg = "Going in rate updated successfully.";
 
             let updatedData = [{...this.data.node.data, ...{
-              'fxRateBaseEffective': this.goingInRate,
+              'staging_FXRateBase': this.goingInRate,
               'modifiedOn': new Date(),
               'modifiedBy': this.currentUserName,
-              'reviewedOn': new Date(),
-              'reviewedBy': this.currentUserName,
-              'isOverride': 'Yes',
-              'isReviewed':true,
-              'colour': ' '
+              'reviewedOn': null,
+              'reviewedBy': null,
+              'isOverride' : (this.data.node.data['isReviewed'] === true) ? 'Yes' : 'No',
+
+              'isReviewed': false
             }}]
 
             this.data.gridApi.applyTransaction({
