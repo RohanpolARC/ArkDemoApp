@@ -2,7 +2,7 @@ import { ColDef, FirstDataRenderedEvent, GridOptions, Module } from '@ag-grid-co
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { dateFormatter } from '../../utilities/utility';
-import { amountFormatter } from 'src/app/shared/functions/formatter';
+import { AmountOrZeroFormatter } from 'src/app/shared/functions/formatter';
 import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { AdaptableApi, AdaptableOptions, AdaptableReadyInfo, Layout } from '@adaptabletools/adaptable-angular-aggrid';
 import { DataService } from 'src/app/core/services/data.service';
@@ -24,25 +24,24 @@ export class NavQuarterlyGridComponent implements OnInit {
   columnDefs: ColDef[] = [
     { field: 'Fund Hedging', maxWidth: 150, allowedAggFuncs: ['Min', 'Max'], tooltipField: 'Fund Hedging'},
     { field: 'Quarter End', maxWidth: 150, valueFormatter: dateFormatter, allowedAggFuncs: ['Min', 'Max'], tooltipField: 'Quarter End'},
-    { field: 'NAV per FS', maxWidth: 150, tooltipField: 'NAV per FS', valueFormatter: amountFormatter},
-    { field: 'Deferred loan origination fee income', headerName: 'Deferred loan origination fee income', maxWidth: 150, tooltipField: 'Deferred loan origination fee income', valueFormatter: amountFormatter},
-    { field: 'Current Period Rebates', headerName: 'Current Period Rebates', maxWidth: 150, cellClass: 'ag-right-aligned-cell', valueFormatter: amountFormatter, allowedAggFuncs: [ 'sum', 'avg', 'first', 'last', 'count', 'min', 'max'], tooltipField:'Current Period Rebates'},
-    { field: 'Organisational costs unamortised', maxWidth: 150, tooltipField:'Organisational costs unamortised', valueFormatter: amountFormatter},
-    { field: 'Subscription costs & leverage costs unamortised', maxWidth: 170, tooltipField: 'Subscription costs & leverage costs unamortised', valueFormatter: amountFormatter},
-    { field: 'Carried Interest Provision ', headerName: 'Carried Interest Provision ', tooltipField:'Carried Interest Provision ', valueFormatter: amountFormatter},
-    { field: 'Rebate ITD', maxWidth: 150, headerName: 'Rebate ITD', tooltipField:'Rebate ITD', valueFormatter: amountFormatter},
-    { field: 'Advanced Tax', maxWidth: 150, valueFormatter: amountFormatter },
-    { field:'Net forward contract movements ITD',maxWidth:150,headerName:'Net forward contract movements ITD',tooltipField:'Net forward contract movements ITD',valueFormatter:amountFormatter},
-    { field:'Total foreign exchange movements ITD',maxWidth:150,headerName:'Total foreign exchange movements ITD',tooltipField:'Total foreign exchange movements ITD',valueFormatter:amountFormatter},
-    { field:'Total Operating exp (excluded GPS) ITD',maxWidth:150,headerName:'Total Operating exp (excluded GPS) ITD',tooltipField:'Total Operating exp (excluded GPS) ITD',valueFormatter:amountFormatter},
-    { field:'Performance fee paid',maxWidth:150,headerName:'Performance fee paid',tooltipField:'Performance fee paid',valueFormatter:amountFormatter},
-    { field:'GPS ITD',maxWidth:150,headerName:'GPS ITD',tooltipField:'GPS ITD',valueFormatter:amountFormatter},
+    { field: 'NAV per FS', maxWidth: 150, tooltipField: 'NAV per FS', valueFormatter: AmountOrZeroFormatter},
+    { field: 'Deferred loan origination fee income', headerName: 'Deferred loan origination fee income', maxWidth: 150, tooltipField: 'Deferred loan origination fee income', valueFormatter: AmountOrZeroFormatter},
+    { field: 'Current Period Rebates', headerName: 'Current Period Rebates', maxWidth: 150, cellClass: 'ag-right-aligned-cell', valueFormatter: AmountOrZeroFormatter, allowedAggFuncs: [ 'sum', 'avg', 'first', 'last', 'count', 'min', 'max'], tooltipField:'Current Period Rebates'},
+    { field: 'Organisational costs unamortised', maxWidth: 150, tooltipField:'Organisational costs unamortised', valueFormatter: AmountOrZeroFormatter},
+    { field: 'Subscription costs & leverage costs unamortised', maxWidth: 170, tooltipField: 'Subscription costs & leverage costs unamortised', valueFormatter: AmountOrZeroFormatter},
+    { field: 'Carried Interest Provision ', headerName: 'Carried Interest Provision ', tooltipField:'Carried Interest Provision ', valueFormatter: AmountOrZeroFormatter},
+    { field: 'Rebate ITD', maxWidth: 150, headerName: 'Rebate ITD', tooltipField:'Rebate ITD', valueFormatter: AmountOrZeroFormatter},
+    { field: 'Advanced Tax', maxWidth: 150, valueFormatter: AmountOrZeroFormatter },
+    { field:'Net forward contract movements ITD',maxWidth:150,headerName:'Net forward contract movements ITD',tooltipField:'Net forward contract movements ITD',valueFormatter:AmountOrZeroFormatter},
+    { field:'Total foreign exchange movements ITD',maxWidth:150,headerName:'Total foreign exchange movements ITD',tooltipField:'Total foreign exchange movements ITD',valueFormatter:AmountOrZeroFormatter},
+    { field:'Total Operating exp (excluded GPS) ITD',maxWidth:150,headerName:'Total Operating exp (excluded GPS) ITD',tooltipField:'Total Operating exp (excluded GPS) ITD',valueFormatter:AmountOrZeroFormatter},
+    { field:'Performance fee paid',maxWidth:150,headerName:'Performance fee paid',tooltipField:'Performance fee paid',valueFormatter:AmountOrZeroFormatter},
+    { field:'GPS ITD',maxWidth:150,headerName:'GPS ITD',tooltipField:'GPS ITD',valueFormatter:AmountOrZeroFormatter},
     { field: 'remark', width: 500, tooltipField: 'remark'},
     { field: '_ROW_ID', headerName: 'Row', maxWidth: 100},
   ]
   gridOptions: GridOptions = {
     ...CommonConfig.GRID_OPTIONS,
-    ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
     enableRangeSelection: true,
     sideBar: true,
     suppressMenuHide: true,
@@ -97,19 +96,6 @@ export class NavQuarterlyGridComponent implements OnInit {
             },
           }
         ]
-      },
-      StatusBar: {
-        Revision: 2,
-        StatusBars: [
-          {
-            Key: 'Center Panel',
-            StatusBarPanels: ['Filter']
-          },
-          {
-            Key: 'Right Panel',
-            StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
-          },
-        ],
       }
     }
   }

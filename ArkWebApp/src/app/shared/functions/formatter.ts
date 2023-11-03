@@ -21,7 +21,7 @@ export function dateTimeFormatter(params) {
 
 export function amountFormatter(params){
     
-    if(params.value!=undefined && Number(Number(params.value).toFixed(2))!=0    ){
+    if(params.value!=undefined && Number(Number(params.value).toFixed(2))!=0){
         if(Number.isInteger(Number(Number(params.value).toFixed(2)))){         // Don't show trailing 0's if number rounded off to 2 decimals is an integer
             return Number(params.value).toLocaleString(undefined,{
                 minimumFractionDigits: 0,
@@ -36,6 +36,29 @@ export function amountFormatter(params){
         }
     }
     else if(Number(Number(params.value).toFixed(2))==0) {
+        return "-"
+    } else{
+        return ""
+    }
+}
+
+
+export function AmountOrZeroFormatter(params){
+    if(params.value!=undefined && params.value!=null){
+        if(Number.isInteger(Number(Number(params.value).toFixed(2)))){         // Don't show trailing 0's if number rounded off to 2 decimals is an integer
+            return Number(params.value).toLocaleString(undefined,{
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            })
+        }
+        else{
+            return Number(params.value).toLocaleString(undefined, {     // Show 2 trailing digits if non integer
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });    
+        }
+    }
+    else if(params.value===null) {
         return "-"
     } else{
         return ""

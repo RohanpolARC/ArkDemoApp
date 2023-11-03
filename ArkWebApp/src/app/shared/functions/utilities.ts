@@ -67,8 +67,14 @@ export function getAmountStr(transformer: DecimalPipe, amount: number | string):
  * @returns `amount` in number
  */
 export function getAmountNumber(amount: string | number): number {
-  
-  return Number(String(amount).replace(/[^0-9.-]/g, ''));
+  const cleanedAmount = String(amount).replace(/[^0-9.-]/g, '');
+
+  // Check if the cleaned amount is empty and return Null if it is.
+  if (cleanedAmount.trim() === '') {
+    return null;
+  }
+
+  return Number(cleanedAmount);
 }
 
 /**

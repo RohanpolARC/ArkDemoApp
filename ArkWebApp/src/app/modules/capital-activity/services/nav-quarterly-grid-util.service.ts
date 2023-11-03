@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ValidateColumn } from './activities-grid-util.service';
 import { getAmountNumber, getDateFromStr } from 'src/app/shared/functions/utilities';
 
+
 @Injectable()
 export class NavQuarterlyGridUtilService {
 
@@ -107,7 +108,7 @@ export class NavQuarterlyGridUtilService {
       invalidmsg += (invalidmsg === '') ? '' : ','
       invalidmsg += 'NAV per FS has to positive';
     }
-    else if(row['NAV per FS'] < 100000){
+    else if(row['NAV per FS'] < 100000 ){
       invalidmsg += (invalidmsg === '') ? '' : ','
       invalidmsg += 'NAV per FS is usually in millions';
     }

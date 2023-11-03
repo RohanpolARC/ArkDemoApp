@@ -75,7 +75,7 @@ export class UploadComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     this.activitiesTemplateURL = '../../../../assets/files/templates/CapitalActivityUploadTemplate.xlsx'; 
-    this.navQuarterlyTemplateURL = 'https://arcmont.sharepoint.com/:x:/r/sites/ArcReporting/Shared%20Documents/ArkWebPortal%20documents/Net%20IRR%20Quarterly%20data%20upload.xlsx?d=wa25fca0f05fa4fe1b1020bbeb5000c83&csf=1&web=1&e=7istbl';
+    this.navQuarterlyTemplateURL = '../../../../assets/files/templates/NavQuarterlyUploadTemplate.xlsx';
     this.hideDropzone = false;
 
     this.subscriptions.push(this.uploadSvc.actionSuccessful$.pipe(
