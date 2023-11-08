@@ -161,7 +161,6 @@ export class UploadService {
     m.netForwardContractMovementsITD= row['Net forward contract movements ITD'];
     m.totalForeignExchangeMovementsITD= row['Total foreign exchange movements ITD'];
     m.totalOperatingExpITD= row['Total Operating exp (excluded GPS) ITD'];
-    m.performanceFeePaid= row['Performance fee paid'];
     m.GPSITD= row['GPS ITD'];
     m.username = this.dataSvc.getCurrentUserName();
 

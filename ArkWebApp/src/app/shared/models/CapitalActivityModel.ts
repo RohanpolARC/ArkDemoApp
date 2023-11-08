@@ -89,7 +89,6 @@ export interface INAVQuarterly {
     netForwardContractMovementsITD: number,
     totalForeignExchangeMovementsITD: number,
     totalOperatingExpITD: number,
-    performanceFeePaid: number,
     GPSITD: number,
     username: string
 }
