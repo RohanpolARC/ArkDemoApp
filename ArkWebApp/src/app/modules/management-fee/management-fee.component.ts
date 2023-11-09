@@ -38,27 +38,27 @@ export class ManagementFeeComponent implements OnInit {
     private filterSvc: GeneralFilterService
     ) { }
     
-  AMOUNT_COLUMNS= ['feeRate']
+  AMOUNT_COLUMNS= [
+    'feeRate',
+    'grossGPSRate',
+    'netOfRebateGPSRate',
+    'netGPSRate'
+  ]
   
   NO_DEC_AMOUNT_COLUMNS = [
     'aumBase',
     'calculatedITDFee',
-    'fixing',
     'adjustment',
     'adjustedITDFee',
     'aggregatedAdjustment',
-    'aumLocal',
     'runningAUMBase',
-    'deltaCommitted',
-    'unfunded',
-    'deltaFunded',
-    'funded'
+    'grossGPS',
+    'netOfRebateGPS',
+    'netGPS',
   ]
 
   DATE_COLUMNS = [
-      'fixingDate',
-      'managementDate',
-      'girTimestamp'
+      'managementDate'
   ]
 
   fetchManagementFee(){
@@ -106,38 +106,28 @@ export class ManagementFeeComponent implements OnInit {
     
     let allowedAggFunc = ['sum', 'max', 'min', 'first', 'last', 'count']
     this.columnDefs = [
-      { field: 'positionID', type: 'abColDefNumber' },
+      { field: 'positionID',headerName: 'Position Id', type: 'abColDefNumber' },
       { field: 'fundHedging', type: 'abColDefString' },
       { field: 'issuerShortName', type: 'abColDefString' },
       { field: 'issuer', type: 'abColDefString' },
       {field: 'transaction',type:'abColDefString'},
       { field: 'asset', type: 'abColDefString' },
       { field: 'managementDate', type: 'abColDefDate',  cellClass: 'dateUK', headerName: 'Trade Date' },
-      { field: 'aumBase',headerName:'AUM Base', type: 'abColDefNumber', aggFunc: 'sum' },
+      { field: 'aumBase',headerName:'AUM', type: 'abColDefNumber', aggFunc: 'sum' },
       { field: 'feeRate', type: 'abColDefNumber',aggFunc: 'max', headerName: 'Fee Rate Percent'  },
       { field: 'calculatedITDFee', type: 'abColDefNumber', aggFunc: 'sum'  },
-      { field: 'fixingDate', 
-      valueGetter:(params:ValueGetterParams)=>{
-        return dateNullValueGetter(params,'fixingDate')
-      },
-      type: 'abColDefDate',  aggFunc: 'Max', allowedAggFuncs: ['Max'], cellClass: 'dateUK' },
-      { field: 'fixing', type: 'abColDefNumber', aggFunc: 'max'  },
       { field: 'adjustment', type: 'abColDefNumber', aggFunc: 'sum',   },
       { field: 'adjustedITDFee', type: 'abColDefNumber', allowedAggFuncs: ['Sum'], aggFunc: 'Sum' },
-      { field: 'noOfMgmtDays',headerName: 'No of Management Days', type: 'abColDefNumber'},
+      { field: 'noOfMgmtDays',headerName: 'No of GPS Days', type: 'abColDefNumber'},
       { field: 'positionCCY',headerName:'Position Ccy',type: 'abColDefString'},
-      { field: 'aumLocal', headerName:'AUM Local',type: 'abColDefNumber'},
       { field: 'aggregatedAdjustment', type: 'abColDefNumber' },
       {field:'runningAUMBase',headerName:'GPS Basis',type:'abColDefNumber'},
-      {field: 'gir',headerName:'GIR',type:'abColDefNumber'},
-      {field: 'girSource',headerName:'GIR Source',type:'abColDefString'},
-      {field: 'girTimestamp',headerName:'GIR Timestamp',type:'abColDefDate'},
-      {field: 'deltaCommitted',headerName:'Delta in Commitment',type:'abColDefNumber'},
-      {field: 'unfunded',type:'abColDefNumber'},
-      {field: 'deltaFunded',headerName:'Delta in Funded',type:'abColDefNumber'},
-      {field: 'funded',type:'abColDefNumber'},
-      {field: 'wtAvgGIRMethod',type:'abColDefString'},
-      {field: 'wtAvgGIR',type:'abColDefNumber'}
+      {field:'grossGPS', headerName:'Gross GPS', type:'abColDefNumber', aggFunc: 'sum'},
+      {field:'grossGPSRate', headerName:'Gross GPS Rate', type:'abColDefNumber'},
+      {field:'netOfRebateGPS', headerName:'Net of Rebate GPS', type:'abColDefNumber', aggFunc: 'sum'},
+      {field:'netOfRebateGPSRate', headerName:'Net of Rebate GPS Rate', type:'abColDefNumber'},
+      {field:'netGPS', headerName:'Net GPS', type:'abColDefNumber', aggFunc: 'sum'},
+      {field:'netGPSRate', headerName:'Net GPS Rate', type:'abColDefNumber'}
 
 
 
@@ -150,24 +140,6 @@ export class ManagementFeeComponent implements OnInit {
     
 
     let aggFuncs = {
-      'Max': (params: IAggFuncParams) => {
-        if(params.column.getColId() === 'fixingDate'){
-
-          const MIN_DATE_VAL: number = -8640000000000000;
-          let maxDate = new Date(MIN_DATE_VAL);
-          params.values.forEach(value => {
-            let d = new Date(value)
-            if(d > maxDate)
-              maxDate = d
-          })
-
-          if(formatDate(maxDate) === '01/01/1' || formatDate(maxDate) === '01/01/1970')
-            return null;
-          else return maxDate;
-        }
-
-        return 0;
-      },
       'Sum': (params: IAggFuncParams) => {
         if(params.column.getColId() === 'adjustedITDFee'){
           let childData = getNodes(params.rowNode as RowNode, []);
@@ -188,9 +160,13 @@ export class ManagementFeeComponent implements OnInit {
       columnDefs: this.columnDefs,
       sideBar: true,
       rowGroupPanelShow: 'always',
+      rowHeight: 40,
       // components: {
       //   AdaptableToolPanel: AdaptableToolPanelAgGridComponent
       // },
+      autoGroupColumnDef:{
+        minWidth:200,
+      },
       defaultColDef: {
         resizable: true,
         sortable: true,
@@ -242,11 +218,27 @@ export class ManagementFeeComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 14,
+          Revision: 17,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
-            Columns: [ ...this.columnDefs.map(c => c.field)].filter(c => !['aggregatedAdjustment'].includes(c)),
+            Columns:[
+              'fundHedging',
+              'issuer',
+              'issuerShortName',
+              'asset',
+              'positionID',
+              'managementDate',
+              'transaction',
+              'noOfMgmtDays',
+              'aumBase',
+              'grossGPS',
+              'grossGPSRate',
+              'netOfRebateGPS',
+              'netOfRebateGPSRate',
+              'netGPS',
+              'netGPSRate'
+            ],
             RowGroupedColumns: [
               'fundHedging'
             ],
@@ -263,13 +255,12 @@ export class ManagementFeeComponent implements OnInit {
           }]
         },
         FormatColumn:{
-          Revision:7,
+          Revision:8,
           FormatColumns:[
             BLANK_DATETIME_FORMATTER_CONFIG(this.DATE_COLUMNS),
             DATE_FORMATTER_CONFIG_ddMMyyyy(this.DATE_COLUMNS),
             CUSTOM_FORMATTER(this.NO_DEC_AMOUNT_COLUMNS,['noDecimalAmountFormatter']),
-            AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['wtAvgGIR','gir'], 8),
-            CUSTOM_FORMATTER([...this.AMOUNT_COLUMNS,'wtAvgGIR','gir'],['amountFormatter'])
+            CUSTOM_FORMATTER([...this.AMOUNT_COLUMNS],['amountFormatter'])
           ]
         },
         StatusBar: {
