@@ -113,7 +113,8 @@ export class ManagementFeeComponent implements OnInit {
       {field: 'transaction',type:'abColDefString'},
       { field: 'asset', type: 'abColDefString' },
       { field: 'managementDate', type: 'abColDefDate',  cellClass: 'dateUK', headerName: 'Trade Date' },
-      { field: 'aumBase',headerName:'AUM', type: 'abColDefNumber', aggFunc: 'sum' },
+      { field: 'aumBase',headerName:'AUM Base', type: 'abColDefNumber', aggFunc: 'sum' },
+      { field: 'runningAUMBase',headerName:'AUM', type: 'abColDefNumber',allowedAggFuncs:['AUMBaseSum','sum', 'max', 'min', 'first', 'last', 'count'], aggFunc: 'AUMBaseSum' },
       { field: 'feeRate', type: 'abColDefNumber',aggFunc: 'max', headerName: 'Fee Rate Percent'  },
       { field: 'calculatedITDFee', type: 'abColDefNumber', aggFunc: 'sum'  },
       { field: 'adjustment', type: 'abColDefNumber', aggFunc: 'sum',   },
@@ -121,13 +122,13 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'noOfMgmtDays',headerName: 'No of GPS Days', type: 'abColDefNumber'},
       { field: 'positionCCY',headerName:'Position Ccy',type: 'abColDefString'},
       { field: 'aggregatedAdjustment', type: 'abColDefNumber' },
-      {field:'runningAUMBase',headerName:'GPS Basis',type:'abColDefNumber'},
+      //{field:'runningAUMBase',headerName:'GPS Basis',type:'abColDefNumber'},
       {field:'grossGPS', headerName:'Gross GPS', type:'abColDefNumber', aggFunc: 'sum'},
-      {field:'grossGPSRate', headerName:'Gross GPS Rate', type:'abColDefNumber'},
+      {field:'grossGPSRate', headerName:'Gross GPS Rate', type:'abColDefNumber', aggFunc: 'max'},
       {field:'netOfRebateGPS', headerName:'Net of Rebate GPS', type:'abColDefNumber', aggFunc: 'sum'},
-      {field:'netOfRebateGPSRate', headerName:'Net of Rebate GPS Rate', type:'abColDefNumber'},
-      {field:'netGPS', headerName:'Net GPS', type:'abColDefNumber', aggFunc: 'sum'},
-      {field:'netGPSRate', headerName:'Net GPS Rate', type:'abColDefNumber'}
+      {field:'netOfRebateGPSRate', headerName:'Net of Rebate GPS Rate', type:'abColDefNumber', aggFunc: 'max'},
+      {field:'netGPS', headerName:'Net GPS', type:'abColDefNumber', aggFunc: 'sum', },
+      {field:'netGPSRate', headerName:'Net GPS Rate', type:'abColDefNumber', aggFunc: 'max'}
 
 
 
@@ -150,6 +151,14 @@ export class ManagementFeeComponent implements OnInit {
         }
 
         return 0;
+      },
+      'AUMBaseSum': (params: IAggFuncParams) => {
+        if(params.column.getColId() === 'runningAUMBase'){
+        let childData = getNodes(params.rowNode as RowNode,[]);
+        let totalAUMBase: number = childData.reduce((n, {aumBase}) => n + aumBase, 0) ?? 0;
+        return totalAUMBase
+        }
+        return 0
       }
     }
   
@@ -218,7 +227,7 @@ export class ManagementFeeComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 17,
+          Revision: 23,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -231,7 +240,7 @@ export class ManagementFeeComponent implements OnInit {
               'managementDate',
               'transaction',
               'noOfMgmtDays',
-              'aumBase',
+              'runningAUMBase',
               'grossGPS',
               'grossGPSRate',
               'netOfRebateGPS',
@@ -245,13 +254,29 @@ export class ManagementFeeComponent implements OnInit {
             AggregationColumns: {
               adjustedITDFee: true,
               adjustment: true,
-              aumBase: true,
               feeRate: true,
               calculatedITDFee: true,
               fixing: true,
               fixingDate: true,
-              aggregatedAdjustment: true
-            }
+              aggregatedAdjustment: true,
+              grossGPS: true,
+              grossGPSRate: true,
+              netOfRebateGPS: true,
+              netOfRebateGPSRate: true,
+              netGPS: true,
+              netGPSRate: true,
+              runningAUMBase: true
+            },
+            ColumnSorts: [
+              {
+                ColumnId: 'positionID',
+                SortOrder: 'Desc',
+              },
+              {
+                ColumnId: 'managementDate',
+                SortOrder: 'Desc'
+              }
+            ],
           }]
         },
         FormatColumn:{
