@@ -114,7 +114,7 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'asset', type: 'abColDefString' },
       { field: 'managementDate', type: 'abColDefDate',  cellClass: 'dateUK', headerName: 'Trade Date' },
       { field: 'aumBase',headerName:'AUM Base', type: 'abColDefNumber', aggFunc: 'sum' },
-      { field: 'runningAUMBase',headerName:'AUM', type: 'abColDefNumber',allowedAggFuncs:['AUMBaseSum','sum', 'max', 'min', 'first', 'last', 'count'], aggFunc: 'AUMBaseSum' },
+      { field: 'runningAUMBase',headerName:'GPS Basis', type: 'abColDefNumber',allowedAggFuncs:['AUMBaseSum','sum', 'max', 'min', 'first', 'last', 'count'], aggFunc: 'AUMBaseSum' },
       { field: 'feeRate', type: 'abColDefNumber',aggFunc: 'max', headerName: 'Fee Rate Percent'  },
       { field: 'calculatedITDFee', type: 'abColDefNumber', aggFunc: 'sum'  },
       { field: 'adjustment', type: 'abColDefNumber', aggFunc: 'sum',   },
@@ -122,13 +122,13 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'noOfMgmtDays',headerName: 'No of GPS Days', type: 'abColDefNumber'},
       { field: 'positionCCY',headerName:'Position Ccy',type: 'abColDefString'},
       { field: 'aggregatedAdjustment', type: 'abColDefNumber' },
-      //{field:'runningAUMBase',headerName:'GPS Basis',type:'abColDefNumber'},
       {field:'grossGPS', headerName:'Gross GPS', type:'abColDefNumber', aggFunc: 'sum'},
       {field:'grossGPSRate', headerName:'Gross GPS Rate', type:'abColDefNumber', aggFunc: 'max'},
       {field:'netOfRebateGPS', headerName:'Net of Rebate GPS', type:'abColDefNumber', aggFunc: 'sum'},
       {field:'netOfRebateGPSRate', headerName:'Net of Rebate GPS Rate', type:'abColDefNumber', aggFunc: 'max'},
       {field:'netGPS', headerName:'Net GPS', type:'abColDefNumber', aggFunc: 'sum', },
-      {field:'netGPSRate', headerName:'Net GPS Rate', type:'abColDefNumber', aggFunc: 'max'}
+      {field:'netGPSRate', headerName:'Net GPS Rate', type:'abColDefNumber', aggFunc: 'max'},
+      {field:'gir', headerName:'GIR', type:'abColDefNumber'}
 
 
 
@@ -211,7 +211,9 @@ export class ManagementFeeComponent implements OnInit {
       userInterfaceOptions:{
         customDisplayFormatters:[
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',this.AMOUNT_COLUMNS),
-          CUSTOM_DISPLAY_FORMATTERS_CONFIG('noDecimalAmountFormatter',this.NO_DEC_AMOUNT_COLUMNS)
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('noDecimalAmountFormatter',this.NO_DEC_AMOUNT_COLUMNS),
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('fxFormatter',['gir'])
+
         ]
       },
       predefinedConfig: {
@@ -227,7 +229,7 @@ export class ManagementFeeComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 23,
+          Revision: 25,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -240,6 +242,7 @@ export class ManagementFeeComponent implements OnInit {
               'managementDate',
               'transaction',
               'noOfMgmtDays',
+              'gir',
               'runningAUMBase',
               'grossGPS',
               'grossGPSRate',
@@ -280,12 +283,13 @@ export class ManagementFeeComponent implements OnInit {
           }]
         },
         FormatColumn:{
-          Revision:8,
+          Revision:9,
           FormatColumns:[
             BLANK_DATETIME_FORMATTER_CONFIG(this.DATE_COLUMNS),
             DATE_FORMATTER_CONFIG_ddMMyyyy(this.DATE_COLUMNS),
             CUSTOM_FORMATTER(this.NO_DEC_AMOUNT_COLUMNS,['noDecimalAmountFormatter']),
-            CUSTOM_FORMATTER([...this.AMOUNT_COLUMNS],['amountFormatter'])
+            CUSTOM_FORMATTER([...this.AMOUNT_COLUMNS],['amountFormatter']),
+            CUSTOM_FORMATTER(['gir'],['fxFormatter'])
           ]
         },
         StatusBar: {
