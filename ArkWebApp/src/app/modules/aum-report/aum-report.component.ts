@@ -38,6 +38,12 @@ export class AumReportComponent implements OnInit {
     "aumLast",
     "aumLatest",
     "aumDiff",
+    "aumSpotLast",
+    "aumSpotLatest",
+    "aumSpotDiff",
+    "grossGPS",
+    "netGPS",
+    "netOfRebateGPS",
     "grossCostAmountEurCurrent",
     "grossCostAmountEurLast",
     "grossCostAmountEurDiff",
@@ -92,6 +98,9 @@ export class AumReportComponent implements OnInit {
       {field: "aumLatest",type:"abColDefNumber", headerName:"AUM Latest" },
       {field: "aumLast",type:"abColDefNumber", headerName:"AUM Last"},
       {field: "aumDiff",type:"abColDefNumber", headerName:"AUM Diff"},
+      {field: "aumSpotLatest",type:"abColDefNumber", headerName:"AUM Spot Latest" },
+      {field: "aumSpotLast",type:"abColDefNumber", headerName:"AUM Spot Last"},
+      {field: "aumSpotDiff",type:"abColDefNumber", headerName:"AUM Spot Diff"},
       {field: "coinvestCostChange",type:"abColDefNumber", headerName:"Co-Invest Cost Change"},
       {field: "smaCostChange",type:"abColDefNumber", headerName:"SMA Cost Change"},
       {field: "grossCostAmountEurCurrent",type:'abColDefNumber'},
@@ -112,6 +121,9 @@ export class AumReportComponent implements OnInit {
       {field: "aumEurAdjustmentCurrent",type:'abColDefNumber', headerName:"AUM Eur Adjustment Current"},
       {field: "aumEurAdjustmentLast",type:'abColDefNumber', headerName:"AUM Eur Adjustment Last"},
       {field: "aumEurAdjustmentDiff",type:'abColDefNumber', headerName:"AUM Eur Adjustment Diff"},
+      {field: "grossGPS", type:'abColDefNumber'},
+      {field: "netOfRebateGPS", type:'abColDefNumber'},
+      {field: "netGPS", type:'abColDefNumber'},
       {field: "issuerType",type:'abColDefString'},
       {field: "moveType",type:'abColDefString'},
       {field: "comment",type:'abColDefString'}
@@ -256,7 +268,7 @@ export class AumReportComponent implements OnInit {
               },             
               Layout:{
                 CurrentLayout:"Basic AUM Report Detail Layout",
-                Revision:8,
+                Revision:10,
                 Layouts:[{
                   Name: "Basic AUM Report Detail Layout",
                   Columns: [
@@ -264,8 +276,14 @@ export class AumReportComponent implements OnInit {
                     ,"aumLatest"
                     ,"aumLast"
                     ,"aumDiff"
+                    ,"aumSpotLatest"
+                    ,"aumSpotLast"
+                    ,"aumSpotDiff"
                     ,"coinvestCostChange"
                     ,"smaCostChange"
+                    ,"grossGPS"
+                    ,"netGPS"
+                    ,"netOfRebateGPS"
                     ,"fundHedging"
                     ,"portfolio"
                     ,"asset"
@@ -296,6 +314,12 @@ export class AumReportComponent implements OnInit {
                     aumLatest: "sum",
                     aumLast: "sum",
                     aumDiff: "sum",
+                    aumSpotLatest: "sum",
+                    aumSpotLast: "sum",
+                    aumSpotDiff: "sum",
+                    grossGPS: "sum",
+                    netGPS: "sum",
+                    netOfRebateGPS: "sum",
                     grossCostAmountEurCurrent: "sum",
                     grossCostAmountEurLast: "sum",
                     grossCostAmountEurDiff: "sum",
@@ -308,7 +332,7 @@ export class AumReportComponent implements OnInit {
                 }],
               },
               FormatColumn:{
-                Revision :6,
+                Revision :7,
                 FormatColumns:[
                   CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountMillionFormatter')
                 ]
@@ -335,7 +359,7 @@ export class AumReportComponent implements OnInit {
         },
         Layout:{
           CurrentLayout: 'Basic AUM Report Layout',
-          Revision: 5,
+          Revision: 8,
           Layouts: [{
             Name: 'Basic AUM Report Layout',
             Columns: [
@@ -344,8 +368,14 @@ export class AumReportComponent implements OnInit {
               "aumLatest",
               "aumLast",
               "aumDiff",
+              "aumSpotLatest",
+              "aumSpotLast",
+              "aumSpotDiff",
               "coinvestCostChange",
               "smaCostChange",
+              "grossGPS",
+              "netGPS",
+              "netOfRebateGPS",
               "grossCostAmountEurCurrent",
               "grossCostAmountEurLast",
               "grossCostAmountEurDiff",
@@ -373,6 +403,12 @@ export class AumReportComponent implements OnInit {
               aumLatest: "sum",
               aumLast: "sum",
               aumDiff: "sum",
+              aumSpotLatest: "sum",
+              aumSpotLast: "sum",
+              aumSpotDiff: "sum",
+              grossGPS: "sum",
+              netGPS: "sum",
+              netOfRebateGPS: "sum",
               grossCostAmountEurCurrent: "sum",
               grossCostAmountEurLast: "sum",
               grossCostAmountEurDiff: "sum",
@@ -386,7 +422,7 @@ export class AumReportComponent implements OnInit {
           
         },
         FormatColumn:{
-          Revision :6,
+          Revision :7,
           FormatColumns:[
             CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountMillionFormatter')
           ]
@@ -451,7 +487,7 @@ export class AumReportComponent implements OnInit {
                     fundedCostAmountEurDiff: k.fundedCostAmountEurDiff, costAmountLocalCurrent: k.costAmountLocalCurrent, costAmountLocalLast: k.costAmountLocalLast
                     ,costAmountLocalDiff: k.costAmountLocalDiff, aumEurAdjustmentCurrent: k.aumEurAdjustmentCurrent, aumEurAdjustmentLast: k.aumEurAdjustmentLast
                     ,aumEurAdjustmentDiff: k.aumEurAdjustmentDiff, issuerType: k.issuerType, moveType: k.moveType, comment: k.comment, smaCostChange: k.smaCostChange,
-                    coinvestCostChange: k.coinvestCostChange
+                    coinvestCostChange: k.coinvestCostChange, grossGPS: k.grossGPS, netOfRebateGPS : k.netOfRebateGPS, netGPS: k.netGPS, aumSpotLatest: k.aumSpotLatest, aumSpotLast: k.aumSpotLast, aumSotDiff: k.aumSpotDiff
                   }})
                 }
               )
@@ -489,6 +525,9 @@ export class AumReportComponent implements OnInit {
           {field: "aumLatest",type:"abColDefNumber", valueFormatter: nonAmountNumberFormatter, headerName:"AUM Latest"},
           {field: "aumLast",type:"abColDefNumber", headerName:"AUM Last"},
           {field: "aumDiff",type:"abColDefNumber", headerName:"AUM Diff"},
+          {field: "aumSpotLatest",type:"abColDefNumber", headerName:"AUM Spot Latest" },
+          {field: "aumSpotLast",type:"abColDefNumber", headerName:"AUM Spot Last"},
+          {field: "aumSpotDiff",type:"abColDefNumber", headerName:"AUM Spot Diff"},
           {field: "coinvestCostChange",type:"abColDefNumber", headerName:"Co-Invest Cost Change"},
           {field: "smaCostChange",type:"abColDefNumber", headerName:"SMA Cost Change"},
           {field: "grossCostAmountEurCurrent",type:'abColDefNumber'},
@@ -509,6 +548,9 @@ export class AumReportComponent implements OnInit {
           {field: "aumEurAdjustmentCurrent",type:'abColDefNumber', headerName:"AUM Eur Adjustment Current"},
           {field: "aumEurAdjustmentLast",type:'abColDefNumber', headerName: "AUM Eur Adjustment Last"},
           {field: "aumEurAdjustmentDiff",type:'abColDefNumber', headerName: "AUM Eur Adjustment Diff"},
+          {field: "grossGPS", type:'abColDefNumber'},
+          {field: "netOfRebateGPS", type:'abColDefNumber'},
+          {field: "netGPS", type:'abColDefNumber'},
           // {field: "issuerType",type:'abColDefString'},
           // {field: "moveType",type:'abColDefString'},
           // {field: "comment",type:'abColDefString'}
