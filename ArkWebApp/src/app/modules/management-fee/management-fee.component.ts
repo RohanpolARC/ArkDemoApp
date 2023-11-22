@@ -136,10 +136,10 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'netGPS', headerName:'Net GPS', type:'abColDefNumber', aggFunc: 'sum', },
       { field: 'netGPSRate', headerName:'Net GPS Rate', type:'abColDefNumber', aggFunc: 'max'},
       { field: 'gir', headerName:'GIR', type:'abColDefNumber'},
-      { field: 'deltaCommitted', headerName: 'Delta Committed', type: 'abColDefNumber'},
-      { field: 'unfunded', headerName: 'Unfunded', type: 'abColDefNumber'},
-      { field: 'deltaFunded', headerName: 'Delta Funded', type: 'abColDefNumber'},
-      { field: 'funded', headerName: 'Funded', type: 'abColDefNumber'},
+      { field: 'deltaCommitted', headerName: 'Delta Committed', type: 'abColDefNumber', aggFunc: 'sum'},
+      { field: 'unfunded', headerName: 'Unfunded', type: 'abColDefNumber', aggFunc: 'sum'},
+      { field: 'deltaFunded', headerName: 'Delta Funded', type: 'abColDefNumber', aggFunc: 'sum'},
+      { field: 'funded', headerName: 'Funded', type: 'abColDefNumber', aggFunc: 'sum'},
       { field: 'runningAUMPosition',headerName:'Local AUM', type: 'abColDefNumber',allowedAggFuncs:['AUMLocalSum','sum', 'max', 'min', 'first', 'last', 'count'], aggFunc: 'AUMLocalSum' },
       { field: 'aumPosition', type: 'abColDefNumber' },
 
@@ -253,7 +253,7 @@ export class ManagementFeeComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 29,
+          Revision: 30,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -301,6 +301,10 @@ export class ManagementFeeComponent implements OnInit {
               netGPSRate: true,
               runningAUMBase: true,
               runningAUMPosition: true,
+              deltaCommitted: true,
+              funded: true,
+              unfunded: true,
+              deltaFunded: true
 
 
             },
