@@ -48,6 +48,7 @@ export class LinkingService {
     this.updateLookupRefreshClick(true);
   }
 
+  
   checkifAlreadyLinked(lookupActivities: any[]){
 
     let cntLinkedActivities: number = lookupActivities?.filter(act => (act?.['resultCategory'] ?? '').trim().toLowerCase() === 'linked').length || 0;
