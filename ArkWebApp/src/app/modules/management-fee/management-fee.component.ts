@@ -140,8 +140,8 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'unfunded', headerName: 'Unfunded', type: 'abColDefNumber'},
       { field: 'deltaFunded', headerName: 'Delta Funded', type: 'abColDefNumber'},
       { field: 'funded', headerName: 'Funded', type: 'abColDefNumber'},
-      { field: 'runningAUMPosition',headerName:'Running AUM Local', type: 'abColDefNumber',allowedAggFuncs:['AUMLocalSum','sum', 'max', 'min', 'first', 'last', 'count'], aggFunc: 'AUMLocalSum' },
-      { field: 'aumPosition',headerName:'AUM Local', type: 'abColDefNumber' },
+      { field: 'runningAUMPosition',headerName:'Local AUM', type: 'abColDefNumber',allowedAggFuncs:['AUMLocalSum','sum', 'max', 'min', 'first', 'last', 'count'], aggFunc: 'AUMLocalSum' },
+      { field: 'aumPosition', type: 'abColDefNumber' },
 
 
 
