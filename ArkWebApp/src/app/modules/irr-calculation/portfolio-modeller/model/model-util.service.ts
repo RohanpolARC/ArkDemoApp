@@ -1,8 +1,5 @@
-import { GridApi, RowNode } from '@ag-grid-community/core';
 import { Injectable } from '@angular/core';
-import { VModel, VPortfolioLocalOverrideModel } from 'src/app/shared/models/IRRCalculationsModel';
-import { GridUtilService } from '../grid/grid-util.service';
-import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
+import { VModel } from 'src/app/shared/models/IRRCalculationsModel';
 
 @Injectable()
 export class ModelUtilService {
@@ -30,6 +27,7 @@ export class ModelUtilService {
       modelData[i].isLocal = Boolean(data[i].isLocal);
       modelData[i].isShared = Boolean(data[i].isShared);
       modelData[i].isManual = Boolean(data[i].isManual);
+      modelData[i].latestWSOStatic = Boolean(data[i].latestWSOStatic);
       modelData[i].username = null;
       modelData[i].positionIDs = data[i].positionIDs?.split(',').map(x => parseInt(x))
       modelData[i].rules = [];

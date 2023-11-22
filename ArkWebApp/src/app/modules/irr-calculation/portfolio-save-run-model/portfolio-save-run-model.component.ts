@@ -167,6 +167,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       modelDesc: new FormControl(this.data.model?.modelDesc),
       isUpdate: new FormControl(!!this.modelID, Validators.required),
       isShared: new FormControl(!!this.data.isShared, Validators.required),
+      latestWSOStatic: new FormControl(this.data.latestWSOStatic, Validators.required),
       aggregationType: new FormControl(aggrStr, Validators.required),
       baseMeasure: new FormControl(this.baseMeasures[0]?.baseMeasure, Validators.required),
       feePreset: new FormControl(this.feePresets[0]?.feePreset, Validators.required),
@@ -280,6 +281,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     model.isLocal = this.isLocal;
     model.isShared = this.modelForm.get('isShared').value;
     model.isManual = !this.isAutomatic;
+    model.latestWSOStatic = this.modelForm.get('latestWSOStatic').value;
     model.irrAggrType = this.modelForm.get('aggregationType').value;
 
     let curveRateName = this.modelForm.get('curveRateName').value;

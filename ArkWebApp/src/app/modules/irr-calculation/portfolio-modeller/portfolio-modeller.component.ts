@@ -198,13 +198,10 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
           this.closeTimer.next();
         } 
       })
-
     }
     else if(context?.length === 1 && context.includes("SaveRunMReturns")){
       this.tabSvc.createNewTabGroup(null, context, contextData)
     }
-
-
   }
 
   fetchPortfolioModels(modelID?: number, context: string[] = ['SaveRunIRR'], contextData: {  //changes context type from string to string[]
@@ -223,7 +220,6 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
 
         if(modelID)
         this.saveModelCashflowsAndOpenTabs(modelID, context, contextData);
-
       },
       error: error => {
         console.error(`Failed to fetch Portfolio Rules: ${error}`)
@@ -260,9 +256,7 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
       closeDropDownOnSelection: true,
     }
   }
-
-  rows: number[]
-  
+  rows: number[] 
   setSelectedModel(modelID?: number){
     if(modelID){
       this.selectedDropdownData = [
@@ -281,7 +275,6 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
 
     return runningTabs?.length ?? 0;
   }
-
   onSavePortfolio(context = 'Save'){
 
     if(this.checkRunningJobs()){
