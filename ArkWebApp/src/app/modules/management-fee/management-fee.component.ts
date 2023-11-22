@@ -55,6 +55,13 @@ export class ManagementFeeComponent implements OnInit {
     'grossGPS',
     'netOfRebateGPS',
     'netGPS',
+    'deltaCommitted',
+    'funded',
+    'unfunded',
+    'deltaFunded',
+    'runningAUMPosition',
+    'aumPosition'
+
   ]
 
   DATE_COLUMNS = [
@@ -110,25 +117,34 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'fundHedging', type: 'abColDefString' },
       { field: 'issuerShortName', type: 'abColDefString' },
       { field: 'issuer', type: 'abColDefString' },
-      {field: 'transaction',type:'abColDefString'},
+      { field: 'transaction',type:'abColDefString'},
       { field: 'asset', type: 'abColDefString' },
       { field: 'managementDate', type: 'abColDefDate',  cellClass: 'dateUK', headerName: 'Trade Date' },
-      { field: 'aumBase',headerName:'AUM Base', type: 'abColDefNumber', aggFunc: 'sum' },
+      { field: 'aumBase',headerName:'AUM Base', type: 'abColDefNumber' },
       { field: 'runningAUMBase',headerName:'GPS Basis', type: 'abColDefNumber',allowedAggFuncs:['AUMBaseSum','sum', 'max', 'min', 'first', 'last', 'count'], aggFunc: 'AUMBaseSum' },
       { field: 'feeRate', type: 'abColDefNumber',aggFunc: 'max', headerName: 'Fee Rate Percent'  },
       { field: 'calculatedITDFee', type: 'abColDefNumber', aggFunc: 'sum'  },
       { field: 'adjustment', type: 'abColDefNumber', aggFunc: 'sum',   },
       { field: 'adjustedITDFee', type: 'abColDefNumber', allowedAggFuncs: ['Sum'], aggFunc: 'Sum' },
       { field: 'noOfMgmtDays',headerName: 'No of GPS Days', type: 'abColDefNumber'},
-      { field: 'positionCCY',headerName:'Position Ccy',type: 'abColDefString'},
+      { field: 'positionCCY',headerName:'Local Currency',type: 'abColDefString'},
       { field: 'aggregatedAdjustment', type: 'abColDefNumber' },
-      {field:'grossGPS', headerName:'Gross GPS', type:'abColDefNumber', aggFunc: 'sum'},
-      {field:'grossGPSRate', headerName:'Gross GPS Rate', type:'abColDefNumber', aggFunc: 'max'},
-      {field:'netOfRebateGPS', headerName:'Net of Rebate GPS', type:'abColDefNumber', aggFunc: 'sum'},
-      {field:'netOfRebateGPSRate', headerName:'Net of Rebate GPS Rate', type:'abColDefNumber', aggFunc: 'max'},
-      {field:'netGPS', headerName:'Net GPS', type:'abColDefNumber', aggFunc: 'sum', },
-      {field:'netGPSRate', headerName:'Net GPS Rate', type:'abColDefNumber', aggFunc: 'max'},
-      {field:'gir', headerName:'GIR', type:'abColDefNumber'}
+      { field: 'grossGPS', headerName:'Gross GPS', type:'abColDefNumber', aggFunc: 'sum'},
+      { field: 'grossGPSRate', headerName:'Gross GPS Rate', type:'abColDefNumber', aggFunc: 'max'},
+      { field: 'netOfRebateGPS', headerName:'Net of Rebate GPS', type:'abColDefNumber', aggFunc: 'sum'},
+      { field: 'netOfRebateGPSRate', headerName:'Net of Rebate GPS Rate', type:'abColDefNumber', aggFunc: 'max'},
+      { field: 'netGPS', headerName:'Net GPS', type:'abColDefNumber', aggFunc: 'sum', },
+      { field: 'netGPSRate', headerName:'Net GPS Rate', type:'abColDefNumber', aggFunc: 'max'},
+      { field: 'gir', headerName:'GIR', type:'abColDefNumber'},
+      { field: 'deltaCommitted', headerName: 'Delta Committed', type: 'abColDefNumber'},
+      { field: 'unfunded', headerName: 'Unfunded', type: 'abColDefNumber'},
+      { field: 'deltaFunded', headerName: 'Delta Funded', type: 'abColDefNumber'},
+      { field: 'funded', headerName: 'Funded', type: 'abColDefNumber'},
+      { field: 'runningAUMPosition',headerName:'Local AUM', type: 'abColDefNumber',allowedAggFuncs:['AUMLocalSum','sum', 'max', 'min', 'first', 'last', 'count'], aggFunc: 'AUMLocalSum' },
+      { field: 'aumPosition', type: 'abColDefNumber' },
+
+
+
 
 
 
@@ -157,6 +173,14 @@ export class ManagementFeeComponent implements OnInit {
         let childData = getNodes(params.rowNode as RowNode,[]);
         let totalAUMBase: number = childData.reduce((n, {aumBase}) => n + aumBase, 0) ?? 0;
         return totalAUMBase
+        }
+        return 0
+      },
+      'AUMLocalSum' : (params: IAggFuncParams) => {
+        if(params.column.getColId() === 'runningAUMPosition'){
+          let childData = getNodes(params.rowNode as RowNode, []);
+          let totalAUMLocal: number = childData.reduce((n,{aumPosition}) => n + aumPosition, 0) ?? 0;
+          return totalAUMLocal
         }
         return 0
       }
@@ -229,7 +253,7 @@ export class ManagementFeeComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 25,
+          Revision: 29,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -239,17 +263,24 @@ export class ManagementFeeComponent implements OnInit {
               'issuerShortName',
               'asset',
               'positionID',
+              'positionCCY',
               'managementDate',
               'transaction',
               'noOfMgmtDays',
               'gir',
               'runningAUMBase',
+              'runningAUMPosition',
               'grossGPS',
               'grossGPSRate',
               'netOfRebateGPS',
               'netOfRebateGPSRate',
               'netGPS',
-              'netGPSRate'
+              'netGPSRate',
+              'deltaCommitted',
+              'funded',
+              'unfunded',
+              'deltaFunded'
+
             ],
             RowGroupedColumns: [
               'fundHedging'
@@ -268,7 +299,10 @@ export class ManagementFeeComponent implements OnInit {
               netOfRebateGPSRate: true,
               netGPS: true,
               netGPSRate: true,
-              runningAUMBase: true
+              runningAUMBase: true,
+              runningAUMPosition: true,
+
+
             },
             ColumnSorts: [
               {
@@ -283,7 +317,7 @@ export class ManagementFeeComponent implements OnInit {
           }]
         },
         FormatColumn:{
-          Revision:9,
+          Revision:11,
           FormatColumns:[
             BLANK_DATETIME_FORMATTER_CONFIG(this.DATE_COLUMNS),
             DATE_FORMATTER_CONFIG_ddMMyyyy(this.DATE_COLUMNS),
