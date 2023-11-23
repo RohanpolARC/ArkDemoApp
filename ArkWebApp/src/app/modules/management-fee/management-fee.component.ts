@@ -120,7 +120,7 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'transaction',type:'abColDefString'},
       { field: 'asset', type: 'abColDefString' },
       { field: 'managementDate', type: 'abColDefDate',  cellClass: 'dateUK', headerName: 'Trade Date' },
-      { field: 'aumBase',headerName:'AUM Base', type: 'abColDefNumber' },
+      { field: 'aumBase',headerName:'Base AUM', type: 'abColDefNumber', aggFunc: 'sum' },
       { field: 'runningAUMBase',headerName:'GPS Basis', type: 'abColDefNumber',allowedAggFuncs:['AUMBaseSum','sum', 'max', 'min', 'first', 'last', 'count'], aggFunc: 'AUMBaseSum' },
       { field: 'feeRate', type: 'abColDefNumber',aggFunc: 'max', headerName: 'Fee Rate Percent'  },
       { field: 'calculatedITDFee', type: 'abColDefNumber', aggFunc: 'sum'  },
@@ -140,7 +140,7 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'unfunded', headerName: 'Unfunded', type: 'abColDefNumber', aggFunc: 'sum'},
       { field: 'deltaFunded', headerName: 'Delta Funded', type: 'abColDefNumber', aggFunc: 'sum'},
       { field: 'funded', headerName: 'Funded', type: 'abColDefNumber', aggFunc: 'sum'},
-      { field: 'runningAUMPosition',headerName:'Local AUM', type: 'abColDefNumber',allowedAggFuncs:['AUMLocalSum','sum', 'max', 'min', 'first', 'last', 'count'], aggFunc: 'AUMLocalSum' },
+      { field: 'runningAUMPosition',headerName:'Local AUM', type: 'abColDefNumber',allowedAggFuncs:['AUMPositionSum','sum', 'max', 'min', 'first', 'last', 'count'], aggFunc: 'AUMPositionSum' },
       { field: 'aumPosition', type: 'abColDefNumber' },
 
 
@@ -176,11 +176,11 @@ export class ManagementFeeComponent implements OnInit {
         }
         return 0
       },
-      'AUMLocalSum' : (params: IAggFuncParams) => {
+      'AUMPositionSum' : (params: IAggFuncParams) => {
         if(params.column.getColId() === 'runningAUMPosition'){
           let childData = getNodes(params.rowNode as RowNode, []);
-          let totalAUMLocal: number = childData.reduce((n,{aumPosition}) => n + aumPosition, 0) ?? 0;
-          return totalAUMLocal
+          let totalAUMPositionSum: number = childData.reduce((n,{aumPosition}) => n + aumPosition, 0) ?? 0;
+          return totalAUMPositionSum
         }
         return 0
       }
@@ -253,7 +253,7 @@ export class ManagementFeeComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 30,
+          Revision: 31,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -270,6 +270,7 @@ export class ManagementFeeComponent implements OnInit {
               'gir',
               'runningAUMBase',
               'runningAUMPosition',
+              'aumBase',
               'grossGPS',
               'grossGPSRate',
               'netOfRebateGPS',
@@ -304,7 +305,8 @@ export class ManagementFeeComponent implements OnInit {
               deltaCommitted: true,
               funded: true,
               unfunded: true,
-              deltaFunded: true
+              deltaFunded: true,
+              aumBase: true
 
 
             },
