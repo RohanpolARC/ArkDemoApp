@@ -26,6 +26,11 @@ steps:
   inputs:    
     workingDir: ArkWebApp
     verbose: true
+
+- task: AdvancedSecurity-Dependency-Scanning@1
+
+- task: AdvancedSecurity-Codeql-Analyze@1
+
 - task: Npm@1
   displayName: 'Angular APP Run build'  
   inputs:    
