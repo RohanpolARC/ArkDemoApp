@@ -14,7 +14,8 @@ steps:
 
 - task: AdvancedSecurity-Codeql-Init@1
   inputs:
-    languages: javascript,csharp
+    languages: javascript
+
 - task: Npm@1
   displayName: 'npm ci'  
   inputs:    
