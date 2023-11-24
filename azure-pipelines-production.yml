@@ -12,6 +12,9 @@ steps:
     versionSpec: '16.x'
   displayName: 'Install Node.js'
 
+- task: AdvancedSecurity-Codeql-Init@1
+  inputs:
+    languages: javascript,csharp
 - task: Npm@1
   displayName: 'npm ci'  
   inputs:    
