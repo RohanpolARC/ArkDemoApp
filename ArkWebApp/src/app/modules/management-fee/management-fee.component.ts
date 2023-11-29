@@ -142,6 +142,8 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'funded', headerName: 'Funded', type: 'abColDefNumber', aggFunc: 'sum'},
       { field: 'runningAUMPosition',headerName:'Local AUM', type: 'abColDefNumber',allowedAggFuncs:['AUMPositionSum','sum', 'max', 'min', 'first', 'last', 'count'], aggFunc: 'AUMPositionSum' },
       { field: 'aumPosition', type: 'abColDefNumber' },
+      { field: 'fundStrategy', type: 'abColDefString' }
+
 
 
 
@@ -253,7 +255,7 @@ export class ManagementFeeComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 31,
+          Revision: 32,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -264,6 +266,7 @@ export class ManagementFeeComponent implements OnInit {
               'asset',
               'positionID',
               'positionCCY',
+              'fundStrategy',
               'managementDate',
               'transaction',
               'noOfMgmtDays',
