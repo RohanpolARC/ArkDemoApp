@@ -79,6 +79,7 @@ export interface PortfolioModellerCalcParams {
     feePreset: string,
     irrAggrType: string,
     curveRateDelta: number,
+    latestWSOStatic: boolean,
     runBy: string
 }
 

@@ -132,7 +132,8 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
     irrAggrType?: string,
     curveRateDelta?: number,
     aggrStr?: string[],
-    mapGroupCols?: string[]
+    mapGroupCols?: string[],
+    latestWSOStatic?: boolean
   } = null){
 
     if(!modelID)
@@ -146,6 +147,7 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
     m.feePreset = contextData.feePreset;
     m.irrAggrType = contextData?.aggrStr?.join(' > ') ?? '';
     m.curveRateDelta = contextData.curveRateDelta ?? 0.0;
+    m.latestWSOStatic = contextData?.latestWSOStatic ?? false;
     m.runBy = this.dataSvc.getCurrentUserName();
 
     // Load cashflows only if running IRR/Performance fees
@@ -210,7 +212,8 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
     irrAggrType?: string,
     curveRateDelta?: number,
     aggrStr?: string[],
-    mapGroupCols?: string[]
+    mapGroupCols?: string[],
+    latestWSOStatic?: boolean
   } = null){
     this.subscriptions.push(this.irrCalcService.getPortfolioModels(this.dataSvc.getCurrentUserName()).subscribe({
       next: data => {
@@ -330,7 +333,8 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
               irrAggrType: res?.['irrAggrType'],
               curveRateDelta: res?.['curveRateDelta'],
               aggrStr: res?.['aggrStr'],
-              mapGroupCols: res?.['mapGroupCols']
+              mapGroupCols: res?.['mapGroupCols'],
+              latestWSOStatic: res?.['latestWSOStatic']
             }
           )
           this.gridUtilSvc.updateLocalFields()
