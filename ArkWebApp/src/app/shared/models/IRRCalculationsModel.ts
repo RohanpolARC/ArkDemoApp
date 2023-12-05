@@ -42,7 +42,8 @@ export interface IRRCalcParams  {
     
     // Dynamically created aggregations order
     aggrStr?: string[]
-    mapGroupCols?: string[]
+    mapGroupCols?: string[],
+    latestWSOStatic: boolean
 }
 
 export interface MonthlyReturnsCalcParams  {
@@ -119,6 +120,18 @@ export type VModel = {
 }
 
 export type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`  | `Portfolio Modeller` | `Cashflows`
+
+export type TabContext = {
+    runID?: string,
+    type?: TabType,
+    baseMeasure?: string,
+    feePreset?: string,
+    irrAggrType?: string,
+    aggrStr?: string[],
+    mapGroupCols?: string[],
+    curveRateDelta: number,
+    latestWSOStatic?: boolean
+}
 
 export type EmitParams = {
   parentDisplayName: string,

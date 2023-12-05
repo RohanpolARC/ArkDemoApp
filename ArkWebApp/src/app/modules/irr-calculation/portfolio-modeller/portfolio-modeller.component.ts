@@ -7,7 +7,7 @@ import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Subject, Subscription, timer } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
-import { EmitParams, PortfolioModellerCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
+import { EmitParams, PortfolioModellerCalcParams, TabContext } from 'src/app/shared/models/IRRCalculationsModel';
 import { EventEmitter } from '@angular/core';
 import { PortfolioSaveRunModelComponent } from '../portfolio-save-run-model/portfolio-save-run-model.component';
 import { getLastBusinessDay, getMomentDateStr, preprocessEditableDateFields } from 'src/app/shared/functions/utilities';
@@ -126,15 +126,7 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
     }
   }
 
-  saveModelCashflowsAndOpenTabs(modelID?: number, context: string[] = ['SaveRunIRR'], contextData: {  //changes context type from string to string[]
-    baseMeasure?: string,
-    feePreset?: string,
-    irrAggrType?: string,
-    curveRateDelta?: number,
-    aggrStr?: string[],
-    mapGroupCols?: string[],
-    latestWSOStatic?: boolean
-  } = null){
+  saveModelCashflowsAndOpenTabs(modelID?: number, context: string[] = ['SaveRunIRR'], contextData: TabContext = null){
 
     if(!modelID)
       console.error(`Model ID not received`)
@@ -206,15 +198,7 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
     }
   }
 
-  fetchPortfolioModels(modelID?: number, context: string[] = ['SaveRunIRR'], contextData: {  //changes context type from string to string[]
-    baseMeasure?: string,
-    feePreset?: string,
-    irrAggrType?: string,
-    curveRateDelta?: number,
-    aggrStr?: string[],
-    mapGroupCols?: string[],
-    latestWSOStatic?: boolean
-  } = null){
+  fetchPortfolioModels(modelID?: number, context: string[] = ['SaveRunIRR'], contextData: TabContext = null){
     this.subscriptions.push(this.irrCalcService.getPortfolioModels(this.dataSvc.getCurrentUserName()).subscribe({
       next: data => {
         this.modelSvc.modelData = this.modelSvc.parseFetchedModels(data);
