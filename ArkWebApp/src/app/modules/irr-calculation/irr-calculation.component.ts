@@ -6,11 +6,29 @@ import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.ser
 import { CashFlowParams, IRRCalcParams, LoadStatus, MonthlyReturnsCalcParams, ParentTabType, PerfFeesCalcParams, ResultTab, TabType } from 'src/app/shared/models/IRRCalculationsModel';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { getMomentDateStr } from 'src/app/shared/functions/utilities';
+import { RefService } from './portfolio-modeller/ref/ref.service';
+import { ComponentReaderService } from './service/component-reader.service';
+import { TabUtilService } from './portfolio-modeller/tab/tab-util.service';
+import { ModelUtilService } from './portfolio-modeller/model/model-util.service';
+import { GridUtilService } from './portfolio-modeller/grid/grid-util.service';
+import { PortfolioModellerService } from './service/portfolio-modeller.service';
+import { FeeCalculationService } from 'src/app/core/services/FeeCalculation/fee-calculation.service';
+import { GridConfigService } from './portfolio-modeller/grid/grid-config.service';
 
 @Component({
   selector: 'app-irr-calculation',
   templateUrl: './irr-calculation.component.html',
-  styleUrls: ['./irr-calculation.component.scss']
+  styleUrls: ['./irr-calculation.component.scss'],
+  providers: [
+    FeeCalculationService,
+    PortfolioModellerService,
+    GridUtilService,
+    GridConfigService,
+    ModelUtilService,
+    TabUtilService,
+    ComponentReaderService,
+    RefService
+  ]
 })
 export class IrrCalculationComponent implements OnInit {
 

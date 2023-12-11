@@ -25,25 +25,17 @@ import { Platform } from '@angular/cdk/platform';
 import { MonthlyReturnsComponent } from './monthly-returns/monthly-returns.component';
 import { FeeCalculationModule } from '../fee-calculation/fee-calculation.module';
 import { PerformanceFeeComponent } from './performance-fee/performance-fee.component';
-import { FeeCalculationService } from 'src/app/core/services/FeeCalculation/fee-calculation.service';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { FeePresetsGridComponent } from './fee-presets-grid/fee-presets-grid.component';
 import { TabGroupWrapperComponent } from './tab-group-wrapper/tab-group-wrapper.component';
 import { CashFlowsComponent } from './cash-flows/cash-flows.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import {MatChipsModule} from '@angular/material/chips';
+import { MatChipsModule } from '@angular/material/chips';
 import { VirtualPositionFormComponent } from './virtual-position-form/virtual-position-form.component';
 import { MatStepperModule } from '@angular/material/stepper';
-import { PortfolioModellerService } from './service/portfolio-modeller.service';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { InputAmountNumberModule } from 'src/app/shared/modules/input-amount-number/input-amount-number.module';
 import { AsPipeModule } from 'src/app/shared/modules/as-pipe/as-pipe.module';
-import { GridUtilService } from './portfolio-modeller/grid/grid-util.service';
-import { ModelUtilService } from './portfolio-modeller/model/model-util.service';
-import { TabUtilService } from './portfolio-modeller/tab/tab-util.service';
-import { GridConfigService } from './portfolio-modeller/grid/grid-config.service';
-import { ComponentReaderService } from './service/component-reader.service';
-import { RefService } from './portfolio-modeller/ref/ref.service';
 
 @NgModule({
   declarations: [
@@ -91,17 +83,9 @@ import { RefService } from './portfolio-modeller/ref/ref.service';
 
   ],
   providers: [
-    FeeCalculationService,
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  
     {provide: DateAdapter, useClass: InputDateAdapter, deps: [MAT_DATE_LOCALE, Platform]},
-    DatePipe,
-    PortfolioModellerService,
-    GridUtilService,
-    GridConfigService,
-    ModelUtilService,
-    TabUtilService,
-    ComponentReaderService,
-    RefService
+    DatePipe  
   ],
   exports: []
 })
