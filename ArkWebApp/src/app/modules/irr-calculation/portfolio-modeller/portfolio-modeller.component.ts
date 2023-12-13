@@ -460,5 +460,6 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
     this.subscriptions.forEach(sub=>{
       sub.unsubscribe();
     })
+    this.irrCalcService.changeSearchDate(null);
   }
 }

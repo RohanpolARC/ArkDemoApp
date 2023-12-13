@@ -36,6 +36,7 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { InputAmountNumberModule } from 'src/app/shared/modules/input-amount-number/input-amount-number.module';
 import { AsPipeModule } from 'src/app/shared/modules/as-pipe/as-pipe.module';
+import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 
 @NgModule({
   declarations: [
@@ -85,7 +86,8 @@ import { AsPipeModule } from 'src/app/shared/modules/as-pipe/as-pipe.module';
   providers: [
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  
     {provide: DateAdapter, useClass: InputDateAdapter, deps: [MAT_DATE_LOCALE, Platform]},
-    DatePipe  
+    DatePipe,
+    IRRCalcService  
   ],
   exports: []
 })
