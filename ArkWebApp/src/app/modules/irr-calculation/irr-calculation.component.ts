@@ -6,7 +6,6 @@ import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.ser
 import { CashFlowParams, IRRCalcParams, LoadStatus, MonthlyReturnsCalcParams, ParentTabType, PerfFeesCalcParams, ResultTab, TabType } from 'src/app/shared/models/IRRCalculationsModel';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { getMomentDateStr } from 'src/app/shared/functions/utilities';
-import { RefService } from './portfolio-modeller/ref/ref.service';
 import { ComponentReaderService } from './service/component-reader.service';
 import { TabUtilService } from './portfolio-modeller/tab/tab-util.service';
 import { ModelUtilService } from './portfolio-modeller/model/model-util.service';
@@ -26,8 +25,7 @@ import { GridConfigService } from './portfolio-modeller/grid/grid-config.service
     GridConfigService,
     ModelUtilService,
     TabUtilService,
-    ComponentReaderService,
-    RefService
+    ComponentReaderService
   ]
 })
 export class IrrCalculationComponent implements OnInit {
