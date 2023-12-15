@@ -7,9 +7,7 @@ import { IRRCalcParams, LoadStatus, ParentTabType, PortfolioModellerCalcParams, 
 import { BehaviorSubject } from 'rxjs';
 import { RESOURCE_CONTEXT } from '../../interceptors/msal-http.interceptor';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class IRRCalcService {
 
   parentTabs: ParentTabType[] = []

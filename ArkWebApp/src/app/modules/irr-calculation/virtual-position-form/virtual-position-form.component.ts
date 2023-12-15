@@ -46,7 +46,6 @@ export class VirtualPositionFormComponent implements OnInit {
   constructor(
     private irrCalcService: IRRCalcService,
     public dialogRef: MatDialogRef<VirtualPositionFormComponent>,
-    public portfolioModellerSvc: PortfolioModellerService,
     public refSvc: RefService,
     public dataSvc: DataService,
     @Inject(MAT_DIALOG_DATA) public params:{
