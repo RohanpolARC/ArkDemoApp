@@ -17,6 +17,7 @@ export type VPortfolioModel = {
     isLocal: boolean,
     isManual: boolean,
     isShared: boolean,
+    latestWSOStatic: boolean,
     localOverrides: VPortfolioLocalOverrideModel[],
     irrAggrType: string // `type1 > type2 > type3`,
     curveRateDelta: number   // percentage with direction (+/-)
@@ -41,7 +42,8 @@ export interface IRRCalcParams  {
     
     // Dynamically created aggregations order
     aggrStr?: string[]
-    mapGroupCols?: string[]
+    mapGroupCols?: string[],
+    latestWSOStatic: boolean
 }
 
 export interface MonthlyReturnsCalcParams  {
@@ -78,6 +80,7 @@ export interface PortfolioModellerCalcParams {
     feePreset: string,
     irrAggrType: string,
     curveRateDelta: number,
+    latestWSOStatic: boolean,
     runBy: string
 }
 
@@ -112,10 +115,23 @@ export type VPositionModel = {
 export type VModel = {
     modelID: number, modelName: string, displayName: string, modelDesc: string, 
     rules: ColumnFilter[], positionIDs: number[], 
-    isLocal: boolean, isManual: boolean, username: string, isShared: boolean, aggregationType: string
+    isLocal: boolean, isManual: boolean, username: string, isShared: boolean, aggregationType: string,
+    latestWSOStatic: boolean
 }
 
 export type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`  | `Portfolio Modeller` | `Cashflows`
+
+export type TabContext = {
+    runID?: string,
+    type?: TabType,
+    baseMeasure?: string,
+    feePreset?: string,
+    irrAggrType?: string,
+    aggrStr?: string[],
+    mapGroupCols?: string[],
+    curveRateDelta: number,
+    latestWSOStatic?: boolean
+}
 
 export type EmitParams = {
   parentDisplayName: string,

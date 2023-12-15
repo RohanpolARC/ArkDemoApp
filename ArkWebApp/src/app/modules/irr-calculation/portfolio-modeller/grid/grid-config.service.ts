@@ -19,7 +19,7 @@ export class GridConfigService {
     private compReaderSvc: ComponentReaderService,
     public gridUtilSvc: GridUtilService,
     // When service is injected in a componenet. Order of execution:
-    // Service Constructor > Component Constructor > Component ngOnInit > Service ngOnInit (Since, it needs to resolve all the dependencies of the component).
+    // Service Constructor > Component Constructor > Component ngOnInit (Since, it needs to resolve all the dependencies of the component).
     // Hence, init() is called inside constructor here, instead of in the ngOnInit() of the service.
     private refSvc: RefService) {
       this.init();
