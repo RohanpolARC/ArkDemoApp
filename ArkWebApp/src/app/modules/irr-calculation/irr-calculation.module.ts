@@ -37,6 +37,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { InputAmountNumberModule } from 'src/app/shared/modules/input-amount-number/input-amount-number.module';
 import { AsPipeModule } from 'src/app/shared/modules/as-pipe/as-pipe.module';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
+import { RefService } from './portfolio-modeller/ref/ref.service';
 
 @NgModule({
   declarations: [
@@ -87,7 +88,8 @@ import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.ser
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  
     {provide: DateAdapter, useClass: InputDateAdapter, deps: [MAT_DATE_LOCALE, Platform]},
     DatePipe,
-    IRRCalcService  
+    IRRCalcService,
+    RefService  
   ],
   exports: []
 })
