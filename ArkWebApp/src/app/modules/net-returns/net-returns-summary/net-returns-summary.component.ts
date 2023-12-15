@@ -58,14 +58,13 @@ export class NetReturnsSummaryComponent implements OnInit {
       { field: 'Leverage', headerName:'Grosss IRR with Leverage',headerTooltip:'Grosss IRR with Leverage'},
       { field: 'Other' ,headerTooltip:'Other'},
       { field: 'FX',headerName:'Net IRR before FX Costs',headerTooltip:'Net IRR Before FX Costs'},
-      { field: 'SetupCosts', headerName:'Net IRR before Setup Costs',headerTooltip:'Net IRR before Setup Costs' },
       { field: 'Opex', headerName:'Net IRR before Opex',headerTooltip:'Net IRR before Opex' },
       { field: 'MgmtFee', headerName:'Net IRR before Management Fee',headerTooltip: 'Net IRR before Management Fee'},
       { field: 'PerfFee', headerName:'Net IRR before Performance Fee',headerTooltip:'Net IRR before Performance Fee' },
       { field: 'NetIRR' ,headerTooltip:'NetIRR'}
     ].map((x: ColDef) => { x.type = x.type ?? 'abColDefNumber'; return x; })
 
-    this.FORMAT_COLUMNS = ['GrossIRR','Leverage','Other','FX','SetupCosts','Opex','MgmtFee','PerfFee','NetIRR']
+    this.FORMAT_COLUMNS = ['GrossIRR','Leverage','Other','FX','Opex','MgmtFee','PerfFee','NetIRR']
 
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
@@ -115,7 +114,7 @@ export class NetReturnsSummaryComponent implements OnInit {
           DashboardTitle: 'Summary'
         },
         Layout: {
-          Revision: 12,
+          Revision: 13,
           CurrentLayout: 'Basic Layout',
           Layouts: [{
             Name: 'Basic Layout',

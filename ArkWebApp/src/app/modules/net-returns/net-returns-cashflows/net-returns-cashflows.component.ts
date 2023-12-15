@@ -64,7 +64,7 @@ export class NetReturnsCashflowsComponent implements OnInit {
       },
       { field: 'capitalSubType', type: 'abColDefString' },
       { field: 'capitalType', type: 'abColDefString' },
-      { field: 'narrative', type: 'abColDefString' },
+      { field: 'narrative', type: 'abColDefString', tooltipField: 'narrative' },
       //{ field: 'groupingRank', sort: 'desc' as 'desc'}
     ].map((x: ColDef) => { x.type = x.type ?? 'abColDefNumber'; x.width = 175; return x; })
 
@@ -75,10 +75,13 @@ export class NetReturnsCashflowsComponent implements OnInit {
       columnDefs: this.columnDefs,
       sideBar: true,
       rowGroupPanelShow: 'always',
+      tooltipShowDelay: 0,
       defaultColDef: {
         resizable: true,
         filter: true,
-        sortable: true
+        sortable: true,
+        enableValue: true,
+        enableRowGroup: true
       },
       headerHeight: 30,
       rowHeight: 30,

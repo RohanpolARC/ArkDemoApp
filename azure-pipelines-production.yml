@@ -22,6 +22,7 @@ steps:
   inputs:    
     workingDir: ArkWebApp
     verbose: true
+
 - task: Npm@1
   displayName: 'Angular APP Run build'  
   inputs:    
