@@ -2,6 +2,8 @@ import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@
 import { FormControl } from '@angular/forms';
 import { LoadStatus, MonthlyReturnsCalcParams, ParentTabType, PerfFeesCalcParams, ResultTab } from 'src/app/shared/models/IRRCalculationsModel';
 import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
+import { PortfolioModellerService } from '../service/portfolio-modeller.service';
+import { MatTabChangeEvent } from '@angular/material/tabs';
 
 @Component({
   selector: 'app-tab-group-wrapper',
@@ -13,6 +15,8 @@ export class TabGroupWrapperComponent implements OnInit {
   IRRCalcParamsInterface: IRRCalcParams
   MonthlyReturnsCalcParamsInterface: MonthlyReturnsCalcParams
   PerfFeesCalcParamsInterface: PerfFeesCalcParams
+  ParentTabType : ParentTabType
+  number : number
 
   @Input() parentTab: ParentTabType
   @Output() status = new EventEmitter<LoadStatus>();
@@ -22,9 +26,15 @@ export class TabGroupWrapperComponent implements OnInit {
   subtabs: ResultTab[]
   selected = new FormControl(0);
 
-  constructor() { }
+  constructor(public portfolioModellerService: PortfolioModellerService) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void { 
+
+  }
+
+  onSubTabChanged(event:MatTabChangeEvent){
+    this.portfolioModellerService.updateTabGroupSelected(this.parentTab.index, event.index, "Child")
+  }
 
   async ngOnChanges(changes: SimpleChanges){
     this.pDisplayName = this.parentTab.parentDisplayName

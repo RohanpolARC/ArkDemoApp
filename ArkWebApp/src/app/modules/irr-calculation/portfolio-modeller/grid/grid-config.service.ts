@@ -177,6 +177,7 @@ export class GridConfigService {
     }
 
     this.adaptableOptions = {
+      filterOptions: CommonConfig.ADAPTABLE_FILTER_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'positionID',
       userName: this.dataSvc.getCurrentUserName(),

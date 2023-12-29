@@ -9,6 +9,9 @@ import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-
 import { FeeCalculationSummaryComponent } from './fee-calculation-summary/fee-calculation-summary.component';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { FeeCashflowsComponent } from './fee-cashflows/fee-cashflows.component';
+import { PortfolioModellerService } from '../irr-calculation/service/portfolio-modeller.service';
+import { RefService } from '../irr-calculation/portfolio-modeller/ref/ref.service';
+import { ComponentReaderService } from '../irr-calculation/service/component-reader.service';
 
 
 @NgModule({
@@ -28,6 +31,11 @@ import { FeeCashflowsComponent } from './fee-cashflows/fee-cashflows.component';
   exports: [
     FeeCalculationSummaryComponent,
     FeeCashflowsComponent
+  ],
+  providers: [
+    PortfolioModellerService,
+    RefService,
+    ComponentReaderService
   ]
 })
 export class FeeCalculationModule { }

@@ -1,4 +1,4 @@
-import { ColDef, GridOptions, GridReadyEvent, IAggFuncParams, Module, RowNode, ValueFormatterParams } from '@ag-grid-community/core';
+import { BodyScrollEvent, ColDef, ColumnResizedEvent, GridOptions, GridReadyEvent, IAggFuncParams, Module, ProcessCellForExportParams, RowNode, ValueFormatterParams, VirtualColumnsChangedEvent } from '@ag-grid-community/core';
 import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
@@ -7,18 +7,22 @@ import { MonthlyReturnsService } from 'src/app/core/services/MonthlyReturns/mont
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { amountFormatter } from 'src/app/shared/functions/formatter';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
-import { LoadStatus, MonthlyReturnsCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
+import { LoadStatus, MonthlyReturnsCalcParams, ParentTabType } from 'src/app/shared/models/IRRCalculationsModel';
 import { getNodes } from '../../capital-activity/utilities/functions';
+import { AgGridScrollService } from '../service/aggrid-scroll.service';
+import { autosizeColumnExceptResized, getMomentDateStrFormat, handleResizedColumns } from 'src/app/shared/functions/utilities';
 
 @Component({
   selector: 'app-monthly-returns',
   templateUrl: './monthly-returns.component.html',
   styleUrls: ['../../../shared/styles/grid-page.layout.scss', './monthly-returns.component.scss'],
-  providers: []
+  providers: [AgGridScrollService]
 })
 export class MonthlyReturnsComponent implements OnInit {
 
   @Input() calcParams: MonthlyReturnsCalcParams;
+  @Input() parentTab: ParentTabType;
+  @Input() childTabIndex: number;
   @Output() status = new EventEmitter<LoadStatus>();
   
   subscriptions: Subscription[] = []
@@ -34,6 +38,7 @@ export class MonthlyReturnsComponent implements OnInit {
 
   constructor(private monthlyReturnSvc: MonthlyReturnsService,
     private dtPipe: DatePipe,
+    private agGridScrollService:AgGridScrollService
   ) { }
 
   ngOnChanges(changes: SimpleChanges){
@@ -56,7 +61,9 @@ export class MonthlyReturnsComponent implements OnInit {
           monthlyReturns.push(row)
         })
 
-        this.monthlyReturns = monthlyReturns        
+        this.monthlyReturns = monthlyReturns  
+        console.log("Monthly Returns Updated")      
+        console.log(this.monthlyReturns)      
       },
       error: (error) => {
         console.error(`Failed to get returns : ${error}`)
@@ -110,8 +117,16 @@ export class MonthlyReturnsComponent implements OnInit {
       { field: 'accInterestEur', valueFormatter: amountFormatter, aggFunc: 'sum', headerName: 'Interest' },
     ]
 
+
+    // The below gridOptions is a temporary fix for AutoSizing Issue in this component
+    // Will come back here to resolve the issue later
+    let gridOptionsWithoutAutoResizing:GridOptions = {...CommonConfig.GRID_OPTIONS}
+    delete gridOptionsWithoutAutoResizing.onFirstDataRendered
+    delete gridOptionsWithoutAutoResizing.onRowDataUpdated
+    delete gridOptionsWithoutAutoResizing.onRowGroupOpened
+
     this.gridOptionsMonthlyRets = {
-      ...CommonConfig.GRID_OPTIONS,
+      ...gridOptionsWithoutAutoResizing,
       enableRangeSelection: true,
       sideBar: true,
       columnDefs: this.columnDefsMonthlyRets,
@@ -135,11 +150,18 @@ export class MonthlyReturnsComponent implements OnInit {
       rowGroupPanelShow: 'always',
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel()
+        this.agGridScrollService.parentTabIndex = this.parentTab.index
+        this.agGridScrollService.childTabIndex = this.childTabIndex
+        this.agGridScrollService.gridApi = this.gridOptionsMonthlyRets.api
       },
       noRowsOverlayComponent: NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
       },
+      rowBuffer:0,
+      onBodyScroll: (event:BodyScrollEvent) => {
+        this.agGridScrollService.onAgGridScroll(event)
+      }
     }
   }
 

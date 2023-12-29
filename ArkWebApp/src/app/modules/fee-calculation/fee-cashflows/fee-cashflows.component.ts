@@ -1,5 +1,5 @@
 import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, Module, ValueFormatterParams } from '@ag-grid-community/core';
+import { BodyScrollEvent, ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, Module, ValueFormatterParams } from '@ag-grid-community/core';
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -9,16 +9,22 @@ import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overla
 import { amountFormatter, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, dateFormatter, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
+import { ParentTabType } from 'src/app/shared/models/IRRCalculationsModel';
+import { PortfolioModellerService } from '../../irr-calculation/service/portfolio-modeller.service';
+import { AgGridScrollService } from '../../irr-calculation/service/aggrid-scroll.service';
 
 @Component({
   selector: 'app-fee-cashflows',
   templateUrl: './fee-cashflows.component.html',
-  styleUrls: ['./fee-cashflows.component.scss']
+  styleUrls: ['./fee-cashflows.component.scss'],
+  providers: [AgGridScrollService]
 })
 export class FeeCashflowsComponent implements OnInit {
 
   @Input() feeCashflows;
   @Input() status: 'Loading' | 'Loaded' | 'Failed';
+  @Input() parentTab: ParentTabType;
+  @Input() childTabIndex: number;
   
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   subscriptions: Subscription[] = []
@@ -31,7 +37,8 @@ export class FeeCashflowsComponent implements OnInit {
 
   constructor(
     private dataSvc: DataService,
-    private feeCalcSvc: FeeCalculationService
+    private feeCalcSvc: FeeCalculationService,
+    public agGridScrollService:AgGridScrollService
   ) { }
 
   percentFormatter(params : ValueFormatterParams) {
@@ -121,7 +128,9 @@ export class FeeCashflowsComponent implements OnInit {
 
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     adaptableApi.columnApi.autosizeAllColumns()
-
+    this.agGridScrollService.parentTabIndex = this.parentTab?.index
+    this.agGridScrollService.childTabIndex = this.childTabIndex
+    this.agGridScrollService.gridApi = this.gridOptions.api
   }
 
   ngOnInit(): void {
@@ -223,10 +232,15 @@ export class FeeCashflowsComponent implements OnInit {
       },
       onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
         autosizeColumnExceptResized(event)
-      },
+      },  
+      rowBuffer:0,
+      onBodyScroll: (event:BodyScrollEvent) => {
+        this.agGridScrollService.onAgGridScroll(event)
+      }
     }
 
     this.adaptableOptions = {
+      filterOptions: CommonConfig.ADAPTABLE_FILTER_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       autogeneratePrimaryKey: true,
       primaryKey: '',

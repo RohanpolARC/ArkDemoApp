@@ -17,7 +17,9 @@
 
                         <app-fee-cashflows [feeCashflows] = "feeCashflows" 
                             [status] = "loadingStatus"
-                            style="height: calc(100vh - 245px - 110px);">
+                            style="height: calc(100vh - 245px - 110px);"
+                            [parentTab] = "parentTab | as : ParentTabType"
+                            [childTabIndex] = "childTabIndex | as : number">
                         </app-fee-cashflows>
     
             <!-- <mat-accordion>

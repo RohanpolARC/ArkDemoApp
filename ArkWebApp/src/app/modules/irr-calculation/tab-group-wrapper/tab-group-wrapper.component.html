@@ -1,6 +1,6 @@
 <div class="parent">
 
-    <mat-tab-group [selectedIndex]="selected.value" >
+    <mat-tab-group [selectedIndex]="selected.value" (selectedTabChange)="onSubTabChanged($event);">
         <mat-tab *ngFor="let subtab of subtabs; let index = index" [label]="subtab.displayName"  class="mat-tab-label">
 
             <ng-template mat-tab-label  >
@@ -26,6 +26,8 @@
                 style="display: block; height: calc(100vh -205px);"
                 (status)="statusReceived($event, index)"
                 [calcParams] = "subtab.calcParams | as : IRRCalcParamsInterface"
+                [parentTab] = "parentTab | as : ParentTabType"
+                [childTabIndex] = "index | as : number"
             ></app-irr-result>
 
             <app-monthly-returns
@@ -33,6 +35,8 @@
                 style="display: block; height: calc(100vh -165px);"
                 (status)="statusReceived($event, index)"
                 [calcParams] = "subtab.calcParams | as : MonthlyReturnsCalcParamsInterface"
+                [parentTab] = "parentTab | as : ParentTabType"
+                [childTabIndex] = "index | as : number"
             ></app-monthly-returns>
 
 
@@ -41,6 +45,8 @@
                 style="display: block; height: calc(100vh -205px);"
                 (status)="statusReceived($event, index)"
                 [calcParams] = "subtab.calcParams | as : PerfFeesCalcParamsInterface"
+                [parentTab] = "parentTab | as : ParentTabType"
+                [childTabIndex] = "index | as : number"
             ></app-performance-fee>
 
 
@@ -49,6 +55,8 @@
                 style="display: block; height: calc(100vh -205px);"
                 (status)="statusReceived($event, index)"
                 [runID] = "subtab.calcParams?.runID"
+                [parentTab] = "parentTab | as : ParentTabType"
+                [childTabIndex] = "index | as : number"
             ></app-cash-flows>
        </mat-tab>
     </mat-tab-group>

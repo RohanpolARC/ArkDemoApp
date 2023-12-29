@@ -319,6 +319,7 @@ NON_AMOUNT_2DEC_COLUMNS=['GrossMOM',
     }
 
     this.adaptableOptions = {
+      filterOptions: CommonConfig.ADAPTABLE_FILTER_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       autogeneratePrimaryKey: true,
       primaryKey: '',

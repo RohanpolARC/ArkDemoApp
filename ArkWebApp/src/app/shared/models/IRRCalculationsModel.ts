@@ -156,5 +156,18 @@ export type ParentTabType = {
     parentDisplayName: string,
     parentActualName: string,
     status: LoadStatus,
-    tabset: ResultTab[]
+    tabset: ResultTab[],
+    index?:number
 }  
+
+export type ScrollPosition = {
+    lastScrollPositionVertical: number,
+    lastScrollPositionHorizontal: string
+}
+
+export class TabGroupSelected {
+    public parentTabSelectedIndex:number;
+    public childTabSelectedIndex:number;
+  }
+
+  export type TabLevel = 'Parent' | 'Child';

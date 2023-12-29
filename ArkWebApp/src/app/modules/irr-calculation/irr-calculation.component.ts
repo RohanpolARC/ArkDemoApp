@@ -13,6 +13,7 @@ import { GridUtilService } from './portfolio-modeller/grid/grid-util.service';
 import { PortfolioModellerService } from './service/portfolio-modeller.service';
 import { FeeCalculationService } from 'src/app/core/services/FeeCalculation/fee-calculation.service';
 import { GridConfigService } from './portfolio-modeller/grid/grid-config.service';
+import { MatTabChangeEvent } from '@angular/material/tabs';
 
 @Component({
   selector: 'app-irr-calculation',
@@ -34,7 +35,8 @@ export class IrrCalculationComponent implements OnInit {
   constructor(
     private dataSvc: DataService,
     public irrCalcSvc: IRRCalcService ,
-    private filterSvc: GeneralFilterService
+    private filterSvc: GeneralFilterService,
+    private portfolioModellerService: PortfolioModellerService
   ) { }
 
   subscriptions: Subscription[] = []
@@ -104,7 +106,7 @@ export class IrrCalculationComponent implements OnInit {
         displayName: tabData.tabName,
         status: 'Loading',
         resultType: tabData.tabType,
-        calcParams: tabData.calcParams
+        calcParams: tabData.calcParams,
       })
     })
 
@@ -128,7 +130,8 @@ export class IrrCalculationComponent implements OnInit {
       parentDisplayName: parentDisplayName ,
       parentActualName: params.parentDisplayName,
       status : 'Loading',
-      tabset: newTabSet
+      tabset: newTabSet,
+      index:this.irrCalcSvc.parentTabs.length+1
     }
     this.irrCalcSvc.parentTabs.push(newParentTab);    
     this.selected.setValue(this.irrCalcSvc.parentTabs.indexOf(newParentTab)+1)
@@ -146,6 +149,10 @@ export class IrrCalculationComponent implements OnInit {
       this.calcParamsMap[displayName] = null;
       this.calcParamsMap[displayName] = params
     }
+  }
+
+  onParentTabChanged(event:MatTabChangeEvent){
+    this.portfolioModellerService.updateTabGroupSelected(event.index,null,"Parent")
   }
 
   ngOnDestroy(){

@@ -1,9 +1,9 @@
 
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridOptions,GridApi, GridReadyEvent, Module, FirstDataRenderedEvent, ProcessCellForExportParams } from '@ag-grid-community/core';
+import { ColDef, GridOptions,GridApi, GridReadyEvent, Module, FirstDataRenderedEvent, ProcessCellForExportParams, BodyScrollEvent } from '@ag-grid-community/core';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { filter, first } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { CashFlowService } from 'src/app/core/services/CashFlows/cash-flow.service';
 import { DataService } from 'src/app/core/services/data.service';
@@ -12,16 +12,21 @@ import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overla
 import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,  DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { autosizeColumnExceptResized,  getMomentDateStrFormat, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
-import { LoadStatus } from 'src/app/shared/models/IRRCalculationsModel';
+import { LoadStatus, ParentTabType, ScrollPosition } from 'src/app/shared/models/IRRCalculationsModel';
+import { PortfolioModellerService } from '../service/portfolio-modeller.service';
+import { AgGridScrollService } from '../service/aggrid-scroll.service';
 
 @Component({
   selector: 'app-cash-flows',
   templateUrl: './cash-flows.component.html',
-  styleUrls: ['../../../shared/styles/grid-page.layout.scss','./cash-flows.component.scss']
+  styleUrls: ['../../../shared/styles/grid-page.layout.scss','./cash-flows.component.scss'],
+  providers: [AgGridScrollService]
 })
 export class CashFlowsComponent implements OnInit {
 
   @Input() runID: string;
+  @Input() parentTab: ParentTabType;
+  @Input() childTabIndex: number;
   @Output() status = new EventEmitter<LoadStatus>();
   
   subscriptions: Subscription[] = []
@@ -109,7 +114,9 @@ export class CashFlowsComponent implements OnInit {
   constructor(
     private cashFlowService:CashFlowService,
     public irrCalcSvc: IRRCalcService,
-    private dataSvc: DataService  
+    private dataSvc: DataService,
+    public portfolioModellerService:PortfolioModellerService,
+    public agGridScrollService:AgGridScrollService
   ) { }
 
 
@@ -258,10 +265,15 @@ export class CashFlowsComponent implements OnInit {
         if(params.column.getColId()==='cashDate')
           return getMomentDateStrFormat(params.value,'DD/MM/YYYY')
         return params.value;
+      },      
+      rowBuffer:0,
+      onBodyScroll: (event:BodyScrollEvent) => {
+        this.agGridScrollService.onAgGridScroll(event)
       }
     }
 
     this.adaptableOptions = {
+      filterOptions: CommonConfig.ADAPTABLE_FILTER_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       autogeneratePrimaryKey: true,
       primaryKey: '',
@@ -333,8 +345,9 @@ export class CashFlowsComponent implements OnInit {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
     this.adaptableApi.dashboardApi.setDashboardTitle(`Cashflows`)
-
-
+    this.agGridScrollService.parentTabIndex = this.parentTab.index
+    this.agGridScrollService.childTabIndex = this.childTabIndex
+    this.agGridScrollService.gridApi = this.gridOptions.api
   }
 
   ngOnDestroy(){

@@ -1,5 +1,5 @@
 import { AdaptableApi, AdaptableOptions, FormatColumn } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, ColGroupDef, FirstDataRenderedEvent, GridOptions, Module, ValueFormatterParams } from '@ag-grid-community/core';
+import { BodyScrollEvent, ColDef, ColGroupDef, FirstDataRenderedEvent, GridOptions, Module, ValueFormatterParams } from '@ag-grid-community/core';
 import { Component, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
 import { Subject, Subscription, timer } from 'rxjs';
 import { first, switchMap, takeUntil } from 'rxjs/operators';
@@ -11,16 +11,20 @@ import { saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
 import { CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER } from 'src/app/shared/functions/formatter';
 import { presistSharedEntities, loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
-import { IRRCalcParams, LoadStatus } from 'src/app/shared/models/IRRCalculationsModel';
+import { IRRCalcParams, LoadStatus, ParentTabType} from 'src/app/shared/models/IRRCalculationsModel';
+import { AgGridScrollService } from '../service/aggrid-scroll.service';
 
 @Component({
   selector: 'app-irr-result',
   templateUrl: './irr-result.component.html',
-  styleUrls: ['../../../shared/styles/grid-page.layout.scss', './irr-result.component.scss']
+  styleUrls: ['../../../shared/styles/grid-page.layout.scss', './irr-result.component.scss'],
+  providers: [AgGridScrollService]
 })
 export class IrrResultComponent implements OnInit {
 
   @Input() calcParams: IRRCalcParams;
+  @Input() parentTab: ParentTabType;
+  @Input() childTabIndex: number;
   @Output() status = new EventEmitter<LoadStatus>();
 
   runID: string
@@ -50,7 +54,7 @@ export class IrrResultComponent implements OnInit {
   ]
 
   calcColDefs: ColDef[] = [    
-    { field: 'CapitalInvestedEur', type: 'abColDefNumber', minWidth: 180 },
+    { field: 'CapitalInvestedEur', type: 'abColDefNumber' },
     { field: 'RealizedProceedsEur', type: 'abColDefNumber', minWidth: 185 },
     { field: 'GrossCostAmountEur', type: 'abColDefNumber', minWidth: 180, hide: true },
     { field: 'CashCarryingValueEur', type: 'abColDefNumber', minWidth: 200 },
@@ -124,7 +128,8 @@ export class IrrResultComponent implements OnInit {
 
   constructor(
     private irrCalcSvc: IRRCalcService,
-    private dataSvc: DataService
+    private dataSvc: DataService,
+    private agGridScrollService:AgGridScrollService
   ) { }
 
   percentFormatter(params : ValueFormatterParams) {
@@ -169,9 +174,14 @@ export class IrrResultComponent implements OnInit {
       onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
         autosizeColumnExceptResized(event)
       },
+      rowBuffer:0,
+      onBodyScroll: (event:BodyScrollEvent) => {
+        this.agGridScrollService.onAgGridScroll(event)
+      }
     }
     
     this.adaptableOptions = {
+      filterOptions: CommonConfig.ADAPTABLE_FILTER_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: '',
       autogeneratePrimaryKey: true,
@@ -453,6 +463,9 @@ export class IrrResultComponent implements OnInit {
     this.adapTableApi = adaptableApi;
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
     this.gridOptions.columnApi.autoSizeColumns([ ...this.calcColDefs, ...this.paggrColDefs ].filter(x => x.minWidth).map(x => x.filter));
+    this.agGridScrollService.parentTabIndex = this.parentTab.index
+    this.agGridScrollService.childTabIndex = this.childTabIndex
+    this.agGridScrollService.gridApi = this.gridOptions.api
   }
 
   NO_DECIMAL_AMOUNT_COLUMNS = [

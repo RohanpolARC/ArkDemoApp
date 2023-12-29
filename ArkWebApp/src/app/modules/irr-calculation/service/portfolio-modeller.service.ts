@@ -1,15 +1,41 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { VirtualPositionFormComponent } from '../virtual-position-form/virtual-position-form.component';
-import { VPositionModel } from 'src/app/shared/models/IRRCalculationsModel';
+import { ScrollPosition, TabGroupSelected, TabLevel, VPositionModel } from 'src/app/shared/models/IRRCalculationsModel';
 import { DataService } from 'src/app/core/services/data.service';
 import { RefService } from '../portfolio-modeller/ref/ref.service';
 import { ComponentReaderService } from './component-reader.service';
 import { getDateFromStr, getMomentDateStrFormat } from 'src/app/shared/functions/utilities';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 @Injectable()
+
+
+
+
 export class PortfolioModellerService {
+
+  private tabGroupSelectedHistory:Map<number,number> = new Map().set(0,0);
+  private tabGroupSelected = new BehaviorSubject<TabGroupSelected>(new TabGroupSelected);
+  tabGroupSelected$ = this.tabGroupSelected.asObservable();
+  updateTabGroupSelected(parentTabSelectedIndex: number, childTabSelectedIndex: number, tabLevel:TabLevel){
+    let newTabGroupSelected:TabGroupSelected = new TabGroupSelected
+    if(tabLevel === "Parent")
+    {
+      newTabGroupSelected.parentTabSelectedIndex = parentTabSelectedIndex;
+      newTabGroupSelected.childTabSelectedIndex = this.tabGroupSelectedHistory.get(parentTabSelectedIndex)
+    }      
+    else if(tabLevel === "Child")
+    {
+      newTabGroupSelected.parentTabSelectedIndex = parentTabSelectedIndex;
+      newTabGroupSelected.childTabSelectedIndex = childTabSelectedIndex;
+      this.tabGroupSelectedHistory.set(parentTabSelectedIndex,childTabSelectedIndex)
+    }
+    this.tabGroupSelected.next(newTabGroupSelected);
+  }
+
   
+
   constructor(
       public dialog: MatDialog,
       private dataSvc:DataService,

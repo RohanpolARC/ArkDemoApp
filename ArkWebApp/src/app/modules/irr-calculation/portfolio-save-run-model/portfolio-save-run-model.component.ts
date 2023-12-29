@@ -271,6 +271,17 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   }
 
   onProceed(context: Proceed){
+
+    if(this.isAutomatic && this.rules.length==0){
+      this.dataService.setWarningMsg(`No Rules applicable for the model`);
+      return
+    }
+    else if(!this.isAutomatic && this.positionIDs.length==0)
+    {
+      this.dataService.setWarningMsg(`No Positions applicable for the model`);
+      return
+    }
+
     this.context = context
 
     let model: VPortfolioModel = <VPortfolioModel> {};
