@@ -72,6 +72,7 @@ export class CommonConfig{
       }
     }
 
+    // Common Adaptable Options
     public static ADAPTABLE_FILTER_OPTIONS : FilterOptions = {
         showDistinctFilteredValuesOnly:true,
         maxFilterValuesToDisplay:Number.MAX_SAFE_INTEGER
