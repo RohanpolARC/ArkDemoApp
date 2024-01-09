@@ -160,7 +160,12 @@ export class AppComponent {
       }
     }))
 
-    this.fetchTabs();
+    if(this.msalSvc.msalSvc.instance.getActiveAccount()){
+      this.fetchTabs();
+    }
+    else{
+      this.msalSvc.msalSvc.loginRedirect();
+    }
     this.userName=this.dataService.getCurrentUserName();
 
       /** On Initial Load (If screen is directly loaded from the url)*/

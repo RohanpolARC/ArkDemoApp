@@ -53,8 +53,6 @@ export class PortfolioHistoryBusinessLogicService {
     .subscribe({
       next:(respObject)=>{
         if(respObject.isSuccess){
-  
-          console.log(respObject)
           models.forEach((model) => {
             this.updateReviewColumns()
           })

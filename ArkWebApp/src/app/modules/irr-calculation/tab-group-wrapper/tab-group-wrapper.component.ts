@@ -55,10 +55,6 @@ export class TabGroupWrapperComponent implements OnInit {
       this.subtabs.push(subtabs[i])
       this.selected.setValue(i)
     }
-
-
-    console.log(this.subtabs)
-    console.log(this.parentTab)
   }
 
   statusReceived(status: LoadStatus, index: number){
