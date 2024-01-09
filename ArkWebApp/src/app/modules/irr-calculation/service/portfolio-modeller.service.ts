@@ -34,6 +34,12 @@ export class PortfolioModellerService {
     this.tabGroupSelected.next(newTabGroupSelected);
   }
 
+  private matTabRemoved = new BehaviorSubject<number>(-1);
+  matTabRemoved$ = this.matTabRemoved.asObservable();
+  removeMatTab(index: number){
+      this.matTabRemoved.next(index);
+  }
+
   
 
   constructor(

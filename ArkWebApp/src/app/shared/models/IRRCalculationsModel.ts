@@ -157,7 +157,8 @@ export type ParentTabType = {
     parentActualName: string,
     status: LoadStatus,
     tabset: ResultTab[],
-    index?:number
+    index?:number,
+    isReIndexed?:boolean
 }  
 
 export type ScrollPosition = {

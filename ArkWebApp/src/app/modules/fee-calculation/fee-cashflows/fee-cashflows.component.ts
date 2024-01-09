@@ -38,7 +38,8 @@ export class FeeCashflowsComponent implements OnInit {
   constructor(
     private dataSvc: DataService,
     private feeCalcSvc: FeeCalculationService,
-    public agGridScrollService:AgGridScrollService
+    public agGridScrollService:AgGridScrollService,
+    private portfolioModellerService: PortfolioModellerService
   ) { }
 
   percentFormatter(params : ValueFormatterParams) {
@@ -128,12 +129,16 @@ export class FeeCashflowsComponent implements OnInit {
 
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     adaptableApi.columnApi.autosizeAllColumns()
-    this.agGridScrollService.parentTabIndex = this.parentTab?.index
-    this.agGridScrollService.childTabIndex = this.childTabIndex
     this.agGridScrollService.gridApi = this.gridOptions.api
+    this.agGridScrollService.childTabIndex = this.childTabIndex
+    this.agGridScrollService.parentTabIndex = this.parentTab?.index
   }
 
   ngOnInit(): void {
+
+    this.portfolioModellerService.matTabRemoved$.subscribe( x => {
+      this.agGridScrollService.parentTabIndex = this.parentTab.index
+    })
     
     this.columnDefs = [
       { field: 'Date', tooltipField:  'Date', cellClass: 'dateUK', minWidth: 122, type: 'abColDefDate' },
@@ -240,7 +245,7 @@ export class FeeCashflowsComponent implements OnInit {
     }
 
     this.adaptableOptions = {
-      filterOptions: CommonConfig.ADAPTABLE_FILTER_OPTIONS,
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       autogeneratePrimaryKey: true,
       primaryKey: '',

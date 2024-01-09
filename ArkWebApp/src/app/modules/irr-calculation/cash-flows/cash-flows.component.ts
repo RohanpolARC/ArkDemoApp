@@ -1,7 +1,7 @@
 
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { ColDef, GridOptions,GridApi, GridReadyEvent, Module, FirstDataRenderedEvent, ProcessCellForExportParams, BodyScrollEvent } from '@ag-grid-community/core';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { filter, first } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -122,6 +122,10 @@ export class CashFlowsComponent implements OnInit {
 
 
   ngOnInit(): void {
+
+    this.portfolioModellerService.matTabRemoved$.subscribe( x => {
+      this.agGridScrollService.parentTabIndex = this.parentTab.index
+    })
 
     this.irrCalcSvc.cashflowLoadStatusEvent.pipe(first()).subscribe({
       next:(e) => {
@@ -273,7 +277,7 @@ export class CashFlowsComponent implements OnInit {
     }
 
     this.adaptableOptions = {
-      filterOptions: CommonConfig.ADAPTABLE_FILTER_OPTIONS,
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       autogeneratePrimaryKey: true,
       primaryKey: '',
@@ -345,9 +349,9 @@ export class CashFlowsComponent implements OnInit {
     this.adaptableApi = adaptableApi;
     this.adaptableApi.toolPanelApi.closeAdapTableToolPanel();
     this.adaptableApi.dashboardApi.setDashboardTitle(`Cashflows`)
-    this.agGridScrollService.parentTabIndex = this.parentTab.index
-    this.agGridScrollService.childTabIndex = this.childTabIndex
     this.agGridScrollService.gridApi = this.gridOptions.api
+    this.agGridScrollService.childTabIndex = this.childTabIndex
+    this.agGridScrollService.parentTabIndex = this.parentTab.index
   }
 
   ngOnDestroy(){

@@ -17,6 +17,7 @@ export class TabGroupWrapperComponent implements OnInit {
   PerfFeesCalcParamsInterface: PerfFeesCalcParams
   ParentTabType : ParentTabType
   number : number
+  boolean : boolean
 
   @Input() parentTab: ParentTabType
   @Output() status = new EventEmitter<LoadStatus>();
@@ -55,6 +56,9 @@ export class TabGroupWrapperComponent implements OnInit {
       this.selected.setValue(i)
     }
 
+
+    console.log(this.subtabs)
+    console.log(this.parentTab)
   }
 
   statusReceived(status: LoadStatus, index: number){

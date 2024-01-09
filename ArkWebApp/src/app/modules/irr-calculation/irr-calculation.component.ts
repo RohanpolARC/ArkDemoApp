@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
@@ -36,13 +36,16 @@ export class IrrCalculationComponent implements OnInit {
     private dataSvc: DataService,
     public irrCalcSvc: IRRCalcService ,
     private filterSvc: GeneralFilterService,
-    private portfolioModellerService: PortfolioModellerService
+    private portfolioModellerService: PortfolioModellerService,
+    private changeDetection: ChangeDetectorRef
   ) { }
 
   subscriptions: Subscription[] = []
   selected = new FormControl(0);
   calcParamsMap = {} //<model name, IRRCalcParams>
   cashflowLoadStatus: LoadStatus = 'Loading';
+  reInitializeIndex: boolean = false;
+  boolean : boolean
 
   removeTab(params:{index?: number,pDisplayName:string}) {
     if(params.index){
@@ -53,6 +56,12 @@ export class IrrCalculationComponent implements OnInit {
     }
     delete this.calcParamsMap[params.pDisplayName]
 
+    console.log("Remove Tab")
+    this.irrCalcSvc.parentTabs.forEach( (parentTab, index) => {
+      parentTab.index = index + 1
+    });
+    console.log(this.irrCalcSvc.parentTabs)
+    this.portfolioModellerService.removeMatTab(params.index);
   }
 
   ngOnInit(): void {

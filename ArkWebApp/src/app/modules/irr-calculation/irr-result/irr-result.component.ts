@@ -13,12 +13,15 @@ import { presistSharedEntities, loadSharedEntities, autosizeColumnExceptResized 
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { IRRCalcParams, LoadStatus, ParentTabType} from 'src/app/shared/models/IRRCalculationsModel';
 import { AgGridScrollService } from '../service/aggrid-scroll.service';
+import { PortfolioModellerService } from '../service/portfolio-modeller.service';
 
 @Component({
   selector: 'app-irr-result',
   templateUrl: './irr-result.component.html',
   styleUrls: ['../../../shared/styles/grid-page.layout.scss', './irr-result.component.scss'],
-  providers: [AgGridScrollService]
+  providers: [
+    AgGridScrollService
+  ]
 })
 export class IrrResultComponent implements OnInit {
 
@@ -129,7 +132,8 @@ export class IrrResultComponent implements OnInit {
   constructor(
     private irrCalcSvc: IRRCalcService,
     private dataSvc: DataService,
-    private agGridScrollService:AgGridScrollService
+    private agGridScrollService:AgGridScrollService,
+    private portfolioModellerService:PortfolioModellerService
   ) { }
 
   percentFormatter(params : ValueFormatterParams) {
@@ -181,7 +185,7 @@ export class IrrResultComponent implements OnInit {
     }
     
     this.adaptableOptions = {
-      filterOptions: CommonConfig.ADAPTABLE_FILTER_OPTIONS,
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: '',
       autogeneratePrimaryKey: true,
@@ -254,6 +258,10 @@ export class IrrResultComponent implements OnInit {
   ngOnInit(): void {
 
     this.Init();
+
+    this.portfolioModellerService.matTabRemoved$.subscribe( x => {
+      this.agGridScrollService.parentTabIndex = this.parentTab.index
+    })
 
     this.irrCalcSvc.cashflowLoadStatusEvent.pipe(takeUntil(this.closeStream)).subscribe(
       e => {
@@ -426,7 +434,6 @@ export class IrrResultComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges){
 
-
     if(this.calcParams !== null){
       this.runID = this.calcParams.runID;
 
@@ -464,8 +471,8 @@ export class IrrResultComponent implements OnInit {
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
     this.gridOptions.columnApi.autoSizeColumns([ ...this.calcColDefs, ...this.paggrColDefs ].filter(x => x.minWidth).map(x => x.filter));
     this.agGridScrollService.parentTabIndex = this.parentTab.index
-    this.agGridScrollService.childTabIndex = this.childTabIndex
     this.agGridScrollService.gridApi = this.gridOptions.api
+    this.agGridScrollService.childTabIndex = this.childTabIndex
   }
 
   NO_DECIMAL_AMOUNT_COLUMNS = [

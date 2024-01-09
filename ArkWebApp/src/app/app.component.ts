@@ -144,9 +144,11 @@ export class AppComponent {
 
     this.subscriptions.push(this.msalBroadcastSvc.msalSubject$
     .subscribe((result: EventMessage) => {
+      console.log(result.eventType)
       if(result.eventType === EventType.LOGIN_SUCCESS || result.eventType === EventType.SSO_SILENT_SUCCESS){
 
         const payload = result.payload as AuthenticationResult;
+        console.log(payload.account)
         this.msalSvc.msalSvc.instance.setActiveAccount(payload.account);
         this.fetchTabs();
         this.userName=this.dataService.getCurrentUserName();  

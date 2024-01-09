@@ -102,7 +102,7 @@ export class MarkChangesComponent implements OnInit {
     }
 
     this.adaptableOptions = {
-      filterOptions: CommonConfig.ADAPTABLE_FILTER_OPTIONS,
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       autogeneratePrimaryKey: true,
       primaryKey: '',

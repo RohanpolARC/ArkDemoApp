@@ -11,6 +11,7 @@ import { LoadStatus, MonthlyReturnsCalcParams, ParentTabType } from 'src/app/sha
 import { getNodes } from '../../capital-activity/utilities/functions';
 import { AgGridScrollService } from '../service/aggrid-scroll.service';
 import { autosizeColumnExceptResized, getMomentDateStrFormat, handleResizedColumns } from 'src/app/shared/functions/utilities';
+import { PortfolioModellerService } from '../service/portfolio-modeller.service';
 
 @Component({
   selector: 'app-monthly-returns',
@@ -38,7 +39,8 @@ export class MonthlyReturnsComponent implements OnInit {
 
   constructor(private monthlyReturnSvc: MonthlyReturnsService,
     private dtPipe: DatePipe,
-    private agGridScrollService:AgGridScrollService
+    private agGridScrollService:AgGridScrollService,
+    private portfolioModellerService:PortfolioModellerService
   ) { }
 
   ngOnChanges(changes: SimpleChanges){
@@ -62,8 +64,6 @@ export class MonthlyReturnsComponent implements OnInit {
         })
 
         this.monthlyReturns = monthlyReturns  
-        console.log("Monthly Returns Updated")      
-        console.log(this.monthlyReturns)      
       },
       error: (error) => {
         console.error(`Failed to get returns : ${error}`)
@@ -72,6 +72,7 @@ export class MonthlyReturnsComponent implements OnInit {
       }
     }))
 
+    
   }
 
   dateFormatter(params: ValueFormatterParams): string{
@@ -105,6 +106,10 @@ export class MonthlyReturnsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this.portfolioModellerService.matTabRemoved$.subscribe( x => {
+      this.agGridScrollService.parentTabIndex = this.parentTab.index
+    })
 
     this.columnDefsMonthlyRets = [
       { field: 'asofDate', valueFormatter: this.dateFormatter.bind(this), headerName: 'As Of Date', rowGroup: true, allowedAggFuncs: [], cellClass: 'dateUK' },
@@ -150,9 +155,9 @@ export class MonthlyReturnsComponent implements OnInit {
       rowGroupPanelShow: 'always',
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel()
-        this.agGridScrollService.parentTabIndex = this.parentTab.index
-        this.agGridScrollService.childTabIndex = this.childTabIndex
         this.agGridScrollService.gridApi = this.gridOptionsMonthlyRets.api
+        this.agGridScrollService.childTabIndex = this.childTabIndex
+        this.agGridScrollService.parentTabIndex = this.parentTab.index
       },
       noRowsOverlayComponent: NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {

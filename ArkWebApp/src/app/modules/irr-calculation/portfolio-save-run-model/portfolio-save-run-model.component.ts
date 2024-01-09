@@ -273,12 +273,12 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   onProceed(context: Proceed){
 
     if(this.isAutomatic && this.rules.length==0){
-      this.dataService.setWarningMsg(`No Rules applicable for the model`);
+      this.dataService.setWarningMsg(`No rules applicable for the model. Please select required filters.`);
       return
     }
     else if(!this.isAutomatic && this.positionIDs.length==0)
     {
-      this.dataService.setWarningMsg(`No Positions applicable for the model`);
+      this.dataService.setWarningMsg(`No positions applicable for the model. Please select required positions.`);
       return
     }
 

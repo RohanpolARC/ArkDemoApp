@@ -238,7 +238,7 @@ export class AumReportComponent implements OnInit {
 
 
     this.adaptableOptions = {
-      filterOptions: CommonConfig.ADAPTABLE_FILTER_OPTIONS,
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       autogeneratePrimaryKey: true,
       primaryKey: '',
@@ -260,10 +260,10 @@ export class AumReportComponent implements OnInit {
 
       plugins: [
         masterDetailAgGridPlugin({
-          detailAdaptableOptions: {
+          detailAdaptableOptions: {            
+            ...CommonConfig.ADAPTABLE_OPTIONS,
             adaptableId: 'AumReportDetails',
             primaryKey: 'positionId',
-            filterOptions: CommonConfig.ADAPTABLE_FILTER_OPTIONS,
             licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
             exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
             userInterfaceOptions: {

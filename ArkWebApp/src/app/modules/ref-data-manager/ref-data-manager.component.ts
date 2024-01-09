@@ -85,7 +85,7 @@ export class RefDataManagerComponent implements OnInit {
   primaryKey: string = 'AttributeId';
 
   adaptableOptions:AdaptableOptions =  {
-    filterOptions: CommonConfig.ADAPTABLE_FILTER_OPTIONS,
+    ...CommonConfig.ADAPTABLE_OPTIONS,
     licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
     primaryKey: this.primaryKey,
     userName: this.dataSvc.getCurrentUserName(),
