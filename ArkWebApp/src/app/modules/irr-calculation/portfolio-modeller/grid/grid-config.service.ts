@@ -155,12 +155,12 @@ export class GridConfigService {
       suppressRowClickSelection: true,
       suppressAggFuncInHeader: true,
       enableGroupEdit: true,
-      autoGroupColumnDef: {
-        pinned: 'left',
-        cellRendererParams: {
-          suppressCount: true     // Disable row count on group
-        }
-      },
+      // autoGroupColumnDef: {
+      //   pinned: 'left',
+      //   cellRendererParams: {
+      //     suppressCount: true     // Disable row count on group
+      //   }
+      // },
       components: {
         agGridMaterialDatepicker: AggridMaterialDatepickerComponent,
         autocompleteCellEditor: MatAutocompleteEditorComponent
