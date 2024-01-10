@@ -47,7 +47,7 @@ export class IrrCalculationComponent implements OnInit {
   reInitializeIndex: boolean = false;
   boolean : boolean
 
-  async removeTab(params:{index?: number,pDisplayName:string}) {
+  removeTab(params:{index?: number,pDisplayName:string}) {
     if(params.index){
       this.irrCalcSvc.parentTabs.splice(params.index, 1);
     }else{
@@ -60,17 +60,6 @@ export class IrrCalculationComponent implements OnInit {
       parentTab.index = index + 1
     });
     this.portfolioModellerService.removeMatTab(params.index);
-    
-    if(params.index == this.irrCalcSvc.parentTabs.length){
-      this.selected.setValue(params.index)
-    }
-    else{
-      const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-      this.selected.setValue(null)
-      await sleep(500);
-      this.selected.setValue(params.index+1)
-    }
-    
   }
 
   ngOnInit(): void {
@@ -169,9 +158,8 @@ export class IrrCalculationComponent implements OnInit {
     }
   }
 
-  onParentTabChanged(event:MatTabChangeEvent){
-    this.selected.setValue(event.index)
-    this.portfolioModellerService.updateTabGroupSelected(event.index,null,"Parent")
+  onParentTabChanged(){
+    this.portfolioModellerService.updateTabGroupSelected(this.selected.value,null,"Parent")
   }
 
   ngOnDestroy(){

@@ -1,7 +1,8 @@
 <div class="parent">
 
             <mat-tab-group [selectedIndex]="selected.value" style="margin-right: 32px; width: 100vw;" 
-               (selectedTabChange)="onParentTabChanged($event);">
+               (selectedTabChange)="this.selected.setValue($event.index)"
+               (animationDone)="onParentTabChanged()">
 
                <mat-tab>
                     <ng-template mat-tab-label>
