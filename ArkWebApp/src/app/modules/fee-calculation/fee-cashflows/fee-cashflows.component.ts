@@ -136,9 +136,9 @@ export class FeeCashflowsComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.portfolioModellerService.matTabRemoved$.subscribe( x => {
+    this.subscriptions.push(this.portfolioModellerService.matTabRemoved$.subscribe( x => {
       this.agGridScrollService.parentTabIndex = this.parentTab.index
-    })
+    }))
     
     this.columnDefs = [
       { field: 'Date', tooltipField:  'Date', cellClass: 'dateUK', minWidth: 122, type: 'abColDefDate' },
@@ -305,5 +305,9 @@ export class FeeCashflowsComponent implements OnInit {
         }
       }
     }
+  }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub => sub.unsubscribe())
   }
 }

@@ -259,9 +259,9 @@ export class IrrResultComponent implements OnInit {
 
     this.Init();
 
-    this.portfolioModellerService.matTabRemoved$.subscribe( x => {
+    this.subscriptions.push(this.portfolioModellerService.matTabRemoved$.subscribe( x => {
       this.agGridScrollService.parentTabIndex = this.parentTab.index
-    })
+    }))
 
     this.irrCalcSvc.cashflowLoadStatusEvent.pipe(takeUntil(this.closeStream)).subscribe(
       e => {
