@@ -8,9 +8,10 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { MsalUserService } from './core/services/Auth/msaluser.service';
 import { MsalBroadcastService } from '@azure/msal-angular';
-import { AuthenticationResult, EventMessage, EventType } from '@azure/msal-browser';
+import { AuthenticationResult, EventMessage, EventType, InteractionStatus } from '@azure/msal-browser';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
+import { filter, takeUntil } from 'rxjs/operators';
 
 @Component({  
   selector: 'app-root',  
@@ -95,7 +96,7 @@ export class AppComponent {
     if(!this.accessService.accessibleTabs){
       this.subscriptions.push(this.accessService.getTabs().subscribe({
         next: tabs => {
-          this.accessService.accessibleTabs = tabs;
+          this.accessService.updateAccessibleTabs(tabs);
           if(sessionStorage.getItem('lastClickedTabRoute')!==null){
             this.router.navigate([ sessionStorage.getItem('lastClickedTabRoute')]);
             sessionStorage.removeItem('lastClickedTabRoute');
@@ -105,7 +106,7 @@ export class AppComponent {
           console.error("Failed to fetch accessible tabs " + error);
         }
       }))  
-    }    
+    }
   }
 
   filterApply(){
@@ -136,40 +137,52 @@ export class AppComponent {
 
   }
 
+  checkAndSetActiveAccount(){
+    /**
+     * If no active account set but there are accounts signed in, sets first account to active account
+     * To use active account set here, subscribe to inProgress$ first in your component
+     * Note: Basic usage demonstrated. Your app may require more complicated account selection logic
+     */
+    let activeAccount = this.msalSvc.msalSvc.instance.getActiveAccount();
+
+    if (!activeAccount && this.msalSvc.msalSvc.instance.getAllAccounts().length > 0) {
+      let accounts = this.msalSvc.msalSvc.instance.getAllAccounts();
+      this.msalSvc.msalSvc.instance.setActiveAccount(accounts[0]);
+    }
+
+    return activeAccount
+  }
+
   ngOnInit(): void { 
     if(this.location.path()!=='/accessibility' && this.location.path()!==''){
       sessionStorage.setItem('lastClickedTabRoute',this.location.path())
     }
 
-
+    // This will enable ACCOUNT_ADDED and ACCOUNT_REMOVED events emitted when a user logs in or out of another tab or window
+    this.msalSvc.msalSvc.instance.enableAccountStorageEvents();
     this.subscriptions.push(this.msalBroadcastSvc.msalSubject$
+    .pipe(
+      filter((msg: EventMessage) => msg.eventType === EventType.ACCOUNT_ADDED || msg.eventType === EventType.ACCOUNT_REMOVED),
+    )
     .subscribe((result: EventMessage) => {
-      console.log(result.eventType)
-      if(result.eventType === EventType.LOGIN_SUCCESS || result.eventType === EventType.SSO_SILENT_SUCCESS){
-
-        const payload = result.payload as AuthenticationResult;
-        console.log(payload.account)
-        this.msalSvc.msalSvc.instance.setActiveAccount(payload.account);
-        this.fetchTabs();
-        this.userName=this.dataService.getCurrentUserName();  
+      if (this.msalSvc.msalSvc.instance.getAllAccounts().length === 0) {
+        window.location.pathname = "/";
       }
-      // if refresh token is expired the msal will redirect itself to microsoft login.
-      else if(result.eventType === EventType.ACQUIRE_TOKEN_FAILURE || result.eventType === EventType.ACQUIRE_TOKEN_BY_CODE_FAILURE){
-        this.msalSvc.msalSvc.loginRedirect();
-        
-      }
+    }));
+  
+    this.subscriptions.push(this.msalBroadcastSvc.inProgress$
+    .pipe(
+      filter((status: InteractionStatus) => status === InteractionStatus.None),
+    )
+    .subscribe(() => {
+      this.checkAndSetActiveAccount();
+      this.fetchTabs();
+      this.userName=this.dataService.getCurrentUserName();
     }))
 
-    if(this.msalSvc.msalSvc.instance.getActiveAccount()){
-      this.fetchTabs();
-    }
-    else{
-      this.msalSvc.msalSvc.loginRedirect();
-    }
-    this.userName=this.dataService.getCurrentUserName();
 
-      /** On Initial Load (If screen is directly loaded from the url)*/
-      /** If Cash Balance screen is directly loaded */
+    /** On Initial Load (If screen is directly loaded from the url)*/
+    /** If Cash Balance screen is directly loaded */
     if(this.location.path() === '/cash-balance'){
       this.updateSelection('Cash Balance')
     }
