@@ -37,6 +37,9 @@ export class CommonConfig{
           return getMomentDateStrFormat(params.value,'DD/MM/YYYY')
         return params.value;
       },
+      onGridSizeChanged(event) {
+        autosizeColumnExceptResized(event)
+      },
       onFirstDataRendered(event) {
         autosizeColumnExceptResized(event)
       },
@@ -84,8 +87,7 @@ export class CommonConfig{
     public static ADAPTABLE_LICENSE_KEY: string = `AppName=ArkWebApp|Owner=Arcmont|StartDate=2023-10-25|EndDate=2024-10-25|Ref=AdaptableLicense|TS=1698057807480|C=1400174890,3196349643,1260976079,1719080318,2748328944,3250147371,2536545759`   
 
     public static GENERAL_EXPORT_OPTIONS: ExportOptions = {
-        // exportDateFormat: 'yyyy/MM/dd',
-        exportFormatType: 'formattedValue'
+      exportFormatType: 'formattedValue'
     }
 
 

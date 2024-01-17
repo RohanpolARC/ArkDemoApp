@@ -6,12 +6,18 @@ import { ComponentReaderService } from '../services/component-reader.service';
 import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
+import { InvestmentGridUtilService } from '../services/investment-grid-util.service';
 
 @Component({
   selector: 'app-investment',
   templateUrl: './investment.component.html',
-  styleUrls: ['./investment.component.scss']
+  styleUrls: ['./investment.component.scss'],
+  providers: [
+    InvestmentGridUtilService,
+    InvestmentGridConfigService,
+  ]
 })
+
 export class InvestmentComponent implements OnInit, IPropertyReader {
   @Input() rowData: any[]
   agGridModules: Module[]

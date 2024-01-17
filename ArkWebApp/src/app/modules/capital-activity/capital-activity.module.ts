@@ -26,10 +26,6 @@ import { FileDropzoneModule } from 'src/app/shared/modules/file-dropzone/file-dr
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
 import { InvestmentComponent } from './investment/investment.component';
 import { InvestorComponent } from './investor/investor.component';
-import { InvestorGridConfigService } from './services/investor-grid-config.service';
-import { InvestorGridUtilService } from './services/investor-grid-util.service';
-import { InvestmentGridConfigService } from './services/investment-grid-config.service';
-import { InvestmentGridUtilService } from './services/investment-grid-util.service';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
 import { UtilService } from './services/util.service';
 import { ComponentReaderService } from './services/component-reader.service';
@@ -83,10 +79,6 @@ import { NavQuarterlyGridComponent } from './bulk-upload/nav-quarterly-grid/nav-
     ComponentReaderService,
     CapitalActivityService,
     UtilService,
-    InvestorGridUtilService,
-    InvestmentGridUtilService,
-    InvestorGridConfigService,
-    InvestmentGridConfigService,
     ModalService,
   ]
 })

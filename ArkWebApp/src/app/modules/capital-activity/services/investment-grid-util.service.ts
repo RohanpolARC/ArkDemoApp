@@ -93,7 +93,7 @@ export class InvestmentGridUtilService implements OnDestroy {
     }))
   }
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe);  
+    this.subscriptions.forEach(sub => sub.unsubscribe()); 
   }
 
   cellStyle (params) {

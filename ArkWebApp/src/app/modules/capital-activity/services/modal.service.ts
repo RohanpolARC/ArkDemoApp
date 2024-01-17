@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, combineLatest, of } from 'rxjs';
-import { map, switchMap, take, tap } from 'rxjs/operators';
+import { filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
 import { AssociateInvestment, CapitalActivityModel, CapitalInvestment, InvestmentSmall } from 'src/app/shared/models/CapitalActivityModel';
@@ -164,6 +164,7 @@ export class ModalService {
     )
 
     this.validationMessage$ = this.submitBtnClick$.pipe(
+      filter((value: boolean) => value),
       switchMap(() => combineLatest([this.submitBtnTextListener$, this.linkingCapitalIDs$, this.actionSuccessful$]).pipe(
         take(1),
         switchMap(([submitBtnText, linkingCapitalIDs, actionSuccessful]) => {

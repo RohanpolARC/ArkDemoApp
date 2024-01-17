@@ -5,11 +5,16 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { AdaptableApi, AdaptableReadyInfo } from '@adaptabletools/adaptable-angular-aggrid';
 import { ComponentReaderService } from '../services/component-reader.service';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
+import { InvestorGridUtilService } from '../services/investor-grid-util.service';
 
 @Component({
   selector: 'app-investor',
   templateUrl: './investor.component.html',
-  styleUrls: ['./investor.component.scss']
+  styleUrls: ['./investor.component.scss'],
+  providers: [
+    InvestorGridUtilService,
+    InvestorGridConfigService,
+  ]
 })
 export class InvestorComponent implements OnInit {
   @Input() rowData: any[];

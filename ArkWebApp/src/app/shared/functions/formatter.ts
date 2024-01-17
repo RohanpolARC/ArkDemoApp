@@ -211,6 +211,22 @@ export function DATE_FORMATTER_CONFIG_ddMMyyyy(dateFields: string[], format: str
     return formatCol;
 }
 
+export function DATE_FORMATTER_CONFIG_MMMyy(dateFields: string[], format: string = 'MMM-yy', IncludeGroupedRows: boolean =true){
+    let formatCol: FormatColumn = {
+        Scope: {
+            ColumnIds: dateFields,
+        },
+        DisplayFormat: {
+            Formatter: 'DateFormatter',
+            Options: {
+                Pattern: format,
+            },
+        },
+        IncludeGroupedRows: IncludeGroupedRows
+    }
+    return formatCol;
+}
+
 export function DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(dateTimeFields: string[], format: string = 'dd/MM/yyyy HH:mm', IncludeGroupedRows: boolean = true){
     let formatCol: FormatColumn = {        
         Scope: {

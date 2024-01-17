@@ -22,6 +22,8 @@
             [modules] = "agGridModules"
             [rowData] = "monthlyReturns"
             class="ag-theme-alpine ag-grid"
+            [adaptableOptions] = "adaptableOptions"
+            (adaptableReady)="onAdaptableReady($event)"
             >
             </ag-grid-angular>
         </mat-card>
