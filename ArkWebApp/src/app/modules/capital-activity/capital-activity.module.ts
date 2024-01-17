@@ -83,9 +83,7 @@ import { NavQuarterlyGridComponent } from './bulk-upload/nav-quarterly-grid/nav-
     ComponentReaderService,
     CapitalActivityService,
     UtilService,
-    InvestorGridUtilService,
     InvestmentGridUtilService,
-    InvestorGridConfigService,
     InvestmentGridConfigService,
     ModalService,
   ]
