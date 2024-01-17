@@ -56,11 +56,9 @@ export class IrrCalculationComponent implements OnInit {
     }
     delete this.calcParamsMap[params.pDisplayName]
 
-    console.log("Remove Tab")
     this.irrCalcSvc.parentTabs.forEach( (parentTab, index) => {
       parentTab.index = index + 1
     });
-    console.log(this.irrCalcSvc.parentTabs)
     this.portfolioModellerService.removeMatTab(params.index);
   }
 
@@ -160,8 +158,8 @@ export class IrrCalculationComponent implements OnInit {
     }
   }
 
-  onParentTabChanged(event:MatTabChangeEvent){
-    this.portfolioModellerService.updateTabGroupSelected(event.index,null,"Parent")
+  onParentTabChanged(){
+    this.portfolioModellerService.updateTabGroupSelected(this.selected.value,null,"Parent")
   }
 
   ngOnDestroy(){

@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MsalService } from '@azure/msal-angular';
-import { Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
 import { PutAccessModel } from 'src/app/shared/models/GeneralModel';
@@ -12,7 +12,13 @@ import { MsalUserService } from './msaluser.service';
 })
 export class AccessService {
 
-  accessibleTabs: {tab: string, isWrite: boolean}[] = null;
+  accessibleTabs : {tab: string, isWrite: boolean}[] = null;
+  accessibleTabsSubject = new BehaviorSubject<{tab: string, isWrite: boolean}[]>(null);
+  accessibleTabs$ = this.accessibleTabsSubject.asObservable();
+  updateAccessibleTabs(tabs: {tab: string, isWrite: boolean}[]){
+    this.accessibleTabsSubject.next(tabs)
+    this.accessibleTabs = tabs
+  }
   
   constructor(private http: HttpClient, 
               private msalService: MsalService) {

@@ -123,9 +123,9 @@ export class CashFlowsComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.portfolioModellerService.matTabRemoved$.subscribe( x => {
+    this.subscriptions.push(this.portfolioModellerService.matTabRemoved$.subscribe( x => {
       this.agGridScrollService.parentTabIndex = this.parentTab.index
-    })
+    }))
 
     this.irrCalcSvc.cashflowLoadStatusEvent.pipe(first()).subscribe({
       next:(e) => {

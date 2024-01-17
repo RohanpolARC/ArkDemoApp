@@ -20,7 +20,6 @@ export class AgGridScrollService{
     constructor(
         private portfolioModellerService:PortfolioModellerService
     ){ 
-        console.log(this.parentTabIndex +" "+this.childTabIndex)
         this.portfolioModellerService.tabGroupSelected$.pipe(
             filter(x => x.parentTabSelectedIndex == this.parentTabIndex && x.childTabSelectedIndex==this.childTabIndex)
         )    
@@ -45,59 +44,4 @@ export class AgGridScrollService{
         else
           this.scrollPosition.lastScrollPositionHorizontal = event.columnApi.getAllDisplayedVirtualColumns()[1].getColId()
     }
-
-
-    // scrollPosition: ScrollPosition = {
-    //     lastScrollPositionVertical:0,    
-    //     lastScrollPositionHorizontal:null
-    // }
-    // parentTabIndex: number = 0;
-    // childTabIndex: number = 0;
-    // gridApi: GridApi
-    // lastScrollPositions = new Map<number, Map<number, ScrollPosition>>();
-
-    // constructor(
-    //     private portfolioModellerService:PortfolioModellerService
-    // ){ 
-    //     console.log(this.parentTabIndex +" "+this.childTabIndex)
-    //     this.portfolioModellerService.tabGroupSelected$.pipe(
-    //         filter(x => x.parentTabSelectedIndex == this.parentTabIndex && x.childTabSelectedIndex==this.childTabIndex)
-    //     )    
-    //     .subscribe(() => {
-    //         let lastScrollPosition:ScrollPosition = this.getLastScrollPositions(this.parentTabIndex, this.childTabIndex)
-    //         if(lastScrollPosition && this.gridApi){            
-    //             this.updateAgGridLastScrollPosition(lastScrollPosition)
-    //         }
-    //     })
-    // }
-
-    // updateAgGridLastScrollPosition(lastScrollPosition:ScrollPosition){
-    //     this.gridApi.ensureIndexVisible(lastScrollPosition.lastScrollPositionVertical, null);
-    //     this.gridApi.ensureColumnVisible(lastScrollPosition.lastScrollPositionHorizontal,"start");
-    // }
-
-    // updateLastScrollPositions(parentTabIndex:number, childTabIndex:number, scrollPosition:ScrollPosition){
-    //     if(this.lastScrollPositions.get(parentTabIndex))
-    //         this.lastScrollPositions.get(parentTabIndex).set(childTabIndex, scrollPosition)
-    //     else
-    //         this.lastScrollPositions.set(parentTabIndex,new Map().set(childTabIndex, scrollPosition))
-    // }
-
-    // getLastScrollPositions(parentTabIndex:number, childTabIndex:number){
-    //     return this.lastScrollPositions?.get(parentTabIndex)?.get(childTabIndex)
-    // }
-
-    // onAgGridScroll(event:BodyScrollEvent){
-    //     this.scrollPosition.lastScrollPositionVertical = event.api.getLastDisplayedRow()
-        
-    //     if(event.columnApi.getAllDisplayedColumns()[0].getColId() == event.columnApi.getAllDisplayedVirtualColumns()[0].getColId())
-    //       this.scrollPosition.lastScrollPositionHorizontal = event.columnApi.getAllDisplayedVirtualColumns()[0].getColId()
-    //     else
-    //       this.scrollPosition.lastScrollPositionHorizontal = event.columnApi.getAllDisplayedVirtualColumns()[1].getColId()
-
-    //     this.updateLastScrollPositions(this.parentTabIndex, this.childTabIndex, this.scrollPosition)
-    // }
-
-    
-
 }

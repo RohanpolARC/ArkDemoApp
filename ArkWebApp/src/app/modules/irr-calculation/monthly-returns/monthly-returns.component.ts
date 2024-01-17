@@ -118,9 +118,9 @@ export class MonthlyReturnsComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.portfolioModellerService.matTabRemoved$.subscribe( x => {
+    this.subscriptions.push(this.portfolioModellerService.matTabRemoved$.subscribe( x => {
       this.agGridScrollService.parentTabIndex = this.parentTab.index
-    })
+    }))
 
     this.columnDefsMonthlyRets = [
       { field: 'asofDate', type:'abColDefDate', headerName: 'As Of Date', allowedAggFuncs: [], cellClass: 'dateUK', sort:'desc'},

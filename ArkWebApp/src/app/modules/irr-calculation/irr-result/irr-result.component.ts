@@ -57,7 +57,7 @@ export class IrrResultComponent implements OnInit {
   ]
 
   calcColDefs: ColDef[] = [    
-    { field: 'CapitalInvestedEur', type: 'abColDefNumber' },
+    { field: 'CapitalInvestedEur', type: 'abColDefNumber', minWidth: 180 },
     { field: 'RealizedProceedsEur', type: 'abColDefNumber', minWidth: 185 },
     { field: 'GrossCostAmountEur', type: 'abColDefNumber', minWidth: 180, hide: true },
     { field: 'CashCarryingValueEur', type: 'abColDefNumber', minWidth: 200 },
@@ -259,9 +259,9 @@ export class IrrResultComponent implements OnInit {
 
     this.Init();
 
-    this.portfolioModellerService.matTabRemoved$.subscribe( x => {
+    this.subscriptions.push(this.portfolioModellerService.matTabRemoved$.subscribe( x => {
       this.agGridScrollService.parentTabIndex = this.parentTab.index
-    })
+    }))
 
     this.irrCalcSvc.cashflowLoadStatusEvent.pipe(takeUntil(this.closeStream)).subscribe(
       e => {
