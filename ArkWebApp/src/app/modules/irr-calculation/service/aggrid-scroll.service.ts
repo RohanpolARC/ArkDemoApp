@@ -37,11 +37,15 @@ export class AgGridScrollService{
     }
 
     onAgGridScroll(event:BodyScrollEvent){
-        this.scrollPosition.lastScrollPositionVertical = event.api.getLastDisplayedRow()
+        if(!(event.columnApi.getAllDisplayedColumns()[0].getColId() == event.columnApi.getAllDisplayedVirtualColumns()[0].getColId()
+         && event.api.getFirstDisplayedRow() == 0)
+        ){
+            this.scrollPosition.lastScrollPositionVertical = event.api.getLastDisplayedRow()
         
-        if(event.columnApi.getAllDisplayedColumns()[0].getColId() == event.columnApi.getAllDisplayedVirtualColumns()[0].getColId())
-          this.scrollPosition.lastScrollPositionHorizontal = event.columnApi.getAllDisplayedVirtualColumns()[0].getColId()
-        else
-          this.scrollPosition.lastScrollPositionHorizontal = event.columnApi.getAllDisplayedVirtualColumns()[1].getColId()
+            if(event.columnApi.getAllDisplayedColumns()[0].getColId() == event.columnApi.getAllDisplayedVirtualColumns()[0].getColId())
+            this.scrollPosition.lastScrollPositionHorizontal = event.columnApi.getAllDisplayedVirtualColumns()[0].getColId()
+            else
+            this.scrollPosition.lastScrollPositionHorizontal = event.columnApi.getAllDisplayedVirtualColumns()[1].getColId()
+        }        
     }
 }
