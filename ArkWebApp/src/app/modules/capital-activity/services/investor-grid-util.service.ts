@@ -24,6 +24,8 @@ export class InvestorGridUtilService implements OnDestroy{
   rowData:any
 
   init(){
+    // editActionClick observable is subscribed with switch map to cancel out any previous api requests and pass in only the latest api response.
+    // In case of where user clicks multiple times on Edit Action this will prevent the modal not populating older api response but with data of latest api request.
     this.subscriptions.push(this.editActionClick$.pipe(
       switchMap(() => this.capitalActivitySvc.getCapitalInvestment(this.rowData.capitalID)) 
     )

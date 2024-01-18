@@ -7,7 +7,7 @@ import { BehaviorSubject, Observable } from "rxjs";
 
 @Injectable()
 // This Service is to retain the AgGrid's Last Scroll Positions on Parent and Child Angular MatTab Changed event
-// This service has to be injected on Component level to maintain and retain last scroll position of each MatTab component
+// This service has to be injected on Component level to maintain and retain last scroll position of grid each MatTab component
 export class AgGridScrollService{
     scrollPosition: ScrollPosition = {
         lastScrollPositionVertical:0,    
@@ -45,10 +45,6 @@ export class AgGridScrollService{
     }
 
     onAgGridScroll(event:BodyScrollEvent){
-        console.log(event)
-        // if(!(event.columnApi.getAllDisplayedColumns()[0].getColId() == event.columnApi.getAllDisplayedVirtualColumns()[0].getColId()
-        //  && event.api.getFirstDisplayedRow() == 0)
-        // ){
         if(this.allowAgGridScrollEvent){        
             this.scrollPosition.lastScrollPositionVertical = event.api.getLastDisplayedRow()
         
@@ -56,7 +52,6 @@ export class AgGridScrollService{
             this.scrollPosition.lastScrollPositionHorizontal = event.columnApi.getAllDisplayedVirtualColumns()[0].getColId()
             else
             this.scrollPosition.lastScrollPositionHorizontal = event.columnApi.getAllDisplayedVirtualColumns()[2].getColId()
-        }
-        // }        
+        }       
     }
 }

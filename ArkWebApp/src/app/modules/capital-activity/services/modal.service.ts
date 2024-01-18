@@ -164,6 +164,7 @@ export class ModalService {
     )
 
     this.validationMessage$ = this.submitBtnClick$.pipe(
+      // Allowing only true value events emitted since we dont want to perform further actions on while observable having false value as that is updated on cleanupSubjects()
       filter((value: boolean) => value),
       switchMap(() => combineLatest([this.submitBtnTextListener$, this.linkingCapitalIDs$, this.actionSuccessful$]).pipe(
         take(1),

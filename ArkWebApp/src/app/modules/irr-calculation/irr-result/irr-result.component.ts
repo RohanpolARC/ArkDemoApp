@@ -259,6 +259,8 @@ export class IrrResultComponent implements OnInit {
 
     this.Init();
 
+    // matTabRemoved$ observable is updated on when a matTab is closed 
+    // on the above event we update the parentTabIndex to the property in its associated agGridScrollService as the Scroll Service should have its latest index values to track scroll positions 
     this.subscriptions.push(this.portfolioModellerService.matTabRemoved$.subscribe( x => {
       this.agGridScrollService.parentTabIndex = this.parentTab.index
     }))
