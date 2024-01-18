@@ -97,10 +97,23 @@ export class UtilService {
     });
 
     dialogRef.afterClosed().pipe(first()).subscribe((result) => {
-      
-      if(dialogRef.componentInstance.isActionSuccessful){
-        this.loadInvestmentData();
+     
+      if(actionType === 'ADD' && dialogRef.componentInstance.isActionSuccessful){
         this.loadInvestorData();  
+      }
+
+      else if(actionType === 'EDIT' && dialogRef.componentInstance.isActionSuccessful && data.isLinked){
+        this.loadInvestorData();  
+        this.loadInvestmentData();
+      }
+
+      else if(actionType === 'EDIT' && dialogRef.componentInstance.isActionSuccessful && !data.isLinked){
+        this.loadInvestorData();  
+      }
+
+      else if(actionType === 'LINK-ADD' && dialogRef.componentInstance.isActionSuccessful){
+        this.loadInvestorData();  
+        this.loadInvestmentData();
       }
     })
   }
