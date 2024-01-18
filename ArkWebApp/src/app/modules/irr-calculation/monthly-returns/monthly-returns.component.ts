@@ -74,7 +74,6 @@ export class MonthlyReturnsComponent implements OnInit {
     params['baseMeasureID'] = 3;
     this.subscriptions.push(this.monthlyReturnSvc.getMonthlyReturns(params).subscribe({
       next: (data: any[]) => {
-        this.status.emit('Loaded')
 
         let monthlyReturns = []
         data?.forEach(ret => {
@@ -85,6 +84,8 @@ export class MonthlyReturnsComponent implements OnInit {
         })
 
         this.monthlyReturns = monthlyReturns
+        
+        this.status.emit('Loaded')
       },
       error: (error) => {
         console.error(`Failed to get returns : ${error}`)
@@ -168,7 +169,10 @@ export class MonthlyReturnsComponent implements OnInit {
       rowBuffer:0,
       onBodyScroll: (event:BodyScrollEvent) => {
         this.agGridScrollService.onAgGridScroll(event)
-      }
+      },
+      onGridSizeChanged(event) {
+        autosizeColumnExceptResized(event)
+      },
     }
 
     this.adaptableOptions = {

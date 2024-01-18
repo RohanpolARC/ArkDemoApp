@@ -2,7 +2,7 @@ import { BodyScrollEvent, GridApi, GridOptions } from "@ag-grid-community/core";
 import { Injectable } from "@angular/core";
 import { ScrollPosition } from "src/app/shared/models/IRRCalculationsModel";
 import { PortfolioModellerService } from "./portfolio-modeller.service";
-import { filter } from "rxjs/operators";
+import { filter, tap } from "rxjs/operators";
 import { BehaviorSubject, Observable } from "rxjs";
 
 @Injectable()
@@ -16,15 +16,23 @@ export class AgGridScrollService{
     parentTabIndex: number = 0;
     childTabIndex: number = 0;
     gridApi: GridApi
+    allowAgGridScrollEvent: boolean = false;
 
     constructor(
         private portfolioModellerService:PortfolioModellerService
     ){ 
         this.portfolioModellerService.tabGroupSelected$.pipe(
+            tap(x => {
+                if(x.parentTabSelectedIndex != this.parentTabIndex && x.childTabSelectedIndex!=this.childTabIndex){
+                    this.allowAgGridScrollEvent = false;
+                }
+            }),
             filter(x => x.parentTabSelectedIndex == this.parentTabIndex && x.childTabSelectedIndex==this.childTabIndex)
         )    
         .subscribe(() => {
             if(this.scrollPosition && this.gridApi){
+                
+                this.allowAgGridScrollEvent = true;
                 this.updateAgGridLastScrollPosition()
             }
             
@@ -37,15 +45,18 @@ export class AgGridScrollService{
     }
 
     onAgGridScroll(event:BodyScrollEvent){
-        if(!(event.columnApi.getAllDisplayedColumns()[0].getColId() == event.columnApi.getAllDisplayedVirtualColumns()[0].getColId()
-         && event.api.getFirstDisplayedRow() == 0)
-        ){
+        console.log(event)
+        // if(!(event.columnApi.getAllDisplayedColumns()[0].getColId() == event.columnApi.getAllDisplayedVirtualColumns()[0].getColId()
+        //  && event.api.getFirstDisplayedRow() == 0)
+        // ){
+        if(this.allowAgGridScrollEvent){        
             this.scrollPosition.lastScrollPositionVertical = event.api.getLastDisplayedRow()
         
             if(event.columnApi.getAllDisplayedColumns()[0].getColId() == event.columnApi.getAllDisplayedVirtualColumns()[0].getColId())
             this.scrollPosition.lastScrollPositionHorizontal = event.columnApi.getAllDisplayedVirtualColumns()[0].getColId()
             else
-            this.scrollPosition.lastScrollPositionHorizontal = event.columnApi.getAllDisplayedVirtualColumns()[1].getColId()
-        }        
+            this.scrollPosition.lastScrollPositionHorizontal = event.columnApi.getAllDisplayedVirtualColumns()[2].getColId()
+        }
+        // }        
     }
 }
