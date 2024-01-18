@@ -149,8 +149,6 @@ export class AppComponent {
       let accounts = this.msalSvc.msalSvc.instance.getAllAccounts();
       this.msalSvc.msalSvc.instance.setActiveAccount(accounts[0]);
     }
-
-    return activeAccount
   }
 
   ngOnInit(): void { 
@@ -158,31 +156,28 @@ export class AppComponent {
       sessionStorage.setItem('lastClickedTabRoute',this.location.path())
     }
 
-    // This will enable ACCOUNT_ADDED and ACCOUNT_REMOVED events emitted when a user logs in or out of another tab or window
-    this.msalSvc.msalSvc.instance.enableAccountStorageEvents();
+
     this.subscriptions.push(this.msalBroadcastSvc.msalSubject$
-    .pipe(
-      filter((msg: EventMessage) => msg.eventType === EventType.ACCOUNT_ADDED || msg.eventType === EventType.ACCOUNT_REMOVED),
-    )
     .subscribe((result: EventMessage) => {
-      if (this.msalSvc.msalSvc.instance.getAllAccounts().length === 0) {
-        window.location.pathname = "/";
+      if(result.eventType === EventType.LOGIN_SUCCESS || result.eventType === EventType.SSO_SILENT_SUCCESS){
+
+        this.checkAndSetActiveAccount();
+        this.fetchTabs();
+        this.userName=this.dataService.getCurrentUserName();  
       }
-    }));
-  
-    this.subscriptions.push(this.msalBroadcastSvc.inProgress$
-    .pipe(
-      filter((status: InteractionStatus) => status === InteractionStatus.None),
-    )
-    .subscribe(() => {
-      this.checkAndSetActiveAccount();
-      this.fetchTabs();
-      this.userName=this.dataService.getCurrentUserName();
+      // if refresh token is expired the msal will redirect itself to microsoft login.
+      else if(result.eventType === EventType.ACQUIRE_TOKEN_FAILURE || result.eventType === EventType.ACQUIRE_TOKEN_BY_CODE_FAILURE){
+        this.msalSvc.msalSvc.loginRedirect();
+        
+      }
     }))
 
+    this.checkAndSetActiveAccount();
+    this.fetchTabs();
+    this.userName=this.dataService.getCurrentUserName();
 
-    /** On Initial Load (If screen is directly loaded from the url)*/
-    /** If Cash Balance screen is directly loaded */
+      /** On Initial Load (If screen is directly loaded from the url)*/
+      /** If Cash Balance screen is directly loaded */
     if(this.location.path() === '/cash-balance'){
       this.updateSelection('Cash Balance')
     }
