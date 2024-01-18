@@ -37,9 +37,6 @@ export class CommonConfig{
           return getMomentDateStrFormat(params.value,'DD/MM/YYYY')
         return params.value;
       },
-      onGridSizeChanged(event) {
-        autosizeColumnExceptResized(event)
-      },
       onFirstDataRendered(event) {
         autosizeColumnExceptResized(event)
       },

@@ -74,7 +74,6 @@ export class MonthlyReturnsComponent implements OnInit {
     params['baseMeasureID'] = 3;
     this.subscriptions.push(this.monthlyReturnSvc.getMonthlyReturns(params).subscribe({
       next: (data: any[]) => {
-        this.status.emit('Loaded')
 
         let monthlyReturns = []
         data?.forEach(ret => {
@@ -85,6 +84,8 @@ export class MonthlyReturnsComponent implements OnInit {
         })
 
         this.monthlyReturns = monthlyReturns
+        
+        this.status.emit('Loaded')
       },
       error: (error) => {
         console.error(`Failed to get returns : ${error}`)
@@ -118,6 +119,8 @@ export class MonthlyReturnsComponent implements OnInit {
 
   ngOnInit(): void {
 
+    // matTabRemoved$ observable is updated on when a matTab is closed 
+    // on the above event we update the parentTabIndex to the property in its associated agGridScrollService as the Scroll Service should have its latest index values to track scroll positions.
     this.subscriptions.push(this.portfolioModellerService.matTabRemoved$.subscribe( x => {
       this.agGridScrollService.parentTabIndex = this.parentTab.index
     }))
@@ -168,7 +171,10 @@ export class MonthlyReturnsComponent implements OnInit {
       rowBuffer:0,
       onBodyScroll: (event:BodyScrollEvent) => {
         this.agGridScrollService.onAgGridScroll(event)
-      }
+      },
+      onGridSizeChanged(event) {
+        autosizeColumnExceptResized(event)
+      },
     }
 
     this.adaptableOptions = {

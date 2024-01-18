@@ -13,6 +13,8 @@ import { MsalUserService } from './msaluser.service';
 export class AccessService {
 
   accessibleTabs : {tab: string, isWrite: boolean}[] = null;
+
+  // accessibleTabs$: BehaviorSubject and Observable created to wait for this accesible tabs to be fetched before logical check of canActivate in Role Guard.
   accessibleTabsSubject = new BehaviorSubject<{tab: string, isWrite: boolean}[]>(null);
   accessibleTabs$ = this.accessibleTabsSubject.asObservable();
   updateAccessibleTabs(tabs: {tab: string, isWrite: boolean}[]){

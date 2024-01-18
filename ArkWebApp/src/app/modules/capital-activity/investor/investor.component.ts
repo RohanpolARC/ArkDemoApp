@@ -11,6 +11,7 @@ import { InvestorGridUtilService } from '../services/investor-grid-util.service'
   selector: 'app-investor',
   templateUrl: './investor.component.html',
   styleUrls: ['./investor.component.scss'],
+  // Grid Config and Util Services injected on component level so that config, services can be added to grid on every ngOnInit() and unsubscribe the subscriptions in services on component ngOnDestroy()
   providers: [
     InvestorGridUtilService,
     InvestorGridConfigService,
