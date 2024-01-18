@@ -23,7 +23,7 @@ export class AgGridScrollService{
     ){ 
         this.portfolioModellerService.tabGroupSelected$.pipe(
             tap(x => {
-                if(x.parentTabSelectedIndex != this.parentTabIndex && x.childTabSelectedIndex!=this.childTabIndex){
+                if(!(x.parentTabSelectedIndex == this.parentTabIndex && x.childTabSelectedIndex==this.childTabIndex)){
                     this.allowAgGridScrollEvent = false;
                 }
             }),
@@ -32,8 +32,8 @@ export class AgGridScrollService{
         .subscribe(() => {
             if(this.scrollPosition && this.gridApi){
                 
+                this.updateAgGridLastScrollPosition()                
                 this.allowAgGridScrollEvent = true;
-                this.updateAgGridLastScrollPosition()
             }
             
         })
