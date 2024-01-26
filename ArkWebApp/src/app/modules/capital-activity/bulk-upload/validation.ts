@@ -12,6 +12,7 @@ let actualCols: string[] = [
     'Wso Asset ID',
     'Asset (optional)',
     'Narative (optional)',
+    'Strategy/Currency'
 ]
 
 let refData;
@@ -40,6 +41,7 @@ export function validateRowForEmptiness(row: any): void{
             'Narative (optional)', 
             // 'Wso Issuer ID', 
             'Wso Asset ID',
+            'Strategy/Currency'
             // 'Fund Currency',
             // 'GIR Override'
         ].indexOf(actualCols[i]) === -1){
@@ -86,6 +88,11 @@ export function validateRowValueRange(row: any): void{
         invalidMsg += ` Fund Currency ${String(row['Fund Currency'])} not in range`
     }
 
+    if(!!row['Strategy/Currency'] && (refOptions.strategies.indexOf(String(row['Strategy/Currency']).trim()) === -1)){
+        invalidMsg += (invalidMsg === '') ? '' : ',';
+        invalidMsg += ` Strategy/Currency ${String(row['Strategy/Currency'])} not in range`;
+    }
+    
     // if(!!row['Position Currency'] && (refOptions.posCcys.indexOf(String(row['Position Currency']).trim()) === -1)){
     //     invalidMsg += (invalidMsg === '') ? '' : ','
     //     invalidMsg += ` Position Currency ${String(row['Position Currency'])} not in range`
@@ -130,7 +137,7 @@ export function validateRow(row: any):void {
     validateRowValueMappings(row);
 }
 
-export function validateExcelRows(rows: any[], ref: {capitalTypes: string[], capitalSubTypes: string[], refData: any}): {isValid: boolean, invalidRows?: {row: any, remark: string}[]} {
+export function validateExcelRows(rows: any[], ref: {capitalTypes: string[], capitalSubTypes: string[], strategies: string[], refData: any}): {isValid: boolean, invalidRows?: {row: any, remark: string}[]} {
 
     refData = ref.refData
     refOptions = getUniqueOptions(ref);

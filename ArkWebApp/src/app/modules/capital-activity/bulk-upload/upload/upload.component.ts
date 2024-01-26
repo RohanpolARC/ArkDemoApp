@@ -39,8 +39,8 @@ export class UploadComponent implements OnInit, OnDestroy {
   getSaveState: () => 'PENDING' | 'SUCCESS' | 'FAILURE' = this.uploadSvc.getSaveState.bind(this.uploadSvc)
   preprocessData: (headers: string[], data: any[]) => any[]
   validateExcelRows: (rows: any[], ref: {
-    capitalTypes: string[], capitalSubTypes: string[], refData: any
-  } | { fundhedgings: string[] }) => {
+    capitalTypes: string[], capitalSubTypes: string[], strategies: string[], refData: any
+  } | { fundhedgings: string[], strategies: string[] }) => {
     isValid: boolean, 
     invalidRows?: {
       row: any, remark: string
@@ -137,12 +137,14 @@ export class UploadComponent implements OnInit, OnDestroy {
         validationResult = this.validateExcelRows(processedData, {
           capitalTypes: this.data.capitalTypes,
           capitalSubTypes: this.data.capitalSubTypes,
+          strategies: this.data.strategies,
           refData: this.data.refData
         });
       }
       else if(this.selectedTemplate === 'NAV Quarterly'){
         validationResult = this.validateExcelRows(processedData, {
-          fundhedgings: [...new Set(<string>this.data.refData?.map(r => <string>r?.['fundHedging']))]
+          fundhedgings: [...new Set(<string>this.data.refData?.map(r => <string>r?.['fundHedging']))],
+          strategies: this.data.strategies
         })
       }
 

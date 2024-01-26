@@ -19,6 +19,7 @@ export class ActivitiesGridUtilService {
     'Wso Asset ID',
     'Asset (optional)',
     'Narative (optional)',
+    'Strategy/Currency'
   ]
   validateHeaders(actualColumns: string[], fileColumns: string[]): ValidateColumn {
 
@@ -60,7 +61,7 @@ export class ActivitiesGridUtilService {
 
   validateExcelRows: (rows: any[], 
     ref: {
-      capitalTypes: string[], capitalSubTypes: string[], refData: any
+      capitalTypes: string[], capitalSubTypes: string[], strategies: string[], refData: any
     }
   )=> {
     isValid: boolean, invalidRows?: {

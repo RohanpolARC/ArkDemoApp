@@ -26,6 +26,7 @@ export class UtilService {
   investmentAdaptableApi: AdaptableApi
   capitalTypeOptions: string[] = [];
   capitalSubTypeOptions: string[] = [];
+  strategyOptions: string[] = [];
   capitalTypeSubtypeAssociation = [];
   refData: any[] = []
   component: IPropertyReader
@@ -63,6 +64,7 @@ export class UtilService {
 
         res?.[0]?.['capitalType'].forEach((capitaltype: string) => { this.capitalTypeOptions.push(capitaltype) } )
         res?.[0]?.['capitalSubType'].forEach((capitalsubtype: string) => { this.capitalSubTypeOptions.push(capitalsubtype) } )
+        res?.[0]?.['strategy'].forEach((strategy: string) => { this.strategyOptions.push(strategy) } )
 
         this.refData = res?.[0]?.['portfolio_Info'];
 
@@ -87,6 +89,7 @@ export class UtilService {
         actionType: actionType,
         capitalTypes: this.capitalTypeOptions,
         capitalSubTypes: this.capitalSubTypeOptions,
+        strategies: this.strategyOptions,
         capitalTypeSubtypeAssociation: this.capitalTypeSubtypeAssociation,
         refData: this.refData,
         gridData: gridData
@@ -111,6 +114,7 @@ export class UtilService {
         adaptableApiInvestor: this.investorAdaptableApi,
         capitalTypes: this.capitalTypeOptions,
         capitalSubTypes: this.capitalSubTypeOptions,
+        strategies: this.strategyOptions,
         refData: this.refData
 
       },
