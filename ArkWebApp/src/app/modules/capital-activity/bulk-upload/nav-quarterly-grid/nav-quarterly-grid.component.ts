@@ -32,10 +32,11 @@ export class NavQuarterlyGridComponent implements OnInit {
     { field: 'Carried Interest Provision ', headerName: 'Carried Interest Provision ', tooltipField:'Carried Interest Provision ', valueFormatter: AmountOrZeroFormatter},
     { field: 'Rebate ITD', maxWidth: 150, headerName: 'Rebate ITD', tooltipField:'Rebate ITD', valueFormatter: AmountOrZeroFormatter},
     { field: 'Advanced Tax', maxWidth: 150, valueFormatter: AmountOrZeroFormatter },
-    { field:'Net forward contract movements ITD',maxWidth:150,headerName:'Net forward contract movements ITD',tooltipField:'Net forward contract movements ITD',valueFormatter:AmountOrZeroFormatter},
-    { field:'Total foreign exchange movements ITD',maxWidth:150,headerName:'Total foreign exchange movements ITD',tooltipField:'Total foreign exchange movements ITD',valueFormatter:AmountOrZeroFormatter},
-    { field:'Total Operating exp (excluded GPS) ITD',maxWidth:150,headerName:'Total Operating exp (excluded GPS) ITD',tooltipField:'Total Operating exp (excluded GPS) ITD',valueFormatter:AmountOrZeroFormatter},
-    { field:'GPS ITD',maxWidth:150,headerName:'GPS ITD',tooltipField:'GPS ITD',valueFormatter:AmountOrZeroFormatter},
+    { field: 'Net forward contract movements ITD',maxWidth:150,headerName:'Net forward contract movements ITD',tooltipField:'Net forward contract movements ITD',valueFormatter:AmountOrZeroFormatter},
+    { field: 'Total foreign exchange movements ITD',maxWidth:150,headerName:'Total foreign exchange movements ITD',tooltipField:'Total foreign exchange movements ITD',valueFormatter:AmountOrZeroFormatter},
+    { field: 'Total Operating exp (excluded GPS) ITD',maxWidth:150,headerName:'Total Operating exp (excluded GPS) ITD',tooltipField:'Total Operating exp (excluded GPS) ITD',valueFormatter:AmountOrZeroFormatter},
+    { field: 'GPS ITD' ,maxWidth:150,headerName:'GPS ITD',tooltipField:'GPS ITD',valueFormatter:AmountOrZeroFormatter},
+    { field: 'Strategy/Currency', maxWidth: 150, tooltipField: 'Strategy/Currency'},
     { field: 'remark', width: 500, tooltipField: 'remark'},
     { field: '_ROW_ID', headerName: 'Row', maxWidth: 100},
   ]
@@ -120,7 +121,7 @@ export class NavQuarterlyGridComponent implements OnInit {
       layout = {
         Name: 'NAV Quarterly',
         Columns: [
-        'Fund Hedging','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates','Organisational costs unamortised','Subscription costs & leverage costs unamortised','Carried Interest Provision ','Rebate ITD','Advanced Tax','Net forward contract movements ITD','Total foreign exchange movements ITD','Total Operating exp (excluded GPS) ITD','GPS ITD','_ROW_ID'
+        'Fund Hedging','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates','Organisational costs unamortised','Subscription costs & leverage costs unamortised','Carried Interest Provision ','Rebate ITD','Advanced Tax','Net forward contract movements ITD','Total foreign exchange movements ITD','Total Operating exp (excluded GPS) ITD','GPS ITD','Strategy/Currency','_ROW_ID'
 
         ],
         PinnedColumnsMap: {
@@ -136,7 +137,7 @@ export class NavQuarterlyGridComponent implements OnInit {
       layout = {
         Name: 'Invalid Excel Grid',
         Columns: [
-        'Fund Hedging','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates','Organisational costs unamortised','Subscription costs & leverage costs unamortised','Carried Interest Provision ','Rebate ITD','Advanced Tax','Net forward contract movements ITD','Total foreign exchange movements ITD','Total Operating exp (excluded GPS) ITD','GPS ITD','remark','_ROW_ID'
+        'Fund Hedging','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates','Organisational costs unamortised','Subscription costs & leverage costs unamortised','Carried Interest Provision ','Rebate ITD','Advanced Tax','Net forward contract movements ITD','Total foreign exchange movements ITD','Total Operating exp (excluded GPS) ITD','GPS ITD','Strategy/Currency','remark','_ROW_ID'
 
         ],
         PinnedColumnsMap: {

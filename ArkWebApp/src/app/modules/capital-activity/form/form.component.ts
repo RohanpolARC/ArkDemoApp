@@ -4,7 +4,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/CapitalActivityModel';
 import { Subscription } from 'rxjs';
 import { Observable } from 'rxjs';
-import { startWith, map, tap } from 'rxjs/operators';
+import { startWith, map, tap, distinctUntilChanged } from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { ModalService } from '../services/modal.service';
@@ -28,6 +28,7 @@ export class FormComponent implements OnInit{
       actionType: 'LINK-ADD' | 'ADD' | 'EDIT',
       capitalTypes: string[],
       capitalSubTypes: string[],
+      strategies: string[],
       capitalTypeSubtypeAssociation: any,
       refData: any,
       gridData: any
@@ -40,6 +41,7 @@ export class FormComponent implements OnInit{
 
   capitalTypeFilteredOptions: Observable<string[]>;
   capitalSubTypeFilteredOptions: Observable<string[]>;
+  strategyFilteredOptions: Observable<string[]>;
   fundHedgingFilteredOptions: Observable<string[]>;
   assetFilteredOptions: Observable<[string, number][]>;
   issuerFilteredOptions: Observable<[string, string, number][]>;
@@ -47,8 +49,8 @@ export class FormComponent implements OnInit{
   posCcyFilteredOptions: Observable<string[]>;
   actionType: 'LINK-ADD' | 'ADD' | 'EDIT'
   gridData: any[] = [];  
-  isNAVType: boolean;  // Hiding issuer and asset when CapitalType = 'NAV' or multiple issuers have been selected during linking
-  isMultipleIssuers: boolean;
+  isNAVType: boolean = false;  // Hiding issuer and asset when CapitalType = 'NAV' or multiple issuers have been selected during linking
+  isMultipleIssuers: boolean = false;
 
   form = new FormGroup({
     valueDate: new FormControl(null, Validators.required),
@@ -56,6 +58,7 @@ export class FormComponent implements OnInit{
     narrative: new FormControl(null),
     capitalType: new FormControl(null, Validators.required),
     capitalSubType: new FormControl(null, Validators.required),
+    strategy: new FormControl(null),
     fundCcy: new FormControl(null, Validators.required),
     totalAmount: new FormControl(null, Validators.required),
     fundHedging: new FormControl(null, Validators.required),
@@ -104,6 +107,13 @@ export class FormComponent implements OnInit{
         return (this.formUtilSvc._filterAsset(value))
       })
     )
+
+    this.strategyFilteredOptions = this.form.get('strategy').valueChanges.pipe(
+      startWith(''),
+      map(value => {
+        return (this.formUtilSvc._filter(this.formUtilSvc.strategyOptions, value))
+      })
+    )
     
     this.fundCcyFilteredOptions = this.form.get('fundCcy').valueChanges.pipe(
       startWith(''),
@@ -113,6 +123,12 @@ export class FormComponent implements OnInit{
     this.capitalTypeFilteredOptions = this.form.get('capitalType').valueChanges.pipe( 
       startWith(''), 
       tap((capitalType: any) => {
+
+        // Received value from valuechanges != form.get('capitaltype).value.
+        // RHS has the latest value that we need whilst the valuechanges has been triggered for '' (from startWith).
+        // Observed that valuechanges is not getting triggered for patchValue() calls made inside ngOnInit. Only getting triggered for it's input value of '' or any UI based user edits.
+
+        capitalType = this.form.get('capitalType').value;
 
         this.formUtilSvc.setSubtypeOptions(capitalType);
         if(!this.formUtilSvc.capitalSubTypeOptions.includes(this.form.get('capitalSubType').value)){
@@ -126,7 +142,7 @@ export class FormComponent implements OnInit{
         }
         else 
           this.isNAVType = false;
-      }),
+        }),
       map(value => this.formUtilSvc._filter(this.formUtilSvc.capitalTypeOptions, value)),
 
     )
@@ -136,7 +152,6 @@ export class FormComponent implements OnInit{
     )
   }
   ngOnInit(): void {
-
     this.formUtilSvc.refData = this.data.refData;
     this.formUtilSvc.capitalTypeSubtypeAssociation = this.data.capitalTypeSubtypeAssociation;
 
@@ -150,6 +165,7 @@ export class FormComponent implements OnInit{
     
     this.formUtilSvc.capitalTypeOptions = this.data.capitalTypes;
     this.formUtilSvc.capitalSubTypeOptions = this.data.capitalSubTypes;
+    this.formUtilSvc.strategyOptions = this.data.strategies;
 
     for(let i = 0; i < this.data.refData.length; i+= 1){
       if(!!this.data.refData[i].fundHedging){
@@ -193,6 +209,7 @@ export class FormComponent implements OnInit{
         narrative: narrative,
         capitalType: null,
         capitalSubType: null,
+        strategy: null,
         fundCcy: FundCcy,
         totalAmount: investmentsBaseAmount,
         fundHedging: FH,
@@ -208,28 +225,30 @@ export class FormComponent implements OnInit{
     {
       this.gridData = this.data.gridData;
 
-      this.formUtilSvc.selectedIssuerID = this.data.rowData.wsoIssuerID;  // Issuer ID for the EDIT row;
-      this.formUtilSvc.selectedAssetID = this.data.rowData.wsoAssetID;
+      let row = this.data.rowData;
+      this.formUtilSvc.selectedIssuerID = row.wsoIssuerID;  // Issuer ID for the EDIT row;
+      this.formUtilSvc.selectedAssetID = row?.['wsoAssetID'];
       
       // Dynamic options for EDIT
-      this.formUtilSvc.setDynamicOptions(this.data.rowData.fundHedging, this.data.rowData.issuerShortName, this.data.rowData.asset);
+      this.formUtilSvc.setDynamicOptions(row?.['fundHedging'], row?.['issuerShortName'], row?.['asset']);
       this.form.patchValue({
-        valueDate: this.data.rowData.valueDate,
-        callDate: this.data.rowData.callDate,
-        narrative: this.data.rowData.narrative,
-        capitalType: this.data.rowData.capitalType,
-        capitalSubType: this.data.rowData.capitalSubType,
-        fundCcy: this.data.rowData.fundCcy,
-        totalAmount: this.data.rowData.totalAmount,
-        fundHedging: this.data.rowData.fundHedging,
-        issuerShortName: this.data.rowData.issuerShortName,
-        asset: this.data.rowData.asset,
+        valueDate: row?.['valueDate'],
+        callDate: row?.['callDate'],
+        narrative: row?.['narrative'],
+        capitalType: row?.['capitalType'],
+        capitalSubType: row?.['capitalSubType'],
+        strategy: row?.['strategy'],
+        fundCcy: row?.['fundCcy'],
+        totalAmount: row?.['totalAmount'],
+        fundHedging: row?.['fundHedging'],
+        issuerShortName: row?.['issuerShortName'],
+        asset: row?.['asset'],
       })
 
         /* totalAmount wasn't getting set from the above patch statement. Hence, manually setting it up */
-      this.form.patchValue({totalAmount: this.data.rowData.totalAmount})
-      this.formUtilSvc.setSubtypeOptions(this.data.rowData.capitalType);
-      
+      this.form.patchValue({totalAmount: row?.['totalAmount']})
+      this.formUtilSvc.setSubtypeOptions(row?.['capitalType']);
+
     }
   }
 

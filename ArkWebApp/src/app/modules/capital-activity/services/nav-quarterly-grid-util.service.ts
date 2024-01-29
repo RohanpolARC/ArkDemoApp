@@ -12,7 +12,7 @@ export class NavQuarterlyGridUtilService {
     'Fund Hedging', 'Quarter End', 'NAV per FS', 'Deferred loan origination fee income',
     'Current Period Rebates', 'Organisational costs unamortised', 'Subscription costs & leverage costs unamortised', 'Carried Interest Provision ',
     'Rebate ITD', 'Advanced Tax', 'Total foreign exchange movements ITD', 'Net forward contract movements ITD', 'Total Operating exp (excluded GPS) ITD',
-     'GPS ITD'
+     'GPS ITD', 'Startegy/Currency'
 
   ]
 
@@ -75,13 +75,13 @@ export class NavQuarterlyGridUtilService {
   }
 
   validateExcelRows(rows: any[], ref: {
-    fundhedgings: string[]
+    fundhedgings: string[], strategies: string[]
   }): {isValid: boolean, invalidRows?: {row: any, remark: string}[]} {
     
     let invalidRows: any[] = [];
 
     for(let i: number = 0; i < rows.length; i+= 1){
-      let invalidMsg = this.validateRow(rows[i], ref.fundhedgings) || '';
+      let invalidMsg = this.validateRow(rows[i], ref.fundhedgings, ref.strategies) || '';
       if(invalidMsg === '')
         continue;
       else
@@ -91,7 +91,7 @@ export class NavQuarterlyGridUtilService {
     return invalidRows.length ? { isValid: false, invalidRows: invalidRows } : { isValid: true }
   }
 
-  validateRow(row: any, fundhedgings: string[]): string {
+  validateRow(row: any, fundhedgings: string[], strategies: string[]): string {
     let invalidmsg: string = '';
 
     if(Number((new Date(row?.['Quarter End'])).getFullYear) < 2012){
@@ -102,6 +102,11 @@ export class NavQuarterlyGridUtilService {
     if(row['Fund Hedging'] && !fundhedgings?.includes(row['Fund Hedging'])){
       invalidmsg += (invalidmsg === '') ? '' : ','
       invalidmsg += 'Fund hedging not part of the allowed list';
+    }
+
+    if(row['Strategy/Currency'] && !strategies?.includes(row['Strategy/Currency'])){
+      invalidmsg += (invalidmsg === '') ? '' : ','
+      invalidmsg += 'Strategy/Currency not part of the allowed list';
     }
 
     if(row['NAV per FS'] < 0){

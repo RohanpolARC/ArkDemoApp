@@ -7,6 +7,7 @@ export interface CapitalActivityModel{
     valueDate: Date;
     capitalType: string;
     capitalSubType: string;
+    strategy: string;
     fundHedging: string;
     issuerShortName: string;
     narrative: string;
@@ -90,5 +91,6 @@ export interface INAVQuarterly {
     totalForeignExchangeMovementsITD: number,
     totalOperatingExpITD: number,
     GPSITD: number,
+    Strategy: string,
     username: string
 }

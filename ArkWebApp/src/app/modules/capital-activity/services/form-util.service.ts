@@ -24,6 +24,7 @@ export class FormUtilService {
   fundHedgingOptions: string[] = []
   capitalTypeOptions: string[] = []
   capitalSubTypeOptions: string[] = []
+  strategyOptions: string[] = []
   fundCcyOptions: string[] = []
   wsoIssuerIDOptions: number[] = []
   assetIDOptions: number[] = []
@@ -38,7 +39,7 @@ export class FormUtilService {
           return options[i];
       }
     }
-    if((val === '' || val === null) && (field === 'issuerShortName' || field === 'asset'))
+    if((val === '' || val === null) && (['issuerShortName', 'asset', 'strategy'].includes(field)))
       return val;
 
     control.get(field).setErrors({invalid: true});
@@ -57,6 +58,7 @@ export class FormUtilService {
     let fundHedging: string = this.validateField(this.fundHedgingOptions, control, 'fundHedging');
     let capitalType: string = this.validateField(this.capitalTypeOptions, control, 'capitalType');
     let capitalSubType: string = this.validateField(this.capitalSubTypeOptions, control, 'capitalSubType');
+    let strategy: string = this.validateField(this.strategyOptions, control, 'strategy');
     let currency: string = this.validateField(this.fundCcyOptions, control, 'fundCcy');
     let totalAmount: number = getAmountNumber(control.get('totalAmount').value);
 
@@ -76,12 +78,14 @@ export class FormUtilService {
     let AS: boolean = (asset !== null && asset !== '');
     let NR: boolean = (narrative !== null && narrative !== '');
 
+    let ST = !control.get('strategy')?.errors?.['invalid']
+
     if(capitalType === 'NAV'){
-      return (CD && VD && FH && CT && CST && CCY && TA) ? { validated: true} : { validated: false }
+      return (CD && VD && FH && CT && CST && CCY && TA && ST) ? { validated: true} : { validated: false }
     }
     
     if(this.actionType === 'LINK-ADD')
-      return ((CD && VD && FH && CT && CST && CCY && TA && (((ISN && AS)|| NR || ISN) && ISN_AS_NR) 
+      return ((CD && VD && FH && CT && CST && CCY && TA && (((ISN && AS)|| NR || ISN) && ISN_AS_NR && ST) 
       )) ? { 
         validated : true 
       }: { 
@@ -89,7 +93,7 @@ export class FormUtilService {
     };
     else if(this.actionType === 'ADD' || this.actionType === 'EDIT')
       return (CD && VD && FH && CT && CST && CCY && TA
-        && (((ISN && AS)|| NR || ISN) && ISN_AS_NR)) ? { 
+        && (((ISN && AS)|| NR || ISN) && ISN_AS_NR) && ST) ? { 
         validated : true 
       }: { 
         validated : false
@@ -106,6 +110,7 @@ export class FormUtilService {
     model.narrative = form.get('narrative').value;
     model.capitalType = form.get('capitalType').value;
     model.capitalSubType = form.get('capitalSubType').value;
+    model.strategy = form.get('strategy').value;
     model.fundCcy = form.get('fundCcy').value;
     model.totalAmount = getAmountNumber(form.get('totalAmount').value);
     model.fundHedging = form.get('fundHedging').value;
@@ -283,6 +288,6 @@ export class FormUtilService {
     if(value === null)
       return options;
     const filterValue = value.toLowerCase();
-    return options.filter(op => op.toLowerCase().includes(filterValue));
+    return options?.filter(op => op.toLowerCase().includes(filterValue));
   }
 }

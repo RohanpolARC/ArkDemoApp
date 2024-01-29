@@ -42,10 +42,11 @@ export function addToGrid(adaptableApi: AdaptableApi, newRowData: any[], ID: any
     }
 }
 
-export function getUniqueOptions(ref: {capitalTypes: string[], capitalSubTypes: string[], refData: any}): any {
+export function getUniqueOptions(ref: {capitalTypes: string[], capitalSubTypes: string[], strategies: string[], refData: any}): any {
     let capitalTypes: string[] = getUniqueOptionsFor(ref.capitalTypes);
     let capitalSubTypes: string[] = getUniqueOptionsFor(ref.capitalSubTypes);
     let fundHedgings: string[] = [];
+    let strategies: string[] = getUniqueOptionsFor(ref.strategies);
     let fundCcys: string[] = [];
     let posCcys: string[] = [];
     let issuerShortNames: string[] = [];
@@ -71,7 +72,7 @@ export function getUniqueOptions(ref: {capitalTypes: string[], capitalSubTypes: 
     wsoIssuerIDs = getUniqueOptionsFor(wsoIssuerIDs);
     wsoAssetIDs = getUniqueOptionsFor(wsoAssetIDs);
 
-    return {capitalTypes, capitalSubTypes, fundHedgings, issuerShortNames, assets, fundCcys, posCcys,  wsoIssuerIDs, wsoAssetIDs};
+    return {capitalTypes, capitalSubTypes, fundHedgings, issuerShortNames, assets, fundCcys, posCcys,  wsoIssuerIDs, wsoAssetIDs, strategies};
 }
 
 export function getUniqueOptionsFor(options: any[]): any[] {

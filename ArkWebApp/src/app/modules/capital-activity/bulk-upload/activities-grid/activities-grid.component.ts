@@ -32,6 +32,7 @@ export class ActivitiesGridComponent implements OnInit {
     { field: 'Wso Asset ID', headerName: 'WSO Asset ID', tooltipField:'Wso Asset ID'},
     { field: 'Asset (optional)', maxWidth: 150, headerName: 'Asset', tooltipField:'Asset (optional)'},
     { field: 'Narative (optional)', maxWidth: 150, headerName: 'Narrative', tooltipField:'Narative (optional)'},
+    { field: 'Strategy/Currency', maxWidth: 150, tooltipField: 'Strategy/Currency'},
     { field: 'remark', width: 500, tooltipField: 'remark'},
     { field: '_ROW_ID', headerName: 'Row', maxWidth: 100},
   ]
@@ -159,6 +160,7 @@ export class ActivitiesGridComponent implements OnInit {
          'Wso Asset ID',
          'Asset (optional)',
          'Narative (optional)',
+         'Strategy/Currency',
          '_ROW_ID'
         ],
         PinnedColumnsMap: {
@@ -184,6 +186,7 @@ export class ActivitiesGridComponent implements OnInit {
          'Wso Asset ID',
          'Asset (optional)',
          'Narative (optional)',
+         'Strategy/Currency',
          'remark',
          '_ROW_ID',
         ],

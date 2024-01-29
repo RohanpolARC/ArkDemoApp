@@ -42,6 +42,7 @@ export class InvestorGridConfigService {
       { field: 'wsoAssetID', tooltipField: 'wsoAssetID', headerName: 'WSO Asset ID', type: 'abColDefString'},
       { field: 'asset', tooltipField: 'asset', headerName: 'Asset', type:'abColDefString'},
       { field: 'narrative', tooltipField: 'narrative', headerName: 'Narrative', type:'abColDefString'},
+      { field: 'strategy', tooltipField: 'Strategy/Currency', headerName: 'Strategy/Currency', type:'abColDefString'},
       { field: 'source', tooltipField: 'source', headerName: 'Source', type:'abColDefString'},
       { field: 'sourceID', tooltipField: 'sourceID', headerName: 'Source ID', type:'abColDefNumber'},
       { field: 'isLinked', tooltipField: 'isLinked', headerName: 'Is Linked', type:'abColDefBoolean'},
@@ -143,7 +144,7 @@ export class InvestorGridConfigService {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 6,
+          Revision: 7,
           CurrentLayout: 'Basic Capital Activity',
           Layouts: [{
             Name: 'Basic Capital Activity',
@@ -163,6 +164,7 @@ export class InvestorGridConfigService {
               'isLinked',
               'linkedAmount',
               'capitalID',
+              'strategy',
               'Edit',
             ],
             RowGroupedColumns: [],
