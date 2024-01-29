@@ -126,7 +126,7 @@ export class MonthlyReturnsComponent implements OnInit {
     }))
 
     this.columnDefsMonthlyRets = [
-      { field: 'asofDate', type:'abColDefDate', headerName: 'As Of Date', allowedAggFuncs: [], cellClass: 'dateUK', sort:'desc'},
+      { field: 'asofDate', type:'abColDefDate', headerName: 'As Of Date', allowedAggFuncs: [], cellClass: 'dateUK'},
       { field: 'issuerShortName', type: 'abColDefString', allowedAggFuncs: [] },
       { field: 'monthlyPnL', type: 'abColDefNumber', headerName: 'Monthly P&L', aggFunc: 'Sum', allowedAggFuncs: ['Sum'] },
       { field: 'baseMeasure', type: 'abColDefNumber', aggFunc: 'Sum', allowedAggFuncs: ['Sum'] },
@@ -143,9 +143,10 @@ export class MonthlyReturnsComponent implements OnInit {
       sideBar: ['filters','adaptable'],
       columnDefs: this.columnDefsMonthlyRets,
       suppressAggFuncInHeader: true,
-      rowData: this.monthlyReturns,
+      rowData: this.monthlyReturns,  
       autoGroupColumnDef: {
-        sort: 'desc'
+        sort: 'desc',
+        suppressMenu: true,     
       },
       rowHeight: 30,
       groupHeaderHeight: 30,
@@ -158,7 +159,8 @@ export class MonthlyReturnsComponent implements OnInit {
         filter: true,
         lockPosition: true,
         enableValue: true,
-        lockPinned: true
+        lockPinned: true,  
+        menuTabs: ['generalMenuTab','filterMenuTab']      
       },
       onGridReady: (params: GridReadyEvent) => {
         params.api.closeToolPanel()
@@ -251,7 +253,7 @@ export class MonthlyReturnsComponent implements OnInit {
         },  
         Layout:{
           CurrentLayout: 'Basic Monthly Returns Layout',
-          Revision: 18,
+          Revision: 20,
           Layouts: [{
             Name: 'Basic Monthly Returns Layout',
             Columns: this.columnDefsMonthlyRets.filter(def => !def.hide).map(def => def.field),
