@@ -47,6 +47,7 @@ export interface CapitalInvestment{
     capitalIDs?: number[];
     valueDate?: Date;   /* For inserting/updating AssetGIR (To be populated as AsOfDate) */
     fxRate?: number;    /* For inserting/updating AssetGIR (To be populated as FxRate/GIR) */
+    strategy: string;
 
     createdOn: Date;
     createdBy: string;
@@ -87,7 +88,9 @@ export interface INAVQuarterly {
     advancedTax: number,
     carriedInterestProvision: number,
     rebateITD: number,
-    netForwardContractMovementsITD: number,
+    netForwardContractMovementsITDRealised: number,
+    netForwardContractMovementsITDUnrealised: number,
+    financeCostITD: number,
     totalForeignExchangeMovementsITD: number,
     totalOperatingExpITD: number,
     GPSITD: number,

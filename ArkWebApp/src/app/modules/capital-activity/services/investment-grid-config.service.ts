@@ -46,7 +46,8 @@ export class InvestmentGridConfigService {
       { field: 'groupBreakBase', headerName: 'Group Break Base', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
       { field: 'type', type: 'abColDefString'},
       { field: 'groupID', type: 'abColDefNumber' },
-      { field: 'link', tooltipField: 'link', headerName: 'Link', type: 'abColDefBoolean', checkboxSelection: true }
+      { field: 'link', tooltipField: 'link', headerName: 'Link', type: 'abColDefBoolean', checkboxSelection: true },
+      { field: 'strategy', tooltipField: 'strategy', headerName: 'Strategy', type: 'abColDefString' }
     ]
 
     this.gridOptions = {

@@ -23,20 +23,22 @@ export class NavQuarterlyGridComponent implements OnInit {
   adaptableApi: AdaptableApi
   columnDefs: ColDef[] = [
     { field: 'Fund Hedging', maxWidth: 150, allowedAggFuncs: ['Min', 'Max'], tooltipField: 'Fund Hedging'},
+    { field: 'Strategy/Currency', maxWidth: 150, tooltipField: 'Strategy/Currency'},
     { field: 'Quarter End', maxWidth: 150, valueFormatter: dateFormatter, allowedAggFuncs: ['Min', 'Max'], tooltipField: 'Quarter End'},
     { field: 'NAV per FS', maxWidth: 150, tooltipField: 'NAV per FS', valueFormatter: AmountOrZeroFormatter},
     { field: 'Deferred loan origination fee income', headerName: 'Deferred loan origination fee income', maxWidth: 150, tooltipField: 'Deferred loan origination fee income', valueFormatter: AmountOrZeroFormatter},
     { field: 'Current Period Rebates', headerName: 'Current Period Rebates', maxWidth: 150, cellClass: 'ag-right-aligned-cell', valueFormatter: AmountOrZeroFormatter, allowedAggFuncs: [ 'sum', 'avg', 'first', 'last', 'count', 'min', 'max'], tooltipField:'Current Period Rebates'},
     { field: 'Organisational costs unamortised', maxWidth: 150, tooltipField:'Organisational costs unamortised', valueFormatter: AmountOrZeroFormatter},
     { field: 'Subscription costs & leverage costs unamortised', maxWidth: 170, tooltipField: 'Subscription costs & leverage costs unamortised', valueFormatter: AmountOrZeroFormatter},
-    { field: 'Carried Interest Provision ', headerName: 'Carried Interest Provision ', tooltipField:'Carried Interest Provision ', valueFormatter: AmountOrZeroFormatter},
-    { field: 'Rebate ITD', maxWidth: 150, headerName: 'Rebate ITD', tooltipField:'Rebate ITD', valueFormatter: AmountOrZeroFormatter},
     { field: 'Advanced Tax', maxWidth: 150, valueFormatter: AmountOrZeroFormatter },
-    { field: 'Net forward contract movements ITD',maxWidth:150,headerName:'Net forward contract movements ITD',tooltipField:'Net forward contract movements ITD',valueFormatter:AmountOrZeroFormatter},
-    { field: 'Total foreign exchange movements ITD',maxWidth:150,headerName:'Total foreign exchange movements ITD',tooltipField:'Total foreign exchange movements ITD',valueFormatter:AmountOrZeroFormatter},
-    { field: 'Total Operating exp (excluded GPS) ITD',maxWidth:150,headerName:'Total Operating exp (excluded GPS) ITD',tooltipField:'Total Operating exp (excluded GPS) ITD',valueFormatter:AmountOrZeroFormatter},
+    { field: 'Carried Interest Provision ', headerName: 'Carried Interest Provision ', tooltipField:'Carried Interest Provision ', valueFormatter: AmountOrZeroFormatter},
     { field: 'GPS ITD' ,maxWidth:150,headerName:'GPS ITD',tooltipField:'GPS ITD',valueFormatter:AmountOrZeroFormatter},
-    { field: 'Strategy/Currency', maxWidth: 150, tooltipField: 'Strategy/Currency'},
+    { field: 'Rebate ITD', maxWidth: 150, headerName: 'Rebate ITD', tooltipField:'Rebate ITD', valueFormatter: AmountOrZeroFormatter},
+    { field: 'Total foreign exchange movements ITD',maxWidth:150,headerName:'Total foreign exchange movements ITD',tooltipField:'Total foreign exchange movements ITD',valueFormatter:AmountOrZeroFormatter},
+    { field: 'Finance Cost ITD',maxWidth:150,headerName:'Finance Cost ITD',tooltipField:'Finance Cost ITD',valueFormatter:AmountOrZeroFormatter},
+    { field: 'Total Operating exp (excluded GPS) ITD',maxWidth:150,headerName:'Total Operating exp (excluded GPS) ITD',tooltipField:'Total Operating exp (excluded GPS) ITD',valueFormatter:AmountOrZeroFormatter},
+    { field: 'Net forward contract movements ITD (unrealised)',maxWidth:150,headerName:'Net forward contract movements ITD',tooltipField:'Net forward contract movements ITD',valueFormatter:AmountOrZeroFormatter},
+    { field: 'Net forward contract movements ITD (realised)',maxWidth:150,headerName:'Net forward contract movements ITD',tooltipField:'Net forward contract movements ITD',valueFormatter:AmountOrZeroFormatter},
     { field: 'remark', width: 500, tooltipField: 'remark'},
     { field: '_ROW_ID', headerName: 'Row', maxWidth: 100},
   ]
@@ -120,7 +122,7 @@ export class NavQuarterlyGridComponent implements OnInit {
       layout = {
         Name: 'NAV Quarterly',
         Columns: [
-        'Fund Hedging','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates','Organisational costs unamortised','Subscription costs & leverage costs unamortised','Carried Interest Provision ','Rebate ITD','Advanced Tax','Net forward contract movements ITD','Total foreign exchange movements ITD','Total Operating exp (excluded GPS) ITD','GPS ITD','Strategy/Currency','_ROW_ID'
+        'Fund Hedging','Strategy/Currency','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates','Organisational costs unamortised','Subscription costs & leverage costs unamortised','Advanced Tax','Carried Interest Provision ','GPS ITD','Rebate ITD','Total foreign exchange movements ITD','Finance Cost ITD','Total Operating exp (excluded GPS) ITD','Net forward contract movements ITD (unrealised)','Net forward contract movements ITD (realised)','_ROW_ID'
 
         ],
         PinnedColumnsMap: {
@@ -136,7 +138,7 @@ export class NavQuarterlyGridComponent implements OnInit {
       layout = {
         Name: 'Invalid Excel Grid',
         Columns: [
-        'Fund Hedging','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates','Organisational costs unamortised','Subscription costs & leverage costs unamortised','Carried Interest Provision ','Rebate ITD','Advanced Tax','Net forward contract movements ITD','Total foreign exchange movements ITD','Total Operating exp (excluded GPS) ITD','GPS ITD','Strategy/Currency','remark','_ROW_ID'
+          'Fund Hedging','Strategy/Currency','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates','Organisational costs unamortised','Subscription costs & leverage costs unamortised','Advanced Tax','Carried Interest Provision ','GPS ITD','Rebate ITD','Total foreign exchange movements ITD','Finance Cost ITD','Total Operating exp (excluded GPS) ITD','Net forward contract movements ITD (unrealised)','Net forward contract movements ITD (realised)','remark','_ROW_ID'
 
         ],
         PinnedColumnsMap: {
