@@ -159,7 +159,9 @@ export class UploadService {
     m.carriedInterestProvision = row['Carried Interest Provision '];
     m.rebateITD = row['Rebate ITD'];
     m.advancedTax = row['Advanced Tax'];
-    m.netForwardContractMovementsITD = row['Net forward contract movements ITD'];
+    m.netForwardContractMovementsITDRealised = row['Net forward contract movements ITD (realised)'];
+    m.netForwardContractMovementsITDUnrealised = row['Net forward contract movements ITD (unrealised)'];
+    m.financeCostITD = row['Finance Cost ITD'];
     m.totalForeignExchangeMovementsITD = row['Total foreign exchange movements ITD'];
     m.totalOperatingExpITD = row['Total Operating exp (excluded GPS) ITD'];
     m.GPSITD = row['GPS ITD'];

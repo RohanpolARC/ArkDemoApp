@@ -9,10 +9,10 @@ export class NavQuarterlyGridUtilService {
   constructor() { }
 
   allowedHeaders: string[] = [         
-    'Fund Hedging', 'Quarter End', 'NAV per FS', 'Deferred loan origination fee income',
-    'Current Period Rebates', 'Organisational costs unamortised', 'Subscription costs & leverage costs unamortised', 'Carried Interest Provision ',
-    'Rebate ITD', 'Advanced Tax', 'Total foreign exchange movements ITD', 'Net forward contract movements ITD', 'Total Operating exp (excluded GPS) ITD',
-     'GPS ITD', 'Startegy/Currency'
+    'Fund Hedging','Strategy/Currency','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates',
+    'Organisational costs unamortised','Subscription costs & leverage costs unamortised','Advanced Tax','Carried Interest Provision ',
+    'GPS ITD','Rebate ITD','Total foreign exchange movements ITD','Finance Cost ITD','Total Operating exp (excluded GPS) ITD',
+    'Net forward contract movements ITD (unrealised)','Net forward contract movements ITD (realised)'
 
   ]
 
@@ -37,7 +37,7 @@ export class NavQuarterlyGridUtilService {
     for(let i: number = 0; i < data.length; i+=1){
       let obj = {}
       for(let j: number= 0; j < headers.length; j+= 1){
-        if(['NAV per FS', 'Deferred loan origination fee income', 'Current Period Rebates', 'Organisational costs unamortised', 'Subscription costs & leverage costs unamortised', 'Carried Interest Provision ', 'Rebate ITD', 'Advanced Tax', 'Total foreign exchange movements ITD', 'Net forward contract movements ITD', 'Total Operating exp (excluded GPS) ITD',  'GPS ITD'].includes(headers[j]))
+        if(['NAV per FS', 'Deferred loan origination fee income', 'Current Period Rebates', 'Organisational costs unamortised', 'Subscription costs & leverage costs unamortised', 'Carried Interest Provision ', 'Rebate ITD', 'Advanced Tax', 'Total foreign exchange movements ITD', 'Net forward contract movements ITD (realised)', 'Total Operating exp (excluded GPS) ITD',  'GPS ITD', 'Finance Cost ITD', 'Net forward contract movements ITD (unrealised)'].includes(headers[j]))
           obj[headers[j]] = getAmountNumber(data[i][j])
         else if(['Quarter End'].includes(headers[j])){
           obj[headers[j]] = getDateFromStr(data[i][j], 'DD/MM/YYYY')
@@ -138,6 +138,11 @@ export class NavQuarterlyGridUtilService {
     if(row['Rebate ITD'] > 0){
       invalidmsg += (invalidmsg === '') ? '' : ','
       invalidmsg += 'Rebate ITD has to be negative'
+    }
+
+    if(row['GPS ITD'] > 0){
+      invalidmsg += (invalidmsg === '') ? '' : ','
+      invalidmsg += 'GPS ITD has to be negative'
     }
     return invalidmsg;
   }
