@@ -96,11 +96,11 @@ export class UploadService {
         this.updateActionSuccessful(isSuccess);
         if(isSuccess){
           this.saveState = 'SUCCESS'
-          return 'Successfully uploaded the activities in bulk'
+          return response.returnMessage
         }
         else {
           this.saveState = 'FAILURE'
-          return 'Failed to upload the activities'
+          return response.returnMessage
         }
       })
     )

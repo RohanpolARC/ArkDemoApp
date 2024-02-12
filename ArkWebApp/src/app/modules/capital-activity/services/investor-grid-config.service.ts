@@ -3,12 +3,10 @@ import { ColDef, FirstDataRenderedEvent, GridOptions } from '@ag-grid-community/
 import { NoRowsOverlayComponent } from '@ag-grid-community/core/dist/cjs/es5/rendering/overlays/noRowsOverlayComponent';
 import { Injectable } from '@angular/core';
 import { CommonConfig } from 'src/app/configs/common-config';
-import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
-import { UtilService } from './util.service';
 import { InvestorGridUtilService } from './investor-grid-util.service';
 
 @Injectable()
@@ -109,15 +107,28 @@ export class InvestorGridConfigService {
         actionColumns: [
           {
             columnId: 'Edit',
-            actionColumnButton: {
-              onClick: this.gridUtilSvc.editActionColumn.bind(this.gridUtilSvc),
-              icon: {
-                src: '../assets/img/edit.svg',
-                style: {
-                  height: 25, width: 25
-                }
+            actionColumnButton: [
+              {
+                onClick: this.gridUtilSvc.editActionColumn.bind(this.gridUtilSvc),
+                hidden: this.gridUtilSvc.hideEditActionColumn.bind(this.gridUtilSvc),
+                icon: {
+                  src: '../assets/img/edit.svg',
+                  style: {
+                    height: 25, width: 25
+                  }
+                },
               },
-            },
+              {
+                onClick: this.gridUtilSvc.editActionColumn.bind(this.gridUtilSvc),
+                hidden: this.gridUtilSvc.hideLockActionColumn.bind(this.gridUtilSvc),
+                icon: {
+                  src: '../assets/img/lock.svg',
+                  style: {
+                    height: 25, width: 25
+                  }
+                },
+              }
+          ],
           }
         ]
       },

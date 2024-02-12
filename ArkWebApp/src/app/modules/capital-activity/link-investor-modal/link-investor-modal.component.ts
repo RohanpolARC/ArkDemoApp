@@ -8,6 +8,7 @@ import { Observable, Subscription, of } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { LinkingService } from '../services/linking.service';
+import { InvestorGridUtilService } from '../services/investor-grid-util.service';
 
 @Component({
   selector: 'app-link-investor-modal',
@@ -16,7 +17,6 @@ import { LinkingService } from '../services/linking.service';
   providers: [LinkingService]
 })
 export class LinkInvestorModalComponent implements OnInit {
-
   rowData$: Observable<any[]> = of([]);
   @Input() investmentData: CapitalInvestment[]
 
@@ -24,7 +24,8 @@ export class LinkInvestorModalComponent implements OnInit {
   actionSuccessful$: Observable<boolean>;
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   columnDefs: ColDef[] = [
-    {field: 'capitalID', headerName: 'Capital ID', type: 'abColDefNumber'},
+    { field: 'lockStatus', tooltipField:'lockStatus', headerName: 'Lock Status', cellRenderer: this.gridUtilSvc.showHideLockIcon.bind(this.gridUtilSvc)},
+    { field: 'capitalID', headerName: 'Capital ID', type: 'abColDefNumber'},
     { field: 'callDate', headerName: 'Call Date', type: 'abColDefDate', valueFormatter: dateFormatter },
     { field: 'valueDate', headerName: 'Value Date', type: 'abColDefDate', valueFormatter: dateFormatter},
     { field: 'capitalType', headerName: 'Capital Type', type:'abColDefString'},
@@ -108,10 +109,11 @@ export class LinkInvestorModalComponent implements OnInit {
         ]
       },
       Layout:{
-        Revision: 7,
+        Revision: 8,
         Layouts:[{
           Name: 'Associate Grid layout',
           Columns:[
+            'lockStatus',
             'fundCcy',
             'totalAmount',
             'linkedAmount',
@@ -149,7 +151,8 @@ export class LinkInvestorModalComponent implements OnInit {
     this.adapTableApi.columnApi.autosizeAllColumns();
   };
   constructor(private msalService: MsalUserService,
-    public linkingSvc: LinkingService
+    public linkingSvc: LinkingService,
+    private gridUtilSvc: InvestorGridUtilService
 ) { }
 
   clearFilter(): void{

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, combineLatest, of } from 'rxjs';
-import { map, switchMap, take, tap } from 'rxjs/operators';
+import { filter, map, switchMap, take, tap } from 'rxjs/operators';
 import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
 import { AssociateInvestment, CapitalActivityModel, CapitalInvestment, InvestmentSmall } from 'src/app/shared/models/CapitalActivityModel';
@@ -24,11 +24,11 @@ export class ModalService {
         this.updateActionSuccessful(isSuccess)
         if(isSuccess){
           this.saveState = 'SUCCESS';
-          return 'Successfully updated capital activity';
+          return response.returnMessage;
         }
         else {
           this.saveState = 'FAILURE';
-          return 'Failed to update capital activity'
+          return response.returnMessage
         }
       })
     )
@@ -46,7 +46,10 @@ export class ModalService {
           let newcapitalID: number = response.data;
           return this.updateInvestmentAssociations([newcapitalID])
         }
-        else return of('');
+        else {
+          this.saveState = "FAILURE"
+          return of(response.returnMessage);
+        }
       })
     )
   }
@@ -87,7 +90,21 @@ export class ModalService {
     );
   }
 
-  validationMessage$: Observable<string>
+  validationMessage$: Observable<string>;
+
+  private hideSubmitButton = new BehaviorSubject<boolean>(false);
+  hideSubmitButton$ = this.hideSubmitButton.asObservable();
+  updateHideSubmitButton(value:boolean){
+    this.hideSubmitButton.next(value);
+  }
+
+
+  private formValidation = new BehaviorSubject<string>('');
+  formValidation$ = this.formValidation.asObservable();
+  updateFormValidation(text:string){
+    this.formValidation.next(text);
+  }
+
   submitBtnText$: Observable<string> = of('Submit')
 
   private submitBtnText = new BehaviorSubject<string>('Submit');
@@ -107,7 +124,7 @@ export class ModalService {
     this.linkingCapitalIDs.next(capitalids)
   }
 
-  private submitBtnClick = new Subject<boolean>();
+  private submitBtnClick = new BehaviorSubject<boolean>(false);
   submitBtnClick$ = this.submitBtnClick.asObservable();
   updateSubmitBtnClick(click: boolean){
     this.submitBtnClick.next(click)
@@ -116,10 +133,7 @@ export class ModalService {
   capitalActivity: CapitalActivityModel
   investmentData: CapitalInvestment[]
 
-  saveState: 'PENDING' | 'SUCCESS' | 'FAILURE'
-  getSaveState(): 'PENDING' | 'SUCCESS' | 'FAILURE' {
-    return this.saveState;
-  }
+  saveState: 'PENDING' | 'SUCCESS' | 'FAILURE' | 'WARNING'
 
   onSubmit = (mode: string) => {
     this.updateSubmitBtnClick(true)
@@ -163,26 +177,34 @@ export class ModalService {
       })
     )
 
-    this.validationMessage$ = this.submitBtnClick$.pipe(
-      switchMap(() => combineLatest([this.submitBtnTextListener$, this.linkingCapitalIDs$, this.actionSuccessful$]).pipe(
-        take(1),
-        switchMap(([submitBtnText, linkingCapitalIDs, actionSuccessful]) => {
-          
-          if(!actionSuccessful){
-            if (submitBtnText === 'Update Link') {
-              return this.updateInvestmentAssociations(linkingCapitalIDs);
-            } else if(submitBtnText === 'Create and Link'){
-              return this.createAndLinkNewInvestorCashflow()
-            } else if(submitBtnText === 'Submit'){
-              return this.createOrUpdateCapitalActivity()
-            }  
-          }
-
-          return of('')
-        })
-      ))
+    this.validationMessage$ = combineLatest([this.submitBtnClick$, this.formValidation$]).pipe(
+      switchMap(([submitBtnClick ,formValidation]) => {
+        
+        if(submitBtnClick){
+          return combineLatest([this.submitBtnTextListener$, this.linkingCapitalIDs$, this.actionSuccessful$]).pipe(
+            take(1),
+            switchMap(([submitBtnText, linkingCapitalIDs, actionSuccessful]) => {
+              this.updateSubmitBtnClick(false)
+              if(!actionSuccessful){
+                if (submitBtnText === 'Update Link') {
+                  return this.updateInvestmentAssociations(linkingCapitalIDs);
+                } else if(submitBtnText === 'Create and Link'){
+                  return this.createAndLinkNewInvestorCashflow()
+                } else if(submitBtnText === 'Submit'){
+                  return this.createOrUpdateCapitalActivity()
+                }  
+              }
+    
+              return of('')
+            })
+          )
+        }
+        else {
+          this.saveState = 'WARNING'
+          return of(formValidation)
+        }
+      })
     )
-
 
     this.disableSubmit$ = combineLatest([
       this.formStatus$, 
@@ -206,15 +228,4 @@ export class ModalService {
     )
   }
 
-  // Important to clean-up/reset (behavior)subjects on modal destroy else new modal instance will retain the previous modal subject values. i.e. if actionSuccessful$ was true last time, for new window it would still be true if not cleaned up.
-  cleanUpSubjects(){
-    this.updateActionSuccessful(false); // Primary reason for clean up
-    this.updateFormStatus(false);
-    this.updateIsAlreadyLinked(false);
-    this.updateLinkingCapitalIDs([]);
-    this.updateSubmitBtnClick(false);
-    this.updateSubmitBtnText('Submit');
-
-    this.saveState = 'PENDING'
-  }
 }
