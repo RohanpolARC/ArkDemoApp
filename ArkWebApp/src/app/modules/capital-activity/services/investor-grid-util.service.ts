@@ -33,13 +33,25 @@ export class InvestorGridUtilService {
   }
 
   hideEditActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext){
-    let rowData = context.rowNode?.data;
-    return new Date(rowData?.valueDate) <= new Date(this.configSvc.config?.lockDate)
+    let lockDate = this.configSvc?.config?.lockDate;
+    if(lockDate){
+      let rowData = context.rowNode?.data;
+      return new Date(rowData?.valueDate) <= new Date(lockDate)  
+    }
+    else {
+      return false;
+    }  
   }
 
   hideLockActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext){
-    let rowData = context.rowNode?.data;
-    return new Date(rowData?.valueDate) > new Date(this.configSvc.config?.lockDate)
+    let lockDate = this.configSvc?.config?.lockDate;
+    if(lockDate){
+      let rowData = context.rowNode?.data;
+      return new Date(rowData?.valueDate) > new Date(lockDate)  
+    }
+    else {
+      return true;
+    }
   }
 
   showHideLockIcon(params){
