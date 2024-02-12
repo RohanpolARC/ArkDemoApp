@@ -38,6 +38,10 @@ import { ConfigurationComponent } from './configuration/configuration.component'
 import { ConfigurationAuditComponent } from './configuration-audit/configuration-audit.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ConfigurationService } from './services/configuration.service';
+import { InvestorGridUtilService } from './services/investor-grid-util.service';
+import { InvestmentGridUtilService } from './services/investment-grid-util.service';
+import { InvestorGridConfigService } from './services/investor-grid-config.service';
+import { InvestmentGridConfigService } from './services/investment-grid-config.service';
 
 @NgModule({
   declarations: [
