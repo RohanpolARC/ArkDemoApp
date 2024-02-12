@@ -1,0 +1,82 @@
+
+<div  class="d-flex flex-column justify-content-between" style="height: 100%;">
+
+<h2 mat-dialog-title>Lock Details</h2>
+
+
+<div class="row">
+    <div class="success-msg" *ngIf="saveStateMessage$ | async as state"
+    [ngClass]="{'success': state === 'SUCCESS', 'failure': state === 'FAILURE', 'update-msg': '1'==='1'}"
+    >
+        {{ validationMessage$ | async }}
+    </div>
+</div>
+
+<ng-container *ngIf="capitalActivityConfig$ | async as config; else elseBlock">
+
+        <form [formGroup]="configurationForm" autocomplete="off" >
+
+                <div class="d-flex flex-row justify-content-between">
+
+                    <div class="col">
+                        <mat-form-field appearance="outline" class="edit">
+                            <mat-label> Lock Date </mat-label>
+                            <input matInput required matInput formControlName="lockDate" [matDatepicker]="datePicker"/>
+                            <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+                            <mat-datepicker #datePicker></mat-datepicker>
+                            <button matSuffix mat-icon-button aria-label="Clear" type="button" (click)="configurationForm.get('lockDate').reset()">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                        </mat-form-field>
+                    </div>
+
+
+                </div>
+        </form>
+        
+        <div style="height: 80%;">
+
+            <ng-container *ngIf="auditGridDataLoaded$ | async as isDataLoaded" >
+                <app-configuration-audit
+                    [gridOptions]         =     "gridOptions"
+                    [adaptableOptions]    =     "adaptableOptions"
+                    [columnDefs]          =     "columnDefs" 
+                >
+                </app-configuration-audit>
+
+            </ng-container>
+
+        </div>
+        
+</ng-container>
+<ng-template #elseBlock>
+        <div style="height: 80%;" class="content">
+
+
+        <mat-spinner [diameter] = "35"></mat-spinner>
+        <br>
+        <div>Loading configuration data.</div>
+        </div>
+
+</ng-template> 
+
+<mat-dialog-actions align="end" class="row">
+    <div class="action">
+        <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="(disableSubmitButton$ | async) ?? true"
+        (click) = "onSubmit()"
+        >
+        Submit</button>
+        
+        <button type="button" 
+        (click) = "onClose()"
+        mat-raised-button
+        >Close</button>
+
+    </div>
+</mat-dialog-actions>
+
+</div>

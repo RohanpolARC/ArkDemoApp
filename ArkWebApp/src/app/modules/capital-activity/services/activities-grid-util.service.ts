@@ -92,7 +92,7 @@ export class ActivitiesGridUtilService {
 
   validateExcelRows: (rows: any[], 
     ref: {
-      capitalTypes: string[], capitalSubTypes: string[], strategies: string[], refData: any
+      capitalTypes: string[], capitalSubTypes: string[], strategies: string[], refData: any, lockDate?: Date
     }
   )=> {
     isValid: boolean, invalidRows?: {

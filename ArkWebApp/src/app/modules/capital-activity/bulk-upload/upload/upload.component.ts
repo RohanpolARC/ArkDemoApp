@@ -7,6 +7,7 @@ import * as XLSX from 'xlsx';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { filter } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
+import { ConfigurationService } from '../../services/configuration.service';
 
 export type UPLOAD_TEMPLATE = 'NAV Quarterly' | 'Activities';
 
@@ -22,6 +23,7 @@ export class UploadComponent implements OnInit, OnDestroy {
     isValid: boolean,
     gridData: any[]
   }
+  /* The value of this variable is used after this dialog is closed to determine if Investor grid is to be reloaded.*/
   isActionSuccessful: boolean;
   subscriptions: Subscription[] = [];
   constructor(public dialogRef: MatDialogRef<UploadComponent>,
@@ -29,7 +31,7 @@ export class UploadComponent implements OnInit, OnDestroy {
     private activitiesSvc: ActivitiesGridUtilService,
     private uploadSvc: UploadService,
     private dataService: DataService,
-
+    private configurationSvc: ConfigurationService,
     @Inject(MAT_DIALOG_DATA) public data: any) { }
   activitiesTemplateURL: string
   navQuarterlyTemplateURL: string
@@ -42,8 +44,9 @@ export class UploadComponent implements OnInit, OnDestroy {
   getSaveState: () => 'PENDING' | 'SUCCESS' | 'FAILURE' = this.uploadSvc.getSaveState.bind(this.uploadSvc)
   preprocessData: (headers: string[], data: any[]) => any[]
   validateExcelRows: (rows: any[], ref: {
-    capitalTypes: string[], capitalSubTypes: string[], strategies: string[], refData: any
-  } | { fundhedgings: string[], strategies: string[] }) => {
+    capitalTypes: string[], capitalSubTypes: string[], strategies: string[], refData: any, lockDate?: Date
+  } | { fundhedgings: string[], strategies: string[], lockDate: Date }) => {
+
     isValid: boolean, 
     invalidRows?: {
       row: any, remark: string
@@ -94,6 +97,7 @@ export class UploadComponent implements OnInit, OnDestroy {
       // Only update this once it becomes successful. Need to filter out since we cleanUpSubjects at component destruction.
       this.isActionSuccessful = actionSuccessful
     }))
+
 
     this.selectedTemplateChange(this.selectedTemplate)
   }
@@ -165,13 +169,15 @@ export class UploadComponent implements OnInit, OnDestroy {
           capitalTypes: this.data.capitalTypes,
           capitalSubTypes: this.data.capitalSubTypes,
           strategies: this.data.strategies,
-          refData: this.data.refData
+          refData: this.data.refData,
+          lockDate: this.configurationSvc.config?.lockDate
         });
       }
       else if(this.selectedTemplate === 'NAV Quarterly'){
         validationResult = this.validateExcelRows(processedData, {
           fundhedgings: [...new Set(<string>this.data.refData?.map(r => <string>r?.['fundHedging']))],
-          strategies: this.data.strategies
+          strategies: this.data.strategies,
+          lockDate: this.configurationSvc.config?.lockDate
         })
       }
 

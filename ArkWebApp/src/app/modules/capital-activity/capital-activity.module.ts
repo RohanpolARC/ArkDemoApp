@@ -31,10 +31,17 @@ import { UtilService } from './services/util.service';
 import { ComponentReaderService } from './services/component-reader.service';
 import { ModalComponent } from './modal/modal.component';
 import { InvestmentsPreviewComponent } from './investments-preview/investments-preview.component';
-import { ModalService } from './services/modal.service';
 import { UploadComponent } from './bulk-upload/upload/upload.component';
 import { ActivitiesGridComponent } from './bulk-upload/activities-grid/activities-grid.component';
 import { NavQuarterlyGridComponent } from './bulk-upload/nav-quarterly-grid/nav-quarterly-grid.component';
+import { ConfigurationComponent } from './configuration/configuration.component';
+import { ConfigurationAuditComponent } from './configuration-audit/configuration-audit.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ConfigurationService } from './services/configuration.service';
+import { InvestorGridUtilService } from './services/investor-grid-util.service';
+import { InvestmentGridUtilService } from './services/investment-grid-util.service';
+import { InvestorGridConfigService } from './services/investor-grid-config.service';
+import { InvestmentGridConfigService } from './services/investment-grid-config.service';
 
 @NgModule({
   declarations: [
@@ -48,6 +55,8 @@ import { NavQuarterlyGridComponent } from './bulk-upload/nav-quarterly-grid/nav-
     UploadComponent,
     ActivitiesGridComponent,
     NavQuarterlyGridComponent,
+    ConfigurationComponent,
+    ConfigurationAuditComponent,
   ],
   imports: [
     CommonModule,
@@ -68,6 +77,7 @@ import { NavQuarterlyGridComponent } from './bulk-upload/nav-quarterly-grid/nav-
     MatExpansionModule,
     MatTooltipModule,
     MatCheckboxModule,
+    MatProgressSpinnerModule,
 
     InputAmountNumberModule,
     FileDropzoneModule,
@@ -79,7 +89,11 @@ import { NavQuarterlyGridComponent } from './bulk-upload/nav-quarterly-grid/nav-
     ComponentReaderService,
     CapitalActivityService,
     UtilService,
-    ModalService,
+    InvestorGridUtilService,
+    InvestmentGridUtilService,
+    InvestorGridConfigService,
+    InvestmentGridConfigService,
+    ConfigurationService
   ]
 })
 export class CapitalActivityModule { }

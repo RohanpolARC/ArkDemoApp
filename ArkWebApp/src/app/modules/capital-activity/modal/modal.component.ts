@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CapitalActivityModel, CapitalInvestment, IModal } from 'src/app/shared/models/CapitalActivityModel';
 import { ModalService } from '../services/modal.service';
@@ -8,7 +8,10 @@ import { filter } from 'rxjs/operators';
 @Component({
   selector: 'app-modal',
   templateUrl: './modal.component.html',
-  styleUrls: ['./modal.component.scss']
+  styleUrls: ['./modal.component.scss'],
+  providers:[
+    ModalService
+  ]
 })
 export class ModalComponent implements OnInit, OnDestroy {
 
@@ -16,16 +19,16 @@ export class ModalComponent implements OnInit, OnDestroy {
   subscriptions: Subscription[] = []
   constructor(public dialogRef: MatDialogRef<ModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IModal,
-    private modalSvc: ModalService) { }
+    public modalSvc: ModalService) { }
   header: string;
   submitBtnText$: Observable<string> = this.modalSvc.submitBtnText$;
   isAlreadyLinked$: Observable<boolean> = this.modalSvc.isAlreadyLinked$;
   disableSubmit$: Observable<boolean> = this.modalSvc.disableSubmit$;
   validationMessage$: Observable<string> = this.modalSvc.validationMessage$;
   investmentData: CapitalInvestment[]
-  getSaveState: () => 'PENDING' | 'SUCCESS' | 'FAILURE' = this.modalSvc.getSaveState.bind(this.modalSvc)
   onSubmit = this.modalSvc.onSubmit
   capitalAct: CapitalActivityModel = <CapitalActivityModel>{};
+  hideSubmitButton$:Observable<boolean> = this.modalSvc.hideSubmitButton$;
   
   ngOnInit(): void {
 
@@ -49,9 +52,8 @@ export class ModalComponent implements OnInit, OnDestroy {
       this.isActionSuccessful = actionSuccessful
     }))
   }
-  ngOnDestroy(): void {
-    this.modalSvc.cleanUpSubjects();
 
+  ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
   close(){

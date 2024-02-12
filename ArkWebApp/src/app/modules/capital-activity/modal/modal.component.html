@@ -2,7 +2,7 @@
 
 <ng-template #validationMessage>
     <div class="update-msg"
-    [ngClass]="{'success': getSaveState() === 'SUCCESS', 'failure': getSaveState() === 'FAILURE', 'update-msg': '1'==='1'}">
+    [ngClass]="{'success': modalSvc.saveState === 'SUCCESS', 'failure': modalSvc.saveState === 'FAILURE', 'warning': modalSvc.saveState === 'WARNING', 'update-msg': '1'==='1'}">
         {{ validationMessage$ | async }}
     </div>
 </ng-template>
@@ -38,7 +38,8 @@
 
 
 <mat-dialog-actions align="end">
-    <button mat-raised-button color="primary" type="submit" 
+    <button *ngIf="!(hideSubmitButton$ | async) as t"
+            mat-raised-button color="primary" type="submit" 
             [disabled]="(disableSubmit$ | async)" 
             (click)="onSubmit(data.actionType)"
     >{{ submitBtnText$ | async }}</button>

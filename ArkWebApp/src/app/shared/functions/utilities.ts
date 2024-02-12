@@ -131,6 +131,10 @@ export function getMomentDateStr(date: Date): string{
   return moment(date).format('YYYY-MM-DD');
 }
 
+export function getMomentDateStr_ddmmyyyy(date: Date): string{
+  return moment(date).format('DD/MM/YYYY');
+}
+
 export function getDateFromStr(date: string, format: 'DD-MM-YYYY' | 'YYYY-MM-DD' | 'DD/MM/YYYY' | 'YYYY/MM/DD' = 'YYYY-MM-DD'): Date {
   return new Date(moment(date, format).format('YYYY-MM-DD'));
 }

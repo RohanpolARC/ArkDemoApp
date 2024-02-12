@@ -3,7 +3,7 @@ import { APIConfig } from 'src/app/configs/api-config';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 import { Subject, throwError } from 'rxjs';
-import { AssociateInvestment, CapitalActivityModel, CapitalInvestment, INAVQuarterly } from '../../../shared/models/CapitalActivityModel'
+import { AssociateInvestment, CapitalActivityModel, CapitalInvestment, ICapitalActivityConfig, INAVQuarterly } from '../../../shared/models/CapitalActivityModel'
 import { APIReponse } from 'src/app/shared/models/GeneralModel';
 
 @Injectable()
@@ -64,4 +64,13 @@ export class CapitalActivityService {
   public getCapitalRefData(){
     return this.http.get<any>(APIConfig.CAPITAL_ACTIVITY_GET_REF_API).pipe(catchError((ex) => throwError(ex)));
   }
+
+  public getCapitalActivityConfig(isAudit: boolean){
+    return this.http.get<ICapitalActivityConfig[]>(`${APIConfig.CAPITAL_ACTIVITY_GET_CONFIG}/?isAudit=${isAudit}`).pipe(catchError((ex) => throwError(ex)));
+  }
+  
+  public putCapitalActivityConfig(lockDateDetails: ICapitalActivityConfig){
+    return this.http.post<APIReponse>(APIConfig.CAPITAL_ACTIVITY_PUT_CONFIG,lockDateDetails).pipe(catchError((ex) => throwError(ex)));
+  }
+
 }

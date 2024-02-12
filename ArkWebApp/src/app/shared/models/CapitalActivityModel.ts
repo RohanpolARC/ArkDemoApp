@@ -97,3 +97,11 @@ export interface INAVQuarterly {
     Strategy: string,
     username: string
 }
+
+export interface ICapitalActivityConfig {
+    lockDate : Date,
+    addedBy : string,
+    numberOfLockedRecords? : number
+    addedOn? : Date
+}
+

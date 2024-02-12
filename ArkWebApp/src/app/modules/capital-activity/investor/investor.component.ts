@@ -5,6 +5,9 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { AdaptableApi, AdaptableReadyInfo } from '@adaptabletools/adaptable-angular-aggrid';
 import { ComponentReaderService } from '../services/component-reader.service';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
+import { ConfigurationService } from '../services/configuration.service';
+import { Subscription } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { InvestorGridUtilService } from '../services/investor-grid-util.service';
 
 @Component({
@@ -22,6 +25,7 @@ export class InvestorComponent implements OnInit {
   agGridModules: Module[]
   gridApi: GridApi
   adaptableApi: AdaptableApi
+  subscriptions: Subscription[] = []
   /**
    * Implementing the visitor pattern to read component properties in the service.
     https://stackoverflow.com/a/56975850
@@ -34,12 +38,18 @@ export class InvestorComponent implements OnInit {
   }    
   constructor(public gridConfigSvc: InvestorGridConfigService,
     private capitalActivitySvc: CapitalActivityService,
-    private componentReaderSvc: ComponentReaderService) {
+    private componentReaderSvc: ComponentReaderService,
+    public configSvc:ConfigurationService) {
       this.componentReaderSvc.registerInvestorComponent(this);
     }
   ngOnInit(): void {
 
     this.agGridModules = CommonConfig.AG_GRID_MODULES
+    this.subscriptions.push(this.configSvc.capitalActivityConfig$.subscribe(
+      (val) => {
+        this.adaptableApi?.gridApi?.refreshCells(this.adaptableApi.gridApi.getAllRowNodes(),['Edit'])
+      })
+    )
   }
   onAdaptableReady = (params: AdaptableReadyInfo) => {
     let api: AdaptableApi = params.adaptableApi;
@@ -50,6 +60,10 @@ export class InvestorComponent implements OnInit {
     api.toolPanelApi.closeAdapTableToolPanel();
     api.columnApi.autosizeAllColumns()
 
-    this.capitalActivitySvc.updateInvestorGridLoaded(true);
+    this.capitalActivitySvc.updateInvestorGridLoaded(true);    
   };
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
 }
