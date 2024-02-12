@@ -4,6 +4,12 @@
     <br>
     <div class="capital-action">
 
+        <button mat-icon-button (click)="utilSvc.openConfigDialog()" 
+            matTooltip="Lock Investor Cashflows" 
+            matTooltipClass="tooltip-capital">
+            <mat-icon class="material-icons-outlined">lock_clock</mat-icon>
+        </button>
+
         <button mat-icon-button (click)="utilSvc.updateInvestmentLinking()" matTooltip="Linking selected investments to investor cashflows" matTooltipClass="tooltip-capital">
             <mat-icon class="material-icons-outlined">link</mat-icon>
         </button>

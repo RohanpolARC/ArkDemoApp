@@ -1,0 +1,14 @@
+<ng-container>
+    <ag-grid-angular
+        [gridOptions]="gridOptions"
+        [adaptableOptions]="adaptableOptions"
+        [columnDefs]="columnDefs"
+        [modules]="agGridModules"
+        [sideBar]="'columns'"
+        class="ag-theme-alpine ag-grid"
+        (gridReady)="onGridReady($event)"
+        (adaptableReady)="onAdaptableReady($event)"
+
+    >
+    </ag-grid-angular>
+</ng-container>

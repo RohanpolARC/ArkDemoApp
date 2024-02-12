@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ValidateColumn } from './activities-grid-util.service';
 import { getAmountNumber, getDateFromStr } from 'src/app/shared/functions/utilities';
+import { formatDate } from 'src/app/shared/functions/formatter';
 
 
 @Injectable()
@@ -75,13 +76,13 @@ export class NavQuarterlyGridUtilService {
   }
 
   validateExcelRows(rows: any[], ref: {
-    fundhedgings: string[], strategies: string[]
+    fundhedgings: string[], strategies: string[], lockDate: Date
   }): {isValid: boolean, invalidRows?: {row: any, remark: string}[]} {
     
     let invalidRows: any[] = [];
 
     for(let i: number = 0; i < rows.length; i+= 1){
-      let invalidMsg = this.validateRow(rows[i], ref.fundhedgings, ref.strategies) || '';
+      let invalidMsg = this.validateRow(rows[i], ref.fundhedgings, ref.strategies, ref.lockDate) || '';
       if(invalidMsg === '')
         continue;
       else
@@ -91,12 +92,17 @@ export class NavQuarterlyGridUtilService {
     return invalidRows.length ? { isValid: false, invalidRows: invalidRows } : { isValid: true }
   }
 
-  validateRow(row: any, fundhedgings: string[], strategies: string[]): string {
+  validateRow(row: any, fundhedgings: string[], strategies: string[], lockDate: Date): string {
     let invalidmsg: string = '';
 
     if(Number((new Date(row?.['Quarter End'])).getFullYear) < 2012){
       invalidmsg += (invalidmsg === '') ? '' : ','
       invalidmsg += 'Quarter End cannot be less than 2012';
+    }
+
+    if((new Date(row?.['Quarter End'])) <= (new Date(lockDate))){
+      invalidmsg += (invalidmsg === '') ? '' : ','
+      invalidmsg += 'Quarter End updates till '+formatDate(lockDate)+' are locked.';
     }
     
     if(row['Fund Hedging'] && !fundhedgings?.includes(row['Fund Hedging'])){

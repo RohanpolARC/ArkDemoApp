@@ -1,14 +1,19 @@
-import { Component, OnInit, Inject, Input } from '@angular/core';
+import { Component, OnInit, Inject, Input, Output, EventEmitter } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/CapitalActivityModel';
-import { Subscription } from 'rxjs';
+import { CapitalActivityModel, CapitalInvestment, ICapitalActivityConfig } from 'src/app/shared/models/CapitalActivityModel';
+import { Subscription, combineLatest, config, of } from 'rxjs';
 import { Observable } from 'rxjs';
-import { startWith, map, tap, distinctUntilChanged } from 'rxjs/operators';
+import { startWith, map, tap, distinctUntilChanged, take, filter, switchMap, debounceTime } from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { ModalService } from '../services/modal.service';
 import { FormUtilService } from '../services/form-util.service';
+import { ConfigurationService } from '../services/configuration.service';
+import { DataService } from 'src/app/core/services/data.service';
+import { getMomentDateStr_ddmmyyyy } from 'src/app/shared/functions/utilities';
+import { start } from 'repl';
+import { UtilService } from '../services/util.service';
 
 @Component({
   selector: 'app-form',
@@ -31,14 +36,19 @@ export class FormComponent implements OnInit{
       strategies: string[],
       capitalTypeSubtypeAssociation: any,
       refData: any,
-      gridData: any
+      gridData: any,
+      isLocked: boolean
     },
     public dialog: MatDialog,
-    private modalSvc: ModalService) { }
+    private modalSvc: ModalService,
+    public configSvc: ConfigurationService,
+    public dataSvc: DataService,
+    public utilSvc:UtilService) { }
   model: CapitalActivityModel = <CapitalActivityModel>{};
 
   subscriptions: Subscription[] = [];
 
+  valueDate$: Observable<Date>;
   capitalTypeFilteredOptions: Observable<string[]>;
   capitalSubTypeFilteredOptions: Observable<string[]>;
   strategyFilteredOptions: Observable<string[]>;
@@ -150,8 +160,34 @@ export class FormComponent implements OnInit{
     this.capitalSubTypeFilteredOptions = this.form.get('capitalSubType').valueChanges.pipe(startWith(''), 
       map(value => this.formUtilSvc._filterCapitalSubtype(value))
     )
+
+    this.valueDate$ = this.form.get('valueDate').valueChanges.pipe(
+      startWith(''),
+      debounceTime(300),
+      distinctUntilChanged()
+    )
+    
+    this.subscriptions.push(combineLatest([this.valueDate$,this.configSvc.capitalActivityConfig$]).pipe(
+      map(([valueDate,config]) => {
+        if(new Date(valueDate) <= new Date(config?.lockDate) && valueDate!=null ){
+          if(this.data.actionType=='EDIT' && this.data.isLocked){
+            this.modalSvc.updateHideSubmitButton(true);
+            this.form.disable();
+          }          
+          return "The capital activities till "+getMomentDateStr_ddmmyyyy(config.lockDate)+" are locked."
+        }          
+        else{
+          return ''
+        }          
+      })
+    )
+    .subscribe(formValidationMessage => {
+      this.modalSvc.updateFormValidation(formValidationMessage)
+    }))
+    
   }
   ngOnInit(): void {
+
     this.formUtilSvc.refData = this.data.refData;
     this.formUtilSvc.capitalTypeSubtypeAssociation = this.data.capitalTypeSubtypeAssociation;
 

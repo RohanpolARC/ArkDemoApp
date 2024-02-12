@@ -1,0 +1,26 @@
+.update-msg{
+    padding: 5px;
+    font-size: 14px;
+    padding-left: 0.8rem;
+}
+
+
+.success{
+    color: rgb(8, 204, 90);
+}
+
+.failure {
+    color: red;
+}
+
+.content{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 90%;
+}
+
+mat-dialog-actions{
+    margin-top: 40px;
+}

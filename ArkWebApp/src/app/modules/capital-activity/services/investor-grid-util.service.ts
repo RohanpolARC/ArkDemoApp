@@ -2,50 +2,64 @@ import { ActionColumnContext, AdaptableButton } from '@adaptabletools/adaptable-
 import { Injectable, OnDestroy } from '@angular/core';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
 import { UtilService } from './util.service';
-import { Subject, Subscription, of } from 'rxjs';
-import { catchError, filter, switchMap, tap } from 'rxjs/operators';
-import { error } from 'console';
-import { CapitalInvestment } from 'src/app/shared/models/CapitalActivityModel';
+import { take } from 'rxjs/operators';
+import { ConfigurationService } from './configuration.service';
 
 @Injectable()
-export class InvestorGridUtilService implements OnDestroy{
+export class InvestorGridUtilService {
 
   constructor(private capitalActivitySvc: CapitalActivityService,
-    private utilSvc: UtilService) {
-      this.init()
-    }
+    private utilSvc: UtilService,
+    private configSvc: ConfigurationService
+    ) { }
 
-  subscriptions: Subscription[] = []
-  private editActionClick = new Subject<boolean>();
-  editActionClick$ = this.editActionClick.asObservable();
-  updateEditActionClick(click: boolean){
-    this.editActionClick.next(click)
-  }
-  rowData:any
+  editActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext,args:boolean[]) {
+    
+    let isLocked = this.hideEditActionColumn(button,context)
 
-  init(){
-    // editActionClick observable is subscribed with switch map to cancel out any previous api requests and pass in only the latest api response.
-    // In case of where user clicks multiple times on Edit Action this will prevent the modal not populating older api response but with data of latest api request.
-    this.subscriptions.push(this.editActionClick$.pipe(
-      switchMap(() => this.capitalActivitySvc.getCapitalInvestment(this.rowData.capitalID)) 
-    )
-    .subscribe({
-      next: investments => {
-        this.utilSvc.openDialog(this.rowData, 'EDIT', investments);
+    let rowData =  context.rowNode?.data;
+    let investments = []; 
+    this.capitalActivitySvc.getCapitalInvestment(rowData.capitalID).pipe(
+      take(1)
+    ).subscribe({
+      next: data => {
+        investments = data;
+        this.utilSvc.openDialog(rowData, 'EDIT', investments, isLocked);
       },
       error: error => {
         console.error("Couldn't fetch investments for this capitalID");
       }
-    }))
-  }
-    
-  editActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
-    this.rowData =  context.rowNode?.data;
-    this.updateEditActionClick(true)
+    })
   }
 
-
-  ngOnDestroy(){
-    this.subscriptions.forEach(sub => sub.unsubscribe()); 
+  hideEditActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext){
+    let lockDate = this.configSvc?.config?.lockDate;
+    if(lockDate){
+      let rowData = context.rowNode?.data;
+      return new Date(rowData?.valueDate) <= new Date(lockDate)  
+    }
+    else {
+      return false;
+    }  
   }
+
+  hideLockActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext){
+    let lockDate = this.configSvc?.config?.lockDate;
+    if(lockDate){
+      let rowData = context.rowNode?.data;
+      return new Date(rowData?.valueDate) > new Date(lockDate)  
+    }
+    else {
+      return true;
+    }
+  }
+
+  showHideLockIcon(params){
+    if(new Date(params.node?.data?.valueDate) <= new Date(this.configSvc.config?.lockDate))
+      return '<span><img src="../assets/img/lock.svg"></span>'
+    else
+      return ''
+  }
+  
+
 }

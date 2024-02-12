@@ -5,7 +5,7 @@
       <mat-form-field appearance="outline" class="col-4">
         <mat-label> Total Amount (Fund Ccy) </mat-label>
         <input type="text" required matInput InputAmountNumber formControlName="totalAmount" />
-        <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="form.get('totalAmount').reset()">
+        <button *ngIf="!data?.isLocked" matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="form.get('totalAmount').reset()">
             <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
@@ -15,7 +15,7 @@
       <mat-form-field appearance="outline" class="col-4">
         <mat-label>Narrative</mat-label>
         <input matInput formControlName="narrative" />
-        <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="form.get('narrative').reset()">
+        <button *ngIf="!data?.isLocked" matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="form.get('narrative').reset()">
             <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
@@ -39,7 +39,7 @@
             {{ISS[0]}}
           </mat-option>
         </mat-autocomplete>
-        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('issuerShortName').reset();
+        <button *ngIf="!data?.isLocked" matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('issuerShortName').reset();
         formUtilSvc.selectedIssuerID = null">
             <mat-icon>close</mat-icon>
         </button>
@@ -61,7 +61,7 @@
             {{ asset[0] }}
           </mat-option>
         </mat-autocomplete>
-        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('asset').reset(); formUtilSvc.selectedAssetID = null;">
+        <button *ngIf="!data?.isLocked" matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('asset').reset(); formUtilSvc.selectedAssetID = null;">
             <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
@@ -83,7 +83,7 @@
             {{strategy}}
           </mat-option>
         </mat-autocomplete>
-        <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('strategy').reset();">
+        <button *ngIf="!data?.isLocked" matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('strategy').reset();">
             <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
@@ -100,7 +100,7 @@
             [for]="callDatePicker"
           ></mat-datepicker-toggle>
           <mat-datepicker #callDatePicker></mat-datepicker>
-          <button matSuffix mat-icon-button type="button" aria-label="Clear" (click)="form.get('callDate').reset()">
+          <button *ngIf="!data?.isLocked" matSuffix mat-icon-button type="button" aria-label="Clear" (click)="form.get('callDate').reset()">
               <mat-icon>close</mat-icon>
           </button>
         </mat-form-field>
@@ -110,7 +110,7 @@
           <input matInput required formControlName="valueDate" [matDatepicker]="valueDatePicker" />
           <mat-datepicker-toggle matSuffix [for]="valueDatePicker"></mat-datepicker-toggle>
           <mat-datepicker #valueDatePicker></mat-datepicker>
-          <button matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="form.get('valueDate').reset()">
+          <button *ngIf="!data?.isLocked" matSuffix mat-icon-button aria-label="Clear" type="button"  (click)="form.get('valueDate').reset()">
               <mat-icon>close</mat-icon>
           </button>
         </mat-form-field>
@@ -137,7 +137,7 @@
               {{capitalType}}
             </mat-option>
           </mat-autocomplete>
-          <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('capitalType').reset()">
+          <button *ngIf="!data?.isLocked" matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('capitalType').reset()">
               <mat-icon>close</mat-icon>
           </button>
         </mat-form-field>
@@ -154,7 +154,7 @@
               {{subtype}}
             </mat-option>
           </mat-autocomplete>
-          <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('capitalSubType').reset()">
+          <button *ngIf="!data?.isLocked" matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('capitalSubType').reset()">
               <mat-icon>close</mat-icon>
           </button>
         </mat-form-field>
@@ -178,7 +178,7 @@
               {{fundHedging}}
             </mat-option>
           </mat-autocomplete>
-          <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('fundHedging').reset()">
+          <button *ngIf="!data?.isLocked" matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('fundHedging').reset()">
               <mat-icon>close</mat-icon>
           </button>
         </mat-form-field>
@@ -188,7 +188,7 @@
             Fund Currency
           </mat-label>
   
-          <input type="text" matInput required formControlName="fundCcy" [matAutocomplete]="autoFundCcy" matAutocompletePosition="below" [readonly]="form.get('asset').value">
+          <input type="text" matInput required formControlName="fundCcy" [matAutocomplete]="autoFundCcy" matAutocompletePosition="below">
           <mat-error *ngIf="form.get('fundCcy').invalid">Please select fund currency from the list</mat-error>
           <mat-autocomplete autoActiveFirstOption #autoFundCcy="matAutocomplete" panelWidth="auto">
             <mat-option
@@ -198,7 +198,7 @@
               {{ccy}}
             </mat-option>
           </mat-autocomplete>
-          <button matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('fundCcy').reset()">
+          <button *ngIf="!data?.isLocked" matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('fundCcy').reset()">
               <mat-icon>close</mat-icon>
           </button>
         </mat-form-field>

@@ -9,6 +9,8 @@ import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { ComponentReaderService } from './component-reader.service';
 import { ModalComponent } from '../modal/modal.component';
 import { UploadComponent } from '../bulk-upload/upload/upload.component';
+import { ConfigurationComponent } from '../configuration/configuration.component';
+import { ConfigurationService } from './configuration.service';
 
 interface ILoadDataFunc {
   (): void
@@ -19,7 +21,9 @@ export class UtilService {
   constructor(public dialog: MatDialog,
     private capitalActivitySvc: CapitalActivityService,
     private dataSvc: DataService,
-    private compReaderSvc: ComponentReaderService) {
+    private compReaderSvc: ComponentReaderService,
+    private configurationSvc: ConfigurationService
+    ) {
       this.loadRefData()
   }
   investorAdaptableApi: AdaptableApi
@@ -44,6 +48,7 @@ export class UtilService {
     }, 500)
   }
 
+
   loadInvestorData(){
     let loader = this.component.readProperty<ILoadDataFunc>('loadInvestorData').bind(this.component)
     loader()  }
@@ -55,7 +60,8 @@ export class UtilService {
 
     forkJoin([
       this.capitalActivitySvc.getCapitalRefData(),
-      this.dataSvc.getRefDatatable('[ArkUI].[CapitalTypeSubtypeAssociation]')
+      this.dataSvc.getRefDatatable('[ArkUI].[CapitalTypeSubtypeAssociation]'),
+      this.capitalActivitySvc.getCapitalActivityConfig(false)
     ]).pipe(
       take(1),
       retry(2)
@@ -72,6 +78,7 @@ export class UtilService {
         if(typeof reftable === 'string')
           this.capitalTypeSubtypeAssociation = JSON.parse(reftable);
 
+        this.configurationSvc.updateCapitalActivityConfig(res?.[2]?.[0])
       },
       error: (error) => {
         this.dataSvc.setWarningMsg(`Failed to load ref data: ${error}`);
@@ -79,7 +86,7 @@ export class UtilService {
     })
   }
 
-  openDialog(data? , actionType = 'ADD', gridData = null):void{
+  openDialog(data? , actionType = 'ADD', gridData = null, isLocked?):void{
 
     const dialogRef = this.dialog.open(ModalComponent, {
       data: {
@@ -92,7 +99,8 @@ export class UtilService {
         strategies: this.strategyOptions,
         capitalTypeSubtypeAssociation: this.capitalTypeSubtypeAssociation,
         refData: this.refData,
-        gridData: gridData
+        gridData: gridData,
+        isLocked: isLocked
       },
       width: '70vw',
       maxWidth: '2000px',
@@ -129,7 +137,6 @@ export class UtilService {
         capitalSubTypes: this.capitalSubTypeOptions,
         strategies: this.strategyOptions,
         refData: this.refData
-
       },
       width: '90vw',
       maxWidth: '90vw',
@@ -146,5 +153,15 @@ export class UtilService {
   updateInvestmentLinking(){
     this.capitalActivitySvc.updateLinkEvent(true);
   }
+
+  openConfigDialog(){
+    const dialogRef = this.dialog.open(ConfigurationComponent, {
+      width: '55vw',
+      maxWidth: '55vw',
+      height: '85vh',
+      maxHeight: '99vh'
+    })
+  }
+
 
 }
