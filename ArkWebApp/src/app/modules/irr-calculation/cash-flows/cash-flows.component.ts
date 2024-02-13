@@ -85,7 +85,13 @@ export class CashFlowsComponent implements OnInit {
   'totalInterest',
   'totalIncome',
   'total',
+  'realisedEur',
+  'realisedInterestEur',
+  'realisedFeesEur',
   'totalEur',
+  'totalEurUnrealisedGain',
+  'totalEurNoInterest',
+  'totalEurNoFees',
   'totalBase',
   'feesCcy',
   'interestCcy',
@@ -187,7 +193,13 @@ export class CashFlowsComponent implements OnInit {
       { field: 'totalInterest', type: 'abColDefNumber' },
       { field: 'totalIncome', type: 'abColDefNumber' },
       { field: 'total', type: 'abColDefNumber' },
+      { field: 'realisedEur', type: 'abColDefNumber' },
+      { field: 'realisedInterestEur', type: 'abColDefNumber' },
+      { field: 'realisedFeesEur', type: 'abColDefNumber' },
       { field: 'totalEur', type: 'abColDefNumber' },
+      { field: 'totalEurUnrealisedGain', type: 'abColDefNumber' },
+      { field: 'totalEurNoInterest', type: 'abColDefNumber' },
+      { field: 'totalEurNoFees', type: 'abColDefNumber' },
       { field: 'totalBase', type: 'abColDefNumber' },
       { field: 'realized', type: 'abColDefNumber' },
       { field: 'isActual', type: 'abColDefBoolean' },
@@ -295,14 +307,14 @@ export class CashFlowsComponent implements OnInit {
         },
         Layout:{
           CurrentLayout: 'Basic Cashflows Layout',
-          Revision: 4,
+          Revision: 8,
           Layouts: [{
             Name: 'Basic Cashflows Layout',
             Columns: this.columnDefs.filter(def => !def.hide).map(def => def.field)
           }]
         },
         FormatColumn:{
-          Revision:9,
+          Revision: 12,
           FormatColumns:[
             CUSTOM_FORMATTER([...this.AMOUNT_COLUMNS],['amountFormatter']),
             CUSTOM_FORMATTER([...this.FX_COLUMNS],['fxFormatter']),

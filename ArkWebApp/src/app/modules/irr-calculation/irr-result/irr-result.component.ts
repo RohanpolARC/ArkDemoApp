@@ -57,6 +57,10 @@ export class IrrResultComponent implements OnInit {
     { field: 'RemainingValueEEur', type: 'abColDefNumber', headerName: 'Remaining Value E Eur', minWidth: 180 },
     { field: 'RemainingValueWEur', type: 'abColDefNumber', headerName: 'Remaining Value W Eur', minWidth: 180 },
     { field: 'CashIRR', minWidth: 110, type: 'abColDefNumber'},
+    { field: 'FeesIRR', minWidth: 110, type: 'abColDefNumber'},
+    { field: 'InterestIRR', minWidth: 110, type: 'abColDefNumber'},
+    { field: 'UnrealisedGainIRR', minWidth: 110, type: 'abColDefNumber'},
+    { field: 'NoInterestIRR', minWidth: 110, type: 'abColDefNumber'},
     { field: 'YTE', headerName: 'YTE', minWidth: 95,type: 'abColDefNumber'},
     { field: 'CurrentYTE', headerName: 'Current YTE', minWidth: 130, type: 'abColDefNumber'},
     { field: 'YTEHedged', hide: true, headerName: 'YTE Hedged', minWidth: 135, type: 'abColDefNumber'},
@@ -216,10 +220,10 @@ export class IrrResultComponent implements OnInit {
           Revision: 15,
         },
         Layout: {
-          Revision: 14,
+          Revision: 17,
         },
         FormatColumn:{
-          Revision:5,
+          Revision: 8,
           FormatColumns:[
             CUSTOM_FORMATTER([...this.calcColDefs.filter(x => x.type === 'abColDefNumber').map(x => x.field)], ['amountFormatter']),
            ]
@@ -465,7 +469,7 @@ export class IrrResultComponent implements OnInit {
   
   NON_AMOUNT_2DEC_COLUMNS = ['ExpectedAge','AverageLifeE','AverageLifeW','CashMOM','MOME','MOMW','PaybackE','PaybackW']
   
-  PERCENT_COLUMNS = ['CashIRR','YTE','CurrentYTE','YTEHedged','YTW','CurrentYTW','CurrentSTE','EffectiveBaseRateNormalised','EffectiveYieldCurve','YTWHedged','CashYield']
+  PERCENT_COLUMNS = ['CashIRR','YTE','CurrentYTE','YTEHedged','YTW','CurrentYTW','CurrentSTE','EffectiveBaseRateNormalised','EffectiveYieldCurve','YTWHedged','CashYield','FeesIRR', 'InterestIRR', 'UnrealisedGainIRR', 'NoInterestIRR']
 
   // LTV values for equities will come as 0 which should be shown as blank(-)
   FORMAT_ZERO_AS_DASH_COLUMNS = ['NetLTV','NetLTVAtInvestement']
