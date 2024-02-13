@@ -32,7 +32,7 @@ export class InvestorGridUtilService implements OnDestroy {
   init()  
  {
   this.subscriptions.push(this.editActionClick$.pipe(
-    switchMap(() => this.capitalActivitySvc.getCapitalInvestment(this.rowData.capitalId).pipe(take(1)))
+    switchMap(() => this.capitalActivitySvc.getCapitalInvestment(this.rowData.capitalID).pipe(take(1)))
   ).subscribe({
    next: data => {
      this.investments = data;
