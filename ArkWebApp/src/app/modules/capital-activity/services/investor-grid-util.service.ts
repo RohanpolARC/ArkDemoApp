@@ -9,7 +9,7 @@ import { ConfigurationService } from './configuration.service';
 import { SIGPWR } from 'constants';
 
 @Injectable()
-export class InvestorGridUtilService {
+export class InvestorGridUtilService implements OnDestroy {
 
   constructor(private capitalActivitySvc: CapitalActivityService,
     private utilSvc: UtilService,
@@ -81,5 +81,7 @@ export class InvestorGridUtilService {
       return ''
   }
   
-
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub => sub.unsubscribe()); 
+  }
 }
