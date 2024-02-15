@@ -50,7 +50,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   feePresets: { feePreset: string, id: number }[]
   calculationTypes: string[]= ['Monthly Returns','Fee Model','IRR']
   curveRates: { curveRateName: string, rate: number }[]
-  currencies: { currency: string, id: number }[]
+  fundCurrencies: { fundCurrency: string, id: number }[]
   readMore: boolean = false;
   isIRRDisabled: boolean = true;
   isFeePresetDisabled: boolean = true;
@@ -79,14 +79,14 @@ export class PortfolioSaveRunModelComponent implements OnInit {
         this.dataService.getUniqueValuesForField('PortfolioModeller-Fee-Calculation-Entities'),
         this.dataService.getRefDatatable('[ArkUI].[IRRAggregationLevelRef]'),
         this.dataService.getUniqueValuesForField('BaseCurve-Rates'),
-        this.dataService.getUniqueValuesForField('currency')
+        this.dataService.getUniqueValuesForField('fundCcy')
       ]).subscribe({
         next: (d: any[]) => {
           let bm = d[0]
           let fp = d[1]
           let aggrRefDt = d[2]
           let bcr = d[3]
-          let curr = d[4]
+          let fcurr = d[4]
 
           if(typeof aggrRefDt === 'string')
             aggrRefDt = JSON.parse(aggrRefDt)
@@ -96,7 +96,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
           this.allAggrCols = aggrRefDt.map(x => x?.['Fields'])
           this.mapGroupCols = aggrRefDt.filter(x => x?.['IsResultColumn']).map(x => x?.['Fields'])
           this.curveRates = bcr.map(item => { return { curveRateName: item.value, rate: item.id } })
-          this.currencies = curr.map(item => { return { currency: item.value, id: item.id } })
+          this.fundCurrencies = fcurr.map(item => { return { fundCurrency: item.value, id: item.id } })
 
           this.Init();
           this.changeListeners();
@@ -173,6 +173,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       feePreset: new FormControl(this.feePresets[0]?.feePreset, Validators.required),
       calculationType: new FormControl([], Validators.required),
       curveRateName: new FormControl(this.curveRates.filter(cr => cr.rate === 0)[0].curveRateName, Validators.required),
+      fundCurrency: new FormControl(this.data.model?.fundCurrency??'EUR', Validators.required),
       aggrStr: new FormControl('')    })
 
     this.updateAggregationOrder(aggrStr);
@@ -283,6 +284,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     model.isManual = !this.isAutomatic;
     model.latestWSOStatic = this.modelForm.get('latestWSOStatic').value;
     model.irrAggrType = this.modelForm.get('aggregationType').value;
+    model.fundCurrency = this.modelForm.get('fundCurrency').value;
 
     let curveRateName = this.modelForm.get('curveRateName').value;
     model.curveRateDelta = this.curveRates.filter(cr => cr.curveRateName === curveRateName)?.['0']?.['rate']
@@ -340,7 +342,8 @@ export class PortfolioSaveRunModelComponent implements OnInit {
               feePreset: this.isFeePresetDisabled ? null :  this.modelForm.get('feePreset').value,
               irrAggrType: this.isIRRDisabled ? null : this.modelForm.get('aggregationType').value,
               curveRateDelta: this.isIRRDisabled ? null : model.curveRateDelta,
-              latestWSOStatic: this.isIRRDisabled ? null : model.latestWSOStatic,  
+              latestWSOStatic: this.isIRRDisabled ? null : model.latestWSOStatic,
+              fundCurrency: this.isIRRDisabled ? null : this.modelForm.get('fundCurrency').value,  
               // Setting dynamically set aggregation order.
               aggrStr: this.aggrCols,
               mapGroupCols: this.mapGroupCols
