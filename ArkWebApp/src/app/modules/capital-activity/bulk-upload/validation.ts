@@ -16,6 +16,11 @@ let actualCols: string[] = [
     'Strategy/Currency'
 ]
 
+let dateCols: string[] = [
+    'Cash Flow Date',
+    'Call Date'
+]
+
 let refData;
 let refOptions;
 let invalidMsg: string = '';
@@ -33,22 +38,28 @@ export function validateColumns(fileColumns: string[]): {isValid: boolean, col?:
 }
 
 export function validateRowForEmptiness(row: any): void{
-
-    for(let i:number = 0; i < actualCols.length; i+=1){
-        if(!row[actualCols[i]] &&
-        [
-            // 'Issuer Short Name(optional)',
-            'Asset (optional)',
-            'Narative (optional)',
-            // 'Wso Issuer ID',
-            'Wso Asset ID',
-            'Strategy/Currency'
-            // 'Fund Currency',
-            // 'GIR Override'
-        ].indexOf(actualCols[i]) === -1){
-            invalidMsg += (invalidMsg === '') ? `${actualCols[i]} cannot be empty` :  `, ${actualCols[i]} cannot be empty`;
+    for (let i: number = 0; i < actualCols.length; i += 1) {
+        if (!row[actualCols[i]] &&
+            [
+                // 'Issuer Short Name(optional)',
+                'Asset (optional)',
+                'Narative (optional)',
+                // 'Wso Issuer ID',
+                'Wso Asset ID',
+                'Strategy/Currency'
+                // 'Fund Currency',
+                // 'GIR Override'
+            ].indexOf(actualCols[i]) === -1) {
+            let errorMessage = '';     
+            if(dateCols.includes(actualCols[i])){         
+              errorMessage = `Invalid ${actualCols[i]}`;
+            }
+            else {
+                errorMessage = `${actualCols[i]} cannot be empty`;
+            }
+            invalidMsg += (invalidMsg === '') ? errorMessage : `, ${errorMessage}`;
         }
-    }
+    }   
 }
 
 export function validateRowValueRange(row: any, lockDate: Date): void{

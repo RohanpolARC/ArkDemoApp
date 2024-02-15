@@ -47,11 +47,19 @@ export class NavQuarterlyGridUtilService {
   validateHeaders(actualColumns: string[], fileColumns: string[]): boolean {
     let invalidColumnFound = false;
 
-    for(let i: number = 0; i<actualColumns.length; i+=1){
-      if(actualColumns.indexOf(fileColumns[i]) !== -1 || fileColumns[i] === '_ROW_ID')
-        continue;
-      else
-        invalidColumnFound = true;           
+    if(actualColumns.length!==fileColumns.length)
+    {
+      invalidColumnFound = true
+    }   
+    else
+    {
+      for(let i: number = 0; i<actualColumns.length; i+=1)
+      {
+        if(actualColumns.indexOf(fileColumns[i]) !== -1 || fileColumns[i] === '_ROW_ID')
+          continue;
+        else
+          invalidColumnFound = true;           
+      }  
     }
     if (invalidColumnFound){
       return false
@@ -131,7 +139,17 @@ export class NavQuarterlyGridUtilService {
 
     if(row['Quarter End'] == null){
       invalidmsg += (invalidmsg === '') ? '' : ','
-      invalidmsg += 'Quarter End cannot be empty';
+      invalidmsg += 'Invalid Quarter End Date';
+    }
+
+    if(row['Quarter End']!== null && ((new Date(row?.['Quarter End'])) <= (new Date(lockDate)))){
+      invalidmsg += (invalidmsg === '') ? '' : ','
+      invalidmsg += 'Quarter End updates till '+formatDate(lockDate)+' are locked.';
+    }
+
+    if(row['Fund Hedging'] && !fundhedgings?.includes(row['Fund Hedging'])){
+      invalidmsg += (invalidmsg === '') ? '' : ','
+      invalidmsg += 'Fund hedging not part of the allowed list';
     }
 
     if(row['Fund Hedging'] == null){
@@ -139,16 +157,6 @@ export class NavQuarterlyGridUtilService {
       invalidmsg += 'Fund hedging cannot be empty';
     }
     
-    if((new Date(row?.['Quarter End'])) <= (new Date(lockDate))){
-      invalidmsg += (invalidmsg === '') ? '' : ','
-      invalidmsg += 'Quarter End updates till '+formatDate(lockDate)+' are locked.';
-    }
-    
-    if(row['Fund Hedging'] && !fundhedgings?.includes(row['Fund Hedging'])){
-      invalidmsg += (invalidmsg === '') ? '' : ','
-      invalidmsg += 'Fund hedging not part of the allowed list';
-    }
-
     if(row['Strategy/Currency'] && !strategies?.includes(row['Strategy/Currency'])){
       invalidmsg += (invalidmsg === '') ? '' : ','
       invalidmsg += 'Strategy/Currency not part of the allowed list';
