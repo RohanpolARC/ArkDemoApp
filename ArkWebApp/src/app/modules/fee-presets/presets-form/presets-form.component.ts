@@ -22,7 +22,7 @@ export class PresetsFormComponent implements OnInit, AfterViewInit {
   @ViewChild(InvestmentdataFormComponent) investmentForm!: InvestmentdataFormComponent
   @ViewChild(FeedataFormComponent) feeForm!: FeedataFormComponent
 
-  fundName: string
+  presetName: string
   isSuccess: boolean = false;
   isFailure: boolean = false;
   updateMsg: string
@@ -47,11 +47,11 @@ export class PresetsFormComponent implements OnInit, AfterViewInit {
   ) { }
   
   ngAfterViewInit(): void {
-    this.fundName = this.feeData?.fundName
+    this.presetName = this.feeData?.presetName
   }
 
-  updateFundName(fund: string){
-    this.fundName = fund;
+  updatePresetName(preset: string){
+    this.presetName = preset;
   }
 
   ngOnInit(): void {
@@ -101,9 +101,6 @@ export class PresetsFormComponent implements OnInit, AfterViewInit {
       ...feeData?.['other'],
       ...{
         modifiedBy: this.msalUserSvc.getUserName()
-      },
-      ...{
-        entity: this.fundName
       }, 
       ...this.getAmountFields()
     }
@@ -130,7 +127,9 @@ export class PresetsFormComponent implements OnInit, AfterViewInit {
     feeDataModel['isQuarterEndMgmtFees'] = (feeData['isQuarterEndMgmtFees'] === 'Yes') 
     feeDataModel['overrideExpected'] = (feeData['overrideExpected'] === 'Yes') 
     feeDataModel['reinvestInterest'] = (feeData['reinvestInterest'] === 'Yes') 
-    feeDataModel['useFXHedgingCashflows'] = (feeData['useFXHedgingCashflows'] === 'Yes') 
+    feeDataModel['useFXHedgingCashflows'] = (feeData['useFXHedgingCashflows'] === 'Yes')
+    feeDataModel['useGIRAdjustment'] = (feeData['useGIRAdjustment'] === 'Yes')
+    feeDataModel['isPerfFeeAfterMgmtFee'] = (feeData['isPerfFeeAfterMgmtFee'] === 'Yes') 
 
     investmentData = {
       ...investmentData,

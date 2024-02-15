@@ -72,6 +72,10 @@ export class FeePresetsComponent implements OnInit {
         enableValue: true,
         enableRowGroup: true  
       },
+      rowHeight: 30,
+      headerHeight: 30,
+      groupHeaderHeight: 30,
+      pivotHeaderHeight: 30,
       excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
       noRowsOverlayComponent: NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
@@ -115,10 +119,10 @@ export class FeePresetsComponent implements OnInit {
                   }
 
                   let rowData = context.rowNode.data;
-                  let fundName: string = rowData?.['fundName'];
+                  let presetName: string = rowData?.['presetName'];
 
                   // To open dialog after successfull fetch
-                  this.fetchFundInvestmentData(fundName, true, PresetGridAction.EDIT, {
+                  this.fetchFundInvestmentData(presetName, true, PresetGridAction.EDIT, {
                     fundFee: rowData,
                     presetID: rowData?.['presetID']
                   });       
@@ -137,11 +141,11 @@ export class FeePresetsComponent implements OnInit {
                   }
 
                   let rowData = JSON.parse(JSON.stringify(context.rowNode.data));
-                  let fundName: string = rowData?.['fundName'];   // This fundname is used to fetch the investment data from the DB.
-                  rowData['fundName'] = null;             // For cloned rows, fundName is set as empty
+                  let presetName: string = rowData?.['presetName'];   // This presetName is used to fetch the investment data from the DB.
+                  rowData['presetName'] = null;             // For cloned rows, presetName is set as empty
 
                   // To open dialog after successfull fetch
-                  this.fetchFundInvestmentData(fundName, true, PresetGridAction.CLONE, {
+                  this.fetchFundInvestmentData(presetName, true, PresetGridAction.CLONE, {
                     fundFee: rowData,
                     presetID: null
                   })
@@ -175,7 +179,7 @@ export class FeePresetsComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 10,
+          Revision: 11,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -231,7 +235,7 @@ export class FeePresetsComponent implements OnInit {
 
   }
 
-  fetchFundInvestmentData(fundName: string, 
+  fetchFundInvestmentData(presetName: string, 
     openDialogAfter: boolean = false, 
     action: PresetGridAction,
     ref: {
@@ -239,14 +243,14 @@ export class FeePresetsComponent implements OnInit {
       presetID: number
       // fundInvestment: any
     }){
-    this.subscriptions.push(this.feePresetsSvc.getFundInvestmentData(fundName).subscribe({
+    this.subscriptions.push(this.feePresetsSvc.getFundInvestmentData(presetName).subscribe({
       next: (fundInvestment: any[]) => {
         if(openDialogAfter){
-          this.openDialog(action, ref.presetID, ref.fundFee, fundInvestment[0])       // For a fundName, only one investment data should come.
+          this.openDialog(action, ref.presetID, ref.fundFee, fundInvestment[0])       // For a presetName, only one investment datarow should come.
         }
       },
       error: (error) => {
-        console.error(`Failed to fetch investment data for ${fundName}`)
+        console.error(`Failed to fetch investment data for ${presetName}`)
 
       }
     }))
@@ -265,6 +269,8 @@ export class FeePresetsComponent implements OnInit {
           row['overrideExpected'] = row['overrideExpected'] ? 'Yes' : 'No';
           row['reinvestInterest'] = row['reinvestInterest'] ? 'Yes' : 'No';
           row['useFXHedgingCashflows'] = row['useFXHedgingCashflows'] ? 'Yes' : 'No';
+          row['useGIRAdjustment'] = row['useGIRAdjustment'] ? 'Yes' : 'No';
+          row['isPerfFeeAfterMgmtFee'] = row['isPerfFeeAfterMgmtFee'] ? 'Yes' : 'No';
           
           let dateFields: string[] = ['financingEndDate', 'financingStartDate', 'holdingDate', 'investmentDate', 'startDate', 'financingStage1EndDate', 'financingStage2EndDate', 'modifiedOn', 'createdOn'];
 

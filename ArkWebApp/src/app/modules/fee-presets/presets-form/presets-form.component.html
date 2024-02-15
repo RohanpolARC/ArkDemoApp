@@ -13,7 +13,7 @@
         <app-feedata-form
             [action] = "action"
             [feeData] = "feeData"
-            (fundNameEmitter)="updateFundName($event)"
+            (presetNameEmitter)="updatePresetName($event)"
         ></app-feedata-form>
     </mat-step>
     <mat-step [stepControl]="investmentForm?.form">
@@ -21,7 +21,7 @@
         <app-investmentdata-form
             [action] = "action"
             [feeInvestment] = "feeInvestment"
-            [fundName] = "fundName"
+            [presetName] = "presetName"
         ></app-investmentdata-form>
     </mat-step>
 </mat-vertical-stepper>
