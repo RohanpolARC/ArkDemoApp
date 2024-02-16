@@ -140,6 +140,7 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
     m.irrAggrType = contextData?.aggrStr?.join(' > ') ?? '';
     m.curveRateDelta = contextData.curveRateDelta ?? 0.0;
     m.latestWSOStatic = contextData?.latestWSOStatic ?? false;
+    m.fundCurrency = contextData?.fundCurrency;
     m.runBy = this.dataSvc.getCurrentUserName();
 
     // Load cashflows only if running IRR/Performance fees
@@ -318,7 +319,8 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
               curveRateDelta: res?.['curveRateDelta'],
               aggrStr: res?.['aggrStr'],
               mapGroupCols: res?.['mapGroupCols'],
-              latestWSOStatic: res?.['latestWSOStatic']
+              latestWSOStatic: res?.['latestWSOStatic'],
+              fundCurrency: res?.['fundCurrency']
             }
           )
           this.gridUtilSvc.updateLocalFields()

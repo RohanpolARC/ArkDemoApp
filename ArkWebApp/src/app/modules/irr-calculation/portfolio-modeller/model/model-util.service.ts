@@ -32,6 +32,7 @@ export class ModelUtilService {
       modelData[i].positionIDs = data[i].positionIDs?.split(',').map(x => parseInt(x))
       modelData[i].rules = [];
       modelData[i].aggregationType = data[i].irrAggrType;
+      modelData[i].fundCurrency = data[i].fundCurrency;
       
       let ruleArr: string[] = tempRules.split('|').join('"').split('~');
       ruleArr.forEach(x => data[i].rules.push(JSON.parse(x)))

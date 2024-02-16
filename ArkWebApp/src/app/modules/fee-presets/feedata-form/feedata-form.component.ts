@@ -14,7 +14,7 @@ export class FeedataFormComponent implements OnInit {
   @Input() feeData;
   @Input() action: PresetGridAction = PresetGridAction.ADD;
 
-  @Output() fundNameEmitter = new EventEmitter<string>();
+  @Output() presetNameEmitter = new EventEmitter<string>();
 
   subscriptions: Subscription[] = []
   form: FormGroup
@@ -31,7 +31,7 @@ export class FeedataFormComponent implements OnInit {
       (<FormGroup>this.form.controls['general']).patchValue({
         commitment: this.feeData.commitment,
         currentCapitalCalled: this.feeData.currentCapitalCalled,
-        fundName: this.feeData.fundName,
+        presetName: this.feeData.presetName,
         startDate: this.feeData.startDate,
         curveCurrency: this.feeData.curveCurrency,
         curveName: this.feeData.curveName,
@@ -74,7 +74,9 @@ export class FeedataFormComponent implements OnInit {
         mgmtFeesRate: this.feeData.mgmtFeesRate,
         otherExpenseRate: this.feeData.otherExpenseRate,
         perfFeesRate: this.feeData.perfFeesRate,
-        undrawnCommitFeesRate: this.feeData.undrawnCommitFeesRate        
+        undrawnCommitFeesRate: this.feeData.undrawnCommitFeesRate,
+        useGIRAdjustment: this.feeData.useGIRAdjustment,
+        isPerfFeeAfterMgmtFee: this.feeData.isPerfFeeAfterMgmtFee        
       });
 
       (<FormGroup>this.form.controls['other']).patchValue({
@@ -100,11 +102,11 @@ export class FeedataFormComponent implements OnInit {
       general: new FormGroup({
         commitment: new FormControl('', Validators.required),
         currentCapitalCalled: new FormControl('', Validators.required),
-        fundName: new FormControl('', Validators.required),
+        presetName: new FormControl('', Validators.required),
         startDate: new FormControl(''),
         curveCurrency: new FormControl('', Validators.required),
         curveName: new FormControl('', Validators.required),
-        // entity: new FormControl(''),        
+        entity: new FormControl(''),        
       }),
       financing: new FormGroup({
         financingMaxCapitalDeploymentPerMonth: new FormControl(0, Validators.required),
@@ -139,7 +141,9 @@ export class FeedataFormComponent implements OnInit {
         mgmtFeesRate: new FormControl('', Validators.required),
         otherExpenseRate: new FormControl('', Validators.required),
         perfFeesRate: new FormControl('', Validators.required),
-        undrawnCommitFeesRate: new FormControl('', Validators.required)        
+        undrawnCommitFeesRate: new FormControl('', Validators.required),
+        useGIRAdjustment: new FormControl('', Validators.required),
+        isPerfFeeAfterMgmtFee: new FormControl('', Validators.required)        
       }),
       other: new FormGroup({
         overrideExpected: new FormControl('No', Validators.required),
@@ -152,10 +156,10 @@ export class FeedataFormComponent implements OnInit {
   }
 
   changeListeners(){
-    this.subscriptions.push(this.form.get('general').get('fundName').valueChanges.pipe(
+    this.subscriptions.push(this.form.get('general').get('presetName').valueChanges.pipe(
       debounceTime(250)
-    ).subscribe(fundName => {
-      this.fundNameEmitter.emit(fundName)
+    ).subscribe(presetName => {
+      this.presetNameEmitter.emit(presetName)
     }))
   }
 }

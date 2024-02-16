@@ -9,7 +9,7 @@ import { PresetGridAction } from '../fee-presets.component';
 })
 export class InvestmentdataFormComponent implements OnInit {
 
-  @Input() fundName: string;
+  @Input() presetName: string;
   @Input() feeInvestment;
   @Input() action: PresetGridAction = PresetGridAction.ADD;
 
@@ -22,15 +22,15 @@ export class InvestmentdataFormComponent implements OnInit {
       this.initForm();
     }
 
-    if(changes?.fundName?.currentValue){
+    if(changes?.presetName?.currentValue){
       this.form.patchValue({
-        fundName: this.fundName
+        presetName: this.presetName
       })
     }
     if(changes?.feeInvestment?.currentValue){
 
       this.form.patchValue({
-        fundName: this.feeInvestment.fundName,
+        presetName: this.feeInvestment.presetName,
         cashYield: this.feeInvestment.cashYield,
         totalYield: this.feeInvestment.totalYield,
         financingRate: this.feeInvestment.financingRate,
@@ -48,7 +48,7 @@ export class InvestmentdataFormComponent implements OnInit {
 
   initForm() {
     this.form = new FormGroup({
-      fundName: new FormControl('', Validators.required),
+      presetName: new FormControl('', Validators.required),
       cashYield: new FormControl('', Validators.required),
       totalYield: new FormControl('', Validators.required),
       financingRate: new FormControl('', Validators.required),

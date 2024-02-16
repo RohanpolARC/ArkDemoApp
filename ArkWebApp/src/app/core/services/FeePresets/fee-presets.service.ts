@@ -48,7 +48,7 @@ export class FeePresetsService {
 
   columnDefs: ColDef[] = [
     { field: 'presetID', headerName: 'Preset ID' },
-    { field: 'fundName', headerName: 'Fee Preset' },
+    { field: 'presetName', headerName: 'Fee Preset' },
     { field: 'commitment' ,type:'abColDefNumber', valueFormatter:amountFormatter},
     { field: 'currentCapitalCalled' ,type:'abColDefNumber', valueFormatter:amountFormatter},
     { field: 'startDate', cellClass: 'dateUK',type:'abColDefDate',valueFormatter:dateFormatter },
@@ -86,7 +86,8 @@ export class FeePresetsService {
     { field: 'otherExpenseRate',type:'abColDefNumber' },
     { field: 'perfFeesRate',type:'abColDefNumber' },
     { field: 'undrawnCommitFeesRate' ,type:'abColDefNumber'},
-
+    { field: 'useGIRAdjustment' },
+    { field: 'isPerfFeeAfterMgmtFee' },
     { field: 'overrideExpected' },
     { field: 'useFXHedgingCashflows' },
     { field: 'otherExpensesFixed' ,type:'abColDefNumber'},
@@ -104,11 +105,11 @@ export class FeePresetsService {
 
   constructor(private http: HttpClient) { }
 
-  public getFundInvestmentData(fund: string){
-    if(fund){
+  public getFundInvestmentData(preset: string){
+    if(preset){
       return this.http.get(`${APIConfig.FEE_PRESET_INVESTMENT_GET_API}`, {
         params: {
-          fundName: fund
+          presetName: preset
         }
       })
     }
@@ -117,11 +118,11 @@ export class FeePresetsService {
     }
   }
 
-  public getFundFeeData(fund?: string){
-    if(fund){
+  public getFundFeeData(preset?: string){
+    if(preset){
       return this.http.get(`${APIConfig.FEE_PRESET_DATA_GET_API}`, {
         params: {
-          fundName: fund
+          presetName: preset
         }
       })
     }

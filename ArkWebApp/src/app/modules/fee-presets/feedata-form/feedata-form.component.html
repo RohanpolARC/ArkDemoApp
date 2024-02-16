@@ -7,9 +7,13 @@
                 <ng-template matStepLabel>General</ng-template>
                 <div class="row" formGroupName="general">
                     <mat-form-field class="col-3" appearance="outline">
-                        <mat-label>Fund Name</mat-label>
-                        <input matInput type="text" formControlName="fundName" 
+                        <mat-label>Preset Name</mat-label>
+                        <input matInput type="text" formControlName="presetName" 
                         autocomplete="off">
+                    </mat-form-field>
+                    <mat-form-field class="col-3" appearance="outline">
+                        <mat-label>Entity</mat-label>
+                        <input matInput type="text" formControlName="entity">
                     </mat-form-field>
                     <mat-form-field class="col-3" appearance="outline">
                         <mat-label>Commitment</mat-label>
@@ -38,10 +42,6 @@
                         <input matInput type="text" formControlName="curveName"
                         autocomplete="off">
                     </mat-form-field>
-                    <!-- <mat-form-field class="col-3" appearance="outline">
-                        <mat-label>Entity</mat-label>
-                        <input matInput type="text" formControlName="entity">
-                    </mat-form-field> -->
                 </div>
             </mat-step>
 
@@ -149,6 +149,21 @@
                         autocomplete="off">
                     </mat-form-field>
 
+                    <mat-form-field class="col-3" appearance="outline">
+                        <mat-label>Use GIR Adjustment</mat-label>
+                        <mat-select formControlName="useGIRAdjustment">
+                            <mat-option [value]="'Yes'">Yes</mat-option>
+                            <mat-option [value]="'No'">No</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field class="col-3" appearance="outline">
+                        <mat-label>Is Perf Fee After Mgmt Fee</mat-label>
+                        <mat-select formControlName="isPerfFeeAfterMgmtFee">
+                            <mat-option [value]="'Yes'">Yes</mat-option>
+                            <mat-option [value]="'No'">No</mat-option>
+                        </mat-select>
+                    </mat-form-field>
                 </div>
             </mat-step>
 

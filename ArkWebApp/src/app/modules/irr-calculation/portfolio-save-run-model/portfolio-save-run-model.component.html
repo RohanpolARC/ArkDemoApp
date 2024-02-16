@@ -124,6 +124,15 @@
                         </mat-select>
                     </mat-form-field>
 
+                    <mat-form-field class="col-3" appearance="outline">
+                        <mat-label>FX Hedge Base ccy</mat-label>
+                        <mat-select formControlName="fundCurrency" required disableOptionCentering>
+                          <mat-option *ngFor="let fc of fundCurrencies" [value]="fc.fundCurrency">
+                            {{fc.fundCurrency}}
+                          </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
                     <mat-form-field class="col-12" appearance="outline">
                         <mat-label>Aggregation Order</mat-label>
                         <mat-chip-list #aggrColList aria-label="Aggregation column selection">

@@ -17,7 +17,7 @@ export const environment = {
   // // arkFunctionUrl: 'https://feecalcfuncuat.azurewebsites.net',
   // arkFunctionScopeUri: ['api://57d373b0-5305-4b6b-a3f7-ccdc0a4560ca/ark-fee-func'],
 
-  //arkFunctionUrl: 'http://localhost:7031',
+  // arkFunctionUrl: 'http://localhost:7031',
 
   // feeCalcFunctionUrl: 'http://localhost:7049',
   feeCalcFunctionUrl: 'https://feecalcfuncuat.azurewebsites.net',
