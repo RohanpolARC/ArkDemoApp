@@ -80,7 +80,7 @@ export class AppComponent {
     public location:Location,
     public accessService: AccessService,
     private router:Router,
-    private msalSvc: MsalUserService,
+    private msalUserSvc: MsalUserService,
     private msalBroadcastSvc: MsalBroadcastService,
     private matIconRegistry: MatIconRegistry,
     private domSanitizer: DomSanitizer
@@ -118,21 +118,21 @@ export class AppComponent {
   }
 
   showUserRoles(){
-    alert(`Your role(s) : ${this.msalSvc.msalSvc.instance.getActiveAccount()?.idTokenClaims?.roles}`)
+    alert(`Your role(s) : ${this.msalUserSvc.msalSvc.instance.getActiveAccount()?.idTokenClaims?.roles}`)
   }
 
   async login(){
-    await this.msalSvc.msalSvc.instance.handleRedirectPromise().then(
+    await this.msalUserSvc.msalSvc.instance.handleRedirectPromise().then(
       res => {
         if(res && res.account)
-          this.msalSvc.msalSvc.instance.setActiveAccount(res.account);
+          this.msalUserSvc.msalSvc.instance.setActiveAccount(res.account);
       }
     );
 
-    const accounts = this.msalSvc.msalSvc.instance.getAllAccounts();
+    const accounts = this.msalUserSvc.msalSvc.instance.getAllAccounts();
     if (accounts.length === 0) {
         // No user signed in
-        await this.msalSvc.msalSvc.instance.loginRedirect();
+        await this.msalUserSvc.msalSvc.instance.loginRedirect();
     }
 
   }
@@ -143,11 +143,11 @@ export class AppComponent {
      * To use active account set here, subscribe to inProgress$ first in your component
      * Note: Basic usage demonstrated. Your app may require more complicated account selection logic
      */
-    let activeAccount = this.msalSvc.msalSvc.instance.getActiveAccount();
+    let activeAccount = this.msalUserSvc.msalSvc.instance.getActiveAccount();
 
-    if (!activeAccount && this.msalSvc.msalSvc.instance.getAllAccounts().length > 0) {
-      let accounts = this.msalSvc.msalSvc.instance.getAllAccounts();
-      this.msalSvc.msalSvc.instance.setActiveAccount(accounts[0]);
+    if (!activeAccount && this.msalUserSvc.msalSvc.instance.getAllAccounts().length > 0) {
+      let accounts = this.msalUserSvc.msalSvc.instance.getAllAccounts();
+      this.msalUserSvc.msalSvc.instance.setActiveAccount(accounts[0]);
     }
   }
 
@@ -167,7 +167,7 @@ export class AppComponent {
       }
       // if refresh token is expired the msal will redirect itself to microsoft login.
       else if(result.eventType === EventType.ACQUIRE_TOKEN_FAILURE || result.eventType === EventType.ACQUIRE_TOKEN_BY_CODE_FAILURE){
-        this.msalSvc.msalSvc.loginRedirect();
+        this.msalUserSvc.msalSvc.loginRedirect();
         
       }
     }))
