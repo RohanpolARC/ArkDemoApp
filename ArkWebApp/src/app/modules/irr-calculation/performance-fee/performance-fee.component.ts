@@ -3,7 +3,7 @@ import { Subject } from 'rxjs';
 import { first, takeUntil } from 'rxjs/operators';
 import { FeeCalculationService } from 'src/app/core/services/FeeCalculation/fee-calculation.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
-import { LoadStatus, PerfFeesCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
+import { LoadStatus, ParentTabType, PerfFeesCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 
 @Component({
   selector: 'app-performance-fee',
@@ -13,6 +13,8 @@ import { LoadStatus, PerfFeesCalcParams } from 'src/app/shared/models/IRRCalcula
 export class PerformanceFeeComponent implements OnInit {
 
   @Input() calcParams: PerfFeesCalcParams;
+  @Input() parentTab: ParentTabType;
+  @Input() childTabIndex: number;
   @Output() status = new EventEmitter<LoadStatus>();
 
   feeSmy: any[] | null
@@ -25,6 +27,8 @@ export class PerformanceFeeComponent implements OnInit {
   positionIDs: number[]
   modelID: number
   closeStream: Subject<any> = new Subject<any>();
+  number : number
+  ParentTabType: ParentTabType
 
   constructor(public feeCalcSvc: FeeCalculationService,
     private irrCalcSvc: IRRCalcService) { }

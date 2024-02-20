@@ -27,7 +27,7 @@
 
 <ng-container *ngIf="data?.actionType === 'LINK-ADD'">
 
-        <ng-container *ngTemplateOutlet="validationMessage"></ng-container>
+<ng-container *ngTemplateOutlet="validationMessage"></ng-container>
     
     <app-link-investor-modal #linkComponent
         [investmentData]="data.rowData"

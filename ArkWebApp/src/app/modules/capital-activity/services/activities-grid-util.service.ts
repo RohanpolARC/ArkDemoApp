@@ -1,12 +1,17 @@
 import { Injectable } from '@angular/core';
 import { getAmountNumber, getDateFromStr, getMomentDate } from 'src/app/shared/functions/utilities';
 import { validateExcelRows } from '../bulk-upload/validation';
-export type ValidateColumn = {isValid: boolean, col?: string};
+import { DataService } from 'src/app/core/services/data.service';
 
 @Injectable()
 export class ActivitiesGridUtilService {
   
-  constructor() { }
+  constructor(   
+    private dataService: DataService
+    ) {}
+
+  hideDropzone: boolean
+  boolValidateHeaders : boolean
 
   allowedHeaders: string[] = [         
     'Cash Flow Date',
@@ -21,20 +26,54 @@ export class ActivitiesGridUtilService {
     'Narative (optional)',
     'Strategy/Currency'
   ]
-  validateHeaders(actualColumns: string[], fileColumns: string[]): ValidateColumn {
 
-    for(let i: number = 0; i<fileColumns.length; i+=1){
-      if(actualColumns.indexOf(fileColumns[i]) !== -1 || fileColumns[i] === '_ROW_ID')
-        continue;
-      else 
-        return {
-          isValid: false, 
-          col: fileColumns[i]
-        };   // Invalid col found
+  handleTemplateUpload(templateName: string, allowedHeaders: string[], data: any[], fileheaders: string[]): boolean {
+    if (data.length === 0) {
+      this.dataService.setWarningMsg(`You have uploaded an empty sheet!`);
+      this.hideDropzone = false;
+      return false;
     }
-
-    return {isValid: true} // No mismatch col found 
+  
+     this.boolValidateHeaders = this.validateHeaders(allowedHeaders, fileheaders);
+    if (!this.boolValidateHeaders) {
+      this.dataService.setWarningMsg(`Please upload the correct ${templateName} template!`);
+      this.hideDropzone = false;
+      return false;
+    }
+  
+    if (data.length === 1) {
+      this.dataService.setWarningMsg(`No data in the ${templateName} template uploaded!`);
+      this.hideDropzone = false;
+      return false;
+    }
+      return true
   }
+  
+  validateHeaders(actualColumns: string[], fileColumns: string[]): boolean {
+    let invalidColumnFound = false;
+
+    if(actualColumns.length!==fileColumns.length)
+    {
+      invalidColumnFound = true
+    }    
+    else
+    {
+      for(let i: number = 0; i<actualColumns.length; i+=1)
+      {
+        if(actualColumns.indexOf(fileColumns[i]) !== -1 || fileColumns[i] === '_ROW_ID')
+          continue;
+        else
+          invalidColumnFound = true;           
+      }  
+    }
+    if (invalidColumnFound){
+      return false
+    }
+    else{
+      return true
+    }
+  }
+
   preprocessData(headers: string[], data: any[]): any[]{
 
     let jsonRowData = []

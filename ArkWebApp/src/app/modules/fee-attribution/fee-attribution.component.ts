@@ -7,11 +7,16 @@ import { filter, switchMap, tap } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
 import { GridConfigService } from './services/grid-config.service';
 import { getMomentDateStr } from 'src/app/shared/functions/utilities';
+import { GridUtilService } from './services/grid-util.service';
 
 @Component({
   selector: 'app-fee-attribution',
   templateUrl: './fee-attribution.component.html',
-  styleUrls: ['../../shared/styles/grid-page.layout.scss', './fee-attribution.component.scss']
+  styleUrls: ['../../shared/styles/grid-page.layout.scss', './fee-attribution.component.scss'],
+  providers: [
+    GridConfigService,
+    GridUtilService
+  ]
 })
 export class FeeAttributionComponent implements OnInit, OnDestroy {
 

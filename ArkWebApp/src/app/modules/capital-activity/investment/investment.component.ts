@@ -6,12 +6,19 @@ import { ComponentReaderService } from '../services/component-reader.service';
 import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
+import { InvestmentGridUtilService } from '../services/investment-grid-util.service';
 
 @Component({
   selector: 'app-investment',
   templateUrl: './investment.component.html',
-  styleUrls: ['./investment.component.scss']
+  styleUrls: ['./investment.component.scss'],
+  // Grid Config and Util Services injected on component level so that config, services can be added to grid on every ngOnInit() and unsubscribe the subscriptions in services on component ngOnDestroy()
+  providers: [
+    InvestmentGridUtilService,
+    InvestmentGridConfigService,
+  ]
 })
+
 export class InvestmentComponent implements OnInit, IPropertyReader {
   @Input() rowData: any[]
   agGridModules: Module[]

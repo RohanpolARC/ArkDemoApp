@@ -85,6 +85,7 @@ export class NetReturnsSummaryComponent implements OnInit {
     }
 
     this.adaptableOptions = {
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: '',
       autogeneratePrimaryKey: true,

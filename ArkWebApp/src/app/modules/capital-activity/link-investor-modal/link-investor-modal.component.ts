@@ -14,7 +14,7 @@ import { InvestorGridUtilService } from '../services/investor-grid-util.service'
   selector: 'app-link-investor-modal',
   templateUrl: './link-investor-modal.component.html',
   styleUrls: ['./link-investor-modal.component.scss'],
-  providers: [LinkingService]
+  providers: [LinkingService,InvestorGridUtilService]
 })
 export class LinkInvestorModalComponent implements OnInit {
   rowData$: Observable<any[]> = of([]);
@@ -79,6 +79,7 @@ export class LinkInvestorModalComponent implements OnInit {
   };
   adapTableApi: AdaptableApi;
   adaptableOptions: AdaptableOptions = {
+    ...CommonConfig.ADAPTABLE_OPTIONS,
     licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
     primaryKey: 'capitalID',
     userName: this.msalService.getUserName(),

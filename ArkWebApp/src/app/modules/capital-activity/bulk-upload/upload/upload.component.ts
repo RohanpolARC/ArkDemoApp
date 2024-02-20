@@ -1,11 +1,12 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { NavQuarterlyGridUtilService } from '../../services/nav-quarterly-grid-util.service';
-import { ActivitiesGridUtilService } from '../../services/activities-grid-util.service';
+import { ActivitiesGridUtilService} from '../../services/activities-grid-util.service';
 import { UploadService } from '../../services/upload.service';
 import * as XLSX from 'xlsx';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { filter } from 'rxjs/operators';
+import { DataService } from 'src/app/core/services/data.service';
 import { ConfigurationService } from '../../services/configuration.service';
 
 export type UPLOAD_TEMPLATE = 'NAV Quarterly' | 'Activities';
@@ -29,6 +30,7 @@ export class UploadComponent implements OnInit, OnDestroy {
     private navQuarterlySvc: NavQuarterlyGridUtilService, 
     private activitiesSvc: ActivitiesGridUtilService,
     private uploadSvc: UploadService,
+    private dataService: DataService,
     private configurationSvc: ConfigurationService,
     @Inject(MAT_DIALOG_DATA) public data: any) { }
   activitiesTemplateURL: string
@@ -53,7 +55,10 @@ export class UploadComponent implements OnInit, OnDestroy {
     isValid: boolean,
     invalidRows?: { row: any, remark: string }[]
   }) => any[]
-  
+
+  validateHeaders : (actualColumns: string[], fileColumns: string[]) => boolean
+
+  handleTemplateUpload : (templateName: string, allowedHeaders: string[], data: any[], fileheaders: string[]) => boolean
   
   onFileReceived(file: File){
     this.hideDropzone = true;
@@ -65,12 +70,16 @@ export class UploadComponent implements OnInit, OnDestroy {
 
     if(template === 'Activities'){
       this.URL = this.activitiesTemplateURL
+      this.handleTemplateUpload = this.activitiesSvc.handleTemplateUpload
+      this.validateHeaders = this.activitiesSvc.validateHeaders
       this.preprocessData = this.activitiesSvc.preprocessData
       this.validateExcelRows = this.activitiesSvc.validateExcelRows
       this.generateGridData = this.activitiesSvc.generateGridData
     }
     else if(template === 'NAV Quarterly'){
       this.URL = this.navQuarterlyTemplateURL
+      this.handleTemplateUpload = this.navQuarterlySvc.handleTemplateUpload
+      this.validateHeaders = this.navQuarterlySvc.validateHeaders
       this.preprocessData = this.navQuarterlySvc.preprocessData
       this.validateExcelRows = this.navQuarterlySvc.validateExcelRows.bind(this.navQuarterlySvc)
       this.generateGridData = this.navQuarterlySvc.generateGridData
@@ -130,13 +139,30 @@ export class UploadComponent implements OnInit, OnDestroy {
       */
 
       let headers: string[] = data?.[0] || [];
-      
+
+      let validationResult: {isValid: boolean, invalidRows?: {row: any, remark: string}[]} = undefined
+
+      let boolValidateTemplateUpload : boolean
+
+      if (this.selectedTemplate === 'NAV Quarterly') {
+        boolValidateTemplateUpload = this.handleTemplateUpload('NAV Quarterly', this.navQuarterlySvc.allowedHeaders, data, headers);
+        if(!boolValidateTemplateUpload)
+        {
+              return
+        }
+      } 
+      else if (this.selectedTemplate === 'Activities') {
+        boolValidateTemplateUpload = this.handleTemplateUpload('Capital Activity', this.activitiesSvc.allowedHeaders, data, headers);
+        if(!boolValidateTemplateUpload)
+        {
+              return
+        }
+      }    
+    
       let processedData = this.preprocessData(headers, data?.slice(1));
 
       this.uploadSvc.updateLoadedFileData(processedData);
 
-
-      let validationResult: {isValid: boolean, invalidRows?: {row: any, remark: string}[]} = undefined
 
       if(this.selectedTemplate === 'Activities'){
         validationResult = this.validateExcelRows(processedData, {

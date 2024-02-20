@@ -1,9 +1,12 @@
 import { ActionColumnContext, AdaptableButton } from '@adaptabletools/adaptable-angular-aggrid';
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';
 import { UtilService } from './util.service';
 import { take } from 'rxjs/operators';
+import { Subject, Subscription, of } from 'rxjs';
+import { catchError, filter, switchMap, tap } from 'rxjs/operators';
 import { ConfigurationService } from './configuration.service';
+import { SIGPWR } from 'constants';
 
 @Injectable()
 export class InvestorGridUtilService {
@@ -11,25 +14,42 @@ export class InvestorGridUtilService {
   constructor(private capitalActivitySvc: CapitalActivityService,
     private utilSvc: UtilService,
     private configSvc: ConfigurationService
-    ) { }
+    ) {
+      this.init()
+    }
+ 
+  subscriptions: Subscription[] = []
+  private editActionClick = new Subject<boolean>();
+  editActionClick$ = this.editActionClick.asObservable();
+  updateEditActionClick(click: boolean){
+    this.editActionClick.next(click)
+  }
+
+  rowData:any
+  isLocked:boolean
+  investments:any[]
+
+  init()  
+  {
+    this.subscriptions.push(this.editActionClick$.pipe(
+      switchMap(() => this.capitalActivitySvc.getCapitalInvestment(this.rowData.capitalID).pipe(take(1)))
+    ).subscribe({
+    next: data => {
+      this.investments = data;
+      this.utilSvc.openDialog(this.rowData, 'EDIT', this.investments, this.isLocked);
+    },
+    error: error => {
+      console.error("Couldn't fetch investments for this capitalID");
+    }
+    }))
+  }
 
   editActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext,args:boolean[]) {
     
-    let isLocked = this.hideEditActionColumn(button,context)
-
-    let rowData =  context.rowNode?.data;
-    let investments = []; 
-    this.capitalActivitySvc.getCapitalInvestment(rowData.capitalID).pipe(
-      take(1)
-    ).subscribe({
-      next: data => {
-        investments = data;
-        this.utilSvc.openDialog(rowData, 'EDIT', investments, isLocked);
-      },
-      error: error => {
-        console.error("Couldn't fetch investments for this capitalID");
-      }
-    })
+    this.isLocked = this.hideEditActionColumn(button,context)
+    this.rowData =  context.rowNode?.data;
+    this.investments = []; 
+    this.updateEditActionClick(true)
   }
 
   hideEditActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext){
@@ -61,5 +81,4 @@ export class InvestorGridUtilService {
       return ''
   }
   
-
 }

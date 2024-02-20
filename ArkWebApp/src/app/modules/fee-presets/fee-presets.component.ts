@@ -87,6 +87,7 @@ export class FeePresetsComponent implements OnInit {
     }
 
     this.adaptableOptions = {
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'presetID',
       adaptableId: 'Fee Presets ID',

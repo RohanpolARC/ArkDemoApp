@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
@@ -13,6 +13,7 @@ import { GridUtilService } from './portfolio-modeller/grid/grid-util.service';
 import { PortfolioModellerService } from './service/portfolio-modeller.service';
 import { FeeCalculationService } from 'src/app/core/services/FeeCalculation/fee-calculation.service';
 import { GridConfigService } from './portfolio-modeller/grid/grid-config.service';
+import { MatTabChangeEvent } from '@angular/material/tabs';
 
 @Component({
   selector: 'app-irr-calculation',
@@ -34,13 +35,16 @@ export class IrrCalculationComponent implements OnInit {
   constructor(
     private dataSvc: DataService,
     public irrCalcSvc: IRRCalcService ,
-    private filterSvc: GeneralFilterService
+    private filterSvc: GeneralFilterService,
+    private portfolioModellerService: PortfolioModellerService
   ) { }
 
   subscriptions: Subscription[] = []
   selected = new FormControl(0);
   calcParamsMap = {} //<model name, IRRCalcParams>
   cashflowLoadStatus: LoadStatus = 'Loading';
+  reInitializeIndex: boolean = false;
+  boolean : boolean
 
   removeTab(params:{index?: number,pDisplayName:string}) {
     if(params.index){
@@ -51,6 +55,10 @@ export class IrrCalculationComponent implements OnInit {
     }
     delete this.calcParamsMap[params.pDisplayName]
 
+    this.irrCalcSvc.parentTabs.forEach( (parentTab, index) => {
+      parentTab.index = index + 1
+    });
+    this.portfolioModellerService.removeMatTab(params.index);
   }
 
   ngOnInit(): void {
@@ -104,7 +112,7 @@ export class IrrCalculationComponent implements OnInit {
         displayName: tabData.tabName,
         status: 'Loading',
         resultType: tabData.tabType,
-        calcParams: tabData.calcParams
+        calcParams: tabData.calcParams,
       })
     })
 
@@ -128,7 +136,8 @@ export class IrrCalculationComponent implements OnInit {
       parentDisplayName: parentDisplayName ,
       parentActualName: params.parentDisplayName,
       status : 'Loading',
-      tabset: newTabSet
+      tabset: newTabSet,
+      index:this.irrCalcSvc.parentTabs.length+1
     }
     this.irrCalcSvc.parentTabs.push(newParentTab);    
     this.selected.setValue(this.irrCalcSvc.parentTabs.indexOf(newParentTab)+1)
@@ -146,6 +155,10 @@ export class IrrCalculationComponent implements OnInit {
       this.calcParamsMap[displayName] = null;
       this.calcParamsMap[displayName] = params
     }
+  }
+
+  onParentTabChanged(){
+    this.portfolioModellerService.updateTabGroupSelected(this.selected.value,null,"Parent")
   }
 
   ngOnDestroy(){

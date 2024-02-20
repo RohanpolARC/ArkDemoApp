@@ -1,8 +1,8 @@
 import { AdaptableApi, AdaptableOptions, FormatColumn } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, ColGroupDef, FirstDataRenderedEvent, GridOptions, Module, ValueFormatterParams } from '@ag-grid-community/core';
+import { BodyScrollEvent, ColDef, ColGroupDef, FirstDataRenderedEvent, GridOptions, Module, ValueFormatterParams } from '@ag-grid-community/core';
 import { Component, Input, OnInit, Output, SimpleChanges, EventEmitter } from '@angular/core';
-import { Subject, Subscription, timer } from 'rxjs';
-import { first, switchMap, takeUntil } from 'rxjs/operators';
+import { Observable, Subject, Subscription, timer } from 'rxjs';
+import { catchError, first, map, switchMap, takeUntil } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
@@ -11,16 +11,23 @@ import { saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
 import { CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER } from 'src/app/shared/functions/formatter';
 import { presistSharedEntities, loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
-import { IRRCalcParams, LoadStatus } from 'src/app/shared/models/IRRCalculationsModel';
+import { IRRCalcParams, LoadStatus, ParentTabType} from 'src/app/shared/models/IRRCalculationsModel';
+import { AgGridScrollService } from '../service/aggrid-scroll.service';
+import { PortfolioModellerService } from '../service/portfolio-modeller.service';
 
 @Component({
   selector: 'app-irr-result',
   templateUrl: './irr-result.component.html',
-  styleUrls: ['../../../shared/styles/grid-page.layout.scss', './irr-result.component.scss']
+  styleUrls: ['../../../shared/styles/grid-page.layout.scss', './irr-result.component.scss'],
+  providers: [
+    AgGridScrollService
+  ]
 })
 export class IrrResultComponent implements OnInit {
 
   @Input() calcParams: IRRCalcParams;
+  @Input() parentTab: ParentTabType;
+  @Input() childTabIndex: number;
   @Output() status = new EventEmitter<LoadStatus>();
 
   runID: string
@@ -125,10 +132,13 @@ export class IrrResultComponent implements OnInit {
 
   closeTimer = new Subject<any>();
   noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
+  rowData$: Observable<any>;
 
   constructor(
     private irrCalcSvc: IRRCalcService,
-    private dataSvc: DataService
+    private dataSvc: DataService,
+    private agGridScrollService:AgGridScrollService,
+    private portfolioModellerService:PortfolioModellerService
   ) { }
 
   percentFormatter(params : ValueFormatterParams) {
@@ -173,9 +183,14 @@ export class IrrResultComponent implements OnInit {
       onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
         autosizeColumnExceptResized(event)
       },
+      rowBuffer:0,
+      onBodyScroll: (event:BodyScrollEvent) => {
+        this.agGridScrollService.onAgGridScroll(event)
+      }
     }
     
     this.adaptableOptions = {
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: '',
       autogeneratePrimaryKey: true,
@@ -249,75 +264,90 @@ export class IrrResultComponent implements OnInit {
 
     this.Init();
 
-    this.irrCalcSvc.cashflowLoadStatusEvent.pipe(takeUntil(this.closeStream)).subscribe(
-      e => {
+    // matTabRemoved$ observable is updated on when a matTab is closed 
+    // on the above event we update the parentTabIndex to the property in its associated agGridScrollService as the Scroll Service should have its latest index values to track scroll positions 
+    this.subscriptions.push(this.portfolioModellerService.matTabRemoved$.subscribe( x => {
+      this.agGridScrollService.parentTabIndex = this.parentTab.index
+    }))
+
+    this.rowData$ = this.irrCalcSvc.cashflowLoadStatusEvent.pipe(
+      takeUntil(this.closeStream),
+      switchMap((e)=> {
         if(e.runID === this.runID && e.status === 'Loaded'){
           this.closeStream.complete();
 
-          this.subscriptions.push(this.irrCalcSvc.getIRRCalculation(this.calcParams).subscribe({
-          next: response => {
-  
-            this.terminateUri = response?.['terminatePostUri'];
+          return this.irrCalcSvc.getIRRCalculation(this.calcParams).pipe(
+            switchMap((response) => {
+              this.terminateUri = response?.['terminatePostUri'];
 
-            timer(0, 10000).pipe(
-              switchMap(() => this.irrCalcSvc.getIRRStatus(response?.['statusQueryGetUri'])),
-              takeUntil(this.closeTimer)
-            ).subscribe({
-              next: (res: any) => {
-  
-                if(res?.['runtimeStatus'] === 'Terminated'){
-                  this.closeTimer.next();
-                }
-                else if(res?.['runtimeStatus'] === 'Completed'){
-                  
-                  let mapGroupCols: string[] = [];
-                  let paggrCols: string[] = [];
-                  
-                  if(res?.['output']?.length > 0){
-                    mapGroupCols = Object.keys(res?.['output'][0].MapGroupColValues);
-                    paggrCols = Object.keys(res?.['output'][0].paggr);
-                  }
+              return timer(0, 10000).pipe(
+                takeUntil(this.closeTimer),                
+                switchMap(
+                  () => this.irrCalcSvc.getIRRStatus(response?.['statusQueryGetUri']).pipe(
+                    map((res) => {
+                      if(res?.['runtimeStatus'] === 'Terminated'){
+                        this.closeTimer.next();
+                      }
+                      else if(res?.['runtimeStatus'] === 'Completed'){
+                        
+                        let mapGroupCols: string[] = [];
+                        let paggrCols: string[] = [];
+                        
+                        if(res?.['output']?.length > 0){
+                          mapGroupCols = Object.keys(res?.['output'][0].MapGroupColValues);
+                          paggrCols = Object.keys(res?.['output'][0].paggr);
+                        }
+      
+                        this.setColumnDefs(mapGroupCols, paggrCols);
+                        
+                        this.setFormatColumns(res?.output);
+      
+                        saveAndSetLayout(this.columnDefs.filter(c => !c?.['hide']), this.adapTableApi, 'IRR Result');
+      
+                        this.calcs = this.updateCalcs(res?.['output']);
+                        
+                        this.status.emit('Loaded')
+        
+                        this.closeTimer.next();
 
-                  this.setColumnDefs(mapGroupCols, paggrCols);
-                  
-                  this.setFormatColumns(res?.output);
-
-                  saveAndSetLayout(this.columnDefs.filter(c => !c?.['hide']), this.adapTableApi, 'IRR Result');
-
-                  this.updateCalcs(res?.['output']);
-                  
-                  this.status.emit('Loaded')
-  
-                  this.closeTimer.next();
-                }
-                else if(res?.['runtimeStatus'] === 'Failed'){
-                  this.closeTimer.next();
-                  this.status.emit('Failed')
-                  this.calcs = [];
-                }
-              },
-              error: (error) => {
-                this.closeTimer.next();
-                this.status.emit('Failed')
-                this.calcs = []
-                console.error(`Failed to fetch response: ${error}`);
-    
-              }
+                        return this.calcs
+                      }
+                      else if(res?.['runtimeStatus'] === 'Failed'){
+                        this.closeTimer.next();
+                        this.status.emit('Failed')
+                        this.calcs = [];
+                        return this.calcs
+                      }
+                    }),
+                    catchError((error) => {
+                      this.closeTimer.next();
+                      this.status.emit('Failed')
+                      this.calcs = []
+                      console.error(`Failed to fetch response:`);
+                      console.error(error);
+                      return this.calcs
+                    })
+                  )                
+                )
+              )
+            }),
+            catchError((error) => {
+              this.closeTimer.next();
+              this.status.emit('Failed')
+              this.calcs = []
+              console.error(`Failed to fetch response:`);
+              console.error(error);
+              return this.calcs
             })
-          },
-          error: error => {
-            this.closeTimer.next();
-            this.status.emit('Failed')
-            this.calcs = []
-            console.error(`Failed to fetch response: ${error}`);
-          }
-          }))  
+          )
         }
         else if(e.runID === this.runID && e.status === 'Failed'){
           this.closeStream.complete();
-          this.status.emit('Failed')
+          this.status.emit('Failed')          
+          return this.calcs
         }
-      }
+      })
+      
     )
   }
 
@@ -335,7 +365,7 @@ export class IrrResultComponent implements OnInit {
       calcs.push({... output[i].calcHelper, ... output[i].MapGroupColValues, ... paggr })
     }
 
-    this.calcs = calcs
+    return calcs
 }
 
   setFormatColumns(output: any) {
@@ -420,7 +450,6 @@ export class IrrResultComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges){
 
-
     if(this.calcParams !== null){
       this.runID = this.calcParams.runID;
 
@@ -457,6 +486,9 @@ export class IrrResultComponent implements OnInit {
     this.adapTableApi = adaptableApi;
     this.adapTableApi.toolPanelApi.closeAdapTableToolPanel();
     this.gridOptions.columnApi.autoSizeColumns([ ...this.calcColDefs, ...this.paggrColDefs ].filter(x => x.minWidth).map(x => x.filter));
+    this.agGridScrollService.parentTabIndex = this.parentTab.index
+    this.agGridScrollService.gridApi = this.gridOptions.api
+    this.agGridScrollService.childTabIndex = this.childTabIndex
   }
 
   NO_DECIMAL_AMOUNT_COLUMNS = [

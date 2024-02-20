@@ -78,6 +78,7 @@ export class ActivitiesGridComponent implements OnInit {
   }
 
   adaptableOptions: AdaptableOptions = {
+    ...CommonConfig.ADAPTABLE_OPTIONS,
     licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
     autogeneratePrimaryKey: true,
      primaryKey:'',

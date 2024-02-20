@@ -7,7 +7,7 @@
             [gridOptions]="gridOptions"
             [defaultColDef]="defaultColDef"
             [modules]="agGridModules"
-            [rowData]="calcs"
+            [rowData]="rowData$ | async"
             class="ag-theme-alpine ag-grid"
             (adaptableReady)="onAdaptableReady($event)"
             >

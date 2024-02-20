@@ -98,6 +98,7 @@ export class UnfundedAssetsComponent implements OnInit {
     }
 
     this.adaptableOptions = {
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'rowID',
       userName: this.dataSvc.getCurrentUserName(),

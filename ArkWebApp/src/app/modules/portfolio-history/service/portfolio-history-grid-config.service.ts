@@ -92,6 +92,7 @@ export class PortfolioHistoryGridConfigService {
 
   getAdaptableOptions() : AdaptableOptions {
     this.adaptableOptions = {
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: "uniqueID",
       userName: this.dataSvc.getCurrentUserName(),

@@ -1,5 +1,5 @@
 import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, Module, ValueFormatterParams } from '@ag-grid-community/core';
+import { BodyScrollEvent, ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, Module, ValueFormatterParams } from '@ag-grid-community/core';
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
@@ -9,16 +9,22 @@ import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overla
 import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
+import { ParentTabType } from 'src/app/shared/models/IRRCalculationsModel';
+import { PortfolioModellerService } from '../../irr-calculation/service/portfolio-modeller.service';
+import { AgGridScrollService } from '../../irr-calculation/service/aggrid-scroll.service';
 
 @Component({
   selector: 'app-fee-cashflows',
   templateUrl: './fee-cashflows.component.html',
-  styleUrls: ['./fee-cashflows.component.scss']
+  styleUrls: ['./fee-cashflows.component.scss'],
+  providers: [AgGridScrollService]
 })
 export class FeeCashflowsComponent implements OnInit {
 
   @Input() feeCashflows;
   @Input() status: 'Loading' | 'Loaded' | 'Failed';
+  @Input() parentTab: ParentTabType;
+  @Input() childTabIndex: number;
   
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
   subscriptions: Subscription[] = []
@@ -31,7 +37,9 @@ export class FeeCashflowsComponent implements OnInit {
 
   constructor(
     private dataSvc: DataService,
-    private feeCalcSvc: FeeCalculationService
+    private feeCalcSvc: FeeCalculationService,
+    public agGridScrollService:AgGridScrollService,
+    private portfolioModellerService: PortfolioModellerService
   ) { }
 
   percentFormatter(params : ValueFormatterParams) {
@@ -121,10 +129,18 @@ export class FeeCashflowsComponent implements OnInit {
 
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     adaptableApi.columnApi.autosizeAllColumns()
-
+    this.agGridScrollService.gridApi = this.gridOptions.api
+    this.agGridScrollService.childTabIndex = this.childTabIndex
+    this.agGridScrollService.parentTabIndex = this.parentTab?.index
   }
 
   ngOnInit(): void {
+
+    // matTabRemoved$ observable is updated on when a matTab is closed 
+    // on the above event we update the parentTabIndex to the property in its associated agGridScrollService as the Scroll Service should have its latest index values to track scroll positions 
+    this.subscriptions.push(this.portfolioModellerService.matTabRemoved$.subscribe( x => {
+      this.agGridScrollService.parentTabIndex = this.parentTab.index
+    }))
     
     this.columnDefs = [
       { field: 'Date', tooltipField:  'Date', cellClass: 'dateUK', minWidth: 122, type: 'abColDefDate' },
@@ -225,10 +241,15 @@ export class FeeCashflowsComponent implements OnInit {
       },
       onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
         autosizeColumnExceptResized(event)
-      },
+      },  
+      rowBuffer:0,
+      onBodyScroll: (event:BodyScrollEvent) => {
+        this.agGridScrollService.onAgGridScroll(event)
+      }
     }
 
     this.adaptableOptions = {
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       autogeneratePrimaryKey: true,
       primaryKey: '',
@@ -289,5 +310,9 @@ export class FeeCashflowsComponent implements OnInit {
         }
       }
     }
+  }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub => sub.unsubscribe())
   }
 }

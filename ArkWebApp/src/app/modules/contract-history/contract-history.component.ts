@@ -64,6 +64,7 @@ export class ContractHistoryComponent implements OnInit {
   }
 
   adaptableOptions: AdaptableOptions = {
+    ...CommonConfig.ADAPTABLE_OPTIONS,
     licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
     primaryKey: '',
     userName: this.dataSvc.getCurrentUserName(),

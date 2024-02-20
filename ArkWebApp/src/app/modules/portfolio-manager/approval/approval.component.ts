@@ -400,6 +400,7 @@ export class ApprovalComponent implements OnInit {
     }
 
     this.adaptableOptions = {
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'uniqueRowID',
 

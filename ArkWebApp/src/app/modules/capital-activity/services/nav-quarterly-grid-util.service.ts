@@ -1,13 +1,18 @@
 import { Injectable } from '@angular/core';
-import { ValidateColumn } from './activities-grid-util.service';
 import { getAmountNumber, getDateFromStr } from 'src/app/shared/functions/utilities';
+import { DataService } from 'src/app/core/services/data.service';
 import { formatDate } from 'src/app/shared/functions/formatter';
 
 
 @Injectable()
 export class NavQuarterlyGridUtilService {
 
-  constructor() { }
+  constructor(
+    private dataService: DataService
+  ) { }
+
+  hideDropzone: boolean
+  boolValidateHeaders : boolean
 
   allowedHeaders: string[] = [         
     'Fund Hedging','Strategy/Currency','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates',
@@ -17,19 +22,51 @@ export class NavQuarterlyGridUtilService {
 
   ]
 
-  validateHeaders(actualColumns: string[], fileColumns: string[]): ValidateColumn {
-
-    for(let i: number = 0; i<fileColumns.length; i+=1){
-      if(actualColumns.indexOf(fileColumns[i]) !== -1 || fileColumns[i] === '_ROW_ID')
-        continue;
-      else 
-        return {
-          isValid: false, 
-          col: fileColumns[i]
-        };   // Invalid col found
+  handleTemplateUpload(templateName: string, allowedHeaders: string[], data: any[], fileheaders: string[]): boolean {
+    if (data.length === 0) {
+      this.dataService.setWarningMsg(`You have uploaded an empty sheet!`);
+      this.hideDropzone = false;
+      return false;
     }
+  
+     this.boolValidateHeaders = this.validateHeaders(allowedHeaders, fileheaders);
+    if (!this.boolValidateHeaders) {
+      this.dataService.setWarningMsg(`Please upload the correct ${templateName} template!`);
+      this.hideDropzone = false;
+      return false;
+    }
+  
+    if (data.length === 1) {
+      this.dataService.setWarningMsg(`No data in the ${templateName} template uploaded!`);
+      this.hideDropzone = false;
+      return false;
+    }
+      return true
+  }
+  
+  validateHeaders(actualColumns: string[], fileColumns: string[]): boolean {
+    let invalidColumnFound = false;
 
-    return {isValid: true} // No mismatch col found 
+    if(actualColumns.length!==fileColumns.length)
+    {
+      invalidColumnFound = true
+    }   
+    else
+    {
+      for(let i: number = 0; i<actualColumns.length; i+=1)
+      {
+        if(actualColumns.indexOf(fileColumns[i]) !== -1 || fileColumns[i] === '_ROW_ID')
+          continue;
+        else
+          invalidColumnFound = true;           
+      }  
+    }
+    if (invalidColumnFound){
+      return false
+    }
+    else{
+      return true
+    }
   }
   
   preprocessData(headers: string[], data: any[]): any[]{
@@ -100,16 +137,26 @@ export class NavQuarterlyGridUtilService {
       invalidmsg += 'Quarter End cannot be less than 2012';
     }
 
-    if((new Date(row?.['Quarter End'])) <= (new Date(lockDate))){
+    if(row['Quarter End'] == null){
+      invalidmsg += (invalidmsg === '') ? '' : ','
+      invalidmsg += 'Invalid Quarter End Date';
+    }
+
+    if(row['Quarter End']!== null && ((new Date(row?.['Quarter End'])) <= (new Date(lockDate)))){
       invalidmsg += (invalidmsg === '') ? '' : ','
       invalidmsg += 'Quarter End updates till '+formatDate(lockDate)+' are locked.';
     }
-    
+
     if(row['Fund Hedging'] && !fundhedgings?.includes(row['Fund Hedging'])){
       invalidmsg += (invalidmsg === '') ? '' : ','
       invalidmsg += 'Fund hedging not part of the allowed list';
     }
 
+    if(row['Fund Hedging'] == null){
+      invalidmsg += (invalidmsg === '') ? '' : ','
+      invalidmsg += 'Fund hedging cannot be empty';
+    }
+    
     if(row['Strategy/Currency'] && !strategies?.includes(row['Strategy/Currency'])){
       invalidmsg += (invalidmsg === '') ? '' : ','
       invalidmsg += 'Strategy/Currency not part of the allowed list';

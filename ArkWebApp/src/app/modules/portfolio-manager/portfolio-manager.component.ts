@@ -296,6 +296,7 @@ export class PortfolioManagerComponent implements OnInit {
     }
 
     this.adaptableOptions = {
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'mappingID',
       userName: this.dataSvc.getCurrentUserName(),

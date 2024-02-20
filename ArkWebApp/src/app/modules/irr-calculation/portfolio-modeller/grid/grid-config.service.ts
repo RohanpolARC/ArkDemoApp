@@ -155,12 +155,12 @@ export class GridConfigService {
       suppressRowClickSelection: true,
       suppressAggFuncInHeader: true,
       enableGroupEdit: true,
-      autoGroupColumnDef: {
-        pinned: 'left',
-        cellRendererParams: {
-          suppressCount: true     // Disable row count on group
-        }
-      },
+      // autoGroupColumnDef: {
+      //   pinned: 'left',
+      //   cellRendererParams: {
+      //     suppressCount: true     // Disable row count on group
+      //   }
+      // },
       components: {
         agGridMaterialDatepicker: AggridMaterialDatepickerComponent,
         autocompleteCellEditor: MatAutocompleteEditorComponent
@@ -177,6 +177,7 @@ export class GridConfigService {
     }
 
     this.adaptableOptions = {
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'positionID',
       userName: this.dataSvc.getCurrentUserName(),

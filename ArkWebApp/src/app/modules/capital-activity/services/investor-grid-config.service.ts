@@ -84,6 +84,7 @@ export class InvestorGridConfigService {
     }
 
     this.adaptableOptions = {
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'capitalID',
       userName: this.dataSvc.getCurrentUserName(),

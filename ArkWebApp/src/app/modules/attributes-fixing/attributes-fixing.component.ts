@@ -124,6 +124,7 @@ export class AttributesFixingComponent implements OnInit {
 
 
     this.adaptableOptions= {
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'fixingID',
       adaptableId: 'Fixing Attribute ID',

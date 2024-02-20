@@ -8,9 +8,10 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { MsalUserService } from './core/services/Auth/msaluser.service';
 import { MsalBroadcastService } from '@azure/msal-angular';
-import { AuthenticationResult, EventMessage, EventType } from '@azure/msal-browser';
+import { AuthenticationResult, EventMessage, EventType, InteractionStatus } from '@azure/msal-browser';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
+import { filter, takeUntil } from 'rxjs/operators';
 
 @Component({  
   selector: 'app-root',  
@@ -79,7 +80,7 @@ export class AppComponent {
     public location:Location,
     public accessService: AccessService,
     private router:Router,
-    private msalSvc: MsalUserService,
+    private msalUserSvc: MsalUserService,
     private msalBroadcastSvc: MsalBroadcastService,
     private matIconRegistry: MatIconRegistry,
     private domSanitizer: DomSanitizer
@@ -95,7 +96,7 @@ export class AppComponent {
     if(!this.accessService.accessibleTabs){
       this.subscriptions.push(this.accessService.getTabs().subscribe({
         next: tabs => {
-          this.accessService.accessibleTabs = tabs;
+          this.accessService.updateAccessibleTabs(tabs);
           if(sessionStorage.getItem('lastClickedTabRoute')!==null){
             this.router.navigate([ sessionStorage.getItem('lastClickedTabRoute')]);
             sessionStorage.removeItem('lastClickedTabRoute');
@@ -105,7 +106,7 @@ export class AppComponent {
           console.error("Failed to fetch accessible tabs " + error);
         }
       }))  
-    }    
+    }
   }
 
   filterApply(){
@@ -117,23 +118,37 @@ export class AppComponent {
   }
 
   showUserRoles(){
-    alert(`Your role(s) : ${this.msalSvc.msalSvc.instance.getActiveAccount()?.idTokenClaims?.roles}`)
+    alert(`Your role(s) : ${this.msalUserSvc.msalSvc.instance.getActiveAccount()?.idTokenClaims?.roles}`)
   }
 
   async login(){
-    await this.msalSvc.msalSvc.instance.handleRedirectPromise().then(
+    await this.msalUserSvc.msalSvc.instance.handleRedirectPromise().then(
       res => {
         if(res && res.account)
-          this.msalSvc.msalSvc.instance.setActiveAccount(res.account);
+          this.msalUserSvc.msalSvc.instance.setActiveAccount(res.account);
       }
     );
 
-    const accounts = this.msalSvc.msalSvc.instance.getAllAccounts();
+    const accounts = this.msalUserSvc.msalSvc.instance.getAllAccounts();
     if (accounts.length === 0) {
         // No user signed in
-        await this.msalSvc.msalSvc.instance.loginRedirect();
+        await this.msalUserSvc.msalSvc.instance.loginRedirect();
     }
 
+  }
+
+  checkAndSetActiveAccount(){
+    /**
+     * If no active account set but there are accounts signed in, sets first account to active account
+     * To use active account set here, subscribe to inProgress$ first in your component
+     * Note: Basic usage demonstrated. Your app may require more complicated account selection logic
+     */
+    let activeAccount = this.msalUserSvc.msalSvc.instance.getActiveAccount();
+
+    if (!activeAccount && this.msalUserSvc.msalSvc.instance.getAllAccounts().length > 0) {
+      let accounts = this.msalUserSvc.msalSvc.instance.getAllAccounts();
+      this.msalUserSvc.msalSvc.instance.setActiveAccount(accounts[0]);
+    }
   }
 
   ngOnInit(): void { 
@@ -146,18 +161,18 @@ export class AppComponent {
     .subscribe((result: EventMessage) => {
       if(result.eventType === EventType.LOGIN_SUCCESS || result.eventType === EventType.SSO_SILENT_SUCCESS){
 
-        const payload = result.payload as AuthenticationResult;
-        this.msalSvc.msalSvc.instance.setActiveAccount(payload.account);
+        this.checkAndSetActiveAccount();
         this.fetchTabs();
         this.userName=this.dataService.getCurrentUserName();  
       }
       // if refresh token is expired the msal will redirect itself to microsoft login.
       else if(result.eventType === EventType.ACQUIRE_TOKEN_FAILURE || result.eventType === EventType.ACQUIRE_TOKEN_BY_CODE_FAILURE){
-        this.msalSvc.msalSvc.loginRedirect();
+        this.msalUserSvc.msalSvc.loginRedirect();
         
       }
     }))
 
+    this.checkAndSetActiveAccount();
     this.fetchTabs();
     this.userName=this.dataService.getCurrentUserName();
 

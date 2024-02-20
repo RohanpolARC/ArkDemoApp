@@ -309,6 +309,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
     }
 
     this.adaptableOptions = {
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: 'positionId',
       userName: this.dataSvc.getCurrentUserName(),

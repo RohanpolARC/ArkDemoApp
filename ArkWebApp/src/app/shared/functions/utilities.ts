@@ -1,5 +1,5 @@
 import { SharedEntitiesContext, SharedEntity } from "@adaptabletools/adaptable-angular-aggrid";
-import { ColDef, ColumnResizedEvent, FirstDataRenderedEvent, RowNode, VirtualColumnsChangedEvent } from "@ag-grid-community/core";
+import { BodyScrollEvent, ColDef, Column, ColumnResizedEvent, FirstDataRenderedEvent, RowNode, VirtualColumnsChangedEvent } from "@ag-grid-community/core";
 import { DecimalPipe } from "@angular/common";
 import * as moment from "moment";
 import { first } from "rxjs/operators";
@@ -197,27 +197,22 @@ export function getWrapWidth(cd:ColDef):number[]{
 }
 
 export  function autosizeColumnExceptResized(event: FirstDataRenderedEvent|VirtualColumnsChangedEvent){
-  let coldef:ColDef<any>[] = event.api.getColumnDefs()
-  let autosizeCols = coldef.map(col=>col.colId).filter(colId=>!event.context?.resizedColumnList?.includes(colId))
+  let autosizeCols:string[] = event.columnApi!.getAllGridColumns().map(col=>col.getId()).filter(colId=>!event.context?.resizedColumnList?.includes(colId));
   event.columnApi.autoSizeColumns(autosizeCols)
 }
 
 export function handleResizedColumns(params:ColumnResizedEvent){
-  if(params.column){
-    let coldef = params.column?.getColDef()
-    if(params.context?.resizedColumnList?.length){
-      if(!params.context.resizedColumnList?.includes(coldef.colId)){
-        params.context.resizedColumnList?.push(coldef.colId)
-      }
-    }else{
-      params.context.resizedColumnList = [coldef.colId]
-    }
+  if(params.column && params.source!='api'){
+    let resizedColumnSet: Set<string> = new Set(params.context?.resizedColumnList)
+    let coldef:ColDef<any> = params.column?.getColDef()
+    resizedColumnSet.add(coldef.colId)
+    params.context.resizedColumnList = Array.from(resizedColumnSet)
     
     let sizes:{
         rowHeight: number;
         headerHeight: number;
       } = params.api.getSizesForCurrentTheme()
-    let wrapSizes = getWrapWidth(coldef)
+    let wrapSizes:number[] = getWrapWidth(coldef)
     if(params.column?.getActualWidth()>wrapSizes[0] && params.column?.getActualWidth()<wrapSizes[1]){
       coldef.headerClass = 'header-font-size-small'
       coldef.headerTooltip=coldef.headerName

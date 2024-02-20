@@ -1,5 +1,5 @@
 import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { GridOptions, CellValueChangedEvent, Module, ColDef, GridReadyEvent, GridApi, FirstDataRenderedEvent, CellClickedEvent } from '@ag-grid-community/core';
+import { GridOptions, CellValueChangedEvent, Module, ColDef, GridReadyEvent, GridApi, FirstDataRenderedEvent, CellClickedEvent, VirtualColumnsChangedEvent } from '@ag-grid-community/core';
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
@@ -89,13 +89,11 @@ export class NetReturnsCashflowsComponent implements OnInit {
       noRowsOverlayComponent : NoRowsOverlayComponent,
       noRowsOverlayComponentParams: {
         noRowsMessageFunc: () => this.noRowsToDisplayMsg,
-      },
-      onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
-        autosizeColumnExceptResized(event)
-      },
+      }
     }
 
     this.adaptableOptions = {
+      ...CommonConfig.ADAPTABLE_OPTIONS,
       licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
       primaryKey: '',
       autogeneratePrimaryKey: true,
