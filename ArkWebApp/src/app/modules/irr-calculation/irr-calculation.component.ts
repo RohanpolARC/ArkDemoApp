@@ -36,8 +36,7 @@ export class IrrCalculationComponent implements OnInit {
     private dataSvc: DataService,
     public irrCalcSvc: IRRCalcService ,
     private filterSvc: GeneralFilterService,
-    private portfolioModellerService: PortfolioModellerService,
-    private changeDetection: ChangeDetectorRef
+    private portfolioModellerService: PortfolioModellerService
   ) { }
 
   subscriptions: Subscription[] = []

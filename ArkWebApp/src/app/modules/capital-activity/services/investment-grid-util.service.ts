@@ -13,7 +13,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { UtilService } from './util.service';
 
 @Injectable()
-export class InvestmentGridUtilService implements OnDestroy {
+export class InvestmentGridUtilService{
 
   constructor(private dialog: MatDialog,
     private capitalActivitySvc: CapitalActivityService,
@@ -91,9 +91,6 @@ export class InvestmentGridUtilService implements OnDestroy {
         .subscribe((link: boolean) => {
           this.processLinking();
     }))
-  }
-  ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe()); 
   }
 
   cellStyle (params) {

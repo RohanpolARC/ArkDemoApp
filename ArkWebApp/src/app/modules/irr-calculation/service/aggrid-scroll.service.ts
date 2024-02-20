@@ -1,4 +1,4 @@
-import { BodyScrollEvent, GridApi, GridOptions } from "@ag-grid-community/core";
+import { BodyScrollEvent, Column, GridApi, GridOptions } from "@ag-grid-community/core";
 import { Injectable } from "@angular/core";
 import { ScrollPosition } from "src/app/shared/models/IRRCalculationsModel";
 import { PortfolioModellerService } from "./portfolio-modeller.service";
@@ -45,13 +45,17 @@ export class AgGridScrollService{
     }
 
     onAgGridScroll(event:BodyScrollEvent){
-        if(this.allowAgGridScrollEvent){        
+        if(this.allowAgGridScrollEvent){       
+            let agGridVirtualColumns:Column[] = event.columnApi.getAllDisplayedVirtualColumns()
             this.scrollPosition.lastScrollPositionVertical = event.api.getLastDisplayedRow()
         
-            if(event.columnApi.getAllDisplayedColumns()[0].getColId() == event.columnApi.getAllDisplayedVirtualColumns()[0].getColId())
-            this.scrollPosition.lastScrollPositionHorizontal = event.columnApi.getAllDisplayedVirtualColumns()[0].getColId()
+            // agGridVirtualColumns always has 2 columns as buffer columns additional than the columns visible on the grid viewports
+            // we are adjusting the scroll position to get column id which is just visible on the grid by setting scroll position to agGridVirtualColumns[2]
+            // Exceptional case with scroll postion as the first column, it doesn't have column buffer so setting scroll position to agGridVirtualColumns[0] 
+            if(event.columnApi.getAllDisplayedColumns()[0].getColId() == agGridVirtualColumns[0].getColId())
+                this.scrollPosition.lastScrollPositionHorizontal = agGridVirtualColumns[0].getColId()
             else
-            this.scrollPosition.lastScrollPositionHorizontal = event.columnApi.getAllDisplayedVirtualColumns()[2].getColId()
+                this.scrollPosition.lastScrollPositionHorizontal = agGridVirtualColumns[2].getColId()
         }       
     }
 }

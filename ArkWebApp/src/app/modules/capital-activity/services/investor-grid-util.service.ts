@@ -9,7 +9,7 @@ import { ConfigurationService } from './configuration.service';
 import { SIGPWR } from 'constants';
 
 @Injectable()
-export class InvestorGridUtilService implements OnDestroy {
+export class InvestorGridUtilService {
 
   constructor(private capitalActivitySvc: CapitalActivityService,
     private utilSvc: UtilService,
@@ -30,19 +30,19 @@ export class InvestorGridUtilService implements OnDestroy {
   investments:any[]
 
   init()  
- {
-  this.subscriptions.push(this.editActionClick$.pipe(
-    switchMap(() => this.capitalActivitySvc.getCapitalInvestment(this.rowData.capitalID).pipe(take(1)))
-  ).subscribe({
-   next: data => {
-     this.investments = data;
-     this.utilSvc.openDialog(this.rowData, 'EDIT', this.investments, this.isLocked);
-   },
-   error: error => {
-     console.error("Couldn't fetch investments for this capitalID");
-   }
-  }))
- }
+  {
+    this.subscriptions.push(this.editActionClick$.pipe(
+      switchMap(() => this.capitalActivitySvc.getCapitalInvestment(this.rowData.capitalID).pipe(take(1)))
+    ).subscribe({
+    next: data => {
+      this.investments = data;
+      this.utilSvc.openDialog(this.rowData, 'EDIT', this.investments, this.isLocked);
+    },
+    error: error => {
+      console.error("Couldn't fetch investments for this capitalID");
+    }
+    }))
+  }
 
   editActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext,args:boolean[]) {
     
@@ -81,7 +81,4 @@ export class InvestorGridUtilService implements OnDestroy {
       return ''
   }
   
-  ngOnDestroy(){
-    this.subscriptions.forEach(sub => sub.unsubscribe()); 
-  }
 }
