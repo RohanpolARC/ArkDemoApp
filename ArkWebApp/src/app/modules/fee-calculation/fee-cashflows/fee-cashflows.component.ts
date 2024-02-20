@@ -130,7 +130,7 @@ export class FeeCashflowsComponent implements OnInit {
       { field: 'Date', tooltipField:  'Date', cellClass: 'dateUK', minWidth: 122, type: 'abColDefDate' },
       { field: 'NumberDays', tooltipField:  'NumberDays', type: 'abColDefNumber' },
       { field: 'PresetName', tooltipField:  'PresetName', type: 'abColDefString' },
-      { field: 'CashType', tooltipField:  'CashType', type:'abColDefString' },
+      { field: 'CashType', tooltipField:  'CashType', type:'abColDefString', maxWidth: 300 },
       { field: 'TotalType', tooltipField:  'TotalType', type: 'abColDefNumber' },
       { field: 'LocalLastMgmtFeeDate', tooltipField:  'LocalLastMgmtFeeDate', cellClass: 'dateUK', minWidth: 122, type: 'abColDefDate' },
       { field: 'LocalLastHurdleCompoundDate', tooltipField:  'LocalLastHurdleCompoundDate', cellClass: 'dateUK', minWidth: 122, type: 'abColDefDate' },
@@ -259,7 +259,7 @@ export class FeeCashflowsComponent implements OnInit {
           DashboardTitle: 'Fee Cashflows'
         },
         Layout:{
-          Revision: 1,
+          Revision: 2,
           CurrentLayout: 'Basic Fee Cashflow Layout',
           Layouts: [{
             Name: 'Basic Fee Cashflow Layout',
@@ -267,7 +267,7 @@ export class FeeCashflowsComponent implements OnInit {
           }]
         },
         FormatColumn:{
-          Revision:2,
+          Revision:3,
           FormatColumns:[
             BLANK_DATETIME_FORMATTER_CONFIG(this.DATE_COLUMNS),
             DATE_FORMATTER_CONFIG_ddMMyyyy(this.DATE_COLUMNS),
