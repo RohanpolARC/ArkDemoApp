@@ -47,7 +47,7 @@ export class InvestmentGridConfigService {
       { field: 'type', type: 'abColDefString'},
       { field: 'groupID', type: 'abColDefNumber' },
       { field: 'link', tooltipField: 'link', headerName: 'Link', type: 'abColDefBoolean', checkboxSelection: true },
-      { field: 'strategy', tooltipField: 'strategy', headerName: 'Strategy/Currency', type: 'abColDefString' }
+      { field: 'strategy', tooltipField: 'strategy', headerName: 'Strategy', type: 'abColDefString' }
     ]
 
     this.gridOptions = {
