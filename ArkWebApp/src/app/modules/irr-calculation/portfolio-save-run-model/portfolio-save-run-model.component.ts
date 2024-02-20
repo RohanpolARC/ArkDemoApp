@@ -343,7 +343,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
               irrAggrType: this.isIRRDisabled ? null : this.modelForm.get('aggregationType').value,
               curveRateDelta: this.isIRRDisabled ? null : model.curveRateDelta,
               latestWSOStatic: this.isIRRDisabled ? null : model.latestWSOStatic,
-              fundCurrency: this.isIRRDisabled ? null : this.modelForm.get('fundCurrency').value,  
+              fundCurrency: this.modelForm.get('fundCurrency').value,  
               // Setting dynamically set aggregation order.
               aggrStr: this.aggrCols,
               mapGroupCols: this.mapGroupCols
