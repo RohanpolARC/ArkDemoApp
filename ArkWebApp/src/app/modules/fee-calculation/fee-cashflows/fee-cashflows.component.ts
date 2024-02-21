@@ -12,6 +12,7 @@ import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { ParentTabType } from 'src/app/shared/models/IRRCalculationsModel';
 import { PortfolioModellerService } from '../../irr-calculation/service/portfolio-modeller.service';
 import { AgGridScrollService } from '../../irr-calculation/service/aggrid-scroll.service';
+import { GridChartsModule } from "@ag-grid-enterprise/charts";
 
 @Component({
   selector: 'app-fee-cashflows',
@@ -26,7 +27,8 @@ export class FeeCashflowsComponent implements OnInit {
   @Input() parentTab: ParentTabType;
   @Input() childTabIndex: number;
   
-  agGridModules: Module[] = CommonConfig.AG_GRID_MODULES
+  agGridModules: Module[] = [...CommonConfig.AG_GRID_MODULES,
+    GridChartsModule]
   subscriptions: Subscription[] = []
   gridOptions: GridOptions
   adaptableOptions: AdaptableOptions
@@ -215,6 +217,7 @@ export class FeeCashflowsComponent implements OnInit {
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
       ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
+      enableCharts: true,
       enableRangeSelection: true,
       sideBar:true,
       columnDefs: this.columnDefs,
