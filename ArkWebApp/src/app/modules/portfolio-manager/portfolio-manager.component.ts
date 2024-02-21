@@ -2,7 +2,7 @@ import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angula
 import { CellValueChangedEvent, ColDef, EditableCallbackParams, FirstDataRenderedEvent, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { MsalService } from '@azure/msal-angular';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
@@ -12,7 +12,7 @@ import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overla
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
 import { BLANK_DATETIME_FORMATTER_CONFIG, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm } from 'src/app/shared/functions/formatter';
 import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
-import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
+import { IUniqueValuesForField, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-renderer.component';
 import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, isFieldValid, validateAndUpdate, getPortfolioTypeParams } from './utilities/functions';
 
@@ -42,6 +42,7 @@ export class PortfolioManagerComponent implements OnInit {
   adapTableApi: AdaptableApi;
   noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
   maxMappingID: number  // Remembers the maximum mapping ID available currently in the system
+  portfolioAUMMethodList: IUniqueValuesForField[] = []
 
   constructor(
     private portfolioManagerSvc: PortfolioManagerService,
@@ -85,9 +86,10 @@ export class PortfolioManagerComponent implements OnInit {
 
     this.setAccess();
 
-    this.subscriptions.push(this.dataSvc.getWSOPortfolioRef().subscribe({
+    this.subscriptions.push(forkJoin([this.dataSvc.getWSOPortfolioRef(),this.dataSvc.getUniqueValuesForField('portfolioAUMMethod')]).subscribe({
       next: resp => {
-        this.portfolioMapDataSvc.setWSOPortfolioRef(resp);
+        this.portfolioMapDataSvc.setWSOPortfolioRef(resp?.[0]);
+        this.portfolioAUMMethodList = resp?.[1]
       },
       error: error => {
         this.portfolioMapDataSvc.setWSOPortfolioRef([]);
@@ -191,7 +193,7 @@ export class PortfolioManagerComponent implements OnInit {
         editable: this.isEditable.bind(this),
         cellEditor: 'autocompleteCellEditor',
         cellEditorParams: () => { return {
-          ...this.getUniqueParamsFromGrid('portfolioAUMMethod'),
+          options: this.portfolioAUMMethodList.map(e => e.value),
           isStrict: true
         }},
         cellStyle: this.getEditableCellStyle.bind(this)      
