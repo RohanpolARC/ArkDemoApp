@@ -304,7 +304,7 @@ export class FeeCashflowsComponent implements OnInit {
                   common: {
                     title: {
                       enabled: true,
-                      text: 'Fee Cashflows',
+                      text: 'Fee flows',
                     },
                     navigator: {
                       enabled: true,
