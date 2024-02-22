@@ -1,13 +1,13 @@
-import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { BodyScrollEvent, ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, Module, ValueFormatterParams } from '@ag-grid-community/core';
+import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
+import { AgChartThemeOverrides, BodyScrollEvent, ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, Module, ValueFormatterParams } from '@ag-grid-community/core';
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { FeeCalculationService } from 'src/app/core/services/FeeCalculation/fee-calculation.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
-import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
+import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy, amountFormatter, dateFormatter } from 'src/app/shared/functions/formatter';
+import { autosizeColumnExceptResized, getMomentDateStr_ddmmyyyy, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { ParentTabType } from 'src/app/shared/models/IRRCalculationsModel';
 import { PortfolioModellerService } from '../../irr-calculation/service/portfolio-modeller.service';
@@ -35,7 +35,9 @@ export class FeeCashflowsComponent implements OnInit {
   columnDefs: ColDef[]
   defaultColDef: ColDef
   gridApi: GridApi
+  adaptableApi: AdaptableApi
   noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
+  currentChartRef: any;
 
   constructor(
     private dataSvc: DataService,
@@ -64,6 +66,49 @@ export class FeeCashflowsComponent implements OnInit {
         this.gridApi?.hideOverlay();
     }
   }
+
+  // public chartThemeOverrides: AgChartThemeOverrides = {
+  //   common: {
+  //     title: {
+  //       enabled: true,
+  //       text: 'Fee Cashflows',
+  //     },
+  //     navigator: {
+  //       enabled: true,
+  //       height: 20,
+  //       margin: 25,
+  //     },
+  //     axes: {
+  //       time: {
+  //         label: {
+  //           rotation: 0,
+  //           format: '%d %b',
+  //         },
+  //       },
+  //       category: {
+  //         label: {
+  //           rotation: 0,
+  //           formatter: dateFormatter
+  //         },
+  //       },
+  //       number: {
+  //         label: {
+  //           formatter: amountFormatter
+  //         },
+  //       },
+  //     },
+  //     series: {
+  //       tooltip: {
+  //         renderer: ({ datum, xKey, yKey }) => {
+  //           console.log(`${datum[xKey]}: ${datum[yKey]} works`)
+  //           return {
+  //             content: `${datum[xKey]}: ${datum[yKey]} works`,
+  //           };
+  //         },
+  //       },
+  //     },
+  //   },
+  // };
 
   DATE_COLUMNS=[
     'Date',
@@ -130,6 +175,7 @@ export class FeeCashflowsComponent implements OnInit {
     'PerfFees','TotalAfterGIRAdjustment', 'GIRAdjustment']
 
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
+    this.adaptableApi = adaptableApi
     adaptableApi.columnApi.autosizeAllColumns()
     this.agGridScrollService.gridApi = this.gridOptions.api
     this.agGridScrollService.childTabIndex = this.childTabIndex
@@ -219,6 +265,7 @@ export class FeeCashflowsComponent implements OnInit {
       ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
       enableCharts: true,
       enableRangeSelection: true,
+      popupParent: document.querySelector('body'),
       sideBar:true,
       columnDefs: this.columnDefs,
       defaultColDef: {
@@ -244,6 +291,34 @@ export class FeeCashflowsComponent implements OnInit {
       },
       onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
         autosizeColumnExceptResized(event)
+        // if (this.currentChartRef) {
+        //   this.currentChartRef.destroyChart();
+        // }
+        // this.currentChartRef = this.gridApi.createRangeChart({
+        //   // chartContainer: document.querySelector('#myChart') as HTMLElement,
+        //   cellRange: {
+        //     columns: ['Date', 'LocalAvgTimeWeightCumCapital','LocalCumCapital','LocalCumCapitalHurdle','PerfFees'],
+        //   },
+        //   suppressChartRanges: true,
+        //   chartType: 'line',
+        // });
+
+        // this.adaptableApi.chartingApi.addChartDefinition({
+        //   Name:'Fee Cashflows',
+        //   Model:{
+        //     modelType: 'range',
+        //     chartType:'line',
+        //     chartId:'feeCashflows',
+        //     cellRange: {
+        //       rowStartIndex: 0,
+        //       rowEndIndex: null,
+        //       columns: ['Date', 'LocalAvgTimeWeightCumCapital','LocalCumCapital','LocalCumCapitalHurdle','PerfFees'],
+        //     },
+        //     chartOptions:this.chartThemeOverrides,
+        //     suppressChartRanges:true
+        //   }
+
+        // })
       },  
       rowBuffer:0,
       onBodyScroll: (event:BodyScrollEvent) => {
@@ -272,15 +347,83 @@ export class FeeCashflowsComponent implements OnInit {
       },
       predefinedConfig: {
         Dashboard: {
-          Revision:2,
+          Revision:3,
           ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
             Name: 'Layout',
             Toolbars: ['Layout']
+          },
+          {
+            Name: 'Charting',
+            Toolbars: ['Charting']
           }],
           IsHidden: false,
           DashboardTitle: 'Fee Cashflows'
+        },
+        Charting: {
+          Revision:4,
+          ChartDefinitions: [
+            {
+              Name:'Fee Cashflows',
+              Model:{
+                modelType: 'range',
+                chartType:'line',
+                chartId:'feeCashflows',
+                cellRange: {
+                  rowStartIndex: 0,
+                  rowEndIndex: null,
+                  columns: ['Date', 'LocalAvgTimeWeightCumCapital','LocalCumCapital','LocalCumCapitalHurdle','PerfFees'],
+                },
+                chartOptions:{
+                  common: {
+                    title: {
+                      enabled: true,
+                      text: 'Fee Cashflows',
+                    },
+                    navigator: {
+                      enabled: true,
+                      height: 20,
+                      margin: 25,
+                    },
+                    axes: {
+                      time: {
+                        label: {
+                          rotation: 0,
+                          format: '%d %b',
+                        },
+                      },
+                      category: {
+                        label: {
+                          rotation: 0,
+                          formatter: dateFormatter
+                        },
+                      },
+                      number: {
+                        label: {
+                          formatter: amountFormatter
+                        },
+                      },
+                    },
+                    series: {
+                      tooltip: {
+                        renderer: ({ datum, xKey, yKey }) => {
+                          console.log(datum[xKey])
+                          console.log(`${getMomentDateStr_ddmmyyyy(datum[xKey])}: ${datum[yKey]} works`)
+                          return {
+                            content: `${getMomentDateStr_ddmmyyyy(datum[xKey])}: ${datum[yKey]} works`,
+                          };
+                        },
+                      },
+                    },
+                  },
+                },
+                suppressChartRanges:true
+              }
+    
+            }
+          ]
+
         },
         Layout:{
           Revision: 2,
