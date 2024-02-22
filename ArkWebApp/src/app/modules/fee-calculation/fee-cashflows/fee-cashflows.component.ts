@@ -67,49 +67,6 @@ export class FeeCashflowsComponent implements OnInit {
     }
   }
 
-  // public chartThemeOverrides: AgChartThemeOverrides = {
-  //   common: {
-  //     title: {
-  //       enabled: true,
-  //       text: 'Fee Cashflows',
-  //     },
-  //     navigator: {
-  //       enabled: true,
-  //       height: 20,
-  //       margin: 25,
-  //     },
-  //     axes: {
-  //       time: {
-  //         label: {
-  //           rotation: 0,
-  //           format: '%d %b',
-  //         },
-  //       },
-  //       category: {
-  //         label: {
-  //           rotation: 0,
-  //           formatter: dateFormatter
-  //         },
-  //       },
-  //       number: {
-  //         label: {
-  //           formatter: amountFormatter
-  //         },
-  //       },
-  //     },
-  //     series: {
-  //       tooltip: {
-  //         renderer: ({ datum, xKey, yKey }) => {
-  //           console.log(`${datum[xKey]}: ${datum[yKey]} works`)
-  //           return {
-  //             content: `${datum[xKey]}: ${datum[yKey]} works`,
-  //           };
-  //         },
-  //       },
-  //     },
-  //   },
-  // };
-
   DATE_COLUMNS=[
     'Date',
     'LocalLastMgmtFeeDate',
@@ -291,34 +248,6 @@ export class FeeCashflowsComponent implements OnInit {
       },
       onFirstDataRendered:(event:FirstDataRenderedEvent)=>{
         autosizeColumnExceptResized(event)
-        // if (this.currentChartRef) {
-        //   this.currentChartRef.destroyChart();
-        // }
-        // this.currentChartRef = this.gridApi.createRangeChart({
-        //   // chartContainer: document.querySelector('#myChart') as HTMLElement,
-        //   cellRange: {
-        //     columns: ['Date', 'LocalAvgTimeWeightCumCapital','LocalCumCapital','LocalCumCapitalHurdle','PerfFees'],
-        //   },
-        //   suppressChartRanges: true,
-        //   chartType: 'line',
-        // });
-
-        // this.adaptableApi.chartingApi.addChartDefinition({
-        //   Name:'Fee Cashflows',
-        //   Model:{
-        //     modelType: 'range',
-        //     chartType:'line',
-        //     chartId:'feeCashflows',
-        //     cellRange: {
-        //       rowStartIndex: 0,
-        //       rowEndIndex: null,
-        //       columns: ['Date', 'LocalAvgTimeWeightCumCapital','LocalCumCapital','LocalCumCapitalHurdle','PerfFees'],
-        //     },
-        //     chartOptions:this.chartThemeOverrides,
-        //     suppressChartRanges:true
-        //   }
-
-        // })
       },  
       rowBuffer:0,
       onBodyScroll: (event:BodyScrollEvent) => {
@@ -347,25 +276,21 @@ export class FeeCashflowsComponent implements OnInit {
       },
       predefinedConfig: {
         Dashboard: {
-          Revision:3,
+          Revision:4,
           ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
             Name: 'Layout',
             Toolbars: ['Layout']
-          },
-          {
-            Name: 'Charting',
-            Toolbars: ['Charting']
           }],
           IsHidden: false,
           DashboardTitle: 'Fee Cashflows'
         },
         Charting: {
-          Revision:4,
+          Revision:5,
           ChartDefinitions: [
             {
-              Name:'Fee Cashflows',
+              Name:'Fee flows',
               Model:{
                 modelType: 'range',
                 chartType:'line',
@@ -408,10 +333,8 @@ export class FeeCashflowsComponent implements OnInit {
                     series: {
                       tooltip: {
                         renderer: ({ datum, xKey, yKey }) => {
-                          console.log(datum[xKey])
-                          console.log(`${getMomentDateStr_ddmmyyyy(datum[xKey])}: ${datum[yKey]} works`)
                           return {
-                            content: `${getMomentDateStr_ddmmyyyy(datum[xKey])}: ${datum[yKey]} works`,
+                            content: `${getMomentDateStr_ddmmyyyy(datum[xKey])}: ${datum[yKey]}`,
                           };
                         },
                       },
@@ -442,11 +365,11 @@ export class FeeCashflowsComponent implements OnInit {
           ]
         },
         StatusBar: {
-          Revision: 2,
+          Revision: 3,
           StatusBars: [
             {
               Key: 'Center Panel',
-              StatusBarPanels: ['Filter']
+              StatusBarPanels: ['Filter','Charting']
             },
             {
               Key: 'Right Panel',
