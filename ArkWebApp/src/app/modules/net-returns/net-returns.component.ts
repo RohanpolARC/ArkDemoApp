@@ -103,7 +103,7 @@ export class NetReturnsComponent implements OnInit {
 
     this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
       if(data){
-        if(data.id===231){
+        if(data.id === 231){
           this.netReturnsSvc.changeSearchDate(getMomentDateStr(data.value))
         }else if(data.id === 232){
           this.netReturnsSvc.changeFundHedgingValues(data.value?.[0]?.value)

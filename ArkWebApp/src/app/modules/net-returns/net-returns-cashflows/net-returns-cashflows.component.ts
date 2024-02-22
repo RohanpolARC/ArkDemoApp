@@ -183,15 +183,40 @@ export class NetReturnsCashflowsComponent implements OnInit {
         height: '80vh'
       });
     }
+
+    if(data?.['capitalType'] === 'NAV' && data?.['capitalSubType'] === 'NAV'){
+
+      let req: DetailedView = <DetailedView>{};
+      req.screen = 'Net Returns - Estimated NAV'
+      req.param1 = this.asOfDate;
+      req.param2 = this.fundHedging;
+      req.param3 = req.param4 = req.param5 = '';
+      req.strParam1 = [];
+
+      const dialogRef = this.dialog.open(DefaultDetailedViewPopupComponent, {
+        data: {
+          detailedViewRequest: req,
+          failureMessage: `Failed to load the estimated NAV details`,
+          noFilterSpace: true,
+          grid: 'Net Returns - Estimated NAV',
+          header: `Estimated NAV details for ${this.asOfDate} - ${this.fundHedging}` 
+        },
+        width: '90vw',
+        height: '80vh'
+      });
+    }
+
   }
   clickableAmountStyle (params) {
-    if(params.data?.['capitalType'] === 'NAV' && params.data?.['capitalSubType'] === 'Performance Fee')
+    if((params.data?.['capitalType'] === 'NAV' && params.data?.['capitalSubType'] === 'Performance Fee') || (params.data?.['capitalType'] === 'NAV' && params.data?.['capitalSubType'] === 'NAV') )
       return { color: '#0590ca' };
     return null;
   }
   amountTooltipGetter (params) {
     if(params.data?.['capitalType'] === 'NAV' && params.data?.['capitalSubType'] === 'Performance Fee')
       return 'View accrual calculation';
+    if(params.data?.['capitalType'] === 'NAV' && params.data?.['capitalSubType'] === 'NAV')
+      return 'View estimated NAV calculation';
     return null;
   }
   onGridReady(params: GridReadyEvent){
