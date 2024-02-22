@@ -332,6 +332,7 @@ export class FeeCashflowsComponent implements OnInit {
                     },
                     series: {
                       tooltip: {
+                        enabled:true,
                         renderer: ({ datum, xKey, yKey }) => {
                           return {
                             content: `${getMomentDateStr_ddmmyyyy(datum[xKey])}: ${datum[yKey]}`,
