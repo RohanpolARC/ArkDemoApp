@@ -131,6 +131,52 @@ export class FeeCashflowsComponent implements OnInit {
     'LocalCumMgmtfees',
     'PerfFees','TotalAfterGIRAdjustment', 'GIRAdjustment']
 
+  chartThemeOverrides:AgChartThemeOverrides = {
+    // Series tooltip property is not available for common chart type so its defined specific to a chart type
+    line: {
+      series: {
+        tooltip: {
+          enabled:true,
+          renderer: ({ datum, xKey, yKey }) => {
+            return {
+              content: `${getMomentDateStr_ddmmyyyy(datum[xKey])}: ${this.formatAmount(datum[yKey])}`,
+            };
+          },
+        },
+      },
+    },
+    common: {
+      title: {
+        enabled: true,
+        text: 'Fee flows',
+      },
+      navigator: {
+        enabled: true,
+        height: 20,
+        margin: 25,
+      },
+      axes: {
+        time: {
+          label: {
+            rotation: 0,
+            format: '%d %b',
+          },
+        },
+        category: {
+          label: {
+            rotation: 0,
+            formatter: dateFormatter
+          },
+        },
+        number: {
+          label: {
+            formatter: amountFormatter
+          },
+        },
+      },
+    },
+  };
+
   onAdaptableReady = ({ adaptableApi, gridOptions }) => {
     this.adaptableApi = adaptableApi
     adaptableApi.columnApi.autosizeAllColumns()
@@ -221,6 +267,7 @@ export class FeeCashflowsComponent implements OnInit {
       ...CommonConfig.GRID_OPTIONS,
       ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
       enableCharts: true,
+      chartThemeOverrides: this.chartThemeOverrides,
       enableRangeSelection: true,
       popupParent: document.querySelector('body'),
       sideBar:true,
@@ -287,7 +334,7 @@ export class FeeCashflowsComponent implements OnInit {
           DashboardTitle: 'Fee Cashflows'
         },
         Charting: {
-          Revision:5,
+          Revision:6,
           ChartDefinitions: [
             {
               Name:'Fee flows',
@@ -300,48 +347,7 @@ export class FeeCashflowsComponent implements OnInit {
                   rowEndIndex: null,
                   columns: ['Date', 'LocalAvgTimeWeightCumCapital','LocalCumCapital','LocalCumCapitalHurdle','PerfFees'],
                 },
-                chartOptions:{
-                  common: {
-                    title: {
-                      enabled: true,
-                      text: 'Fee flows',
-                    },
-                    navigator: {
-                      enabled: true,
-                      height: 20,
-                      margin: 25,
-                    },
-                    axes: {
-                      time: {
-                        label: {
-                          rotation: 0,
-                          format: '%d %b',
-                        },
-                      },
-                      category: {
-                        label: {
-                          rotation: 0,
-                          formatter: dateFormatter
-                        },
-                      },
-                      number: {
-                        label: {
-                          formatter: amountFormatter
-                        },
-                      },
-                    },
-                    series: {
-                      tooltip: {
-                        enabled:true,
-                        renderer: ({ datum, xKey, yKey }) => {
-                          return {
-                            content: `${getMomentDateStr_ddmmyyyy(datum[xKey])}: ${datum[yKey]}`,
-                          };
-                        },
-                      },
-                    },
-                  },
-                },
+                chartOptions:this.chartThemeOverrides,
                 suppressChartRanges:true
               }
     
@@ -379,6 +385,28 @@ export class FeeCashflowsComponent implements OnInit {
           ],
         }
       }
+    }
+  }
+
+  formatAmount(amount:string){
+    if(amount!=undefined && Number(Number(amount).toFixed(2))!=0){
+      if(Number.isInteger(Number(Number(amount).toFixed(2)))){         // Don't show trailing 0's if number rounded off to 2 decimals is an integer
+          return Number(amount).toLocaleString(undefined,{
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0
+          })
+      }
+      else{
+          return Number(amount).toLocaleString(undefined, {     // Show 2 trailing digits if non integer
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+          });    
+      }
+    }
+    else if(Number(Number(amount).toFixed(2))==0) {
+        return "-"
+    } else{
+        return ""
     }
   }
 
