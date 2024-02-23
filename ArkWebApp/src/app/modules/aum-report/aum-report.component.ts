@@ -69,7 +69,8 @@ export class AumReportComponent implements OnInit {
     "aumEurAdjustmentLast",
     "aumEurAdjustmentDiff",
     "coinvestCostChange",
-    "smaCostChange"
+    "smaCostChange",
+    "upfrontFees"
   ]
 
 
@@ -141,7 +142,8 @@ export class AumReportComponent implements OnInit {
 
       {field: "issuerType",type:'abColDefString'},
       {field: "moveType",type:'abColDefString'},
-      {field: "comment",type:'abColDefString'}
+      {field: "comment",type:'abColDefString'},
+      {field: "upfrontFees",type:'abColDefNumber', headerName:"Upfront Fees"},
 
     ]
 
@@ -285,7 +287,7 @@ export class AumReportComponent implements OnInit {
               },             
               Layout:{
                 CurrentLayout:"Basic AUM Report Detail Layout",
-                Revision:11,
+                Revision:12,
                 Layouts:[{
                   Name: "Basic AUM Report Detail Layout",
                   Columns: [
@@ -329,6 +331,7 @@ export class AumReportComponent implements OnInit {
                     ,"aumEurAdjustmentCurrent"
                     ,"aumEurAdjustmentLast"
                     ,"aumEurAdjustmentDiff"
+                    ,"upfrontFees"
                   ],
                   RowGroupedColumns: [
                     "fund"
@@ -356,12 +359,13 @@ export class AumReportComponent implements OnInit {
                     grossFundedCostAmountEurLast: "sum",
                     grossFundedCostAmountEurDiff: "sum",
                     coinvestCostChange : "sum",
-                    smaCostChange : "sum"
+                    smaCostChange : "sum",
+                    upfrontFees: "sum"
                   }
                 }],
               },
               FormatColumn:{
-                Revision :8,
+                Revision :9,
                 FormatColumns:[
                   CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountMillionFormatter')
                 ]
@@ -388,7 +392,7 @@ export class AumReportComponent implements OnInit {
         },
         Layout:{
           CurrentLayout: 'Basic AUM Report Layout',
-          Revision: 9,
+          Revision: 10,
           Layouts: [{
             Name: 'Basic AUM Report Layout',
             Columns: [
@@ -429,7 +433,8 @@ export class AumReportComponent implements OnInit {
               "aumEurAdjustmentCurrent",
               "aumEurAdjustmentLast",
               "aumEurAdjustmentDiff",
-              "comment"
+              "comment",
+              "upfrontFees"
             ],
             RowGroupedColumns: [
               "issuerType"
@@ -457,13 +462,14 @@ export class AumReportComponent implements OnInit {
               grossFundedCostAmountEurLast: "sum",
               grossFundedCostAmountEurDiff: "sum",
               coinvestCostChange : "sum",
-              smaCostChange : "sum"
+              smaCostChange : "sum",
+              upfrontFees: "sum"
             }
           }]
           
         },
         FormatColumn:{
-          Revision :8,
+          Revision :9,
           FormatColumns:[
             CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountMillionFormatter')
           ]
@@ -531,7 +537,7 @@ export class AumReportComponent implements OnInit {
                     coinvestCostChange: k.coinvestCostChange, aumSpotLatest: k.aumSpotLatest, aumSpotLast: k.aumSpotLast, aumSotDiff: k.aumSpotDiff,
                     grossGPSLatest: k.grossGPSLatest, grossGPSLast: k.grossGPSLast, grossGPSDiff: k.grossGPSDiff,
                     netGPSLatest: k.netGPSLatest, netGPSLast: k.netGPSLast, netGPSDiff: k.netGPSDiff,
-                    netOfRebateGPSLatest: k.netOfRebateGPSLatest, netOfRebateGPSLast: k.netOfRebateGPSLast, netOfRebateGPSDiff: k.netOfRebateGPSDiff,
+                    netOfRebateGPSLatest: k.netOfRebateGPSLatest, netOfRebateGPSLast: k.netOfRebateGPSLast, netOfRebateGPSDiff: k.netOfRebateGPSDiff, upfrontFees: k.upfrontFees,
                   }})
                 }
               )
@@ -605,7 +611,9 @@ export class AumReportComponent implements OnInit {
           {field: "netOfRebateGPSDiff", type:'abColDefNumber'},
           // {field: "issuerType",type:'abColDefString'},
           // {field: "moveType",type:'abColDefString'},
-          // {field: "comment",type:'abColDefString'}
+          // {field: "comment",type:'abColDefString'},
+          {field: "upfrontFees",type:"abColDefNumber", headerName:"Upfront Fees"},
+
         ]
         let detailGridInfo: DetailGridInfo = params.api.getDetailGridInfo(`detail_${params.data?.['__ADAPTABLE_PK__']}`);
         if(detailGridInfo){
