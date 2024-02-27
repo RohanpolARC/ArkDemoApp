@@ -33,6 +33,7 @@ export class ModelUtilService {
       modelData[i].rules = [];
       modelData[i].aggregationType = data[i].irrAggrType;
       modelData[i].fundCurrency = data[i].fundCurrency;
+      modelData[i].feePreset = data[i].feePreset;
       
       let ruleArr: string[] = tempRules.split('|').join('"').split('~');
       ruleArr.forEach(x => data[i].rules.push(JSON.parse(x)))

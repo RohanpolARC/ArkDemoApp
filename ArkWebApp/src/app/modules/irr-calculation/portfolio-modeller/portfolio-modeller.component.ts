@@ -288,6 +288,7 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
         isShared: this.modelSvc.modelMap[this.selectedModelID]?.isShared,
         positionIDs: this.selectedPositionIDs,
         aggregationType: this.modelSvc.modelMap[this.selectedModelID]?.aggregationType,
+        feePreset: this.modelSvc.modelMap[this.selectedModelID]?.feePreset,
         updatedValues: this.gridUtilSvc.getUpdatedValues(this.gridApi),
         context: context
       },

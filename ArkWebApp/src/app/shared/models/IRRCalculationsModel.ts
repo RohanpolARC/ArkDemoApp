@@ -22,6 +22,7 @@ export type VPortfolioModel = {
     irrAggrType: string // `type1 > type2 > type3`,
     curveRateDelta: number   // percentage with direction (+/-)
     fundCurrency: number
+    feePreset: string
 }
 
 export type VPortfolioLocalOverrideModel = {
@@ -119,7 +120,7 @@ export type VModel = {
     modelID: number, modelName: string, displayName: string, modelDesc: string, 
     rules: ColumnFilter[], positionIDs: number[], 
     isLocal: boolean, isManual: boolean, username: string, isShared: boolean, aggregationType: string,
-    fundCurrency: string, latestWSOStatic: boolean
+    fundCurrency: string, latestWSOStatic: boolean, feePreset: string
 }
 
 export type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`  | `Portfolio Modeller` | `Cashflows`
