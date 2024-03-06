@@ -38,6 +38,8 @@ import { InputAmountNumberModule } from 'src/app/shared/modules/input-amount-num
 import { AsPipeModule } from 'src/app/shared/modules/as-pipe/as-pipe.module';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { RefService } from './portfolio-modeller/ref/ref.service';
+import { PortfolioManageModelComponent } from './portfolio-manage-model/portfolio-manage-model.component';
+import { PortfolioManageModelGridComponent } from './portfolio-manage-model-grid/portfolio-manage-model-grid.component';
 
 @NgModule({
   declarations: [
@@ -50,7 +52,9 @@ import { RefService } from './portfolio-modeller/ref/ref.service';
     FeePresetsGridComponent,
     TabGroupWrapperComponent,
     CashFlowsComponent,
-    VirtualPositionFormComponent
+    VirtualPositionFormComponent,
+    PortfolioManageModelComponent,
+    PortfolioManageModelGridComponent
   ],
   imports: [
     CommonModule,

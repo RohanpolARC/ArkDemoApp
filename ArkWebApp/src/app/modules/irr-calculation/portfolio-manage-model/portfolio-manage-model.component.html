@@ -1,0 +1,23 @@
+<div  class="d-flex flex-column justify-content-between" style="height: 100%;">
+    <h2 mat-dialog-title>Manage Models</h2>    
+    <ng-container>
+        <app-portfolio-manage-model-grid
+            [rowData$] = "portfolioManageModelSvc.rowData$"
+            [gridOptions]         =     "gridOptions"
+            [adaptableOptions]    =     "adaptableOptions"
+            [columnDefs]          =     "columnDefs" 
+        >
+        </app-portfolio-manage-model-grid>
+
+    </ng-container>
+    <mat-dialog-actions align="end" class="row">
+        <div class="action">
+                        
+            <button type="button" 
+            (click) = "onClose()"
+            mat-raised-button
+            >Close</button>
+    
+        </div>
+    </mat-dialog-actions>
+</div>

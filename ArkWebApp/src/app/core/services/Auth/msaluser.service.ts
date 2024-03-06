@@ -48,6 +48,14 @@ export class MsalUserService {
         return this.msalSvc.instance.getActiveAccount()?.name;
     }
 
+    public getUserRoles():string[] {
+        return this.msalSvc.instance.getActiveAccount()?.idTokenClaims?.roles
+    }
+
+    public isUserAdmin():boolean {
+        return this.msalSvc.instance.getActiveAccount()?.idTokenClaims?.roles.map(role => role.toLowerCase()).includes('admin.write')
+    }
+
     public logout() {  
         this.msalSvc.logout();
         this.msalSvc.instance.loginRedirect();
