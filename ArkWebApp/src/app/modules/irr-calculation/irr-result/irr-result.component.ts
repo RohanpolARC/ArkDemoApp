@@ -236,7 +236,7 @@ export class IrrResultComponent implements OnInit {
           Revision: 15,
         },
         Layout: {
-          Revision: 17,
+          Revision: 18,
         },
         FormatColumn:{
           Revision: 8,
