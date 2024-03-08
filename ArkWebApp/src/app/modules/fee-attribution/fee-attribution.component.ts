@@ -70,7 +70,7 @@ export class FeeAttributionComponent implements OnInit, OnDestroy {
 
     this.rowData$ = this.dataSvc.filterApplyBtnState.pipe(
       filter((isHit: boolean) => isHit && !!this.asOfDateRange && !!this.funds?.length),
-      tap(() => { this.gridConfigSvc.gridApi.showLoadingOverlay() }),
+      tap(() => { this.gridConfigSvc?.gridApi?.showLoadingOverlay() }),
       switchMap((isHit) => this.feeAttributionSvc.getFeeAttribution(this.asOfDateRange, this.asofdate, this.funds))
     )
   }
