@@ -5,7 +5,6 @@ import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
-import { GridUtilService } from './grid-util.service';
 
 @Injectable()
 export class GridConfigService {
@@ -14,8 +13,7 @@ export class GridConfigService {
   columnDefs: ColDef[] 
   public gridOptions: GridOptions 
   public adaptableOptions: AdaptableOptions
-  constructor(private dataSvc: DataService,
-    private gridUtilSvc: GridUtilService) { 
+  constructor(private dataSvc: DataService) { 
       this.init()
     }
   init(){
