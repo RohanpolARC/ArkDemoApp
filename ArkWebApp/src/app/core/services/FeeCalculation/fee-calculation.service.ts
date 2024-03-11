@@ -58,15 +58,15 @@ export class FeeCalculationService {
     }).pipe(catchError((ex) => throwError(ex)))
   }
 
-  public fetchFeeCashflows(asOfDate: string, entity: string, positionIDs: number[] = null, runID = null){
+  public fetchFeeCashflows(asOfDate: string, presetName: string, positionIDs: number[] = null, runID = null){
 
-    if(!asOfDate || !entity){
-      console.warn(`Received something null -> AsOfDate: ${asOfDate} , Entity: ${entity}`)
+    if(!asOfDate || !presetName){
+      console.warn(`Received something null -> AsOfDate: ${asOfDate} , PresetName: ${presetName}`)
       return;
     }
 
     this.feeSmy = this.feeCashflows = null
-    this.subscriptions.push(this.getFeeCalculation({asOfDate: asOfDate, entity: entity, positionIDs: positionIDs, runID: runID}).subscribe({
+    this.subscriptions.push(this.getFeeCalculation({asOfDate: asOfDate, presetName: presetName, positionIDs: positionIDs, runID: runID}).subscribe({
     next: response => {
 
       this.terminateUri = response?.['terminatePostUri']
