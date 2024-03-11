@@ -6,9 +6,11 @@ import { DataService } from 'src/app/core/services/data.service';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { NetReturnsService } from 'src/app/core/services/NetReturns/net-returns.service';
 import { getMomentDateStr } from 'src/app/shared/functions/utilities';
+import { NetReturnsSummary } from 'src/app/shared/models/NetReturnModel';
 import { NetReturnReportParams, ReportServerParams } from 'src/app/shared/models/ReportParamsModel';
 import { SsrsReportPopupComponent } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-popup/ssrs-report-popup.component';
 import { environment } from 'src/environments/environment';
+import { NetReturnsSummaryGridService } from './services/net-returns-summary-grid.service';
 
 @Component({
   selector: 'app-net-returns',
@@ -58,6 +60,7 @@ export class NetReturnsComponent implements OnInit {
   isDisabled:boolean = true
 
   constructor(private netReturnsSvc: NetReturnsService,
+              private netReturnsSummaryGridSvc: NetReturnsSummaryGridService,
               private filterSvc: GeneralFilterService,
               private dataSvc: DataService,
               private dialog: MatDialog
@@ -68,6 +71,8 @@ export class NetReturnsComponent implements OnInit {
   }
 
   rowData$: Observable<any>//: Observable<{cashflowCount: number, RunID: string, smry: any[], cashflows: any[]}>
+  summaryData$: Observable<NetReturnsSummary>
+
 
   onRunReport(){
     if(this.isDisabled){
@@ -88,7 +93,7 @@ export class NetReturnsComponent implements OnInit {
       reportFilterConfigKey:"net-returns-report",
       parameters : ReportParams
     }
-    const dialogRef = this.dialog.open(SsrsReportPopupComponent,{ 
+    const dialogRef = this.dialog.open(SsrsReportPopupComponent,{
       data: reportData,
         width: '95vw',
         height: '95vh',
@@ -113,10 +118,10 @@ export class NetReturnsComponent implements OnInit {
           this.netReturnsSvc.changeCashflowType(data.value?.[0]?.value)
         }else if(data.id === 235){
           this.netReturnsSvc.changeSaveNetReturns(data.value)
-        }     
+        }
       }
     }))
-      
+
 
     // Recreated declarative rxjs stream manipulation.
 
@@ -142,24 +147,26 @@ export class NetReturnsComponent implements OnInit {
                 tap((pollResp)=>{
                   this.netReturnsSvc.netSmyGridApi?.showLoadingOverlay()
                   this.netReturnsSvc.netCashflowsGridApi?.showLoadingOverlay()
+                  this.netReturnsSummaryGridSvc.gridApi?.showLoadingOverlay()
                 }),
                 filter((pollResp)=>{
-                  return (['Terminated', 'Completed', 'Failed'].includes(pollResp?.['runtimeStatus']) && pollResp?.['output']?.['Summary'] && pollResp?.['output']?.['Cashflows'])
+                  return (['Terminated', 'Completed', 'Failed'].includes(pollResp?.['runtimeStatus']) && pollResp?.['output']?.['Summary'] && pollResp?.['output']?.['Cashflows'] && pollResp?.['output']?.['Returns'])
                 }),
-                map((pollResp) => { return { 
-                  ...{ 
-                      summary: pollResp?.['output']?.['Summary'], 
-                      cashflows: pollResp?.['output']?.['Cashflows'] 
+                map((pollResp) => { return {
+                  ...{
+                      returns: pollResp?.['output']?.['Returns'],
+                      summary: pollResp?.['output']?.['Summary'],
+                      cashflows: pollResp?.['output']?.['Cashflows']
                     }
-                  , 'runtimeStatus': pollResp?.['runtimeStatus'] 
+                  , 'runtimeStatus': pollResp?.['runtimeStatus']
                 }}),
                 tap((pollResp) => {
                   if(['Terminated', 'Completed', 'Failed'].includes(pollResp?.['runtimeStatus'])){
                     this.closeTimer$.next();
-                    this.isDisabled = false  
+                    this.isDisabled = false
                   }
-                }))              
-                
+                }))
+
               )
             )
           })

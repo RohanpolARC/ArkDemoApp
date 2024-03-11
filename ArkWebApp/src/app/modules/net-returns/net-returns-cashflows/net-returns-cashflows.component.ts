@@ -113,24 +113,34 @@ export class NetReturnsCashflowsComponent implements OnInit {
       },
       predefinedConfig: {
         Dashboard: {
-          Revision: 5,
+          Revision: 7,
           ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
-          Tabs: [{
-            Name: 'Layout',
-            Toolbars: ['Layout']
-          }],
           IsHidden: false,
           DashboardTitle: 'Cashflows'
         },
         Layout: {
-          Revision: 4,
-          CurrentLayout: 'Basic Layout',
+          Revision: 10,
+          CurrentLayout: 'Default',
           Layouts: [{
-            Name: 'Basic Layout',
-            Columns: this.columnDefs.map(c => c.field).filter(field => !['category'].includes(field)).filter(field => !['groupingRank'].includes(field)),
-            RowGroupedColumns: ['category'],
-          }]
+            Name: 'Default',
+            Columns: this.columnDefs.map(c => c.field).filter(field => !['category','valueDate'].includes(field)).filter(field => !['groupingRank'].includes(field)),
+            RowGroupedColumns: ['category','valueDate'],
+            AggregationColumns:{
+              'amount' : 'sum'
+            },
+            SuppressAggFuncInHeader: true
+          },
+          {
+            Name: 'Capital Subtype Summary',
+            Columns: this.columnDefs.map(c => c.field).filter(field => !['category','capitalSubType'].includes(field)).filter(field => !['groupingRank'].includes(field)),
+            RowGroupedColumns: ['category','capitalSubType'],
+            AggregationColumns:{
+              'amount' : 'sum'
+            },
+            SuppressAggFuncInHeader: true
+          }
+        ]
         },
         FormatColumn:{
           Revision: 4,
