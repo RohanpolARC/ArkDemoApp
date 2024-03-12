@@ -3,10 +3,11 @@
 <ag-grid-angular
     [gridOptions] = "gridOptions"
     [modules] = "agGridModules"
-    [rowData] = "summary"
+    [rowData] = "smy"
     class="ag-theme-alpine ag-grid"
     [adaptableOptions] = "adaptableOptions"
     (adaptableReady)="onAdaptableReady($event)"
+    (cellValueChanged)="onCellValueChanged($event)"
     (gridReady)="onGridReady($event)"
     class="ag-theme-alpine ag-grid"
 >

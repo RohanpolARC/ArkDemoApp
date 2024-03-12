@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { NetReturnsRoutingModule } from './net-returns-routing.module';
 import { NetReturnsComponent } from './net-returns.component';
-import { NetReturnsSummaryComponent } from './net-returns-summary/net-returns-summary.component';
+import { NetReturnsIrrComponent } from './net-returns-irr/net-returns-irr.component';
 import { NetReturnsCashflowsComponent } from './net-returns-cashflows/net-returns-cashflows.component';
 import { MatCardModule } from '@angular/material/card';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
@@ -12,14 +12,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { SsrsReportViewerModule } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-viewer.module';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
+import { NetReturnsSummaryComponent } from './net-returns-summary/net-returns-summary.component';
+import { NetReturnsSummaryGridService } from './services/net-returns-summary-grid.service';
 
 
 
 @NgModule({
   declarations: [
     NetReturnsComponent,
-    NetReturnsSummaryComponent,
-    NetReturnsCashflowsComponent
+    NetReturnsIrrComponent,
+    NetReturnsCashflowsComponent,
+    NetReturnsSummaryComponent
   ],
   imports: [
     CommonModule,
@@ -33,6 +36,9 @@ import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detaile
     SsrsReportViewerModule,
     MatDialogModule,
     DetailedViewModule
+  ],
+  providers: [
+    NetReturnsSummaryGridService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 

@@ -136,13 +136,16 @@ export class FeeCashflowsComponent implements OnInit {
     line: {
       series: {
         tooltip: {
-          enabled:true,
+          enabled: true,
           renderer: ({ datum, xKey, yKey }) => {
             return {
-              content: `${getMomentDateStr_ddmmyyyy(datum[xKey])}: ${this.formatAmount(datum[yKey])}`,
+              content: `${getMomentDateStr_ddmmyyyy(datum[xKey]?.['value'])}: ${this.formatAmount(datum[yKey])}`,
             };
           },
         },
+        marker: {
+          enabled: false
+        }
       },
     },
     common: {
@@ -334,7 +337,7 @@ export class FeeCashflowsComponent implements OnInit {
           DashboardTitle: 'Fee Cashflows'
         },
         Charting: {
-          Revision:6,
+          Revision: 7,
           ChartDefinitions: [
             {
               Name:'Fee flows',

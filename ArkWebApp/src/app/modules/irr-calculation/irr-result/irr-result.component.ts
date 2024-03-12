@@ -69,11 +69,12 @@ export class IrrResultComponent implements OnInit {
     { field: 'UnrealisedGainIRR', minWidth: 110, type: 'abColDefNumber'},
     { field: 'NoInterestIRR', minWidth: 110, type: 'abColDefNumber'},
     { field: 'YTE', headerName: 'YTE', minWidth: 95,type: 'abColDefNumber'},
+    { field: 'YTEHedged', headerName: 'YTE Hedged', minWidth: 135, type: 'abColDefNumber'},
     { field: 'CurrentYTE', headerName: 'Current YTE', minWidth: 130, type: 'abColDefNumber'},
-    { field: 'YTEHedged', hide: true, headerName: 'YTE Hedged', minWidth: 135, type: 'abColDefNumber'},
+    { field: 'CurrentYTEHedged', headerName: 'Current YTE Hedged', minWidth: 140, type: 'abColDefNumber' },
     { field: 'YTW', headerName: 'YTW', minWidth: 88, type: 'abColDefNumber'},
     { field: 'CurrentYTW', minWidth: 136, type: 'abColDefNumber'},
-    { field: 'YTWHedged', hide: true, headerName: 'YTW Hedged', minWidth: 136, type: 'abColDefNumber'},
+    { field: 'YTWHedged', headerName: 'YTW Hedged', minWidth: 136, type: 'abColDefNumber'},
     { field: 'CurrentSTE', minWidth:  130, type: 'abColDefNumber', headerName: 'Current STE' },
     { field: 'EffectiveYieldCurve', type: 'abColDefNumber', minWidth: 180 },
     { field: 'EffectiveBaseRateNormalised', minWidth: 180, type: 'abColDefNumber' },
@@ -235,7 +236,7 @@ export class IrrResultComponent implements OnInit {
           Revision: 15,
         },
         Layout: {
-          Revision: 17,
+          Revision: 18,
         },
         FormatColumn:{
           Revision: 8,
@@ -501,7 +502,7 @@ export class IrrResultComponent implements OnInit {
   
   NON_AMOUNT_2DEC_COLUMNS = ['ExpectedAge','AverageLifeE','AverageLifeW','CashMOM','MOME','MOMW','PaybackE','PaybackW']
   
-  PERCENT_COLUMNS = ['CashIRR','YTE','CurrentYTE','YTEHedged','YTW','CurrentYTW','CurrentSTE','EffectiveBaseRateNormalised','EffectiveYieldCurve','YTWHedged','CashYield','FeesIRR', 'InterestIRR', 'UnrealisedGainIRR', 'NoInterestIRR']
+  PERCENT_COLUMNS = ['CashIRR','YTE','CurrentYTE','YTEHedged','CurrentYTEHedged','YTW','CurrentYTW','CurrentSTE','EffectiveBaseRateNormalised','EffectiveYieldCurve','YTWHedged','CashYield','FeesIRR', 'InterestIRR', 'UnrealisedGainIRR', 'NoInterestIRR']
 
   // LTV values for equities will come as 0 which should be shown as blank(-)
   FORMAT_ZERO_AS_DASH_COLUMNS = ['NetLTV','NetLTVAtInvestement']

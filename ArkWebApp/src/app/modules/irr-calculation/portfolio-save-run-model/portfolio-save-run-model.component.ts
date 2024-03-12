@@ -168,6 +168,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     ]
 
     let aggrStr: string = this.data.aggregationType ?? this.aggregationTypes[0].type
+    let feePreset: string = this.data.feePreset ?? this.feePresets[0]?.feePreset
     
     this.modelForm = new FormGroup({
       modelName: new FormControl(this.data.model?.modelName, Validators.required),
@@ -177,7 +178,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       latestWSOStatic: new FormControl(!!this.data.latestWSOStatic, Validators.required),
       aggregationType: new FormControl(aggrStr, Validators.required),
       baseMeasure: new FormControl(this.baseMeasures[0]?.baseMeasure, Validators.required),
-      feePreset: new FormControl(this.feePresets[0]?.feePreset, Validators.required),
+      feePreset: new FormControl(feePreset, Validators.required),
       calculationType: new FormControl([], this.isClonnedModel ? [] : Validators.required),
       curveRateName: new FormControl(this.curveRates.filter(cr => cr.rate === 0)[0].curveRateName, Validators.required),
       fundCurrency: new FormControl(this.data.model?.fundCurrency??'EUR', Validators.required),
@@ -303,6 +304,8 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     model.latestWSOStatic = this.modelForm.get('latestWSOStatic').value;
     model.irrAggrType = this.modelForm.get('aggregationType').value;
     model.fundCurrency = this.modelForm.get('fundCurrency').value;
+   
+    model.feePreset = this.modelForm.get('feePreset').value;
     model.isAdmin = this.msalUserService.isUserAdmin();
     
     let curveRateName = this.modelForm.get('curveRateName').value;

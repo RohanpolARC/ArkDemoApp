@@ -34,6 +34,7 @@ export class ModelUtilService {
       modelData[i].rulesStr = '';
       modelData[i].aggregationType = data[i].irrAggrType;
       modelData[i].fundCurrency = data[i].fundCurrency;
+      modelData[i].feePreset = data[i].feePreset;
       modelData[i].createdBy = data[i].createdBy;
       
       let ruleArr: string[] = tempRules.split('|').join('"').split('~');
