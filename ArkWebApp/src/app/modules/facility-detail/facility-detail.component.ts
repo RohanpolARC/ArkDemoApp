@@ -18,6 +18,7 @@ import { ActionColumnContext, AdaptableButton } from '@adaptabletools/adaptable-
 import { MatDialog } from '@angular/material/dialog';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
+import {  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 
 @Component({
   selector: 'app-facility-detail',
@@ -252,14 +253,15 @@ export class FacilityDetailComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
-      if(data){
-        if(data.id===211){
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+      if(filters){
+        if(filters[211]){
           let funds:any[] = []
-          data.value?.forEach(ele=>funds.push(ele.value))
+          filters[211].value?.forEach(ele=>funds.push(ele.value))
           this.facilityDetailsService.changeFundValues(funds)
-        }else if(data.id === 212){
-          this.facilityDetailsService.changeSearchDate(getMomentDateStr(data.value))
+        }
+        if(filters[212]){
+          this.facilityDetailsService.changeSearchDate(getMomentDateStr(filters[212].value))
         }
       }
     }))

@@ -9,7 +9,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import {     CUSTOM_DISPLAY_FORMATTERS_CONFIG,   CUSTOM_FORMATTER,   nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
 import {  autosizeColumnExceptResized,  loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
-import { AsOfDateRange, FilterValueChangeParams } from 'src/app/shared/models/FilterPaneModel';
+import { AsOfDateRange, IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 import { MasterDetailModule } from "@ag-grid-enterprise/master-detail";
 import masterDetailAgGridPlugin from '@adaptabletools/adaptable-plugin-master-detail-aggrid';
 
@@ -85,16 +85,16 @@ export class AumReportComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe((filter:FilterValueChangeParams)=>{
-      if(filter){
-        if(filter.id === 622){
-          this.sDate = filter.value
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+      if(filters){
+        if(filters[622]){
+          this.sDate = filters[622].value
           if(this.sDate.end === 'Invalid date')
             this.sDate.end = this.sDate.start;
           this.aumReportSvc.changeSearchDateRange(this.sDate)
         }
-        else if(filter.id === 623){
-          this.funds = filter?.value?.map(fund => fund?.value);
+        if(filters[623]){
+          this.funds = filters[623].value?.map(fund => fund?.value);
 
         }
       }

@@ -9,7 +9,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER } from 'src/app/shared/functions/formatter';
 import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
-import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
+import { AsOfDateRange,  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 
 @Component({
   selector: 'app-mark-changes',
@@ -43,10 +43,10 @@ export class MarkChangesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
-      if(data){
-        if(data.id === 341){
-          this.sDate = data.value
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+      if(filters){
+        if(filters[341]){
+          this.sDate = filters[341].value
           if(this.sDate.end === 'Invalid date')
             this.sDate.end = this.sDate.start;
           this.markChangesSvc.changeSearchDateRange(this.sDate)

@@ -14,6 +14,7 @@ import { PortfolioModellerService } from './service/portfolio-modeller.service';
 import { FeeCalculationService } from 'src/app/core/services/FeeCalculation/fee-calculation.service';
 import { GridConfigService } from './portfolio-modeller/grid/grid-config.service';
 import { MatTabChangeEvent } from '@angular/material/tabs';
+import {  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 
 @Component({
   selector: 'app-irr-calculation',
@@ -62,10 +63,10 @@ export class IrrCalculationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
-      if(data){
-        if(data.id === 221){
-          this.irrCalcSvc.changeSearchDate(getMomentDateStr(data.value))
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+      if(filters){
+        if(filters[221]){
+          this.irrCalcSvc.changeSearchDate(getMomentDateStr(filters[221].value))
         }
       }
     }))

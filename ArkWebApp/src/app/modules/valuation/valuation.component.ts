@@ -6,7 +6,7 @@ import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
-import { AsOfDateRange, FilterValueChangeParams } from 'src/app/shared/models/FilterPaneModel';
+import { AsOfDateRange,  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 import { SpreadBenchmarkIndex, YieldCurve } from 'src/app/shared/models/ValuationModel';
 import { MarkOverrideMasterComponent } from './mark-override-master/mark-override-master.component';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
@@ -112,18 +112,20 @@ export class ValuationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe((data:FilterValueChangeParams)=>{
-      if(data){
-        if(data.id===351){
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+      if(filters){
+        if(filters[351]){
           let funds = []
-          funds = data.value?.map(x=>x.value)
+          funds = filters[351].value?.map(x=>x.value)
           this.valuationSvc.changeFundValues(funds)
-        }else if(data.id===352){
+        }
+        if(filters[352]){
           let types = []
-          types = data.value?.map(x=>x.value)
+          types = filters[352].value?.map(x=>x.value)
           this.valuationSvc.changeMarkType(types)
-        }else if (data.id===353){
-          this.valuationSvc.changeSearchDateRange(data.value)
+        }
+        if (filters[353]){
+          this.valuationSvc.changeSearchDateRange(filters[353].value)
         }
       }
     }))

@@ -26,6 +26,7 @@ import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detail
 import { DetailedViewService } from 'src/app/shared/modules/detailed-view/detailed-view.service';
 import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
+import {  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 
 let overrideColMap: {
   [col: string] : {
@@ -199,10 +200,10 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
   }
 
   ngOnInit(): void {
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
-      if(data){
-        if(data.id === 321){
-          this.positionScreenSvc.changeSearchDate(getMomentDateStr(data.value))
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+      if(filters){
+        if(filters[321]){
+          this.positionScreenSvc.changeSearchDate(getMomentDateStr(filters[321].value))
         }
       }
     }))

@@ -7,6 +7,7 @@ import { DataService } from 'src/app/core/services/data.service';
 import { FeeCalculationService } from 'src/app/core/services/FeeCalculation/fee-calculation.service';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { getMomentDateStr } from 'src/app/shared/functions/utilities';
+import {  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 
 @Component({
   selector: 'app-fee-calculation',
@@ -39,12 +40,13 @@ export class FeeCalculationComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
-      if(data){
-        if(data.id===421){
-          this.feeCalcSvc.changeEntityValue(data.value?.[0].value)
-        }else if(data.id === 422){
-          this.feeCalcSvc.changeSearchDate(getMomentDateStr(data.value))
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+      if(filters){
+        if(filters[421]){
+          this.feeCalcSvc.changeEntityValue(filters[421].value?.[0].value)
+        }
+        if(filters[422]){
+          this.feeCalcSvc.changeSearchDate(getMomentDateStr(filters[422].value))
         }
       }
     }))

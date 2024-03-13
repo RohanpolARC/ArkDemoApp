@@ -7,6 +7,7 @@ import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/genera
 import { NetReturnsService } from 'src/app/core/services/NetReturns/net-returns.service';
 import { getMomentDateStr } from 'src/app/shared/functions/utilities';
 import { NetReturnsSummary } from 'src/app/shared/models/NetReturnModel';
+import {  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 import { NetReturnReportParams, ReportServerParams } from 'src/app/shared/models/ReportParamsModel';
 import { SsrsReportPopupComponent } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-popup/ssrs-report-popup.component';
 import { environment } from 'src/environments/environment';
@@ -106,19 +107,23 @@ export class NetReturnsComponent implements OnInit {
   ngOnInit(){
 
 
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
-      if(data){
-        if(data.id === 231){
-          this.netReturnsSvc.changeSearchDate(getMomentDateStr(data.value))
-        }else if(data.id === 232){
-          this.netReturnsSvc.changeFundHedgingValues(data.value?.[0]?.value)
-        }else if(data.id ===233){
-          this.netReturnsSvc.changeCalcMethod(data.value?.[0]?.value)
-        }else if(data.id === 234){
-          this.netReturnsSvc.changeCashflowType(data.value?.[0]?.value)
-        }else if(data.id === 235){
-          this.netReturnsSvc.changeSaveNetReturns(data.value)
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+      if(filters){
+        if(filters[231]){
+          this.netReturnsSvc.changeSearchDate(getMomentDateStr(filters[231].value))
         }
+        if(filters[232]){
+          this.netReturnsSvc.changeFundHedgingValues(filters[232].value?.[0]?.value)
+        }
+        if(filters[233]){
+          this.netReturnsSvc.changeCalcMethod(filters[233].value?.[0]?.value)
+        }
+        if(filters[234]){
+          this.netReturnsSvc.changeCashflowType(filters[234].value?.[0]?.value)
+        }
+        if(filters[235]){
+          this.netReturnsSvc.changeSaveNetReturns(filters[235].value)
+        }     
       }
     }))
 

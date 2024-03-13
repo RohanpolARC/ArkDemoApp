@@ -47,7 +47,6 @@ export class GeneralFilterComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-
         this.subscriptions.push(this.filterSvc.getFilters(this.screen).pipe(
           first()
         ).subscribe((data:FilterConfig[])=>{
@@ -99,7 +98,7 @@ export class GeneralFilterComponent implements OnInit {
                   
               }}))
             } else if (filter.type==='toggle'){
-              filter.value = this.setDefaultBooleanValue(filter.default)
+              filter.value = this.setDefaultBooleanValue(filter.default)         
               this.onChange(filter.value,filter.id,filter.isReport,filter.reportParamName) //event emitter call to notify default values are set
 
   
@@ -117,7 +116,7 @@ export class GeneralFilterComponent implements OnInit {
               this.dateRange = new FormGroup({
                 start: new FormControl(defaultStartDate),
                 end: new FormControl(defaultEndDate),
-              });
+              });             
               this.onChange({
                 start:defaultStartDate,
                 end:defaultEndDate
@@ -144,12 +143,16 @@ export class GeneralFilterComponent implements OnInit {
               this.onChange(filter.value,filter.id,filter.isReport,filter.reportParamName)
   
             }
+            this.filterSvc.emitFilterConfig()
           })
         })
         )
   }
 
 
+  emitFilterConfig(filterValues: any[]){
+    this.filterSvc.emitFilterConfig()
+  }
 
   getPlaceholder(option,isSingleSelect=0){
     if(isSingleSelect){
@@ -180,21 +183,32 @@ export class GeneralFilterComponent implements OnInit {
   }
 
 
+  getFilterValueChangeParams(
+    value : any,
+    id : number,
+    isReport : boolean,
+    reportParamName : string
+  ){
+    let filterValueChange:FilterValueChangeParams = {
+      value : value
+    }
+    if(isReport){
+      filterValueChange.reportParamName = reportParamName
+      filterValueChange.isReport = true
+    }
+
+    this.filterSvc.filterValues[id] = filterValueChange
+    return filterValueChange
+  }
+
   onChange(
     value : any,
     id : number,
     isReport : boolean,
     reportParamName : string)
   {
-    
-    let filterValueChange:FilterValueChangeParams = {
-      id : id,
-      value : value
-    }
-    if(isReport){
-      filterValueChange.reportParamName = reportParamName
-    }
-    this.filterSvc.changeFilterValues(filterValueChange) 
+    this.getFilterValueChangeParams(value,id,isReport,reportParamName)
+    this.filterSvc.emitFilterConfig()
     
   }
 

@@ -56,7 +56,6 @@ export class NetReturnsSummaryGridService {
   setGridOptions(): void{
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
-      ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
       enableRangeSelection: true,
       columnDefs: this.columnDefs,
       tooltipShowDelay: 0,

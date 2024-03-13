@@ -11,6 +11,7 @@ import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overla
 import { createColumnDefs, GENERAL_FORMATTING_EXCEPTIONS, parseFetchedData, saveAndSetLayout } from 'src/app/shared/functions/dynamic.parse';
 import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import {  presistSharedEntities, loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
+import {  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 
 @Component({
@@ -134,13 +135,14 @@ export class ContractHistoryComponent implements OnInit {
   ) { }
 
   changeListeners() {
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
-      if(data){
-        if(data.id===521){
-          this.contractHistorySvc.changeisLatestValue(data.value)
-        }else if(data.id === 522){
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+      if(filters){
+        if(filters[521]){
+          this.contractHistorySvc.changeisLatestValue(filters[521].value)
+        }
+        if(filters[522]){
           let funds:any[] = []
-          data.value?.forEach(ele=>funds.push(ele.value))
+          filters[522].value?.forEach(ele=>funds.push(ele.value))
           this.contractHistorySvc.changeFundValues(funds) 
         }
       }
