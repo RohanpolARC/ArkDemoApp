@@ -40,16 +40,6 @@ export class PortfolioManageModelComponent implements OnInit {
     adaptableOptions: AdaptableOptions = this.portfolioManageModelSvc.getAdaptableOptions()
 
   ngOnInit(): void {
-
-
-    // this.rowData = [
-    //   {modelName: 'DL2-Masai-AC', modelDesc: 'Test', rules: '{|ColumnId|:|fund|,|Predicate|:{|PredicateId|:|Values|,|Inputs|:[|DL2|]}}', username: null, modelID: 2},
-    //   {modelName: 'CS-Crypto-Equity-Hypo1', modelDesc: null, rules: null, username: null, modelID: 4},
-    //   {modelName: 'CS-Crypto-Equity-NoOverride', modelDesc: null, rules: null, username: null, modelID: 9},
-    //   {modelName: 'DL2-No-Override', modelDesc: null, rules: '{|ColumnId|:|fund|,|Predicate|:{|PredicateId|:|Values|,|Inputs|:[|DL2|]}}', username: null, modelID: 10}
-    // ]
-
-    // this.rowData$ = this.irrCalcService.getPortfolioModels(this.dataSvc.getCurrentUserName())
   }
 
   onGridReady(params: GridReadyEvent){

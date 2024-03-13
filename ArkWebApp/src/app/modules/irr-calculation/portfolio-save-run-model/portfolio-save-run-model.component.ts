@@ -143,7 +143,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       this.modelID = this.data.model.modelID
     }
 
-    if(this.autoManualOption == "Automatic" && this.data.clonnedRules){
+    if(this.autoManualOption == "Automatic" && this.data.isClonnedModel){
       this.rules = this.data.clonnedRules
     }
     else if(this.autoManualOption == "Automatic"){

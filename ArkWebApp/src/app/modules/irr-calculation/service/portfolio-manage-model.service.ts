@@ -1,5 +1,5 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableOptions } from "@adaptabletools/adaptable-angular-aggrid";
-import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, RowNode } from "@ag-grid-community/core";
+import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, RowNode, ValueGetterParams } from "@ag-grid-community/core";
 import { NoRowsOverlayComponent } from "@ag-grid-community/core/dist/cjs/es5/rendering/overlays/noRowsOverlayComponent";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable, Subscription, combineLatest, observable } from "rxjs";
@@ -43,8 +43,7 @@ export class PortfolioManageModelService{
         { field: 'autoManualOption', tooltipField: 'autoManualOption', headerName: 'Automatic/Manual', type: 'abColDefString'},
         { field: 'isShared', tooltipField: 'isShared', headerName: 'Is Shared Model', type: 'abColDefString'},
         { field: 'latestWSOStaticStr', tooltipField: 'latestWSOStaticStr', headerName: 'Uses Latest WSO Static', type: 'abColDefString'},
-        { field: 'positionIDs', tooltipField: 'positionIDs', headerName: 'Position IDs', type: 'abColDefString', maxWidth:200},
-        { field: 'rulesStr', tooltipField: 'rulesStr', headerName: 'Rules', type: 'abColDefString'},
+        { field: 'rulesAndPositionIDs', tooltipField: 'rulesAndPositionIDs', headerName: 'Rules/Position IDs', type: 'abColDefString', maxWidth:700, valueGetter: this.getRulesAndPositionIDs},
         { field: 'createdBy', tooltipField: 'createdBy', headerName: 'Owner', type: 'abColDefString'}
     ]
 
@@ -117,8 +116,7 @@ export class PortfolioManageModelService{
                             button: AdaptableButton<ActionColumnContext>,
                             context: ActionColumnContext
                             ) => {
-                                if(this.msalUserSvc.getUserRoles().map(role => role.toLowerCase()).includes('admin.write') 
-                                  || context.rowNode?.data.createdBy == this.dataSvc.getCurrentUserName())
+                                if(this.msalUserSvc.isUserAdmin() || context.rowNode?.data.createdBy == this.dataSvc.getCurrentUserName())
                                 {
                                   return false
                                 }
@@ -163,7 +161,7 @@ export class PortfolioManageModelService{
             ]
           },
           Layout: {
-            Revision: 16,
+            Revision: 18,
             CurrentLayout: 'Basic',
             Layouts:[
               {
@@ -175,24 +173,16 @@ export class PortfolioManageModelService{
                     'fundCurrency',
                     'irrAggrType',
                     'isLocal',
-                    'autoManualOption',
                     'isShared',
                     'latestWSOStaticStr',
-                    'positionIDs',
-                    'rulesStr',
+                    'autoManualOption',
+                    'rulesAndPositionIDs',
                     'createdBy',                
                     'Actions',
                 ],                
                 PinnedColumnsMap: {
                     Actions: 'right'
                 },
-                ColumnFilters:[{
-                  ColumnId: 'isSharedStr',
-                  Predicate: {
-                    PredicateId: 'Values',
-                    Inputs: ['No']
-                  }
-                }], 
               }
             ],
           }
@@ -212,21 +202,35 @@ export class PortfolioManageModelService{
 
     init(){
       this.rowData$ = combineLatest([this.firstLoad$, this.refreshGrid$]).pipe(
-        switchMap(([firstLoad]) => {
-
+        switchMap(() => {
           let fetchAllModels:boolean
-          if(this.msalUserSvc.getUserRoles().map(role => role.toLowerCase()).includes('admin.write')){
+          if(this.msalUserSvc.isUserAdmin()){
             fetchAllModels = true;
           }
-
           return this.irrCalcService.getPortfolioModels(this.dataSvc.getCurrentUserName(), fetchAllModels).pipe(
             map((data:any) => {
               return this.modelSvc.parseFetchedModels(data)
             })
           )
+        }),
+        tap(()=>{
+          this.adaptableApi.filterApi.setColumnFilters([{
+            ColumnId: 'createdBy',
+            Predicate: {
+              PredicateId: 'Values',
+              Inputs: [this.msalUserSvc.getUserName()]
+            }
+          }])
         })
       )   
-    }    
+    }  
+    
+    getRulesAndPositionIDs(params: ValueGetterParams){
+      if(params.data.autoManualOption == 'Automatic')
+        return params.data.rulesStr
+      else
+        return params.data.positionIDs        
+    }
 
     getColumnDefs(): ColDef[] {
         return this.columnDefs
@@ -245,7 +249,7 @@ export class PortfolioManageModelService{
         if(action === 'DELETE'){
 
           let isDeleteAccess:boolean
-          if(this.msalUserSvc.getUserRoles().map(role => role.toLowerCase()).includes('admin.write') || portfolioModelData.createdBy == this.dataSvc.getCurrentUserName()){
+          if(this.msalUserSvc.isUserAdmin() || portfolioModelData.createdBy == this.dataSvc.getCurrentUserName()){
             isDeleteAccess = true;
           }
 

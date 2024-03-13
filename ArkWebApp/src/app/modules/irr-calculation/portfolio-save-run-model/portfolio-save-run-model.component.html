@@ -149,7 +149,7 @@
                             </button>
                           </mat-chip>
                           <input
-                            [disabled]="isIRRDisabled"
+                            [disabled]="isIRRDisabled && !isClonnedModel"
                             placeholder="New aggregation..."
                             #aggrColInput
                             formControlName="aggrStr"
