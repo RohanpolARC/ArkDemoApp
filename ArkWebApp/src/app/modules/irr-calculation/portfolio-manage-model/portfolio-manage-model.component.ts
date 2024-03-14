@@ -1,14 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
-import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
-import { DataService } from 'src/app/core/services/data.service';
+import { Observable } from 'rxjs';
 import { ModelUtilService } from '../portfolio-modeller/model/model-util.service';
-import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
-import { AdaptableApi, AdaptableOptions, AdaptableReadyInfo } from '@adaptabletools/adaptable-angular-aggrid';
+import { ColDef, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
+import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { CommonConfig } from 'src/app/configs/common-config';
-import { NoRowsOverlayComponent } from '@ag-grid-community/core/dist/cjs/es5/rendering/overlays/noRowsOverlayComponent';
-import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { PortfolioManageModelService } from '../service/portfolio-manage-model.service';
 import { MatDialogRef } from '@angular/material/dialog';
 
@@ -20,33 +15,24 @@ import { MatDialogRef } from '@angular/material/dialog';
     PortfolioManageModelService
   ]
 })
-export class PortfolioManageModelComponent implements OnInit {
+export class PortfolioManageModelComponent {
 
-  rowData:any[]
-  rowData$:Observable<any[]> = of([])
+  rowData$:Observable<any[]> = this.portfolioManageModelSvc.rowData$
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES;
   constructor(
-    private dataSvc: DataService,    
-    public modelSvc: ModelUtilService,
     public portfolioManageModelSvc: PortfolioManageModelService,
     public dialogRef: MatDialogRef<PortfolioManageModelComponent>,
   ) { }
 
-    gridApi: GridApi
-    adaptableApi: AdaptableApi
+  gridApi: GridApi
+  adaptableApi: AdaptableApi
 
-    gridOptions: GridOptions = this.portfolioManageModelSvc.getGridOptions()
-    columnDefs: ColDef[] = this.portfolioManageModelSvc.getColumnDefs()
-    adaptableOptions: AdaptableOptions = this.portfolioManageModelSvc.getAdaptableOptions()
-
-  ngOnInit(): void {
-  }
+  gridOptions: GridOptions = this.portfolioManageModelSvc.getGridOptions()
+  columnDefs: ColDef[] = this.portfolioManageModelSvc.getColumnDefs()
+  adaptableOptions: AdaptableOptions = this.portfolioManageModelSvc.getAdaptableOptions()
 
   onGridReady(params: GridReadyEvent){
     params.api.closeToolPanel();
-  }
-
-  onAdaptableReady(params: AdaptableReadyInfo){
   }
 
   onClose(){

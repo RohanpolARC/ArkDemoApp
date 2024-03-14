@@ -1,19 +1,18 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableOptions } from "@adaptabletools/adaptable-angular-aggrid";
-import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, RowNode, ValueGetterParams } from "@ag-grid-community/core";
+import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, ValueGetterParams } from "@ag-grid-community/core";
 import { NoRowsOverlayComponent } from "@ag-grid-community/core/dist/cjs/es5/rendering/overlays/noRowsOverlayComponent";
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable, Subscription, combineLatest, observable } from "rxjs";
+import { BehaviorSubject, Observable, Subscription, combineLatest } from "rxjs";
 import { CommonConfig } from "src/app/configs/common-config";
 import { IRRCalcService } from "src/app/core/services/IRRCalculation/irrcalc.service";
 import { DataService } from "src/app/core/services/data.service";
 import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from "src/app/shared/functions/utilities";
 import { ModelUtilService } from "../portfolio-modeller/model/model-util.service";
-import { VModel, VPortfolioDeleteModel, VPortfolioModel } from "src/app/shared/models/IRRCalculationsModel";
-import { map, mergeMap, switchMap, tap } from "rxjs/operators";
+import { VModel, VPortfolioDeleteModel } from "src/app/shared/models/IRRCalculationsModel";
+import { first, map, switchMap, tap } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import { ConfirmPopupComponent } from "src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component";
 import { PortfolioSaveRunModelComponent } from "../portfolio-save-run-model/portfolio-save-run-model.component";
-import { MsalService } from "@azure/msal-angular";
 import { MsalUserService } from "src/app/core/services/Auth/msaluser.service";
 
 @Injectable()
@@ -26,11 +25,13 @@ export class PortfolioManageModelService{
         this.firstLoad.next(firstLoad)
     }
 
-    refreshGrid = new BehaviorSubject<boolean>(false);
-    refreshGrid$ = this.refreshGrid.asObservable();
-    updateRefreshGrid(refreshGrid: boolean){
-        this.refreshGrid.next(refreshGrid)
+    refreshModels = new BehaviorSubject<boolean>(false);
+    refreshModels$ = this.refreshModels.asObservable();
+    updateRefreshModels(refreshModels: boolean){
+        this.refreshModels.next(refreshModels)
     }
+
+    isActionSuccessful:boolean
 
     columnDefs: ColDef[] = [
         { field: 'modelID', tooltipField: 'modelID', headerName: 'Model ID', type: 'abColDefNumber'},
@@ -67,6 +68,7 @@ export class PortfolioManageModelService{
         groupHeaderHeight: 30,
         tooltipShowDelay: 0,
         enableRangeSelection: true,
+        suppressScrollOnNewData: true,
         noRowsOverlayComponent: NoRowsOverlayComponent,
         noRowsOverlayComponentParams: {
           noRowsMessageFunc: () => `No data found.`,
@@ -201,9 +203,16 @@ export class PortfolioManageModelService{
     }
 
     init(){
-      this.rowData$ = combineLatest([this.firstLoad$, this.refreshGrid$]).pipe(
-        switchMap(() => {
+
+      // Column filters should be applied only on first load but not on refreshModels event due to Clone/Delete actions
+      let isFirstLoad:boolean = false
+      this.rowData$ = combineLatest([this.firstLoad$, this.refreshModels$]).pipe(
+        switchMap(([firstLoad, refreshGrid],index) => {
           let fetchAllModels:boolean
+          if(index == 0)
+            isFirstLoad=true
+          else
+            isFirstLoad=false
           if(this.msalUserSvc.isUserAdmin()){
             fetchAllModels = true;
           }
@@ -212,15 +221,18 @@ export class PortfolioManageModelService{
               return this.modelSvc.parseFetchedModels(data)
             })
           )
-        }),
-        tap(()=>{
-          this.adaptableApi.filterApi.setColumnFilters([{
-            ColumnId: 'createdBy',
-            Predicate: {
-              PredicateId: 'Values',
-              Inputs: [this.msalUserSvc.getUserName()]
-            }
-          }])
+        }),            
+        tap(() => {
+          if(isFirstLoad)
+          {
+            this.adaptableApi?.filterApi.setColumnFilters([{
+              ColumnId: 'createdBy',
+              Predicate: {
+                PredicateId: 'Values',
+                Inputs: [this.msalUserSvc.getUserName()]
+              }
+            }])
+          }          
         })
       )   
     }  
@@ -266,16 +278,17 @@ export class PortfolioManageModelService{
             },
             maxHeight: '95vh'
           })
-          this.subscriptions.push(dialogRef.afterClosed().subscribe((value)=>{
+
+          dialogRef.afterClosed().pipe(first()).subscribe((value) => {
             if(value.action==='Confirm'){
-                let model:VPortfolioDeleteModel = 
-                {
-                    modelID:portfolioModelData.modelID,
-                    username:this.dataSvc.getCurrentUserName()
-                }
-                this.deletePortfolioModel(model)
+              let model:VPortfolioDeleteModel = 
+              {
+                  modelID:portfolioModelData.modelID,
+                  username:this.dataSvc.getCurrentUserName()
+              }
+              this.deletePortfolioModel(model)
             }
-          }))
+          })          
         }
         else if(action === 'CLONE')
         {
@@ -301,16 +314,19 @@ export class PortfolioManageModelService{
               width: '80vw',
               maxWidth: '2000px'
             })
-          this.subscriptions.push(dialogRef.afterClosed().subscribe(()=>{
-              this.updateRefreshGrid(true)
-          }))
+
+          dialogRef.afterClosed().pipe(first()).subscribe(() => {
+            this.updateRefreshModels(true)
+            this.isActionSuccessful = true
+          })
         }
     }
 
     deletePortfolioModel(model:VPortfolioDeleteModel){
       this.subscriptions.push(this.irrCalcService.deletePortfolioModel(model).subscribe((result:any)=>{
         if(result.isSuccess===true){          
-          this.updateRefreshGrid(true)
+          this.updateRefreshModels(true)
+          this.isActionSuccessful = true
           this.dataSvc.setWarningMsg('Portfolio Model deleted successfully','Dismiss','ark-theme-snackbar-success')
         }else{
           this.dataSvc.setWarningMsg('Portfolio Model could not be deleted','Dismiss','ark-theme-snackbar-error')

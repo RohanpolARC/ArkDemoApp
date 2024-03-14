@@ -204,10 +204,14 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
       next: data => {
         this.modelSvc.modelData = this.modelSvc.parseFetchedModels(data);
         this.modelSvc.modelMap = this.modelSvc.initModelMap(this.modelSvc.modelData)
-        this.setSelectedModel(modelID)
 
         if(modelID)
-        this.saveModelCashflowsAndOpenTabs(modelID, context, contextData);
+        {
+          this.setSelectedModel(modelID)
+          this.saveModelCashflowsAndOpenTabs(modelID, context, contextData);
+        }
+
+        this.resetIfModelDeleted()
       },
       error: error => {
         console.error(`Failed to fetch Portfolio Rules: ${error}`)
@@ -360,6 +364,11 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
     }
   }
 
+  resetIfModelDeleted(){
+    if(!this.modelSvc.modelMap.hasOwnProperty(this.selectedModelID))
+      this.onReset(true)
+  }
+
 
   overridenPositionIDs = {}
   fetchOverridesForModel(modelID: number){
@@ -407,9 +416,12 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
       width:'80vw'
     })
 
-    this.subscriptions.push(dialogRef.afterClosed().subscribe(res => {
-      this.fetchPortfolioModels()
-    }))
+    dialogRef.afterClosed().pipe(first()).subscribe((result) => {
+      // Manage Model Dialog Closed.
+      if(dialogRef.componentInstance.portfolioManageModelSvc.isActionSuccessful){
+        this.fetchPortfolioModels();
+      }
+    })
   }
 
   changeListeners(){
