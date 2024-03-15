@@ -316,7 +316,7 @@ export class PortfolioManageModelService implements OnDestroy{
                 updatedValues: null,
                 clonnedRules : portfolioModelData.rules,
                 context: 'Save',
-                isClonnedModel: true
+                isClonedModel: true
               },
               maxHeight: '100vh',
               width: '80vw',

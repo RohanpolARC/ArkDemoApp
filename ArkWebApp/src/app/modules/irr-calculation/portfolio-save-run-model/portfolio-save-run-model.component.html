@@ -56,14 +56,14 @@
                         </button>
                     </mat-form-field>
 
-                    <mat-form-field *ngIf = "!isClonnedModel" appearance="outline" class="col-3">
+                    <mat-form-field *ngIf = "!isClonedModel" appearance="outline" class="col-3">
                         <mat-label>Select Calculation Type</mat-label>
                         <mat-select formControlName="calculationType" multiple required disableOptionCentering>
                             <mat-option *ngFor="let calType of calculationTypes" [value]="calType">{{calType}}</mat-option>
                         </mat-select>
                     </mat-form-field>
 
-                    <div class="col-3" *ngIf = "isClonnedModel"></div>
+                    <div class="col-3" *ngIf = "isClonedModel"></div>
 
                     <div class="col-6">
                         <div class="flex-row d-flex justify-content-between">
@@ -71,11 +71,11 @@
                                 [disabled]="modelForm?.invalid ? true : isSuccess" type="button" class="w-10"
                                 color="primary" (click)="onProceed('Save')">Save</button>
 
-                                <button *ngIf = "!isClonnedModel"
+                                <button *ngIf = "!isClonedModel"
                                 mat-raised-button [disabled]="disableSaveAndRun" type="button"
                                 color="primary" (click)="onProceed('SaveRun')" class="w-18">Save & Run</button>
 
-                                <div *ngIf = "!isClonnedModel" class="w-10"></div>
+                                <div *ngIf = "!isClonedModel" class="w-10"></div>
 
                                 <button mat-raised-button (click)="onClose()" type="button" class="w-10">Cancel</button>
                         </div>
@@ -93,7 +93,7 @@
 
                     <mat-form-field class="col-3" appearance="outline">
                         <mat-label>IRR Aggregation Type</mat-label>
-                        <mat-select formControlName="aggregationType" required disableOptionCentering [disabled]="isIRRDisabled && !isClonnedModel">
+                        <mat-select formControlName="aggregationType" required disableOptionCentering [disabled]="isIRRDisabled && !isClonedModel">
                           <mat-option *ngFor="let aggr of aggregationTypes" [value]="aggr.type">
                             {{aggr.type}}
                           </mat-option>
@@ -102,7 +102,7 @@
 
                     <mat-form-field class="col-3" appearance="outline">
                         <mat-label>Monthly Returns Base Measure</mat-label>
-                        <mat-select formControlName="baseMeasure" required disableOptionCentering [disabled]="isMonthlyReturnsDisabled && !isClonnedModel">
+                        <mat-select formControlName="baseMeasure" required disableOptionCentering [disabled]="isMonthlyReturnsDisabled && !isClonedModel">
                           <mat-option *ngFor="let bM of baseMeasures" [value]="bM.baseMeasure">
                             {{bM.baseMeasure}}
                           </mat-option>
@@ -111,7 +111,7 @@
 
                     <mat-form-field class="col-3" appearance="outline">
                         <mat-label>Fee Preset</mat-label>
-                        <mat-select formControlName="feePreset" required disableOptionCentering [disabled]="isFeePresetDisabled && !isClonnedModel">
+                        <mat-select formControlName="feePreset" required disableOptionCentering [disabled]="isFeePresetDisabled && !isClonedModel">
                           <mat-option *ngFor="let fp of feePresets" [value]="fp.feePreset">
                             {{fp.feePreset}}
                           </mat-option>
@@ -120,7 +120,7 @@
 
                     <mat-form-field class="col-3" appearance="outline">
                         <mat-label>Base Curve Rate</mat-label>
-                        <mat-select formControlName="curveRateName" required disableOptionCentering [disabled]="isIRRDisabled && !isClonnedModel">
+                        <mat-select formControlName="curveRateName" required disableOptionCentering [disabled]="isIRRDisabled && !isClonedModel">
                           <mat-option *ngFor="let c of curveRates" [value]="c.curveRateName">
                             {{c.curveRateName}}
                           </mat-option>
@@ -149,7 +149,7 @@
                             </button>
                           </mat-chip>
                           <input
-                            [disabled]="isIRRDisabled && !isClonnedModel"
+                            [disabled]="isIRRDisabled && !isClonedModel"
                             placeholder="New aggregation..."
                             #aggrColInput
                             formControlName="aggrStr"

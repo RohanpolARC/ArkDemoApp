@@ -57,7 +57,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   isFeePresetDisabled: boolean = true;
   isMonthlyReturnsDisabled: boolean = true;
   removableChip: boolean = false;
-  isClonnedModel: boolean = false;
+  isClonedModel: boolean = false;
 
   constructor(
     public dialogRef: MatDialogRef<PortfolioSaveRunModelComponent>,
@@ -129,7 +129,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     this.originalModelName = this.selectedModelName;
     
     this.asOfDate = this.data.asOfDate;
-    this.isClonnedModel = this.data.isClonnedModel ? this.data.isClonnedModel:false;
+    this.isClonedModel = this.data.isClonedModel ? this.data.isClonedModel:false;
       /**
        * If no model is selected then disable slide toggle to update.
        */
@@ -143,7 +143,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       this.modelID = this.data.model.modelID
     }
 
-    if(this.autoManualOption == "Automatic" && this.data.isClonnedModel){
+    if(this.autoManualOption == "Automatic" && this.data.isClonedModel){
       this.rules = this.data.clonnedRules
     }
     else if(this.autoManualOption == "Automatic"){
@@ -179,7 +179,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       aggregationType: new FormControl(aggrStr, Validators.required),
       baseMeasure: new FormControl(this.baseMeasures[0]?.baseMeasure, Validators.required),
       feePreset: new FormControl(feePreset, Validators.required),
-      calculationType: new FormControl([], this.isClonnedModel ? [] : Validators.required),
+      calculationType: new FormControl([], this.isClonedModel ? [] : Validators.required),
       curveRateName: new FormControl(this.curveRates.filter(cr => cr.rate === 0)[0].curveRateName, Validators.required),
       fundCurrency: new FormControl(this.data.model?.fundCurrency??'EUR', Validators.required),
       aggrStr: new FormControl('')    })

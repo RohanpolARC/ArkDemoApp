@@ -125,10 +125,14 @@ export type VPositionModel = {
 export type VModel = {
     modelID: number, modelName: string, displayName: string, modelDesc: string, 
     rules: ColumnFilter[], positionIDs: number[], 
-    isLocal: string, autoManualOption: string, username: string, isShared: string, aggregationType: string,
+    isLocal: YesNoType, autoManualOption: AutoManualType, username: string, isShared: YesNoType, aggregationType: string,
     fundCurrency: string, latestWSOStatic: boolean, feePreset: string, rulesStr : string, createdBy: string,
     createdOn: string, modifiedOn: string
 }
+
+export type AutoManualType = 'Automatic' | 'Manual'
+
+export type YesNoType = 'Yes' | 'No'
 
 export type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`  | `Portfolio Modeller` | `Cashflows`
 
