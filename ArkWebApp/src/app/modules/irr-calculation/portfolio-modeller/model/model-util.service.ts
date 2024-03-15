@@ -36,6 +36,8 @@ export class ModelUtilService {
       modelData[i].fundCurrency = data[i].fundCurrency;
       modelData[i].feePreset = data[i].feePreset;
       modelData[i].createdBy = data[i].createdBy;
+      modelData[i].createdOn = data[i].createdOn;
+      modelData[i].modifiedOn = data[i].modifiedOn;
       
       let ruleArr: string[] = tempRules.split('|').join('"').split('~');
       ruleArr.forEach(x => data[i].rules.push(JSON.parse(x)))

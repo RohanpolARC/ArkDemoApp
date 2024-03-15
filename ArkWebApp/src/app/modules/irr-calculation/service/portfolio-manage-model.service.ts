@@ -14,6 +14,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { ConfirmPopupComponent } from "src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component";
 import { PortfolioSaveRunModelComponent } from "../portfolio-save-run-model/portfolio-save-run-model.component";
 import { MsalUserService } from "src/app/core/services/Auth/msaluser.service";
+import { BLANK_DATETIME_FORMATTER_CONFIG, DATE_FORMATTER_CONFIG_ddMMyyyy } from "src/app/shared/functions/formatter";
 
 @Injectable()
 export class PortfolioManageModelService implements OnDestroy{
@@ -45,7 +46,9 @@ export class PortfolioManageModelService implements OnDestroy{
         { field: 'isShared', tooltipField: 'isShared', headerName: 'Is Shared Model', type: 'abColDefString'},
         { field: 'latestWSOStaticStr', tooltipField: 'latestWSOStaticStr', headerName: 'Uses Latest WSO Static', type: 'abColDefString'},
         { field: 'rulesAndPositionIDs', tooltipField: 'rulesAndPositionIDs', headerName: 'Rules/Position IDs', type: 'abColDefString', maxWidth:700, valueGetter: this.getRulesAndPositionIDs},
-        { field: 'createdBy', tooltipField: 'createdBy', headerName: 'Owner', type: 'abColDefString'}
+        { field: 'createdBy', tooltipField: 'createdBy', headerName: 'Owner', type: 'abColDefString'},
+        { field: 'createdOn', tooltipField: 'createdOn', headerName: 'Created On', type: 'abColDefDate'},
+        { field: 'modifiedOn', tooltipField: 'modifiedOn', headerName: 'Last Run On', type: 'abColDefDate'}
     ]
 
     gridApi: GridApi
@@ -158,32 +161,37 @@ export class PortfolioManageModelService implements OnDestroy{
             IsHidden: false, DashboardTitle: ' '
           },
           FormatColumn: {
-            Revision: 2,
+            Revision: 3,
             FormatColumns: [
+              BLANK_DATETIME_FORMATTER_CONFIG(['createdOn', 'modifiedOn']), 
+              DATE_FORMATTER_CONFIG_ddMMyyyy(['createdOn', 'modifiedOn'])              
             ]
           },
           Layout: {
-            Revision: 18,
+            Revision: 19,
             CurrentLayout: 'Basic',
             Layouts:[
               {
                 Name: 'Basic',
                 Columns: [
                     'modelName',
+                    'autoManualOption',
+                    'createdBy',
+                    'createdOn',
+                    'modifiedOn',
+                    'isShared',
+                    'rulesAndPositionIDs',
                     'modelDesc',
+                    'isLocal',
                     'feePreset',
                     'fundCurrency',
                     'irrAggrType',
-                    'isLocal',
-                    'isShared',
-                    'latestWSOStaticStr',
-                    'autoManualOption',
-                    'rulesAndPositionIDs',
-                    'createdBy',                
+                    'latestWSOStaticStr',               
                     'Actions',
                 ],                
                 PinnedColumnsMap: {
-                    Actions: 'right'
+                    Actions: 'right',
+                    modelName: 'left'
                 },
               }
             ],

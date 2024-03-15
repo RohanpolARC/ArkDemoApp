@@ -126,7 +126,8 @@ export type VModel = {
     modelID: number, modelName: string, displayName: string, modelDesc: string, 
     rules: ColumnFilter[], positionIDs: number[], 
     isLocal: string, autoManualOption: string, username: string, isShared: string, aggregationType: string,
-    fundCurrency: string, latestWSOStatic: boolean, feePreset: string, rulesStr : string, createdBy: string
+    fundCurrency: string, latestWSOStatic: boolean, feePreset: string, rulesStr : string, createdBy: string,
+    createdOn: string, modifiedOn: string
 }
 
 export type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`  | `Portfolio Modeller` | `Cashflows`
