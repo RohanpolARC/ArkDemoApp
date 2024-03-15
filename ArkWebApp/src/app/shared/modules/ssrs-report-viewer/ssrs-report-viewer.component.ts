@@ -4,7 +4,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { first } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
-import { FilterValueChangeParams } from '../../models/FilterPaneModel';
+import {  IFilterPaneParams } from '../../models/FilterPaneModel';
 import { ReportServerParams } from '../../models/ReportParamsModel';
 
 
@@ -48,10 +48,15 @@ export class SsrsReportViewerComponent implements OnInit,OnDestroy {
     
     let reportSrc = this.ssrsReportViewerSvc.makeReportLink(this.reportServerParams,this.ssrsReportViewerSvc.getSSRSFormatParam(this.formatType),100,true)
     this.getReportFile(reportSrc,'Pdf',true,false)
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe((params:FilterValueChangeParams)=>{
-      if(params.reportParamName){
-        this.reportServerParams.parameters[params.reportParamName]=params.value
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+
+      for(const k in filters){
+        let filter = filters[k]
+        if(filter.isReport){
+          this.reportServerParams.parameters[filter.reportParamName] = filter.value
+        }
       }
+
     }))
 
   }

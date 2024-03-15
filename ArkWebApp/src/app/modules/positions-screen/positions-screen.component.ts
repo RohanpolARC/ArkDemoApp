@@ -9,6 +9,7 @@ import {   BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CU
 import { getMomentDateStr, presistSharedEntities, loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import {  AMOUNT_COLUMNS_LIST, DATE_COLUMNS_LIST, GRID_OPTIONS, POSITIONS_COLUMN_DEF } from './grid-structure';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
+import {  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 
 @Component({
   selector: 'app-positions-screen',
@@ -67,10 +68,10 @@ export class PositionsScreenComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
-      if(data){
-        if(data.id === 311){
-          this.positionScreenSvc.changeSearchDate(getMomentDateStr(data.value))
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+      if(filters){
+        if(filters[311]){
+          this.positionScreenSvc.changeSearchDate(getMomentDateStr(filters[311].value))
         }
       }
     }))

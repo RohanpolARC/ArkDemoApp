@@ -10,7 +10,7 @@ import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overla
 import {  CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, formatDate, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import {  autosizeColumnExceptResized,  loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
-import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
+import { AsOfDateRange,  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 
 @Component({
   selector: 'app-aum-delta',
@@ -72,10 +72,10 @@ export class AumDeltaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
-      if(data){
-        if(data.id === 331){
-          this.sDate = data.value
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+      if(filters){
+        if(filters[331]){
+          this.sDate = filters[331].value
           if(this.sDate.end === 'Invalid date')
             this.sDate.end = this.sDate.start;
           this.aumDeltaSvc.changeSearchDateRange(this.sDate)

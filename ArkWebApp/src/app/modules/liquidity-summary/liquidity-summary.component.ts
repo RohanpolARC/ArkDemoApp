@@ -34,6 +34,7 @@ import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overla
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
 import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
+import {  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 
 @Component({
   selector: 'app-liquidity-summary',
@@ -642,16 +643,19 @@ export class LiquiditySummaryComponent implements OnInit {
       },
     }
 
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
-      if(data){
-        if(data.id === 111){
-          this.liquiditySummarySvc.changeFundHedgingValues(data.value?.map(v => v.value)) //fundhedging
-        }else if(data.id === 112){
-          this.liquiditySummarySvc.changeSearchDate(getMomentDateStr(data.value))
-        }else if(data.id === 113){
-          this.liquiditySummarySvc.changenoofdaysValues(data.value)
-        }else if(data.id === 114){
-          this.liquiditySummarySvc.changeincludeCoinvestValue(data.value)
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+      if(filters){
+        if(filters[111]){
+          this.liquiditySummarySvc.changeFundHedgingValues(filters[111].value?.map(v => v.value)) //fundhedging
+        }
+        if(filters[112]){
+          this.liquiditySummarySvc.changeSearchDate(getMomentDateStr(filters[112].value))
+        }
+        if(filters[113]){
+          this.liquiditySummarySvc.changenoofdaysValues(filters[113].value)
+        }
+        if(filters[114]){
+          this.liquiditySummarySvc.changeincludeCoinvestValue(filters[114].value)
         }
       }
 

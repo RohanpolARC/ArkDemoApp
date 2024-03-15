@@ -11,7 +11,11 @@ export interface AsOfDateRange{
 }
 
 export interface FilterValueChangeParams{
-    id:                     number,
     value:                  any,
-    reportParamName?:       string
+    reportParamName?:       string,
+    isReport?:               boolean
   }
+
+export interface IFilterPaneParams{
+    [id:number] : FilterValueChangeParams
+}

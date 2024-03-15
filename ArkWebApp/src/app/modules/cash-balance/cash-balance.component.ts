@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {  Subscription } from 'rxjs';
 import { CashBalanceService } from 'src/app/core/services/CashBalance/cash-balance.service';
 import { DataService } from 'src/app/core/services/data.service';
-import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
+import { AsOfDateRange, IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 import {  CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy, BLANK_DATETIME_FORMATTER_CONFIG } from 'src/app/shared/functions/formatter';
 import {   autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
@@ -194,10 +194,10 @@ export class CashBalanceComponent implements OnInit {
   ngOnInit(): void {
     this.rowData = [];
 
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe((data)=>{
-      if(data){
-        if(data.id===121){
-          this.sDate = data.value
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+      if(filters){
+        if(filters[121]){
+          this.sDate = filters[121].value
           if(this.sDate.end === 'Invalid date')
             this.sDate.end = this.sDate.start;
           this.cashBalanceSvc.changeSearchDateRange(this.sDate);

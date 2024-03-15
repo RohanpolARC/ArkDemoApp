@@ -36,7 +36,7 @@ export class NetReturnsSummaryGridService {
     tap((isHit: boolean) => {
       if(isHit){
         this.noRowsToDisplayMsg = 'No data found for applied filter.'
-        this.gridApi.showLoadingOverlay();
+        this.gridApi?.showLoadingOverlay();
       }
     })
   )
@@ -56,7 +56,6 @@ export class NetReturnsSummaryGridService {
   setGridOptions(): void{
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
-      ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
       enableRangeSelection: true,
       columnDefs: this.columnDefs,
       tooltipShowDelay: 0,

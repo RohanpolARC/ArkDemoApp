@@ -13,6 +13,7 @@ import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
+import {  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 
 @Component({
   selector: 'app-management-fee',
@@ -96,10 +97,10 @@ export class ManagementFeeComponent implements OnInit {
 
   }
   ngOnInit(): void {
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
-      if(data){
-        if(data.id === 431){
-          this.managementFeeSvc.changeSearchDate(getMomentDateStr(data.value))
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+      if(filters){
+        if(filters[431]){
+          this.managementFeeSvc.changeSearchDate(getMomentDateStr(filters[431].value))
         }
       }
     }))

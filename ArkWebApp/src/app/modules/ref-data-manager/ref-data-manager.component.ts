@@ -15,6 +15,7 @@ import { NoRowsCustomMessages, RefDataProc } from 'src/app/shared/models/General
 import { AddRefDataFormComponent } from './add-ref-data-form/add-ref-data-form.component';
 import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
+import {  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 
 
 @Component({
@@ -140,11 +141,11 @@ export class RefDataManagerComponent implements OnInit {
   ) { }
 
   changeListeners(){
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe(data=>{
-      if(data){
-        if(data.id === 621){
-          if(data.value?.[0]?.value!==null && data.value?.[0]?.value!==undefined){
-            this.refDataManagerSvc.changeFilterValues([data.value?.[0]?.value])
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams)=>{
+      if(filters){
+        if(filters[621]){
+          if(filters[621].value?.[0]?.value!==null && filters[621].value?.[0]?.value!==undefined){
+            this.refDataManagerSvc.changeFilterValues([filters[621].value?.[0]?.value])
           }
         }
       }

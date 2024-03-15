@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
-import { AsOfDateRange, FilterValueChangeParams } from 'src/app/shared/models/FilterPaneModel';
+import { AsOfDateRange,  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 import { FeeAttributionService } from './services/fee-attribution.service';
 import { Observable, Subscription } from 'rxjs';
 import { filter, switchMap, tap } from 'rxjs/operators';
@@ -55,16 +55,16 @@ export class FeeAttributionComponent implements OnInit, OnDestroy {
       })
     )
 
-    this.subscriptions.push(this.filterSvc.currentFilterValues.subscribe((filter: FilterValueChangeParams) => {
-      if(filter?.id === 441){
-        let funds: string[] = filter?.value?.map(fund => fund?.value);
+    this.subscriptions.push(this.filterSvc.filterValueChanges.subscribe((filters: IFilterPaneParams) => {
+      if(filters?.[441]){
+        let funds: string[] = filters[441].value?.map(fund => fund?.value);
         this.feeAttributionSvc.changeFundValues(funds);
       }
-      else if(filter?.id === 442){
-        this.feeAttributionSvc.changeAsofdateRange(filter?.value)
+      if(filters?.[442]){
+        this.feeAttributionSvc.changeAsofdateRange(filters[442]?.value)
       }
-      else if(filter?.id === 443){
-        this.feeAttributionSvc.changeAsofdate(getMomentDateStr(filter?.value))
+      if(filters?.[443]){
+        this.feeAttributionSvc.changeAsofdate(getMomentDateStr(filters[443]?.value))
       }
     }))
 
