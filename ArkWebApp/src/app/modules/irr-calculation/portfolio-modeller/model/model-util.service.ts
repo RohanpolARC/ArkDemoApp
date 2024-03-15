@@ -46,9 +46,9 @@ export class ModelUtilService {
 
 
       modelData[i].rules?.forEach(rule => {
-        modelData[i].rulesStr += "Column: "+rule.ColumnId+", Values: "+rule.Predicate.Inputs+","
+        modelData[i].rulesStr += "Column: "+rule.ColumnId+", "+rule.Predicate.PredicateId+": "+rule.Predicate.Inputs+", "
       })
-      modelData[i].rulesStr = modelData[i].rulesStr?.slice(0, -1) // Remove last delimeter
+      modelData[i].rulesStr = modelData[i].rulesStr?.slice(0, -2) // Remove last delimeter
       
     }
     return modelData;

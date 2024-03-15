@@ -170,7 +170,7 @@
                 <div *ngIf="autoManualOption == 'Automatic'" class="form-field elements-list">
                     Rules:
                     <div *ngFor="let rule of rules">
-                        Column: {{ rule.ColumnId }}, Values: {{ rule.Predicate.Inputs }}
+                        Column: {{ rule.ColumnId }}, {{ rule.Predicate.PredicateId }}: {{ rule.Predicate.Inputs }}
                     </div>
                 </div>
 

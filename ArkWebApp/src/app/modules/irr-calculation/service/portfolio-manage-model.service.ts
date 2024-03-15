@@ -270,7 +270,7 @@ export class PortfolioManageModelService{
             return
           }
 
-          let confirmTextString = 'Are you sure you want to delete this Model ?'
+          let confirmTextString = 'Are you sure you want to delete this model ?'
           const dialogRef = this.dialog.open(ConfirmPopupComponent, { 
             data:{
                 headerText:confirmTextString,
