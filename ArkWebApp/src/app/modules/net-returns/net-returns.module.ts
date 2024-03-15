@@ -13,7 +13,6 @@ import { SsrsReportViewerModule } from 'src/app/shared/modules/ssrs-report-viewe
 import { MatDialogModule } from '@angular/material/dialog';
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
 import { NetReturnsSummaryComponent } from './net-returns-summary/net-returns-summary.component';
-import { NetReturnsSummaryGridService } from './services/net-returns-summary-grid.service';
 
 
 
@@ -36,9 +35,6 @@ import { NetReturnsSummaryGridService } from './services/net-returns-summary-gri
     SsrsReportViewerModule,
     MatDialogModule,
     DetailedViewModule
-  ],
-  providers: [
-    NetReturnsSummaryGridService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 

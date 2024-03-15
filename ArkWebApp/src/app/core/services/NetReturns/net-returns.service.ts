@@ -6,9 +6,7 @@ import { APIConfig } from 'src/app/configs/api-config';
 import { RESOURCE_CONTEXT } from '../../interceptors/msal-http.interceptor';
 import { GridApi } from '@ag-grid-community/core';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class NetReturnsService {
 
   public netSmyGridApi:GridApi

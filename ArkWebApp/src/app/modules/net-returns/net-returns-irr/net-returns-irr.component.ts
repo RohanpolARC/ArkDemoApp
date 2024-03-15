@@ -25,7 +25,7 @@ export class NetReturnsIrrComponent implements OnInit {
     tap((isHit: boolean) => {
       if(isHit){
         this.noRowsToDisplayMsg = 'No data found for applied filter.'
-        this.gridApi.showLoadingOverlay();
+        this.gridApi?.showLoadingOverlay();
       }
     })
   )

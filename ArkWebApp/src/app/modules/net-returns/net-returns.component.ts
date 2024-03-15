@@ -16,7 +16,11 @@ import { NetReturnsSummaryGridService } from './services/net-returns-summary-gri
 @Component({
   selector: 'app-net-returns',
   templateUrl: './net-returns.component.html',
-  styleUrls: ['../../shared/styles/grid-page.layout.scss', './net-returns.component.scss']
+  styleUrls: ['../../shared/styles/grid-page.layout.scss', './net-returns.component.scss'],
+  providers: [
+    NetReturnsService,
+    NetReturnsSummaryGridService
+  ]
 })
 export class NetReturnsComponent implements OnInit {
 
