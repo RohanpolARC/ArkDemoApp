@@ -48,7 +48,7 @@ export class PortfolioManageModelService implements OnDestroy{
         { field: 'rulesAndPositionIDs', tooltipField: 'rulesAndPositionIDs', headerName: 'Rules/Position IDs', type: 'abColDefString', maxWidth:700, valueGetter: this.getRulesAndPositionIDs},
         { field: 'createdBy', tooltipField: 'createdBy', headerName: 'Owner', type: 'abColDefString'},
         { field: 'createdOn', tooltipField: 'createdOn', headerName: 'Created On', type: 'abColDefDate'},
-        { field: 'modifiedOn', tooltipField: 'modifiedOn', headerName: 'Last Run On', type: 'abColDefDate'}
+        { field: 'modifiedOn', tooltipField: 'modifiedOn', headerName: 'Modified On', type: 'abColDefDate'}
     ]
 
     gridApi: GridApi
