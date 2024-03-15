@@ -1,7 +1,7 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableOptions } from "@adaptabletools/adaptable-angular-aggrid";
 import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, ValueGetterParams } from "@ag-grid-community/core";
 import { NoRowsOverlayComponent } from "@ag-grid-community/core/dist/cjs/es5/rendering/overlays/noRowsOverlayComponent";
-import { Injectable } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
 import { BehaviorSubject, Observable, Subscription, combineLatest } from "rxjs";
 import { CommonConfig } from "src/app/configs/common-config";
 import { IRRCalcService } from "src/app/core/services/IRRCalculation/irrcalc.service";
@@ -16,7 +16,7 @@ import { PortfolioSaveRunModelComponent } from "../portfolio-save-run-model/port
 import { MsalUserService } from "src/app/core/services/Auth/msaluser.service";
 
 @Injectable()
-export class PortfolioManageModelService{
+export class PortfolioManageModelService implements OnDestroy{
 
     /* this behaviour subject will only be used once - when config audit component is initialized */
     firstLoad = new BehaviorSubject<boolean>(false);
@@ -332,6 +332,10 @@ export class PortfolioManageModelService{
           this.dataSvc.setWarningMsg('Portfolio Model could not be deleted','Dismiss','ark-theme-snackbar-error')
         }
       }))
+    }
+
+    ngOnDestroy(): void {
+      this.subscriptions.forEach(sub => sub.unsubscribe());
     }
 
 
