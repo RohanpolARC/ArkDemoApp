@@ -6,6 +6,7 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { forkJoin, Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
+import { MsalUserService } from 'src/app/core/services/Auth/msaluser.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
 import { VPortfolioModel } from 'src/app/shared/models/IRRCalculationsModel';
@@ -19,8 +20,8 @@ type Proceed = "Save" | "SaveRun"
 })
 export class PortfolioSaveRunModelComponent implements OnInit {
 
-  isLocal: boolean
-  isAutomatic: boolean
+  isLocal: string
+  autoManualOption: string
   subscriptions: Subscription[] = []
   adaptableApi: AdaptableApi
 
@@ -56,12 +57,14 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   isFeePresetDisabled: boolean = true;
   isMonthlyReturnsDisabled: boolean = true;
   removableChip: boolean = false;
+  isClonedModel: boolean = false;
 
   constructor(
     public dialogRef: MatDialogRef<PortfolioSaveRunModelComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
     private dataService: DataService,
-    private irrCalcService: IRRCalcService
+    private irrCalcService: IRRCalcService,
+    public msalUserService: MsalUserService
   ) { }
 
   modelValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
@@ -115,7 +118,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   }
 
   Init(){
-    this.isAutomatic = this.data.isAutomatic
+    this.autoManualOption = this.data.autoManualOption
     this.isLocal = this.data.isLocal
     this.disableSubmit = false;
     this.disableSave = true;
@@ -126,6 +129,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     this.originalModelName = this.selectedModelName;
     
     this.asOfDate = this.data.asOfDate;
+    this.isClonedModel = this.data.isClonedModel ? this.data.isClonedModel:false;
       /**
        * If no model is selected then disable slide toggle to update.
        */
@@ -139,7 +143,10 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       this.modelID = this.data.model.modelID
     }
 
-    if(this.isAutomatic){
+    if(this.autoManualOption == "Automatic" && this.data.isClonedModel){
+      this.rules = this.data.clonnedRules
+    }
+    else if(this.autoManualOption == "Automatic"){
       this.rules = JSON.parse(JSON.stringify(this.adaptableApi.filterApi.getActiveColumnFilters()))
       this.rules = this.rules.filter(f => f['ColumnId'] !== 'isOverride')
       this.recursiveRemoveKey(this.rules, 'Uuid')
@@ -167,12 +174,12 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       modelName: new FormControl(this.data.model?.modelName, Validators.required),
       modelDesc: new FormControl(this.data.model?.modelDesc),
       isUpdate: new FormControl(!!this.modelID, Validators.required),
-      isShared: new FormControl(!!this.data.isShared, Validators.required),
+      isShared: new FormControl(this.data.isShared == "Yes" ? true:false, Validators.required),
       latestWSOStatic: new FormControl(!!this.data.latestWSOStatic, Validators.required),
       aggregationType: new FormControl(aggrStr, Validators.required),
       baseMeasure: new FormControl(this.baseMeasures[0]?.baseMeasure, Validators.required),
       feePreset: new FormControl(feePreset, Validators.required),
-      calculationType: new FormControl([], Validators.required),
+      calculationType: new FormControl([], this.isClonedModel ? [] : Validators.required),
       curveRateName: new FormControl(this.curveRates.filter(cr => cr.rate === 0)[0].curveRateName, Validators.required),
       fundCurrency: new FormControl(this.data.model?.fundCurrency??'EUR', Validators.required),
       aggrStr: new FormControl('')    })
@@ -274,11 +281,11 @@ export class PortfolioSaveRunModelComponent implements OnInit {
 
   onProceed(context: Proceed){
 
-    if(this.isAutomatic && this.rules.length==0){
+    if(this.autoManualOption == "Automatic" && this.rules.length==0){
       this.dataService.setWarningMsg(`No rules applicable for the model. Please select required filters.`);
       return
     }
-    else if(!this.isAutomatic && this.positionIDs.length==0)
+    else if(this.autoManualOption == "Manual" && this.positionIDs.length==0)
     {
       this.dataService.setWarningMsg(`No positions applicable for the model. Please select required positions.`);
       return
@@ -292,18 +299,19 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     model.username = this.dataService.getCurrentUserName();
     model.modelID = (this.modelForm.get('isUpdate').value) ? this.modelID : null;
     model.isLocal = this.isLocal;
-    model.isShared = this.modelForm.get('isShared').value;
-    model.isManual = !this.isAutomatic;
+    model.isShared = this.modelForm.get('isShared').value ? "Yes" : "No";
+    model.autoManualOption = this.autoManualOption;
     model.latestWSOStatic = this.modelForm.get('latestWSOStatic').value;
     model.irrAggrType = this.modelForm.get('aggregationType').value;
     model.fundCurrency = this.modelForm.get('fundCurrency').value;
    
     model.feePreset = this.modelForm.get('feePreset').value;
-
+    model.isAdmin = this.msalUserService.isUserAdmin();
+    
     let curveRateName = this.modelForm.get('curveRateName').value;
     model.curveRateDelta = this.curveRates.filter(cr => cr.curveRateName === curveRateName)?.['0']?.['rate']
 
-    if(this.isAutomatic){
+    if(this.autoManualOption == "Automatic"){
       /** Convert rules object into rules string separated by delimeter that is to be sent to ArkWebApi */
       this.rulesSTR = ''
       this.rules.forEach(rule => {
@@ -368,7 +376,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
         else{
           this.isSuccess = false
           this.isFailure = true
-          this.updateMsg = 'Failed to update model';
+          this.updateMsg = 'Failed to update model: '+result.returnMessage;
         }
       },
       error: error => {

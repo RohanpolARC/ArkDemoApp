@@ -20,20 +20,24 @@ export class ModelUtilService {
     let modelData: VModel[] = data
     for(let i:number = 0; i < data.length; i+= 1){
       let tempRules: string = String(data[i].rules);
-      modelData[i].displayName = Boolean(data[i].isShared) ? `${data[i].modelName}*` : `${data[i].modelName}`
+      modelData[i].displayName = Boolean(data[i].isShared=="Yes") ? `${data[i].modelName}*` : `${data[i].modelName}`
       modelData[i].modelName = data[i].modelName;
       modelData[i].modelID = Number(data[i].modelID);
       modelData[i].modelDesc = data[i].modelDesc;
-      modelData[i].isLocal = Boolean(data[i].isLocal);
-      modelData[i].isShared = Boolean(data[i].isShared);
-      modelData[i].isManual = Boolean(data[i].isManual);
+      modelData[i].isLocal = data[i].isLocal;
+      modelData[i].isShared = data[i].isShared;
+      modelData[i].autoManualOption = data[i].autoManualOption;
       modelData[i].latestWSOStatic = Boolean(data[i].latestWSOStatic);
       modelData[i].username = null;
       modelData[i].positionIDs = data[i].positionIDs?.split(',').map(x => parseInt(x))
       modelData[i].rules = [];
+      modelData[i].rulesStr = '';
       modelData[i].aggregationType = data[i].irrAggrType;
       modelData[i].fundCurrency = data[i].fundCurrency;
       modelData[i].feePreset = data[i].feePreset;
+      modelData[i].createdBy = data[i].createdBy;
+      modelData[i].createdOn = data[i].createdOn;
+      modelData[i].modifiedOn = data[i].modifiedOn;
       
       let ruleArr: string[] = tempRules.split('|').join('"').split('~');
       ruleArr.forEach(x => data[i].rules.push(JSON.parse(x)))
@@ -41,6 +45,13 @@ export class ModelUtilService {
       if(ruleArr[0] === "null"){
         modelData[i].rules = null
       }
+
+
+      modelData[i].rules?.forEach(rule => {
+        modelData[i].rulesStr += "Column: "+rule.ColumnId+", "+rule.Predicate.PredicateId+": "+rule.Predicate.Inputs+", "
+      })
+      modelData[i].rulesStr = modelData[i].rulesStr?.slice(0, -2) // Remove last delimeter
+      
     }
     return modelData;
   }

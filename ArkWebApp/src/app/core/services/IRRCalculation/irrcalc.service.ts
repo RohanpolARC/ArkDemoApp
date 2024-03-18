@@ -3,7 +3,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
-import { IRRCalcParams, LoadStatus, ParentTabType, PortfolioModellerCalcParams, VPortfolioModel, VPositionModel } from 'src/app/shared/models/IRRCalculationsModel';
+import { IRRCalcParams, LoadStatus, ParentTabType, PortfolioModellerCalcParams, VModel, VPortfolioDeleteModel, VPortfolioModel, VPositionModel } from 'src/app/shared/models/IRRCalculationsModel';
 import { BehaviorSubject } from 'rxjs';
 import { RESOURCE_CONTEXT } from '../../interceptors/msal-http.interceptor';
 
@@ -45,10 +45,16 @@ export class IRRCalcService {
     );
   }
 
-  public getPortfolioModels(userName: string){
-    return this.http.get<any>(`${APIConfig.IRR_PORTFOLIO_MODEL_GET_API}/?userName=${userName}`).pipe(
+  public getPortfolioModels(userName: string, fetchAllModels:boolean = false){
+    return this.http.get<any>(`${APIConfig.IRR_PORTFOLIO_MODEL_GET_API}/?userName=${userName}&fetchAllModels=${fetchAllModels}`).pipe(
       catchError((ex) => throwError(ex))
     )
+  }
+
+  public deletePortfolioModel(model: VPortfolioDeleteModel){
+    return this.http.post(`${APIConfig.IRR_PORTFOLIO_MODEL_DELETE_API}`,model).pipe(
+      catchError((ex) => throwError(ex))
+  );
   }
 
   public getLocalOverrides(modelID: number){

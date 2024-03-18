@@ -33,6 +33,12 @@
         
             </div>
 
+            <button mat-icon-button (click)="onManageModel()"
+            matTooltip="Manage Model"
+            matTooltipClass="tooltip-style">
+                <mat-icon class="material-icons-outlined">settings</mat-icon>
+            </button>
+
             <button mat-icon-button (click)="portfolioModellerSvc.openVirtualPositionsForm('ADD')"
             matTooltip="Add virtual position"
             matTooltipClass="tooltip-style">

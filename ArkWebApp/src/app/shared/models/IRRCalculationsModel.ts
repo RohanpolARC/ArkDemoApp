@@ -14,15 +14,21 @@ export type VPortfolioModel = {
     positionIDs: string,
     username: string,
     modelID: number,  // If modalID = null, then create, else update 
-    isLocal: boolean,
-    isManual: boolean,
-    isShared: boolean,
+    isLocal: string,
+    autoManualOption: string,
+    isShared: string,
     latestWSOStatic: boolean,
     localOverrides: VPortfolioLocalOverrideModel[],
-    irrAggrType: string // `type1 > type2 > type3`,
-    curveRateDelta: number   // percentage with direction (+/-)
-    fundCurrency: number
-    feePreset: string
+    irrAggrType: string, // `type1 > type2 > type3`,
+    curveRateDelta: number,   // percentage with direction (+/-)
+    fundCurrency: number,
+    feePreset: string,
+    isAdmin: boolean
+}
+
+export type VPortfolioDeleteModel = {
+    modelID: number,
+    username: string
 }
 
 export type VPortfolioLocalOverrideModel = {
@@ -119,9 +125,14 @@ export type VPositionModel = {
 export type VModel = {
     modelID: number, modelName: string, displayName: string, modelDesc: string, 
     rules: ColumnFilter[], positionIDs: number[], 
-    isLocal: boolean, isManual: boolean, username: string, isShared: boolean, aggregationType: string,
-    fundCurrency: string, latestWSOStatic: boolean, feePreset: string
+    isLocal: YesNoType, autoManualOption: AutoManualType, username: string, isShared: YesNoType, aggregationType: string,
+    fundCurrency: string, latestWSOStatic: boolean, feePreset: string, rulesStr : string, createdBy: string,
+    createdOn: string, modifiedOn: string
 }
+
+export type AutoManualType = 'Automatic' | 'Manual'
+
+export type YesNoType = 'Yes' | 'No'
 
 export type TabType =  `IRR` | `Monthly Returns` | `Performance Fees`  | `Portfolio Modeller` | `Cashflows`
 

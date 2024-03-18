@@ -64,6 +64,7 @@ export class APIConfig {
     public static IRR_POSITIONS_GET_API: string = APIConfig.BASEURL + "/api/IRRCalculation/GetPositions";
     public static IRR_PORTFOLIO_MODEL_PUT_API: string = APIConfig.BASEURL + "/api/IRRCalculation/PutModel";
     public static IRR_PORTFOLIO_MODEL_GET_API: string = APIConfig.BASEURL + "/api/IRRCalculation/GetModel";
+    public static IRR_PORTFOLIO_MODEL_DELETE_API: string = APIConfig.BASEURL + "/api/IRRCalculation/DeleteModel";
     public static IRR_LOCAL_OVERRIDES_GET_API: string = APIConfig.BASEURL + "/api/IRRCalculation/GetLocalOverrides";
     public static IRR_RUN_CALCS_API: string = APIConfig.ARK_IRR_FUNCTION_BASEURL + "/api/IRRCalculatorFunction_HttpTrigger";
 

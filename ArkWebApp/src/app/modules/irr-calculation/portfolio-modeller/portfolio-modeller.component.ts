@@ -21,6 +21,7 @@ import { RefService } from './ref/ref.service';
 import { ModelUtilService } from './model/model-util.service';
 import { GridUtilService } from './grid/grid-util.service';
 import { TabUtilService } from './tab/tab-util.service';
+import { PortfolioManageModelComponent } from '../portfolio-manage-model/portfolio-manage-model.component';
 
 let adaptable_Api: AdaptableApi
 
@@ -94,8 +95,7 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
               ...['expectedDate', 'localExpectedDate', 'globalExpectedDate', 'entryDate'], 
               ...['maturityDate', 'localMaturityDate', 'globalMaturityDate']])
             data[i]['isOverride'] = this.gridUtilSvc.getIsOverride(data[i])
-          }  
-
+          }
           adaptable_Api.gridApi.setGridData(data)
 
           if(this.selectedModelID){
@@ -204,10 +204,14 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
       next: data => {
         this.modelSvc.modelData = this.modelSvc.parseFetchedModels(data);
         this.modelSvc.modelMap = this.modelSvc.initModelMap(this.modelSvc.modelData)
-        this.setSelectedModel(modelID)
 
         if(modelID)
-        this.saveModelCashflowsAndOpenTabs(modelID, context, contextData);
+        {
+          this.setSelectedModel(modelID)
+          this.saveModelCashflowsAndOpenTabs(modelID, context, contextData);
+        }
+
+        this.resetIfModelDeleted()
       },
       error: error => {
         console.error(`Failed to fetch Portfolio Rules: ${error}`)
@@ -283,8 +287,8 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
         adaptableApi: adaptable_Api, 
         model: this.modelSvc.modelMap[this.selectedModelID], 
         asOfDate: this.asOfDate, 
-        isAutomatic: this.isAutomatic.value, 
-        isLocal: this.isLocal.value,
+        autoManualOption: this.isAutomatic.value ? "Automatic":"Manual", 
+        isLocal: this.isLocal.value ? "Yes":"No",
         isShared: this.modelSvc.modelMap[this.selectedModelID]?.isShared,
         positionIDs: this.selectedPositionIDs,
         aggregationType: this.modelSvc.modelMap[this.selectedModelID]?.aggregationType,
@@ -360,6 +364,11 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
     }
   }
 
+  resetIfModelDeleted(){
+    if(!this.modelSvc.modelMap.hasOwnProperty(this.selectedModelID))
+      this.onReset(true)
+  }
+
 
   overridenPositionIDs = {}
   fetchOverridesForModel(modelID: number){
@@ -390,10 +399,10 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
     this.selectedPositionIDs = []
 
     /** On model selection, data will be refetched with overrides, hence we do not want to programmatically set it again, hence emitEvent: false */
-    this.isLocal.setValue(this.modelSvc.modelMap[this.selectedModelID].isLocal, {emitEvent: false})
+    this.isLocal.setValue(this.modelSvc.modelMap[this.selectedModelID].isLocal == "Yes", {emitEvent: false})
 
     //emitEvent: true (Default) since we want to switch layouts programmatically. 
-    this.isAutomatic.setValue(!this.modelSvc.modelMap[this.selectedModelID].isManual)
+    this.isAutomatic.setValue(this.modelSvc.modelMap[this.selectedModelID].autoManualOption == "Automatic")
 
     if(this.modelSvc.modelMap[this.selectedModelID].rules){
       adaptable_Api.filterApi.setColumnFilter(this.modelSvc.modelMap[this.selectedModelID].rules)
@@ -401,6 +410,19 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
 
     this.fetchIRRPostions()
  }
+
+  onManageModel(context="Manage"){
+    const dialogRef = this.dialog.open(PortfolioManageModelComponent, {
+      width:'80vw'
+    })
+
+    dialogRef.afterClosed().pipe(first()).subscribe((result) => {
+      // Manage Model Dialog Closed.
+      if(dialogRef.componentInstance.portfolioManageModelSvc.isActionSuccessful){
+        this.fetchPortfolioModels();
+      }
+    })
+  }
 
   changeListeners(){
     this.subscriptions.push(this.isAutomatic.valueChanges.subscribe( isAuto => {
