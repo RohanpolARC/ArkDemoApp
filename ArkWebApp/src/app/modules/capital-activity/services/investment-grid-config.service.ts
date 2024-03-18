@@ -39,6 +39,7 @@ export class InvestmentGridConfigService {
       { field: 'positionCcy', tooltipField: 'positionCcy', headerName: 'Position Ccy', type: 'abColDefString'},
       { field: 'amount', tooltipField: 'amount', headerName: 'Total', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
       { field: 'linkedAmountBase', tooltipField: 'linkedAmountBase', headerName: 'Linked Amount Base', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber' },
+      { field: 'minLinkedDate', tooltipField: 'minLinkedDate', headerName: 'Min Linked Date', cellClass: 'dateUK', type: 'abColDefDate' },
       { field: 'totalBase', tooltipValueGetter: this.gridUtilSvc.tooltipValueGetter, headerName: 'Total Base', cellClass: 'ag-right-aligned-cell', onCellClicked: this.gridUtilSvc.onTotalBaseClick.bind(this), 
         cellStyle: this.gridUtilSvc.cellStyle, type: 'abColDefNumber'},
       { field: 'totalEur', headerName: 'Total Eur', cellClass: 'ag-right-aligned-cell', type: 'abColDefNumber'},
@@ -120,7 +121,7 @@ export class InvestmentGridConfigService {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 19,
+          Revision: 20,
           Layouts:[{
             Name: 'Basic Investment Cashflow',
             Columns: [
@@ -136,6 +137,7 @@ export class InvestmentGridConfigService {
               'positionCcy',
               'amount',
               'linkedAmountBase',
+              'minLinkedDate',
               'totalBase',
               'totalEur',
               'breakBase',
@@ -160,7 +162,7 @@ export class InvestmentGridConfigService {
         FormatColumn:{
           Revision: 9,
           FormatColumns:[
-            DATE_FORMATTER_CONFIG_ddMMyyyy(['cashDate']),
+            DATE_FORMATTER_CONFIG_ddMMyyyy(['cashDate', 'minLinkedDate']),
                
             AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['amount','totalBase','totalEur', 'linkedAmountBase', 'breakBase', 'groupBreakBase'],2,['amountZeroFormat']),
             AMOUNT_FORMATTER_CONFIG_Zero(['amount','totalBase','totalEur', 'linkedAmountBase', 'breakBase', 'groupBreakBase'],2,['amountZeroFormat'])
