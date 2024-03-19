@@ -82,6 +82,7 @@ export class PortfolioManageModelService implements OnDestroy{
     }
 
     adaptableOptions: AdaptableOptions ={
+        ...CommonConfig.ADAPTABLE_OPTIONS,
         licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
         primaryKey: 'modelID',
         userName: this.dataSvc.getCurrentUserName(),
@@ -313,6 +314,8 @@ export class PortfolioManageModelService implements OnDestroy{
                 isShared: portfolioModelData.isShared,
                 positionIDs: portfolioModelData.positionIDs,
                 aggregationType: portfolioModelData.aggregationType,
+                feePreset: portfolioModelData.feePreset,
+                latestWSOStatic: portfolioModelData.latestWSOStatic,
                 updatedValues: null,
                 clonnedRules : portfolioModelData.rules,
                 context: 'Save',
