@@ -24,6 +24,7 @@ export interface CapitalActivityModel{
     wsoAssetID: number;
     action: string;
     linkedAmount: number;
+    minLinkedDate: Date;
     isLinked: boolean;
     
     positionIDCashdateTypeStr: string;
