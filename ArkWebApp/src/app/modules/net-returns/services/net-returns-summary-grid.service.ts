@@ -42,10 +42,12 @@ export class NetReturnsSummaryGridService {
   )
 
   columnDefs: ColDef[]  = [
+    { field: 'FundCurrency', type: 'abColDefString', headerName: 'Currency' },
     { field: 'NAV', type: 'abColDefNumber' },
     { field: 'AUM', type: 'abColDefNumber' },
     { field: 'AUMEur', type: 'abColDefNumber', headerName: 'AUM Eur' },
-    { field: 'GrossCapitalDrawn', type: 'abColDefNumber', headerName: 'Gross Capital Drawn'},
+    { field: 'GrossCapitalDrawnInvestment', type: 'abColDefNumber', headerName: 'Gross Capital Drawn - Investment'},
+    { field: 'GrossCapitalDrawnOpex', type: 'abColDefNumber', headerName: 'Gross Capital Drawn - Opex'},
     { field: 'RecallableCapital', type: 'abColDefNumber', headerName: 'Recallable Capital' },
     { field: 'DistributionsGainsCurrentIncome', type: 'abColDefNumber', headerName: 'Distributions - gains/current income' },
     { field: 'DistributionsPermanentReturnOfCapital', type: 'abColDefNumber', headerName: 'Distributions - permanent return of capital' },
@@ -56,6 +58,7 @@ export class NetReturnsSummaryGridService {
   setGridOptions(): void{
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
+      ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
       enableRangeSelection: true,
       columnDefs: this.columnDefs,
       tooltipShowDelay: 0,
@@ -109,7 +112,7 @@ export class NetReturnsSummaryGridService {
           DashboardTitle: 'Summary'
         },
         Layout: {
-          Revision: 6,
+          Revision: 9,
           CurrentLayout: 'Basic Layout',
           Layouts: [{
             Name: 'Basic Layout',
@@ -117,10 +120,23 @@ export class NetReturnsSummaryGridService {
           }]
         },
         FormatColumn: {
-          Revision: 4,
+          Revision: 5,
           FormatColumns: [
             CUSTOM_FORMATTER(this.columnDefs.map(cd => cd.field),'amountFormatter')
           ]
+        },
+        StatusBar: {
+          Revision: 1,
+          StatusBars: [
+            {
+              Key: 'Center Panel',
+              StatusBarPanels: ['Filter']
+            },
+            {
+              Key: 'Right Panel',
+              StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+            },
+          ],
         }
 
        

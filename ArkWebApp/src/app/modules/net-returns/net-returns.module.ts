@@ -15,7 +15,6 @@ import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detaile
 import { NetReturnsSummaryComponent } from './net-returns-summary/net-returns-summary.component';
 
 
-
 @NgModule({
   declarations: [
     NetReturnsComponent,
