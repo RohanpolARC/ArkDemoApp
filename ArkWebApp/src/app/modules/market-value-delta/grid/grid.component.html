@@ -1,0 +1,11 @@
+<ng-container *ngIf = "rowData$ | async as rd">
+    <ag-grid-angular
+        [modules] = "agGridModules"
+        [gridOptions] = "gridOptions"
+        [rowData] = "rd"
+        [adaptableOptions] = "adaptableOptions"
+        (gridReady) = "onGridReady($event)"
+        (adaptableReady)="onAdaptableReady($event)"
+        class="ag-theme-alpine ag-grid"
+    ></ag-grid-angular>
+</ng-container>

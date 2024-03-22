@@ -8,10 +8,9 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { MsalUserService } from './core/services/Auth/msaluser.service';
 import { MsalBroadcastService } from '@azure/msal-angular';
-import { AuthenticationResult, EventMessage, EventType, InteractionStatus } from '@azure/msal-browser';
+import { EventMessage, EventType } from '@azure/msal-browser';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
-import { filter, takeUntil } from 'rxjs/operators';
 
 @Component({  
   selector: 'app-root',  
@@ -65,6 +64,7 @@ export class AppComponent {
   ValuationStyle: any = {};
   FeeAttributionStyle: any = {};
   AumReportStyle: any = {};
+  MarketValueDeltaStyle: any = {};
 
   funds
   fundHedgings
@@ -241,6 +241,9 @@ export class AppComponent {
     else if(this.location.path() === '/fee-attribution'){
       this.updateSelection('Fee Attribution')
     }
+    else if(this.location.path() === '/market-value-delta'){
+      this.updateSelection('Market Value Delta')
+    }
     else this.updateSelection('')
   }
 
@@ -256,7 +259,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle = this.AUMDeltaStyle = this.NetReturnsStyle = this.MarkChangeStyle = this.ValuationStyle = this.FeeAttributionStyle = this.AumReportStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle = this.AUMDeltaStyle = this.NetReturnsStyle = this.MarkChangeStyle = this.ValuationStyle = this.FeeAttributionStyle = this.AumReportStyle = this.MarketValueDeltaStyle = this.notSelectedElement;
 
     if(screen === 'GIREditor'){
       this.GIREditorStyle = this.selectedElement;
@@ -357,6 +360,10 @@ export class AppComponent {
     else if(screen === 'AUM Report'){
       this.AumReportStyle = this.selectedElement;
       this.router.navigate(['/aum-report'])
+    }
+    else if(screen === 'Market Value Delta'){
+      this.MarketValueDeltaStyle = this.selectedElement;
+      this.router.navigate(['/market-value-delta'])
     }
   }
 }

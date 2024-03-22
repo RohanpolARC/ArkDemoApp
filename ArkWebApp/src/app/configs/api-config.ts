@@ -123,5 +123,7 @@ export class APIConfig {
     public static VALUATION_YIELD_CURVES_GET_API: string = APIConfig.BASEURL + "/api/Valuation/GetYieldCurveData";
     public static FEE_ATTRIBUTION_GET_API: string = APIConfig.BASEURL + "/api/FeeAttribution/Data";
 
+    public static MARKET_VALUE_DELTA_GET_API: string = APIConfig.BASEURL + "/api/MarketValueDelta/GetData";
+
     public static GET_REPORT_API:string = APIConfig.BASEURL + "/api/ReportViewer/GetReport";
 }

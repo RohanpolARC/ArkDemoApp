@@ -95,12 +95,15 @@
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Valuation')" [ngStyle]="ValuationStyle" >
           <div class="list-item-text">Valuation</div>
         </mat-list-item>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Market Value Delta')" [ngStyle]="MarketValueDeltaStyle" >
+          <div class="list-item-text">Market Value Delta</div>
+        </mat-list-item>
         <!-- <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('AUM Delta')" [ngStyle]="AUMDeltaStyle">
           <div class="list-item-text">AUM Delta</div>
         </mat-list-item> -->
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Mark Changes')" [ngStyle]="MarkChangeStyle">
+        <!-- <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Mark Changes')" [ngStyle]="MarkChangeStyle">
           <div class="list-item-text">Mark Changes</div>
-        </mat-list-item>
+        </mat-list-item> -->
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('AUM Report')" [ngStyle]="AumReportStyle">
           <div class="list-item-text">AUM Report</div>
         </mat-list-item>
@@ -187,7 +190,7 @@
       <button mat-raised-button id="apply-button"  
         *ngIf="[
         '/facility-detail', '/liquidity-summary', '/fee-calculation', '/management-fee',
-        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/aum-delta', '/net-returns','/mark-changes','/valuation','/fee-attribution','/aum-report'].includes(location.path())" 
+        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/aum-delta', '/net-returns','/mark-changes','/valuation','/fee-attribution','/aum-report','/market-value-delta'].includes(location.path())" 
         (click)="filterApply()">Apply</button>
     </div>
 
@@ -250,6 +253,10 @@
 
     <div *ngIf="location.path() === '/aum-report'" class="filter-element">
       <app-general-filter [screen] = "'Aum Report'"></app-general-filter>
+    </div>
+
+    <div *ngIf="location.path() === '/market-value-delta'" class="filter-element">
+      <app-general-filter [screen] = "'Market Value Delta'"></app-general-filter>
     </div>
 
 

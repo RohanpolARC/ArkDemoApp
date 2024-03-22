@@ -69,11 +69,12 @@ const routes: Routes = [
   // { path: 'hedging-mark', loadChildren: () => import('./modules/hedging-mark/hedging-mark.module').then(m => m.HedgingMarkModule) },
   // { path: 'aum-delta', loadChildren: () => import('./modules/aum-delta/aum-delta.module').then(m => m.AumDeltaModule) },
   { path: 'net-returns', loadChildren: () => import('./modules/net-returns/net-returns.module').then(m => m.NetReturnsModule) },
-  { path: 'mark-changes', loadChildren: () => import('./modules/mark-changes/mark-changes.module').then(m => m.MarkChangesModule) },
+  // { path: 'mark-changes', loadChildren: () => import('./modules/mark-changes/mark-changes.module').then(m => m.MarkChangesModule) },
   { path: 'valuation', loadChildren: () => import('./modules/valuation/valuation.module').then(m => m.ValuationModule) },
   { path: 'fee-attribution', loadChildren: () => import('./modules/fee-attribution/fee-attribution.module').then(m => m.FeeAttributionModule) },
   { path: 'aum-report', loadChildren: () => import('./modules/aum-report/aum-report.module').then(m => m.AumReportModule) },
-
+  { path: 'market-value-delta', loadChildren: () => import('./modules/market-value-delta/market-value-delta.module').then(m => m.MarketValueDeltaModule) }
+  
 ];
 
 @NgModule({  
