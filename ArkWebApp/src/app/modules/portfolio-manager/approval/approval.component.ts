@@ -12,7 +12,7 @@ import { BLANK_DATETIME_FORMATTER_CONFIG, dateTimeFormatter, DATETIME_FORMATTER_
 import { presistSharedEntities, loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { ApprovalActionCellRendererComponent } from '../approval-action-cell-renderer/approval-action-cell-renderer.component';
-import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, validateAndUpdate, getPortfolioTypeParams } from '../utilities/functions';
+import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, validateAndUpdate, getPortfolioTypeParams, getUseGIRParams } from '../utilities/functions';
 
 @Component({
   selector: 'app-approval',
@@ -79,6 +79,7 @@ export class ApprovalComponent implements OnInit {
   getPortfolioNameParams = getPortfolioNameParams.bind(this)
   getPortFolioTypeParams = getPortfolioTypeParams.bind(this)
   getUniqueParamsFromGrid = getUniqueParamsFromGrid.bind(this)
+  getUseGIRParams = getUseGIRParams.bind(this)
 
   /**
    * To find other node in case of state `UPDATE` and status `Pending`, to highlight it 
@@ -355,6 +356,15 @@ export class ApprovalComponent implements OnInit {
           isStrict: true
         }},
       },
+      { field: "useGIR", type: 'abColDefString',
+        cellStyle: this.getCellStyle.bind(this, 'useGIR'),
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: () => { return {
+          ...this.getUseGIRParams(),
+          isStrict: true
+        }},
+      },
       { field: "action", cellRenderer: 'actionCellRenderer'},
       { field: 'modifiedBy', headerName: 'Requested By',  type: 'abColDefString' },
       { field: 'modifiedOn', headerName: 'Requested On', type: 'abColDefDate', cellClass: 'dateUK'},
@@ -427,7 +437,7 @@ export class ApprovalComponent implements OnInit {
 
       predefinedConfig: {
         Dashboard: {
-          Revision: 2,
+          Revision: 3,
           ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
@@ -439,7 +449,7 @@ export class ApprovalComponent implements OnInit {
         },
         
         Layout: {
-          Revision: 21,
+          Revision: 22,
           CurrentLayout: 'Default Approval Layout',
           Layouts: [{
             Name: 'Default Approval Layout',
@@ -466,6 +476,7 @@ export class ApprovalComponent implements OnInit {
               "isCoinvestment",
               "excludeFxExposure",
               "portfolioType",
+              "useGIR",
               'modifiedBy',
               'modifiedOn',
               'remark',

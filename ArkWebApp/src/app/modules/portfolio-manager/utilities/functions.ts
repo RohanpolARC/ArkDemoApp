@@ -170,6 +170,12 @@ export function getPortfolioTypeParams(){
   }
 }
 
+export function getUseGIRParams(){
+  return {
+    options: ["Yes", "No"]
+  }
+}
+
 /**
  * For mappings grid only.
  * 
