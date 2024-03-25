@@ -11,6 +11,7 @@ import { SpreadBenchmarkIndex, YieldCurve } from 'src/app/shared/models/Valuatio
 import { MarkOverrideMasterComponent } from './mark-override-master/mark-override-master.component';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { formatDate } from 'src/app/shared/functions/formatter';
+import { preprocessEditableDateFields } from 'src/app/shared/functions/utilities';
 
 @Component({
   selector: 'app-valuation',
@@ -63,41 +64,11 @@ export class ValuationComponent implements OnInit {
       this.closeTimer$.next();
       this.runValuationInProgress = false;
 
-      this.valuationSvc.getYieldCurves(this.asofdate.end).pipe(first()).subscribe({
-        next: (yieldcurves: YieldCurve[]) => {
-          this.yieldCurves = [...yieldcurves];
-        }
-      })
-
-      this.valuationSvc.getSpreadBenchmarkIndex(this.asofdate.end, null).pipe(first()).subscribe({
-        next: (indexes: SpreadBenchmarkIndex[]) => {
-          
-          let spreadIndexes = {};
-          for(let i: number = 0; i < indexes.length; i+= 1){
-            let bmindex: string = indexes[i]?.['securityName'];
-            if(!spreadIndexes.hasOwnProperty(bmindex))
-              spreadIndexes[bmindex] = indexes[i];
-          }
-
-          this.benchmarkIndexes = spreadIndexes;
-        },
-        error: (error) => {
-          console.error(`Failed to load spread benchmark indexes`);
-        }
-      })
     }),
     switchMap((isHit) => {
       return this.valuationSvc.getValuationData(this.asofdate, this.funds?.join(','), this.marktypes?.join(',')).pipe(
-        tap((data: any[]) => { 
-          let formatDateCols = ['overrideDate', 'expectedDate', 'modifiedOn', 'reviewedOn', 'effectiveDate']
-          data.map(row=>{
-            formatDateCols.forEach(dateCol=>{
-              let dateFormated =   formatDate(row[dateCol]);
-              if(['01/01/1970', '01/01/01','01/01/1', 'NaN/NaN/NaN'].includes(dateFormated)){
-                row[dateCol] = null;
-              }
-            })
-          })
+        map((data: any[]) => { 
+          return data?.map(row => preprocessEditableDateFields(row, ['initialSpreadDate']));
         })
       )
     })
@@ -173,6 +144,7 @@ export class ValuationComponent implements OnInit {
       return;
     }
 
+    this.dataSvc.setWarningMsg(`Push to WSO initiated`, `Dismiss`, `ark-theme-snackbar-normal`);
     this.valuationSvc.putReviewingAssets(assets).pipe(first()).subscribe({
       next: (feed: any[]) => {
         this.reviewedAssets = feed;
