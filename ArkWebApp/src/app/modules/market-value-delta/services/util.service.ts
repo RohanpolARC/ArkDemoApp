@@ -59,7 +59,7 @@ export class UtilService {
     this.rowData$ = this.dataService.filterApplyBtnState.pipe(
       switchMap((isHit) => {
         if(isHit && this.asOfDateRange != null && this.newIssuerOrAsset != null){
-          this.gridConfigService.gridApi.showLoadingOverlay()
+          this.gridConfigService.gridApi?.showLoadingOverlay()
           return this.marketValueDeltaService.getMarketValueDeltaData(this.asOfDateRange,this.newIssuerOrAsset).pipe(
             map((data) => {
               return data

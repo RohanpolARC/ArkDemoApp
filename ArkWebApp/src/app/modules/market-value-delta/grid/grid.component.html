@@ -1,8 +1,8 @@
-<ng-container *ngIf = "rowData$ | async as rd">
+<ng-container>
     <ag-grid-angular
         [modules] = "agGridModules"
         [gridOptions] = "gridOptions"
-        [rowData] = "rd"
+        [rowData] = "rowData$ | async"
         [adaptableOptions] = "adaptableOptions"
         (gridReady) = "onGridReady($event)"
         (adaptableReady)="onAdaptableReady($event)"
