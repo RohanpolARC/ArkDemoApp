@@ -4,6 +4,7 @@ import { Injectable, OnInit } from '@angular/core';
 import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { ICheckboxChanged, ICheckboxControl, IDefaultValue, IDisableCheckbox, IShowCheckbox } from 'src/app/shared/modules/aggrid-mat-checkbox-editor/aggrid-mat-checkbox-editor.types';
 import { ValuationGridService } from './valuation-grid.service';
+import { getFinalDate } from 'src/app/shared/functions/utilities';
 
 @Injectable()
 export class GridCheckboxUtilService implements OnInit {
@@ -80,11 +81,14 @@ export class GridCheckboxUtilService implements OnInit {
       params.data['oldOverride'] = params.data?.['override'];
       params.data['override'] = params.data?.['modelValuation'];
       params.data['oldShowIsReviewed'] = params.data?.['showIsReviewed'];
+      params.data['oldOverrideDate'] = params.data['overrideDate'];
+      params.data['overrideDate'] = getFinalDate(new Date(this.gridSvc.getAsOfDate().end));
       
       this.gridSvc.clearReview(params.node)
     }
     else{
       params.data['override'] = params.data?.['oldOverride'];
+      params.data['overrideDate'] = params.data?.['oldOverrideDate']
       params.data['showIsReviewed'] = params.data['oldShowIsReviewed'] ?? 0;   // need to reset it to the original value if useModelValuation was mistakenly ticked previously and now is being reverted back. If it was ticked initially and user unticks it, we purposely mark it as unreviewed (i.e. 0) as we won't have `oldShowIsReviewed` in this case
     }
     this.getAdaptableApi().gridApi.refreshCells([params.node], this.getColumnDefs().map(col => col.field))

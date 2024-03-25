@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { interval, Observable, Subject, Subscription } from 'rxjs';
-import { filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { filter, map, skip, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { NetReturnsService } from 'src/app/core/services/NetReturns/net-returns.service';
@@ -135,6 +135,7 @@ export class NetReturnsComponent implements OnInit {
     // Recreated declarative rxjs stream manipulation.
 
     this.rowData$ = this.dataSvc.filterApplyBtnState.pipe(
+      skip(1),
       filter((isHit: boolean) => isHit),
       switchMap((isHit) => {
         this.isDisabled = true

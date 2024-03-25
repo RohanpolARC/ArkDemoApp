@@ -1,5 +1,5 @@
 import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { GridOptions, CellValueChangedEvent, Module, ColDef, GridReadyEvent, GridApi, FirstDataRenderedEvent, CellClickedEvent, VirtualColumnsChangedEvent } from '@ag-grid-community/core';
+import { GridOptions, Module, ColDef, GridReadyEvent, GridApi, CellClickedEvent } from '@ag-grid-community/core';
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
@@ -9,7 +9,7 @@ import { NetReturnsService } from 'src/app/core/services/NetReturns/net-returns.
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
-import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
+import { loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
 
@@ -38,7 +38,6 @@ export class NetReturnsCashflowsComponent implements OnInit {
   columnDefs: ColDef[]
   gridOptions: GridOptions
   gridApi: GridApi
-  // rowData$: Observable<any[]>
   adaptableOptions: AdaptableOptions
 
   subscriptions: Subscription[] = []

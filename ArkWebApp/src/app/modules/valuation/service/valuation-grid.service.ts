@@ -1,12 +1,12 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton } from '@adaptabletools/adaptable-angular-aggrid';
-import { CellClassParams, CellClickedEvent, CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, IRowNode, RowNode, ValueGetterParams } from '@ag-grid-community/core';
+import { CellClassParams, CellClickedEvent, CellKeyDownEvent, CellKeyPressEvent, CellValueChangedEvent, ColDef, EditableCallbackParams, GridApi, IRowNode, RowNode, ValueGetterParams } from '@ag-grid-community/core';
 import { EventEmitter, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { first } from 'rxjs/operators';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { DataService } from 'src/app/core/services/data.service';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';
-import { getFinalDate } from 'src/app/shared/functions/utilities';
+import { getDateFromStr, getFinalDate } from 'src/app/shared/functions/utilities';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { APIReponse, DetailedView, IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { SpreadBenchmarkIndex, Valuation, YieldCurve } from 'src/app/shared/models/ValuationModel';
@@ -55,6 +55,7 @@ export class ValuationGridService {
       'spreadBenchmarkIndex': { global: 'globalspreadBenchmarkIndex' },
       'initialBenchmarkYield': { global: 'globalinitialBenchmarkYield' },
       'currentBenchmarkYield': { global: 'globalcurrentBenchmarkYield' },
+      'initialSpreadDate': { global: 'globalinitialSpreadDate' },
       'initialSpread': { global: 'globalinitialSpread' },
       'currentSpread': { global: 'globalcurrentSpread' },
       'benchmarkIndexPrice': { global: 'globalBenchmarkIndexPrice' },
@@ -153,6 +154,10 @@ export class ValuationGridService {
     delete node.data['review']
   }
 
+  undoClearReview(node: IRowNode){
+    node.data['showIsReviewed'] = node.data?.[this.overrideColMap?.['showIsReviewed'].global];
+    node.data['review'] = node.data?.[this.overrideColMap?.['review'].global];
+  }
   saveActionColumn(button: AdaptableButton<ActionColumnContext>, context: ActionColumnContext) {
 
     if(this.saveInProgress){
@@ -171,10 +176,13 @@ export class ValuationGridService {
     valuation.assetID = node.data?.['assetID'];
     valuation.markType = node.data?.['markType'];   // Hedging Mark/Mark Override
     valuation.forceOverride = node.data?.['forceOverride'];
-    valuation.yieldCurve = node.data?.['yieldCurve'];
-    valuation.initialYCYield = node.data?.['initialYCYield'];
-    valuation.spreadBenchmarkIndex = node.data?.['spreadBenchmarkIndex'];
-    valuation.initialBenchmarkYield = node.data?.['initialBenchmarkYield'];
+    // valuation.yieldCurve = node.data?.['yieldCurve'];
+    // valuation.initialYCYield = node.data?.['initialYCYield'];
+    // valuation.spreadBenchmarkIndex = node.data?.['spreadBenchmarkIndex'];
+    // valuation.initialBenchmarkYield = node.data?.['initialBenchmarkYield'];
+    valuation.initialSpreadDate = getDateFromStr(node.data?.['initialSpreadDate'], 'DD/MM/YYYY');
+    valuation.initialSpread = node.data?.['initialSpread'];
+    valuation.currentSpread = node.data?.['currentSpread'];
     valuation.deltaSpreadDiscount = node.data?.['deltaSpreadDiscount'];
     
     // To clear up hedging mark by setting it to NULL in DB.
@@ -190,6 +198,7 @@ export class ValuationGridService {
         //Clearing intermediate states
         delete node.data['oldOverride']
         delete node.data['oldShowIsReviewed']
+        delete node.data['oldOverrideDate']
 
         if(res.isSuccess){
           this.dataSvc.setWarningMsg(`Saved Valuation information for this asset`, `Dismiss`, `ark-theme-snackbar-success`);
@@ -197,9 +206,14 @@ export class ValuationGridService {
           // Returns calculatedWSOMark after save.(Returns -1 from procedure (as default) if mark override was not modified)
           if(res.data > 0){
             node.data['calculatedWSOMark'] = res.data;
+
+            node.data['modifiedBy'] = valuation.modifiedBy;
+            node.data['modifiedOn'] = new Date();  
           }
-          node.data['modifiedBy'] = valuation.modifiedBy;
-          node.data['modifiedOn'] = new Date();
+          else {
+            // Reviewing columns get cleared while going in editing state (check edit()), it only makes sense if override is always updated. But, if override isn't updated and instead other fields are updated, then we need to restore the original review fields. 
+            this.undoClearReview(node);
+          }
 
           this.lockEdit = false;
           delete context.rowNode.data['editing'];
@@ -215,8 +229,9 @@ export class ValuationGridService {
         }
       },
       error: (err) => {
-        console.error(`Failed to save valuation model: ${err}`)
+        console.error(err)
         this.saveInProgress = false
+        this.dataSvc.setWarningMsg(`Failed to save valuation information`, `Dismiss`, `ark-theme-snackbar-error`)
       }
     })
 
@@ -308,7 +323,7 @@ export class ValuationGridService {
     return !this.isEditing(context);
   }
 
-  editableCellStyle = (params: CellClassParams) => {
+  cellEditableStyle = (params: CellClassParams) => {
     let node: RowNode = <RowNode>params.node;
 
     if(node.group)
@@ -321,6 +336,51 @@ export class ValuationGridService {
     }
     return null;
   }
+
+  cellLifeCycleStyles = (params: CellClassParams) => {
+
+    let style = {};
+
+    let col: string  = params.column.getColId();
+    let node: RowNode = <RowNode> params.node;
+
+    if(node.data?.['comment'] ?? '' != '')
+      style = { ...style, backgroundColor: 'pink' }
+
+    if(col === 'deltaSpreadDiscount'){
+      let currentSpread: number = Number(node.data?.['currentSpread'] ?? 0);
+      let initialSpread: number = Number(node.data?.['initialSpread'] ?? 0);
+
+      let deltaSpreadDiscount: number = Number(node.data?.[col] ?? 0);
+
+      if(currentSpread - initialSpread !== deltaSpreadDiscount){
+        style = { ...style, backgroundColor: '#ffcc00' }
+      }
+    }
+
+    else if(['modelValuation', 'modelValuationPlus100', 'modelValuationMinus100'].includes(col) && node?.data?.[col] > 0){
+      
+      let isValuationStale: string = node.data?.['isModelValuationStale'];
+      if(isValuationStale === 'Yes'){
+        style = { ...style, backgroundColor: '#A9A9A9' }
+      }
+    }
+
+    return style;
+  }
+  cellStylizer = (params: CellClassParams) => {
+    
+    let finalStyle =  {};
+
+    // Generate cell editing state styles,if any
+    finalStyle = { ...finalStyle, ...this.cellEditableStyle(params) };
+
+    // Generate specific cell styles which could change throughout the lifecycle of the cell.
+    finalStyle = { ...finalStyle, ...this.cellLifeCycleStyles(params) };
+
+    return finalStyle;
+  }
+
 
   checkValidations(params: CellValueChangedEvent, tolerance: number = 5){
 
@@ -366,10 +426,31 @@ export class ValuationGridService {
     this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
   }
 
+  onInitialSpreadCellValueChanged(params: CellValueChangedEvent | CellKeyDownEvent){
+    
+    this.updateDeltaSpreadDiscount(params.node);
+  }
+
+  onCurrentSpreadCellValueChanged(params: CellValueChangedEvent | CellKeyDownEvent){
+
+    this.updateDeltaSpreadDiscount(params.node);
+  }
+
+  updateDeltaSpreadDiscount(node: IRowNode){
+
+    let initalSpread: number = node.data?.['initialSpread'] ?? 0;
+    let currentSpread: number = node.data?.['currentSpread'] ?? 0
+
+    node.data['isModelValuationStale'] = 'Yes';
+    node.data['deltaSpreadDiscount'] = Number(currentSpread) - Number(initalSpread);
+
+    this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
+  }
+
   onDeltaSpreadDiscountCellValueChanged(params: CellValueChangedEvent){
 
-    let node: RowNode =<RowNode> params.node;
-    node.data['isModelValuationStale'] = true;
+    let node: RowNode = <RowNode> params.node;
+    node.data['isModelValuationStale'] = 'Yes';
 
     this.getAdaptableApi().gridApi.refreshCells([node], this.getColumnDefs().map(col => col.field));
   }
@@ -433,6 +514,11 @@ export class ValuationGridService {
 
   isCellEditable(params: EditableCallbackParams | CellClassParams){
 
+    let editableColumns: string[] = ['override', 'initialSpreadDate', 'initialSpread', 'currentSpread', 'deltaSpreadDiscount'];
+
+    if(!editableColumns.includes(params.column.getColId()))
+      return false;
+
     if(params?.data?.['markType'] === 'Hedging Mark' || params?.data?.['markType'] === 'Impaired Cost'){
       if(params.column.getColId() === 'override')
         return this.isEditing(params.node as RowNode);
@@ -489,7 +575,14 @@ export class ValuationGridService {
     let updatedData: any[] = []
     for(let i: number = 0; i < nodes.length; i+= 1){
       let data = nodes[i].data;
-      data = { ...data, ...valMap[data?.['assetID']], 'usedSpreadDiscount': valMap[data?.['assetID']]?.['deltaSpreadDiscount'], 'useModelValuation': false };
+      data = { 
+        ...data, 
+        ...valMap[data?.['assetID']], 
+        'usedSpreadDiscount': valMap[data?.['assetID']]?.['deltaSpreadDiscount'], 
+        'useModelValuation': false,
+        'isModelValuationStale': 'No'  
+      };
+
       // Not updating showIsReviewed as that is dependent on the value of the actual override cell which is not affected by this update.
       updatedData.push(data);
     }
@@ -614,5 +707,21 @@ export class ValuationGridService {
       },
       width: '90vw', height: '80vh'
     })
+  }
+
+  // When tabbing out from one editing cell to another (or on Enter press), cellvaluechanged() for the first editing cell doesn't get called. Handling this here
+  onCellKeyDown = (params: CellKeyDownEvent) => {
+    let colid: string = params.column.getColId(),
+        keyboardKey: string = params.event?.['key'];
+
+    if(keyboardKey === 'Tab' || keyboardKey === 'Enter'){
+
+      if(colid === 'initialSpread'){
+        this.onInitialSpreadCellValueChanged(params);
+      }
+      else if(colid === 'currentSpread'){
+        this.onCurrentSpreadCellValueChanged(params);
+      }
+    }
   }
 }

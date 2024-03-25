@@ -5,10 +5,13 @@ export interface Valuation {
     overrideDate: Date,
     overrideSource: 'Model Valuation' | 'New Mark',  
     forceOverride: boolean
-    yieldCurve: string,
-    initialYCYield: number,
-    spreadBenchmarkIndex: string,
-    initialBenchmarkYield: number,
+    // yieldCurve: string,
+    // initialYCYield: number,
+    // spreadBenchmarkIndex: string,
+    // initialBenchmarkYield: number,
+    initialSpreadDate: Date,
+    initialSpread: number,
+    currentSpread: number,
     deltaSpreadDiscount: number,
     modifiedBy: string,
 }
