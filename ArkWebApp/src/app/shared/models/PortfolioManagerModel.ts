@@ -24,6 +24,7 @@ export interface PortfolioMapping {
     portfolioType: string,
     portfolioName: string,
     solvencyPortfolioName: string,
+    useGIR: string,
     userName: string
 }
 
