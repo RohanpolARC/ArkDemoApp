@@ -212,6 +212,7 @@ export class FormComponent implements OnInit{
     this.formUtilSvc.capitalTypeOptions = this.data.capitalTypes;
     this.formUtilSvc.capitalSubTypeOptions = this.data.capitalSubTypes;
     this.formUtilSvc.strategyOptions = this.data.strategies;
+    this.formUtilSvc.overrideCurrencyOptions = this.data.overrideCurrencies
 
     for(let i = 0; i < this.data.refData.length; i+= 1){
       if(!!this.data.refData[i].fundHedging){
@@ -223,7 +224,6 @@ export class FormComponent implements OnInit{
     }
     this.formUtilSvc.fundHedgingOptions = [...new Set(this.formUtilSvc.fundHedgingOptions)]
     this.formUtilSvc.fundCcyOptions = [...new Set(this.formUtilSvc.fundCcyOptions)]
-    this.formUtilSvc.overrideCurrencyOptions = [...new Set(this.formUtilSvc.fundCcyOptions)]
 
     if(this.data.actionType === 'LINK-ADD'){
 

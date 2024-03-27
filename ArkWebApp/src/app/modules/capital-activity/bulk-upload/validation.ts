@@ -161,7 +161,7 @@ export function validateRow(row: any,lockDate: Date):void {
     validateRowValueMappings(row);
 }
 
-export function validateExcelRows(rows: any[], ref: {capitalTypes: string[], capitalSubTypes: string[], strategies: string[], refData: any, lockDate: Date}): {isValid: boolean, invalidRows?: {row: any, remark: string}[]} {
+export function validateExcelRows(rows: any[], ref: {capitalTypes: string[], capitalSubTypes: string[], strategies: string[], overrideCurrencies: string[], refData: any, lockDate: Date}): {isValid: boolean, invalidRows?: {row: any, remark: string}[]} {
 
     refData = ref.refData
     refOptions = getUniqueOptions(ref);

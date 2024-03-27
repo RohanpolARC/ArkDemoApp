@@ -72,6 +72,7 @@ export class UtilService {
         res?.[0]?.['capitalType'].forEach((capitaltype: string) => { this.capitalTypeOptions.push(capitaltype) } )
         res?.[0]?.['capitalSubType'].forEach((capitalsubtype: string) => { this.capitalSubTypeOptions.push(capitalsubtype) } )
         res?.[0]?.['strategy'].forEach((strategy: string) => { this.strategyOptions.push(strategy) } )
+        res?.[0]?.['overrideCurrency'].forEach((overrideCurrency: string) => { this.overrideCurrencyOptions.push(overrideCurrency) } )
 
         this.refData = res?.[0]?.['portfolio_Info'];
 

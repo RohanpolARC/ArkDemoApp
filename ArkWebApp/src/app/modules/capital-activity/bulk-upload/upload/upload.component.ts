@@ -44,7 +44,7 @@ export class UploadComponent implements OnInit, OnDestroy {
   getSaveState: () => 'PENDING' | 'SUCCESS' | 'FAILURE' = this.uploadSvc.getSaveState.bind(this.uploadSvc)
   preprocessData: (headers: string[], data: any[]) => any[]
   validateExcelRows: (rows: any[], ref: {
-    capitalTypes: string[], capitalSubTypes: string[], strategies: string[], refData: any, lockDate?: Date
+    capitalTypes: string[], capitalSubTypes: string[], strategies: string[], overrideCurrencies:string[], refData: any, lockDate?: Date
   } | { fundhedgings: string[], strategies: string[], overrideCurrencies:string[], lockDate: Date }) => {
 
     isValid: boolean, 
@@ -169,6 +169,7 @@ export class UploadComponent implements OnInit, OnDestroy {
           capitalTypes: this.data.capitalTypes,
           capitalSubTypes: this.data.capitalSubTypes,
           strategies: this.data.strategies,
+          overrideCurrencies: this.data.overrideCurrencies,
           refData: this.data.refData,
           lockDate: this.configurationSvc.config?.lockDate
         });
@@ -177,7 +178,7 @@ export class UploadComponent implements OnInit, OnDestroy {
         validationResult = this.validateExcelRows(processedData, {
           fundhedgings: [...new Set(<string>this.data.refData?.map(r => <string>r?.['fundHedging']))],
           strategies: this.data.strategies,
-          overrideCurrencies: [...new Set(<string>this.data.refData?.map(r => <string>r?.['fundCcy']))],
+          overrideCurrencies: this.data.overrideCurrencies,
           lockDate: this.configurationSvc.config?.lockDate
         })
       }

@@ -60,6 +60,8 @@ export class FormUtilService {
     let capitalType: string = this.validateField(this.capitalTypeOptions, control, 'capitalType');
     let capitalSubType: string = this.validateField(this.capitalSubTypeOptions, control, 'capitalSubType');
     let currency: string = this.validateField(this.fundCcyOptions, control, 'fundCcy');
+    let strategy: string = this.validateField(this.strategyOptions, control, 'strategy');
+    let overrideCurrency: string = this.validateField(this.overrideCurrencyOptions, control, 'overrideCurrency');
     let totalAmount: number = getAmountNumber(control.get('totalAmount').value);
 
     let CD: boolean = (callDate !== null && callDate !== 'Invalid date' && callDate > '2000/01/01')
