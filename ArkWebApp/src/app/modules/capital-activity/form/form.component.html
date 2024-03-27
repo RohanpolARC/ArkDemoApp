@@ -67,10 +67,10 @@
       </mat-form-field>
     </ng-template>
 
-    <ng-template #strategy>
-      <mat-form-field appearance="outline" class="col-4">
+    <ng-template #strategyAndCurrency>
+      <mat-form-field appearance="outline" class="col-2">
         <mat-label>
-          Strategy/Currency
+          Strategy
         </mat-label>
 
         <input type="text" matInput formControlName="strategy" [matAutocomplete]="autostrategy" matAutocompletePosition="below" >
@@ -84,6 +84,26 @@
           </mat-option>
         </mat-autocomplete>
         <button *ngIf="!data?.isLocked" matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('strategy').reset();">
+            <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="col-2">
+        <mat-label>
+          Override Currency
+        </mat-label>
+
+        <input type="text" matInput formControlName="overrideCurrency" [matAutocomplete]="autoOverrideCurrency" matAutocompletePosition="below" >
+        <mat-error *ngIf="form.get('overrideCurrency').invalid">Please select overide currency from the list</mat-error>
+        <mat-autocomplete autoActiveFirstOption #autoOverrideCurrency="matAutocomplete" panelWidth="auto">
+          <mat-option
+            *ngFor="let overrideCurrency of overrideCurrencyFilteredOptions | async"
+            [value]="overrideCurrency"
+          >
+            {{overrideCurrency}}
+          </mat-option>
+        </mat-autocomplete>
+        <button *ngIf="!data?.isLocked" matSuffix mat-icon-button aria-label="Clear"  type="button" (click)="form.get('overrideCurrency').reset();">
             <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
@@ -119,7 +139,7 @@
           https://stackoverflow.com/a/52443923
          -->
         <!-- <ng-container *ngTemplateOutlet="empty"></ng-container> -->
-        <ng-container *ngIf="hideIssuerAndAsset(); then strategy else empty">
+        <ng-container *ngIf="hideIssuerAndAsset(); then strategyAndCurrency else empty">
         </ng-container>
     </div>
 
@@ -159,7 +179,7 @@
           </button>
         </mat-form-field>
 
-        <ng-container *ngIf="hideIssuerAndAsset(); then totalAmount else strategy">
+        <ng-container *ngIf="hideIssuerAndAsset(); then totalAmount else strategyAndCurrency">
         </ng-container>
 
     </div>

@@ -13,7 +13,8 @@ let actualCols: string[] = [
     'Wso Asset ID',
     'Asset (optional)',
     'Narative (optional)',
-    'Strategy/Currency'
+    'Strategy',
+    'Override Currency'
 ]
 
 let dateCols: string[] = [
@@ -46,7 +47,8 @@ export function validateRowForEmptiness(row: any): void{
                 'Narative (optional)',
                 // 'Wso Issuer ID',
                 'Wso Asset ID',
-                'Strategy/Currency'
+                'Strategy',
+                'Override Currency'
                 // 'Fund Currency',
                 // 'GIR Override'
             ].indexOf(actualCols[i]) === -1) {
@@ -105,9 +107,14 @@ export function validateRowValueRange(row: any, lockDate: Date): void{
         invalidMsg += ` Fund Currency ${String(row['Fund Currency'])} not in range`
     }
 
-    if(!!row['Strategy/Currency'] && (refOptions.strategies.indexOf(String(row['Strategy/Currency']).trim()) === -1)){
+    if(!!row['Strategy'] && (refOptions.strategies.indexOf(String(row['Strategy']).trim()) === -1)){
         invalidMsg += (invalidMsg === '') ? '' : ',';
-        invalidMsg += ` Strategy/Currency ${String(row['Strategy/Currency'])} not in range`;
+        invalidMsg += ` Strategy ${String(row['Strategy'])} not in range`;
+    }
+
+    if(!!row['Override Currency'] && (refOptions.overrideCurrencies.indexOf(String(row['Override Currency']).trim()) === -1)){
+        invalidMsg += (invalidMsg === '') ? '' : ','
+        invalidMsg += ` Override Currency ${String(row['Override Currency'])} not in range`
     }
 
     // if(!!row['Position Currency'] && (refOptions.posCcys.indexOf(String(row['Position Currency']).trim()) === -1)){
@@ -154,7 +161,7 @@ export function validateRow(row: any,lockDate: Date):void {
     validateRowValueMappings(row);
 }
 
-export function validateExcelRows(rows: any[], ref: {capitalTypes: string[], capitalSubTypes: string[], strategies: string[], refData: any, lockDate: Date}): {isValid: boolean, invalidRows?: {row: any, remark: string}[]} {
+export function validateExcelRows(rows: any[], ref: {capitalTypes: string[], capitalSubTypes: string[], strategies: string[], overrideCurrencies: string[], refData: any, lockDate: Date}): {isValid: boolean, invalidRows?: {row: any, remark: string}[]} {
 
     refData = ref.refData
     refOptions = getUniqueOptions(ref);

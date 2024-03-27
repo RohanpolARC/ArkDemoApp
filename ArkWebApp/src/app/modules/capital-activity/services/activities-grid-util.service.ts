@@ -24,7 +24,8 @@ export class ActivitiesGridUtilService {
     'Wso Asset ID',
     'Asset (optional)',
     'Narative (optional)',
-    'Strategy/Currency'
+    'Strategy',
+    'Override Currency'
   ]
 
   handleTemplateUpload(templateName: string, allowedHeaders: string[], data: any[], fileheaders: string[]): boolean {
@@ -100,7 +101,7 @@ export class ActivitiesGridUtilService {
 
   validateExcelRows: (rows: any[], 
     ref: {
-      capitalTypes: string[], capitalSubTypes: string[], strategies: string[], refData: any, lockDate?: Date
+      capitalTypes: string[], capitalSubTypes: string[], strategies: string[], overrideCurrencies:string[], refData: any, lockDate?: Date
     }
   )=> {
     isValid: boolean, invalidRows?: {
