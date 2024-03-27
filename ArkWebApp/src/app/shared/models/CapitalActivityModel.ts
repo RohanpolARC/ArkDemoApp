@@ -8,6 +8,7 @@ export interface CapitalActivityModel{
     capitalType: string;
     capitalSubType: string;
     strategy: string;
+    overrideCurrency: string;
     fundHedging: string;
     issuerShortName: string;
     narrative: string;
@@ -49,6 +50,7 @@ export interface CapitalInvestment{
     valueDate?: Date;   /* For inserting/updating AssetGIR (To be populated as AsOfDate) */
     fxRate?: number;    /* For inserting/updating AssetGIR (To be populated as FxRate/GIR) */
     strategy: string;
+    overrideCurrency: string;
 
     createdOn: Date;
     createdBy: string;
@@ -95,7 +97,8 @@ export interface INAVQuarterly {
     totalForeignExchangeMovementsITD: number,
     totalOperatingExpITD: number,
     GPSITD: number,
-    Strategy: string,
+    strategy: string,
+    overrideCurrency: string,
     username: string
 }
 

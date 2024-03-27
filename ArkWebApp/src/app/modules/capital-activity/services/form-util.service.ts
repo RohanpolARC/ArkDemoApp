@@ -25,6 +25,7 @@ export class FormUtilService {
   capitalTypeOptions: string[] = []
   capitalSubTypeOptions: string[] = []
   strategyOptions: string[] = []
+  overrideCurrencyOptions: string[] = []
   fundCcyOptions: string[] = []
   wsoIssuerIDOptions: number[] = []
   assetIDOptions: number[] = []
@@ -39,7 +40,7 @@ export class FormUtilService {
           return options[i];
       }
     }
-    if((val === '' || val === null) && (['issuerShortName', 'asset', 'strategy'].includes(field)))
+    if((val === '' || val === null) && (['issuerShortName', 'asset', 'strategy','overrideCurrency'].includes(field)))
       return val;
 
     control.get(field).setErrors({invalid: true});
@@ -58,7 +59,6 @@ export class FormUtilService {
     let fundHedging: string = this.validateField(this.fundHedgingOptions, control, 'fundHedging');
     let capitalType: string = this.validateField(this.capitalTypeOptions, control, 'capitalType');
     let capitalSubType: string = this.validateField(this.capitalSubTypeOptions, control, 'capitalSubType');
-    let strategy: string = this.validateField(this.strategyOptions, control, 'strategy');
     let currency: string = this.validateField(this.fundCcyOptions, control, 'fundCcy');
     let totalAmount: number = getAmountNumber(control.get('totalAmount').value);
 
@@ -79,13 +79,14 @@ export class FormUtilService {
     let NR: boolean = (narrative !== null && narrative !== '');
 
     let ST = !control.get('strategy')?.errors?.['invalid']
+    let OC = !control.get('overrideCurrency')?.errors?.['invalid']
 
     if(capitalType === 'NAV'){
-      return (CD && VD && FH && CT && CST && CCY && TA && ST) ? { validated: true} : { validated: false }
+      return (CD && VD && FH && CT && CST && CCY && TA && ST && OC) ? { validated: true} : { validated: false }
     }
     
     if(this.actionType === 'LINK-ADD')
-      return ((CD && VD && FH && CT && CST && CCY && TA && (((ISN && AS)|| NR || ISN) && ISN_AS_NR && ST) 
+      return ((CD && VD && FH && CT && CST && CCY && TA && (((ISN && AS)|| NR || ISN) && ISN_AS_NR && ST && OC) 
       )) ? { 
         validated : true 
       }: { 
@@ -93,7 +94,7 @@ export class FormUtilService {
     };
     else if(this.actionType === 'ADD' || this.actionType === 'EDIT')
       return (CD && VD && FH && CT && CST && CCY && TA
-        && (((ISN && AS)|| NR || ISN) && ISN_AS_NR) && ST) ? { 
+        && (((ISN && AS)|| NR || ISN) && ISN_AS_NR) && ST && OC) ? { 
         validated : true 
       }: { 
         validated : false
@@ -111,6 +112,7 @@ export class FormUtilService {
     model.capitalType = form.get('capitalType').value;
     model.capitalSubType = form.get('capitalSubType').value;
     model.strategy = form.get('strategy').value;
+    model.overrideCurrency = form.get('overrideCurrency').value;
     model.fundCcy = form.get('fundCcy').value;
     model.totalAmount = getAmountNumber(form.get('totalAmount').value);
     model.fundHedging = form.get('fundHedging').value;

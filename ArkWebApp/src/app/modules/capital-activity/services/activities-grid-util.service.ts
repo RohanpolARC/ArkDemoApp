@@ -24,7 +24,8 @@ export class ActivitiesGridUtilService {
     'Wso Asset ID',
     'Asset (optional)',
     'Narative (optional)',
-    'Strategy/Currency'
+    'Strategy',
+    'Override Currency'
   ]
 
   handleTemplateUpload(templateName: string, allowedHeaders: string[], data: any[], fileheaders: string[]): boolean {

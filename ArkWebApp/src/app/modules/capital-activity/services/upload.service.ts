@@ -137,7 +137,8 @@ export class UploadService {
     m.asset = row['Asset (optional)'];
     m.fundCcy = row['Fund Currency'];
     m.wsoAssetID = Number(row['Wso Asset ID'] || 0);
-    m.strategy = row['Strategy/Currency'];
+    m.strategy = row['Strategy'];
+    m.overrideCurrency = row['Override Currency'];
     m.createdBy = m.modifiedBy = this.dataSvc.getCurrentUserName();
     m.createdOn = m.modifiedOn = new Date();
     m.source = 'ArkUI - template';
@@ -165,7 +166,8 @@ export class UploadService {
     m.totalForeignExchangeMovementsITD = row['Total foreign exchange movements ITD'];
     m.totalOperatingExpITD = row['Total Operating exp (excluded GPS) ITD'];
     m.GPSITD = row['GPS ITD'];
-    m.Strategy = row['Strategy/Currency']
+    m.strategy = row['Strategy'];
+    m.overrideCurrency = row['Override Currency'];
     m.username = this.dataSvc.getCurrentUserName();
 
     return m;

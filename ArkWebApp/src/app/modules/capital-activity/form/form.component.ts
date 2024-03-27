@@ -34,6 +34,7 @@ export class FormComponent implements OnInit{
       capitalTypes: string[],
       capitalSubTypes: string[],
       strategies: string[],
+      overrideCurrencies: string[],
       capitalTypeSubtypeAssociation: any,
       refData: any,
       gridData: any,
@@ -52,6 +53,7 @@ export class FormComponent implements OnInit{
   capitalTypeFilteredOptions: Observable<string[]>;
   capitalSubTypeFilteredOptions: Observable<string[]>;
   strategyFilteredOptions: Observable<string[]>;
+  overrideCurrencyFilteredOptions: Observable<string[]>;
   fundHedgingFilteredOptions: Observable<string[]>;
   assetFilteredOptions: Observable<[string, number][]>;
   issuerFilteredOptions: Observable<[string, string, number][]>;
@@ -69,6 +71,7 @@ export class FormComponent implements OnInit{
     capitalType: new FormControl(null, Validators.required),
     capitalSubType: new FormControl(null, Validators.required),
     strategy: new FormControl(null),
+    overrideCurrency: new FormControl(null),
     fundCcy: new FormControl(null, Validators.required),
     totalAmount: new FormControl(null, Validators.required),
     fundHedging: new FormControl(null, Validators.required),
@@ -122,6 +125,13 @@ export class FormComponent implements OnInit{
       startWith(''),
       map(value => {
         return (this.formUtilSvc._filter(this.formUtilSvc.strategyOptions, value))
+      })
+    )
+
+    this.overrideCurrencyFilteredOptions = this.form.get('overrideCurrency').valueChanges.pipe(
+      startWith(''),
+      map(value => {
+        return (this.formUtilSvc._filter(this.formUtilSvc.overrideCurrencyOptions, value))
       })
     )
     
@@ -213,6 +223,7 @@ export class FormComponent implements OnInit{
     }
     this.formUtilSvc.fundHedgingOptions = [...new Set(this.formUtilSvc.fundHedgingOptions)]
     this.formUtilSvc.fundCcyOptions = [...new Set(this.formUtilSvc.fundCcyOptions)]
+    this.formUtilSvc.overrideCurrencyOptions = [...new Set(this.formUtilSvc.fundCcyOptions)]
 
     if(this.data.actionType === 'LINK-ADD'){
 
@@ -246,6 +257,7 @@ export class FormComponent implements OnInit{
         capitalType: null,
         capitalSubType: null,
         strategy: null,
+        overrideCurrency: null,
         fundCcy: FundCcy,
         totalAmount: investmentsBaseAmount,
         fundHedging: FH,
@@ -274,6 +286,7 @@ export class FormComponent implements OnInit{
         capitalType: row?.['capitalType'],
         capitalSubType: row?.['capitalSubType'],
         strategy: row?.['strategy'],
+        overrideCurrency: row?.['overrideCurrency'],
         fundCcy: row?.['fundCcy'],
         totalAmount: row?.['totalAmount'],
         fundHedging: row?.['fundHedging'],

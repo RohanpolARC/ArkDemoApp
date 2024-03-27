@@ -15,7 +15,7 @@ export class NavQuarterlyGridUtilService {
   boolValidateHeaders : boolean
 
   allowedHeaders: string[] = [         
-    'Fund Hedging','Strategy/Currency','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates',
+    'Fund Hedging','Strategy','Override Currency','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates',
     'Organisational costs unamortised','Subscription costs & leverage costs unamortised','Advanced Tax','Carried Interest Provision ',
     'GPS ITD','Rebate ITD','Total foreign exchange movements ITD','Finance Cost ITD','Total Operating exp (excluded GPS) ITD',
     'Net forward contract movements ITD (unrealised)','Net forward contract movements ITD (realised)'
@@ -113,13 +113,13 @@ export class NavQuarterlyGridUtilService {
   }
 
   validateExcelRows(rows: any[], ref: {
-    fundhedgings: string[], strategies: string[], lockDate: Date
+    fundhedgings: string[], strategies: string[], overrideCurrencies:string[], lockDate: Date
   }): {isValid: boolean, invalidRows?: {row: any, remark: string}[]} {
     
     let invalidRows: any[] = [];
 
     for(let i: number = 0; i < rows.length; i+= 1){
-      let invalidMsg = this.validateRow(rows[i], ref.fundhedgings, ref.strategies, ref.lockDate) || '';
+      let invalidMsg = this.validateRow(rows[i], ref.fundhedgings, ref.strategies, ref.overrideCurrencies, ref.lockDate) || '';
       if(invalidMsg === '')
         continue;
       else
@@ -129,7 +129,7 @@ export class NavQuarterlyGridUtilService {
     return invalidRows.length ? { isValid: false, invalidRows: invalidRows } : { isValid: true }
   }
 
-  validateRow(row: any, fundhedgings: string[], strategies: string[], lockDate: Date): string {
+  validateRow(row: any, fundhedgings: string[], strategies: string[], overrideCurrencies:string[], lockDate: Date): string {
     let invalidmsg: string = '';
 
     if(Number((new Date(row?.['Quarter End'])).getFullYear) < 2012){
@@ -157,9 +157,14 @@ export class NavQuarterlyGridUtilService {
       invalidmsg += 'Fund hedging cannot be empty';
     }
     
-    if(row['Strategy/Currency'] && !strategies?.includes(row['Strategy/Currency'])){
+    if(row['Strategy'] && !strategies?.includes(row['Strategy'])){
       invalidmsg += (invalidmsg === '') ? '' : ','
-      invalidmsg += 'Strategy/Currency not part of the allowed list';
+      invalidmsg += 'Strategy not part of the allowed list';
+    }
+
+    if(row['Override Currency'] && !overrideCurrencies?.includes(row['Override Currency'])){
+      invalidmsg += (invalidmsg === '') ? '' : ','
+      invalidmsg += 'Override Currency not part of the allowed list';
     }
 
     if(row['NAV per FS'] < 0){

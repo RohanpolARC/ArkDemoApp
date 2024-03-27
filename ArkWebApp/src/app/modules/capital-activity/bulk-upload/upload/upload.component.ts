@@ -45,7 +45,7 @@ export class UploadComponent implements OnInit, OnDestroy {
   preprocessData: (headers: string[], data: any[]) => any[]
   validateExcelRows: (rows: any[], ref: {
     capitalTypes: string[], capitalSubTypes: string[], strategies: string[], refData: any, lockDate?: Date
-  } | { fundhedgings: string[], strategies: string[], lockDate: Date }) => {
+  } | { fundhedgings: string[], strategies: string[], overrideCurrencies:string[], lockDate: Date }) => {
 
     isValid: boolean, 
     invalidRows?: {
@@ -177,6 +177,7 @@ export class UploadComponent implements OnInit, OnDestroy {
         validationResult = this.validateExcelRows(processedData, {
           fundhedgings: [...new Set(<string>this.data.refData?.map(r => <string>r?.['fundHedging']))],
           strategies: this.data.strategies,
+          overrideCurrencies: [...new Set(<string>this.data.refData?.map(r => <string>r?.['fundCcy']))],
           lockDate: this.configurationSvc.config?.lockDate
         })
       }

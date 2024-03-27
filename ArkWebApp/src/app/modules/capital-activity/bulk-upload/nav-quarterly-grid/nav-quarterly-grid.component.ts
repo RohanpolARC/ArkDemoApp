@@ -23,7 +23,8 @@ export class NavQuarterlyGridComponent implements OnInit {
   adaptableApi: AdaptableApi
   columnDefs: ColDef[] = [
     { field: 'Fund Hedging', maxWidth: 150, allowedAggFuncs: ['Min', 'Max'], tooltipField: 'Fund Hedging'},
-    { field: 'Strategy/Currency', maxWidth: 150, tooltipField: 'Strategy/Currency'},
+    { field: 'Strategy', maxWidth: 150, tooltipField: 'Strategy'},
+    { field: 'Override Currency', maxWidth: 150, tooltipField: 'Override Currency'},
     { field: 'Quarter End', maxWidth: 150, valueFormatter: dateFormatter, allowedAggFuncs: ['Min', 'Max'], tooltipField: 'Quarter End'},
     { field: 'NAV per FS', maxWidth: 150, tooltipField: 'NAV per FS', valueFormatter: AmountOrZeroFormatter},
     { field: 'Deferred loan origination fee income', headerName: 'Deferred loan origination fee income', maxWidth: 150, tooltipField: 'Deferred loan origination fee income', valueFormatter: AmountOrZeroFormatter},
@@ -123,7 +124,7 @@ export class NavQuarterlyGridComponent implements OnInit {
       layout = {
         Name: 'NAV Quarterly',
         Columns: [
-        'Fund Hedging','Strategy/Currency','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates','Organisational costs unamortised','Subscription costs & leverage costs unamortised','Advanced Tax','Carried Interest Provision ','GPS ITD','Rebate ITD','Total foreign exchange movements ITD','Finance Cost ITD','Total Operating exp (excluded GPS) ITD','Net forward contract movements ITD (unrealised)','Net forward contract movements ITD (realised)','_ROW_ID'
+        'Fund Hedging','Strategy','Override Currency','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates','Organisational costs unamortised','Subscription costs & leverage costs unamortised','Advanced Tax','Carried Interest Provision ','GPS ITD','Rebate ITD','Total foreign exchange movements ITD','Finance Cost ITD','Total Operating exp (excluded GPS) ITD','Net forward contract movements ITD (unrealised)','Net forward contract movements ITD (realised)','_ROW_ID'
 
         ],
         PinnedColumnsMap: {
@@ -139,7 +140,7 @@ export class NavQuarterlyGridComponent implements OnInit {
       layout = {
         Name: 'Invalid Excel Grid',
         Columns: [
-          'Fund Hedging','Strategy/Currency','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates','Organisational costs unamortised','Subscription costs & leverage costs unamortised','Advanced Tax','Carried Interest Provision ','GPS ITD','Rebate ITD','Total foreign exchange movements ITD','Finance Cost ITD','Total Operating exp (excluded GPS) ITD','Net forward contract movements ITD (unrealised)','Net forward contract movements ITD (realised)','remark','_ROW_ID'
+          'Fund Hedging','Strategy','Override Currency','Quarter End','NAV per FS','Deferred loan origination fee income','Current Period Rebates','Organisational costs unamortised','Subscription costs & leverage costs unamortised','Advanced Tax','Carried Interest Provision ','GPS ITD','Rebate ITD','Total foreign exchange movements ITD','Finance Cost ITD','Total Operating exp (excluded GPS) ITD','Net forward contract movements ITD (unrealised)','Net forward contract movements ITD (realised)','remark','_ROW_ID'
 
         ],
         PinnedColumnsMap: {

@@ -31,6 +31,7 @@ export class UtilService {
   capitalTypeOptions: string[] = [];
   capitalSubTypeOptions: string[] = [];
   strategyOptions: string[] = [];
+  overrideCurrencyOptions: string[] = [];
   capitalTypeSubtypeAssociation = [];
   refData: any[] = []
   component: IPropertyReader
@@ -97,6 +98,7 @@ export class UtilService {
         capitalTypes: this.capitalTypeOptions,
         capitalSubTypes: this.capitalSubTypeOptions,
         strategies: this.strategyOptions,
+        overrideCurrencies: this.overrideCurrencyOptions,
         capitalTypeSubtypeAssociation: this.capitalTypeSubtypeAssociation,
         refData: this.refData,
         gridData: gridData,
@@ -136,6 +138,7 @@ export class UtilService {
         capitalTypes: this.capitalTypeOptions,
         capitalSubTypes: this.capitalSubTypeOptions,
         strategies: this.strategyOptions,
+        overrideCurrencies: this.overrideCurrencyOptions,
         refData: this.refData
       },
       width: '90vw',
