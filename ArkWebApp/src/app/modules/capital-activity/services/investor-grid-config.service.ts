@@ -156,7 +156,7 @@ export class InvestorGridConfigService {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 9,
+          Revision: 10,
           CurrentLayout: 'Basic Capital Activity',
           Layouts: [{
             Name: 'Basic Capital Activity',

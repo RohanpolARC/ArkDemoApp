@@ -112,7 +112,7 @@ export function validateRowValueRange(row: any, lockDate: Date): void{
         invalidMsg += ` Strategy ${String(row['Strategy'])} not in range`;
     }
 
-    if(!!row['Override Currency'] && (refOptions.fundCcys.indexOf(String(row['Override Currency']).trim()) === -1)){
+    if(!!row['Override Currency'] && (refOptions.overrideCurrencies.indexOf(String(row['Override Currency']).trim()) === -1)){
         invalidMsg += (invalidMsg === '') ? '' : ','
         invalidMsg += ` Override Currency ${String(row['Override Currency'])} not in range`
     }
