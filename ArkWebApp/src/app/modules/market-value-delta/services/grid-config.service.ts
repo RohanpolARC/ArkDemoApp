@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
+import { loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 
 @Injectable()
 export class GridConfigService {
@@ -12,7 +13,7 @@ export class GridConfigService {
   adaptableApi: AdaptableApi
 
   constructor(
-    private dataService: DataService
+    private dataSvc: DataService
   ) { }
 
   AMOUNT_COLUMNS = [
@@ -118,11 +119,17 @@ export class GridConfigService {
     licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
     autogeneratePrimaryKey: true,
     primaryKey: '',
-    userName: this.dataService.getCurrentUserName(),
+    userName: this.dataSvc.getCurrentUserName(),
     adaptableId: 'MV Delta Id',
     adaptableStateKey: 'MV Delta Key',
     gridOptions: this.gridOptions,
     exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
+    teamSharingOptions: {
+      enableTeamSharing: true,
+      persistSharedEntities: presistSharedEntities.bind(this), 
+      loadSharedEntities: loadSharedEntities.bind(this)
+    },
+
     userInterfaceOptions: {
       customDisplayFormatters: [
         CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', this.AMOUNT_COLUMNS),
@@ -151,23 +158,40 @@ export class GridConfigService {
         ]
       },
       Layout: {
-        Revision: 2,
-        CurrentLayout: 'Basic',
+        Revision: 3,
+        CurrentLayout: 'Default',
         Layouts:[
           {
-            Name: 'Basic',
-            Columns: [ ...this.columnDefs.filter(c => !c.hide).map(c => c.field)],
-            RowGroupedColumns: [ 'issuerShortName', 'asset' ],
+            Name: 'Default',
+            Columns: [ "positionId","marketValueLatest","marketValueLast","mvDeltaExisting","mvDeltaNew","ccyName","marketValueIssueLatest","marketValueIssueLast","mvIssueDeltaExisting","mvIssueDeltaNew","markLatest","markLast","markDeltaExisting","markDeltaNew","issuerShortName","asset","assetId","fund","fundHedging","portfolioName","portfolioType","fundCcy","assetTypeName","maturityDate"],
+            RowGroupedColumns: [ "valuationMethod","issuerShortName","asset" ],
             AggregationColumns: {
-              'marketValueLatest'         : 'sum',
-              'marketValueLast'           : 'sum',
-              'mvDeltaExisting'           : 'sum',
-              'mvDeltaNew'                : 'sum',
-              'marketValueIssueLatest'    : 'sum',
-              'marketValueIssueLast'      : 'sum',
-              'mvIssueDeltaExisting'      : 'sum',
-              'mvIssueDeltaNew'           : 'sum'
-            }
+              "marketValueLatest":"sum",
+              "marketValueLast":"sum",
+              "mvDeltaExisting":"sum",
+              "mvDeltaNew":"sum",
+              "ccyName":"first",
+              "marketValueIssueLatest":"sum",
+              "marketValueIssueLast":"sum",
+              "mvIssueDeltaExisting":"sum",
+              "mvIssueDeltaNew":"sum",
+              "markLatest":"avg",
+              "markLast":"avg",
+              "markDeltaExisting":"avg"
+            },
+            ColumnSorts:[{
+              ColumnId:"asset",
+              SortOrder:"Desc"
+            }],
+            EnablePivot: false,
+            ColumnFilters: [{
+              ColumnId : "marketValueLatest",
+              Predicate : {
+                PredicateId : "NotBetween",
+                Inputs : [-0.1,0.1]
+              }
+            }],
+            SuppressAggFuncInHeader : true
           }
         ]
       },
