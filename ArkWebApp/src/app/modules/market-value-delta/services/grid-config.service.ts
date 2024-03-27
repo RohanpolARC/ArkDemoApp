@@ -158,23 +158,40 @@ export class GridConfigService {
         ]
       },
       Layout: {
-        Revision: 2,
-        CurrentLayout: 'Basic',
+        Revision: 3,
+        CurrentLayout: 'Default',
         Layouts:[
           {
-            Name: 'Basic',
-            Columns: [ ...this.columnDefs.filter(c => !c.hide).map(c => c.field)],
-            RowGroupedColumns: [ 'issuerShortName', 'asset' ],
+            Name: 'Default',
+            Columns: [ "positionId","marketValueLatest","marketValueLast","mvDeltaExisting","mvDeltaNew","ccyName","marketValueIssueLatest","marketValueIssueLast","mvIssueDeltaExisting","mvIssueDeltaNew","markLatest","markLast","markDeltaExisting","markDeltaNew","issuerShortName","asset","assetId","fund","fundHedging","portfolioName","portfolioType","fundCcy","assetTypeName","maturityDate"],
+            RowGroupedColumns: [ "valuationMethod","issuerShortName","asset" ],
             AggregationColumns: {
-              'marketValueLatest'         : 'sum',
-              'marketValueLast'           : 'sum',
-              'mvDeltaExisting'           : 'sum',
-              'mvDeltaNew'                : 'sum',
-              'marketValueIssueLatest'    : 'sum',
-              'marketValueIssueLast'      : 'sum',
-              'mvIssueDeltaExisting'      : 'sum',
-              'mvIssueDeltaNew'           : 'sum'
-            }
+              "marketValueLatest":"sum",
+              "marketValueLast":"sum",
+              "mvDeltaExisting":"sum",
+              "mvDeltaNew":"sum",
+              "ccyName":"first",
+              "marketValueIssueLatest":"sum",
+              "marketValueIssueLast":"sum",
+              "mvIssueDeltaExisting":"sum",
+              "mvIssueDeltaNew":"sum",
+              "markLatest":"avg",
+              "markLast":"avg",
+              "markDeltaExisting":"avg"
+            },
+            ColumnSorts:[{
+              ColumnId:"asset",
+              SortOrder:"Desc"
+            }],
+            EnablePivot: false,
+            ColumnFilters: [{
+              ColumnId : "marketValueLatest",
+              Predicate : {
+                PredicateId : "NotBetween",
+                Inputs : [-0.1,0.1]
+              }
+            }],
+            SuppressAggFuncInHeader : true
           }
         ]
       },
