@@ -14,7 +14,7 @@ import { BLANK_DATETIME_FORMATTER_CONFIG, DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHm
 import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { IUniqueValuesForField, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-renderer.component';
-import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, isFieldValid, validateAndUpdate, getPortfolioTypeParams } from './utilities/functions';
+import { getPortfolioIDParams, getPortfolioNameParams, getUniqueParamsFromGrid, isFieldValid, validateAndUpdate, getPortfolioTypeParams, getUseGIRParams } from './utilities/functions';
 
 @Component({
   selector: 'app-portfolio-manager',
@@ -243,6 +243,16 @@ export class PortfolioManagerComponent implements OnInit {
         }},
         cellStyle: this.getEditableCellStyle.bind(this)
       },
+      { 
+        field: "useGIR",
+        editable: this.isEditable.bind(this),
+        cellEditor: 'autocompleteCellEditor',
+        cellEditorParams: () => { return {
+          ...this.getUseGIRParams(),
+          isStrict: true
+        }},
+        cellStyle: this.getEditableCellStyle.bind(this)
+      },
       { field: "modifiedOn",  
         type:"abColDefDate"
       },
@@ -320,7 +330,7 @@ export class PortfolioManagerComponent implements OnInit {
 
       predefinedConfig: {
         Dashboard: {
-          Revision: 5,
+          Revision: 6,
           ModuleButtons: CommonConfig.DASHBOARD_MODULE_BUTTONS,
           IsCollapsed: true,
           Tabs: [{
@@ -331,7 +341,7 @@ export class PortfolioManagerComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 16,
+          Revision: 18,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -357,6 +367,7 @@ export class PortfolioManagerComponent implements OnInit {
               "isCoinvestment",
               "excludeFxExposure",
               "portfolioType",
+              "useGIR",
               "modifiedOn",
               "modifiedBy",
               'action'
@@ -414,6 +425,7 @@ export class PortfolioManagerComponent implements OnInit {
   getPortfolioNameParams = getPortfolioNameParams.bind(this)
   getPortFolioTypeParams = getPortfolioTypeParams.bind(this)
   getUniqueParamsFromGrid = getUniqueParamsFromGrid.bind(this)
+  getUseGIRParams = getUseGIRParams.bind(this)
   
   isEditable (params: EditableCallbackParams)  {
     return params.node.rowIndex === this.actionClickedRowID;
