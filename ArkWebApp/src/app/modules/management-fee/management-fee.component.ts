@@ -4,12 +4,11 @@ import { map } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
 import { ManagementFeeService } from 'src/app/core/services/ManagementFee/management-fee.service';
-import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,  DATE_FORMATTER_CONFIG_ddMMyyyy, formatDate } from 'src/app/shared/functions/formatter';
+import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,  DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { getMomentDateStr,  presistSharedEntities,loadSharedEntities, autosizeColumnExceptResized } from 'src/app/shared/functions/utilities';
 import { getNodes } from '../capital-activity/utilities/functions';
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
-import { GridApi, GridOptions, Module, ColDef, IAggFuncParams, GridReadyEvent, ValueGetterParams, ValueParserParams, RowNode, FirstDataRenderedEvent } from '@ag-grid-community/core';
-import { dateNullValueGetter } from 'src/app/shared/functions/value-getters';
+import { GridApi, GridOptions, Module, ColDef, IAggFuncParams, GridReadyEvent, RowNode, FirstDataRenderedEvent } from '@ag-grid-community/core';
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
@@ -66,7 +65,8 @@ export class ManagementFeeComponent implements OnInit {
   ]
 
   DATE_COLUMNS = [
-      'managementDate'
+      'managementDate',
+      'gpsDate'
   ]
 
   fetchManagementFee(){
@@ -143,7 +143,8 @@ export class ManagementFeeComponent implements OnInit {
       { field: 'funded', headerName: 'Funded', type: 'abColDefNumber', aggFunc: 'sum'},
       { field: 'runningAUMPosition',headerName:'Local AUM', type: 'abColDefNumber',allowedAggFuncs:['AUMPositionSum','sum', 'max', 'min', 'first', 'last', 'count'], aggFunc: 'AUMPositionSum' },
       { field: 'aumPosition', type: 'abColDefNumber' },
-      { field: 'fundStrategy', type: 'abColDefString' }
+      { field: 'fundStrategy', type: 'abColDefString' },
+      { field: 'gpsDate', type: 'abColDefDate', cellClass: 'dateUK', headerName: 'GPS Date' }
 
 
 
@@ -257,7 +258,7 @@ export class ManagementFeeComponent implements OnInit {
           DashboardTitle: ' '
         },
         Layout: {
-          Revision: 32,
+          Revision: 33,
           CurrentLayout: 'Default Layout',
           Layouts: [{
             Name: 'Default Layout',
@@ -270,6 +271,7 @@ export class ManagementFeeComponent implements OnInit {
               'positionCCY',
               'fundStrategy',
               'managementDate',
+              'gpsDate',
               'transaction',
               'noOfMgmtDays',
               'gir',
@@ -328,7 +330,7 @@ export class ManagementFeeComponent implements OnInit {
           }]
         },
         FormatColumn:{
-          Revision:11,
+          Revision:12,
           FormatColumns:[
             BLANK_DATETIME_FORMATTER_CONFIG(this.DATE_COLUMNS),
             DATE_FORMATTER_CONFIG_ddMMyyyy(this.DATE_COLUMNS),

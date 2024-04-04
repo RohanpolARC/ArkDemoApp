@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { UtilService } from './services/util.service';
-import { MarketValueDeltaModel } from 'src/app/shared/models/MarketValueDeltaModel';
+import { MarketValueDeltaModel, NewIssuerOrAsset } from 'src/app/shared/models/MarketValueDeltaModel';
 import { GridConfigService } from './services/grid-config.service';
 
 @Component({
@@ -17,7 +17,7 @@ import { GridConfigService } from './services/grid-config.service';
 export class MarketValueDeltaComponent implements OnInit {
 
   currentAsOfDateRange$ : Observable<AsOfDateRange>
-  currentNewIssuerOrAsset$ : Observable<string>
+  currentNewIssuerOrAsset$ : Observable<NewIssuerOrAsset>
   rowData$: Observable<MarketValueDeltaModel[]>
 
 
