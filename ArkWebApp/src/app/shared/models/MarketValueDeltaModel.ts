@@ -44,3 +44,5 @@ export interface MarketValueDeltaModel{
     MarketValueIssueFunded      :   number,
     MarketValueIssueFundedSD    :   number
 }
+
+export type NewIssuerOrAsset = "Issuer" | "Asset"

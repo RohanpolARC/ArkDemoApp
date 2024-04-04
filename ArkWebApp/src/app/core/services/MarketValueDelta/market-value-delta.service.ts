@@ -4,7 +4,7 @@ import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { APIConfig } from 'src/app/configs/api-config';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
-import { MarketValueDeltaModel } from 'src/app/shared/models/MarketValueDeltaModel';
+import { MarketValueDeltaModel, NewIssuerOrAsset } from 'src/app/shared/models/MarketValueDeltaModel';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,7 @@ export class MarketValueDeltaService {
     private http: HttpClient
   ) { }
 
-  getMarketValueDeltaData(asofdate: AsOfDateRange, newIssuerOrAsset: string){
+  getMarketValueDeltaData(asofdate: AsOfDateRange, newIssuerOrAsset: NewIssuerOrAsset){
     return this.http.get<MarketValueDeltaModel[]>(
       `${APIConfig.MARKET_VALUE_DELTA_GET_API}/?prevdate=${asofdate.start}&currentdate=${asofdate.end}&newIssuerOrAsset=${newIssuerOrAsset}`).pipe(
       catchError((ex) => throwError(ex))
