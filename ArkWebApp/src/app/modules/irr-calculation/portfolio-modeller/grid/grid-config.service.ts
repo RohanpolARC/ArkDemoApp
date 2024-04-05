@@ -8,7 +8,7 @@ import { RefService } from '../ref/ref.service';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { AggridMaterialDatepickerComponent } from 'src/app/modules/facility-detail/aggrid-material-datepicker/aggrid-material-datepicker.component';
 import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-autocomplete-editor/mat-autocomplete-editor.component';
-import { NoRowsOverlayComponent } from '@ag-grid-community/core/dist/cjs/es5/rendering/overlays/noRowsOverlayComponent';
+import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { DataService } from 'src/app/core/services/data.service';
 

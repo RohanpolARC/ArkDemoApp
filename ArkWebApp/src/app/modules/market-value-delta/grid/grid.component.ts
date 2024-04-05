@@ -29,6 +29,7 @@ export class GridComponent implements OnInit {
   }
 
   onGridReady(params: GridReadyEvent){
+    params.api.showNoRowsOverlay()
     params.api.closeToolPanel()
     this.gridConfigService.gridApi = params.api;   
   }

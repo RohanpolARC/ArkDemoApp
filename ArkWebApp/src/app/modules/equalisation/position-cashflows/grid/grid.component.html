@@ -1,0 +1,10 @@
+<ag-grid-angular
+    [modules]="agGridModules"
+    [gridOptions]="gridOptions"
+    [adaptableOptions]="adaptableOptions"
+    [rowGroupPanelShow]="'always'"
+    [rowData]="rowData$ | async"
+    (gridReady)="onGridReady($event)"
+    class="ag-theme-alpine ag-grid">
+</ag-grid-angular>
+

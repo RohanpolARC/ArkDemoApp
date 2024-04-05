@@ -95,6 +95,9 @@
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Valuation')" [ngStyle]="ValuationStyle" >
           <div class="list-item-text">Valuation</div>
         </mat-list-item>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Position Cashflow')" [ngStyle]="PortfolioPositionCashflowStyle" >
+          <div class="list-item-text">Position Cashflow</div>
+        </mat-list-item>
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Market Value Delta')" [ngStyle]="MarketValueDeltaStyle" >
           <div class="list-item-text">Market Value Delta</div>
         </mat-list-item>
@@ -134,6 +137,25 @@
     </mat-expansion-panel>
   </mat-accordion>
   
+  <mat-accordion>
+    <mat-expansion-panel [expanded]="false">
+      <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
+        <mat-panel-title>
+          Equalisation
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <mat-list>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Equalisation - Portfolio History')" [ngStyle]="EqualisationPortfolioHistoryStyle">
+          <div class="list-item-text">Portfolio History</div>
+        </mat-list-item>
+        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Equalisation - Position Cashflows')" [ngStyle]="EqualisationPositionCashflowsStyle">
+          <div class="list-item-text">Position Cashflows</div>
+        </mat-list-item>
+      </mat-list>
+    </mat-expansion-panel>
+  </mat-accordion>
+
   <mat-accordion>
       <mat-expansion-panel [expanded]="false" >
         <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
@@ -190,7 +212,7 @@
       <button mat-raised-button id="apply-button"  
         *ngIf="[
         '/facility-detail', '/liquidity-summary', '/fee-calculation', '/management-fee',
-        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/aum-delta', '/net-returns','/mark-changes','/valuation','/fee-attribution','/aum-report','/market-value-delta'].includes(location.path())" 
+        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/aum-delta', '/net-returns','/mark-changes','/valuation','/fee-attribution','/aum-report','/market-value-delta','/position-cashflow','/equalisation/position-cashflows','/equalisation/portfolio-history'].includes(location.path())" 
         (click)="filterApply()">Apply</button>
     </div>
 
@@ -259,6 +281,17 @@
       <app-general-filter [screen] = "'Market Value Delta'"></app-general-filter>
     </div>
 
+    <div *ngIf="location.path() === '/position-cashflow'" class="filter-element">
+      <app-general-filter [screen] = "'Position Cashflow'"></app-general-filter>
+    </div>
+
+    <div *ngIf="location.path() === '/equalisation/position-cashflows'" class="filter-element">
+      <app-general-filter [screen] = "'Equalisation - Position Cashflows'"></app-general-filter>
+    </div>
+      
+    <div *ngIf="location.path() === '/equalisation/portfolio-history'" class="filter-element">
+      <app-general-filter [screen] = "'Equalisation - Portfolio History'"></app-general-filter>
+    </div>
 
   </mat-sidenav>
 

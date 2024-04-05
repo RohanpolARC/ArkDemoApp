@@ -4,7 +4,7 @@ import { MarketValueDeltaService } from 'src/app/core/services/MarketValueDelta/
 import { MarketValueDeltaModel, NewIssuerOrAsset } from 'src/app/shared/models/MarketValueDeltaModel';
 import { AsOfDateRange, IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
-import { filter, map, switchMap, take } from 'rxjs/operators';
+import { filter, map, skip, switchMap, withLatestFrom } from 'rxjs/operators';
 import { getMomentDateStr } from 'src/app/shared/functions/utilities';
 import { DataService } from 'src/app/core/services/data.service';
 import { GridConfigService } from './grid-config.service';
@@ -57,28 +57,20 @@ export class UtilService {
     )
 
     this.rowData$ = this.dataService.filterApplyBtnState.pipe(
-      
-      switchMap(_ => {
-        if(_){
-          return combineLatest([this.currentAsOfDateRange$, this.currentNewIssuerOrAsset$]).pipe(
-            take(1),
-            filter(([currentAsOfDateRange, currentNewIssuerOrAsset]) => 
-              currentAsOfDateRange.start != 'Invalid date' && currentAsOfDateRange.end != 'Invalid date' && !!currentNewIssuerOrAsset
-            ),
-            switchMap(([currentAsOfDateRange, currentNewIssuerOrAsset]) => {
-              this.gridConfigService.gridApi?.showLoadingOverlay()
-                  return this.marketValueDeltaService.getMarketValueDeltaData(currentAsOfDateRange,currentNewIssuerOrAsset).pipe(
-                    map(data => {
-                      return data
-                    })
-                  )
-            })
-          )
-        }else {
-          return of([])
-        }
-
+      skip(1),     // We add this skip operator to skip last emitted value of filterApplyBtnState observable which is Behaviour Subject, it prevents grid from loading data by default.
+      withLatestFrom(this.currentAsOfDateRange$, this.currentNewIssuerOrAsset$),
+      filter(([isHit, currentAsOfDateRange, currentNewIssuerOrAsset]) => 
+      !!isHit && currentAsOfDateRange.start != 'Invalid date' && currentAsOfDateRange.end != 'Invalid date' && !!currentNewIssuerOrAsset
+      ),
+      switchMap(([isHit,currentAsOfDateRange, currentNewIssuerOrAsset]) => {
+        this.gridConfigService.gridApi?.showLoadingOverlay()
+            return this.marketValueDeltaService.getMarketValueDeltaData(currentAsOfDateRange,currentNewIssuerOrAsset).pipe(
+              map(data => {
+                return data
+              })
+            )
       })
+    
     )
     
   }
