@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ModelUtilService } from '../model/model-util.service';
 import { ComponentReaderService } from '../../service/component-reader.service';
 import { IRRCalcParams, MonthlyReturnsCalcParams, PerfFeesCalcParams, TabContext, TabType } from 'src/app/shared/models/IRRCalculationsModel';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 
 @Injectable()
 export class TabUtilService {
@@ -56,7 +56,7 @@ export class TabUtilService {
 
     let selectedPositionIDs: number[] = this.compReaderSvc.selectedPositionIDs();
     let selectedModelID: number = this.compReaderSvc.selectedModelID();
-    let isLocal: FormControl = this.compReaderSvc.isLocal();
+    let isLocal: UntypedFormControl = this.compReaderSvc.isLocal();
     let asOfDate: string = this.compReaderSvc.asOfDate();
 
     let calcParams: MonthlyReturnsCalcParams | PerfFeesCalcParams | IRRCalcParams

@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject, Input, Output, EventEmitter } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CapitalActivityModel, CapitalInvestment, ICapitalActivityConfig } from 'src/app/shared/models/CapitalActivityModel';
 import { Subscription, combineLatest, config, of } from 'rxjs';
@@ -64,19 +64,19 @@ export class FormComponent implements OnInit{
   isNAVType: boolean = false;  // Hiding issuer and asset when CapitalType = 'NAV' or multiple issuers have been selected during linking
   isMultipleIssuers: boolean = false;
 
-  form = new FormGroup({
-    valueDate: new FormControl(null, Validators.required),
-    callDate: new FormControl(null, Validators.required),
-    narrative: new FormControl(null),
-    capitalType: new FormControl(null, Validators.required),
-    capitalSubType: new FormControl(null, Validators.required),
-    strategy: new FormControl(null),
-    overrideCurrency: new FormControl(null),
-    fundCcy: new FormControl(null, Validators.required),
-    totalAmount: new FormControl(null, Validators.required),
-    fundHedging: new FormControl(null, Validators.required),
-    issuerShortName: new FormControl(null),
-    asset: new FormControl(null)
+  form = new UntypedFormGroup({
+    valueDate: new UntypedFormControl(null, Validators.required),
+    callDate: new UntypedFormControl(null, Validators.required),
+    narrative: new UntypedFormControl(null),
+    capitalType: new UntypedFormControl(null, Validators.required),
+    capitalSubType: new UntypedFormControl(null, Validators.required),
+    strategy: new UntypedFormControl(null),
+    overrideCurrency: new UntypedFormControl(null),
+    fundCcy: new UntypedFormControl(null, Validators.required),
+    totalAmount: new UntypedFormControl(null, Validators.required),
+    fundHedging: new UntypedFormControl(null, Validators.required),
+    issuerShortName: new UntypedFormControl(null),
+    asset: new UntypedFormControl(null)
   },{ validators: this.formUtilSvc.capitalValidator }
   );
 

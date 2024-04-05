@@ -2,7 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { AttributesFixingService } from 'src/app/core/services/AttributesFixing/attributes-fixing.service';
 import { MatDialogRef,MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
-import { Form, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Form, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { DataService } from 'src/app/core/services/data.service';
 import { forkJoin } from 'rxjs';
 import { AttributeFixingModel } from 'src/app/shared/models/AttributesFixingModel';
@@ -20,7 +20,7 @@ type ACTION_TYPE = 'ADD' | 'EDIT';
 })
 export class FixingDetailsFormComponent implements OnInit {
 
-  form: FormGroup
+  form: UntypedFormGroup
   fixingRef: any;
   attrNames: string[]
   attrDataTypes: string[] = ['Boolean','Decimal','Integer','Date','String']
@@ -91,13 +91,13 @@ export class FixingDetailsFormComponent implements OnInit {
 
   initForm(){
     this.attributeType= this.data.fixingDetails.attributeType
-    this.form = new FormGroup({
-      asOfDate:new FormControl(null, Validators.required),
-      attributeName: new FormControl(null, Validators.required),
-      attributeLevel: new FormControl(null, Validators.required),
-      attributeLevelValue: new FormControl(null, Validators.required),
-      attributeType: new FormControl(null, Validators.required),
-      attributeValue: new FormControl(null, Validators.required)
+    this.form = new UntypedFormGroup({
+      asOfDate:new UntypedFormControl(null, Validators.required),
+      attributeName: new UntypedFormControl(null, Validators.required),
+      attributeLevel: new UntypedFormControl(null, Validators.required),
+      attributeLevelValue: new UntypedFormControl(null, Validators.required),
+      attributeType: new UntypedFormControl(null, Validators.required),
+      attributeValue: new UntypedFormControl(null, Validators.required)
     })
 
     this.changeListeners();

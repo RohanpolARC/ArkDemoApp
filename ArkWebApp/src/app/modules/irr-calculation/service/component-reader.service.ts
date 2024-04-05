@@ -1,7 +1,7 @@
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { GridApi } from '@ag-grid-community/core';
 import { EventEmitter, Injectable } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { IPropertyReader } from 'src/app/shared/models/GeneralModel';
 import { EmitParams } from 'src/app/shared/models/IRRCalculationsModel';
 
@@ -15,8 +15,8 @@ export class ComponentReaderService {
 
   constructor() { }
 
-  isLocal(): FormControl {
-    return this.component.readProperty<FormControl>('isLocal')
+  isLocal(): UntypedFormControl {
+    return this.component.readProperty<UntypedFormControl>('isLocal')
   }
   
   asOfDate(): string {

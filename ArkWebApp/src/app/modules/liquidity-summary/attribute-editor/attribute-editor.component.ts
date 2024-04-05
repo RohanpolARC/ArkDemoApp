@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { FormGroup, FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import * as moment from 'moment';
 import { LiquiditySummaryAttributeModel } from '../../../shared/models/LiquiditySummaryModel';
@@ -22,7 +22,7 @@ export class AttributeEditorComponent implements OnInit {
   updateMsg: string;
   isSuccess: boolean = false;
   isFailure: boolean = false;
-  liquidityForm: FormGroup;
+  liquidityForm: UntypedFormGroup;
   submittedData;
   
   attributeID: number;      // To be set when attribute is being edited
@@ -174,12 +174,12 @@ export class AttributeEditorComponent implements OnInit {
                              parseInt(this.data.asOfDate.substring(8,10))
   );
 
-    this.liquidityForm = new FormGroup({
-      date: new FormControl(new Date(this.asOfDate), Validators.required),
-      days: new FormControl(0, Validators.required),
-      level: new FormControl(null, Validators.required),
-      attribute: new FormControl(null, Validators.required),
-      isRelative: new FormControl(false, Validators.required)
+    this.liquidityForm = new UntypedFormGroup({
+      date: new UntypedFormControl(new Date(this.asOfDate), Validators.required),
+      days: new UntypedFormControl(0, Validators.required),
+      level: new UntypedFormControl(null, Validators.required),
+      attribute: new UntypedFormControl(null, Validators.required),
+      isRelative: new UntypedFormControl(false, Validators.required)
     },{
       validators: this.liquidityValidator
     })

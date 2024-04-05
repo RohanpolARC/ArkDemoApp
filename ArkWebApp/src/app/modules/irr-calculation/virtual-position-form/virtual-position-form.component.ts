@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, UntypedFormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
 import { first, map, startWith } from 'rxjs/operators';
@@ -17,7 +17,7 @@ import { RefService } from '../portfolio-modeller/ref/ref.service';
 })
 export class VirtualPositionFormComponent implements OnInit {
 
-  form: FormGroup
+  form: UntypedFormGroup
   stepperError: string = 'Incomplete'
   subscriptions:Subscription[] =[]
 
@@ -177,30 +177,30 @@ export class VirtualPositionFormComponent implements OnInit {
   }
 
   initForm() {
-    this.form = new FormGroup({
-      position: new FormGroup({
-        issuerShortName: new FormControl('', Validators.required),
-        asset: new FormControl('', Validators.required),
-        assetTypeName: new FormControl('', [Validators.required,this.assetTypeNameValidator]),
-        ccy: new FormControl('', [Validators.required,this.ccyValidator]),
-        fundCcy: new FormControl('EUR', [Validators.required, this.ccyValidator]),
-        faceValueIssue: new FormControl('', Validators.required),
-        costPrice: new FormControl('', Validators.required),
-        entryDate: new FormControl('',[Validators.required,this.dateValidator]),
-        expectedExitPrice: new FormControl('',[Validators.required]),
-        expectedExitDate: new FormControl('',[Validators.required,this.dateValidator]),
+    this.form = new UntypedFormGroup({
+      position: new UntypedFormGroup({
+        issuerShortName: new UntypedFormControl('', Validators.required),
+        asset: new UntypedFormControl('', Validators.required),
+        assetTypeName: new UntypedFormControl('', [Validators.required,this.assetTypeNameValidator]),
+        ccy: new UntypedFormControl('', [Validators.required,this.ccyValidator]),
+        fundCcy: new UntypedFormControl('EUR', [Validators.required, this.ccyValidator]),
+        faceValueIssue: new UntypedFormControl('', Validators.required),
+        costPrice: new UntypedFormControl('', Validators.required),
+        entryDate: new UntypedFormControl('',[Validators.required,this.dateValidator]),
+        expectedExitPrice: new UntypedFormControl('',[Validators.required]),
+        expectedExitDate: new UntypedFormControl('',[Validators.required,this.dateValidator]),
       }),
 
-      static: new FormGroup({
-        maturityDate: new FormControl(''),
-        benchMarkIndex: new FormControl('',[Validators.required,this.benchMarkIndexValidator]),
-        spread: new FormControl(),
-        pikMargin: new FormControl(),
-        unfundedMargin: new FormControl(),
-        floorRate: new FormControl(),
-        dealTypeCS: new FormControl('',[this.dealTypeCSValidator]),
-        dealType:new FormControl('',[this.dealTypeValidator]),
-        seniority:new FormControl('',[this.seniorityValidator])
+      static: new UntypedFormGroup({
+        maturityDate: new UntypedFormControl(''),
+        benchMarkIndex: new UntypedFormControl('',[Validators.required,this.benchMarkIndexValidator]),
+        spread: new UntypedFormControl(),
+        pikMargin: new UntypedFormControl(),
+        unfundedMargin: new UntypedFormControl(),
+        floorRate: new UntypedFormControl(),
+        dealTypeCS: new UntypedFormControl('',[this.dealTypeCSValidator]),
+        dealType:new UntypedFormControl('',[this.dealTypeValidator]),
+        seniority:new UntypedFormControl('',[this.seniorityValidator])
       })
     },[this.conditionalValidator])
   }

@@ -1,6 +1,6 @@
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, UntypedFormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -41,7 +41,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
   updateMsg: string;
   isSuccess: boolean
   isFailure: boolean
-  modelForm: FormGroup
+  modelForm: UntypedFormGroup
   context: Proceed
   aggregationTypes: {
     type: string,
@@ -170,19 +170,19 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     let aggrStr: string = this.data.aggregationType ?? this.aggregationTypes[0].type
     let feePreset: string = this.data.feePreset ?? this.feePresets[0]?.feePreset
     
-    this.modelForm = new FormGroup({
-      modelName: new FormControl(this.data.model?.modelName, Validators.required),
-      modelDesc: new FormControl(this.data.model?.modelDesc),
-      isUpdate: new FormControl(!!this.modelID, Validators.required),
-      isShared: new FormControl(this.data.isShared == "Yes" ? true:false, Validators.required),
-      latestWSOStatic: new FormControl(!!this.data.latestWSOStatic, Validators.required),
-      aggregationType: new FormControl(aggrStr, Validators.required),
-      baseMeasure: new FormControl(this.baseMeasures[0]?.baseMeasure, Validators.required),
-      feePreset: new FormControl(feePreset, Validators.required),
-      calculationType: new FormControl([], this.isClonedModel ? [] : Validators.required),
-      curveRateName: new FormControl(this.curveRates.filter(cr => cr.rate === 0)[0].curveRateName, Validators.required),
-      fundCurrency: new FormControl(this.data.model?.fundCurrency??'EUR', Validators.required),
-      aggrStr: new FormControl('')    })
+    this.modelForm = new UntypedFormGroup({
+      modelName: new UntypedFormControl(this.data.model?.modelName, Validators.required),
+      modelDesc: new UntypedFormControl(this.data.model?.modelDesc),
+      isUpdate: new UntypedFormControl(!!this.modelID, Validators.required),
+      isShared: new UntypedFormControl(this.data.isShared == "Yes" ? true:false, Validators.required),
+      latestWSOStatic: new UntypedFormControl(!!this.data.latestWSOStatic, Validators.required),
+      aggregationType: new UntypedFormControl(aggrStr, Validators.required),
+      baseMeasure: new UntypedFormControl(this.baseMeasures[0]?.baseMeasure, Validators.required),
+      feePreset: new UntypedFormControl(feePreset, Validators.required),
+      calculationType: new UntypedFormControl([], this.isClonedModel ? [] : Validators.required),
+      curveRateName: new UntypedFormControl(this.curveRates.filter(cr => cr.rate === 0)[0].curveRateName, Validators.required),
+      fundCurrency: new UntypedFormControl(this.data.model?.fundCurrency??'EUR', Validators.required),
+      aggrStr: new UntypedFormControl('')    })
 
     this.updateAggregationOrder(aggrStr);
   }

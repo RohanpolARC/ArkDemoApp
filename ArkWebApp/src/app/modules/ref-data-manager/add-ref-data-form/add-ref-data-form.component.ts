@@ -1,6 +1,6 @@
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DataService } from 'src/app/core/services/data.service';
 import { RefDataManagerService } from 'src/app/core/services/RefDataManager/ref-data-manager.service';
@@ -15,7 +15,7 @@ type ACTION_TYPE = 'ADD' | 'EDIT';
 })
 export class AddRefDataFormComponent implements OnInit {
   adaptableApi: AdaptableApi;
-  form: FormGroup;
+  form: UntypedFormGroup;
   isSuccess: boolean;
   isFailure: boolean;
   updateMsg: string;
@@ -47,10 +47,10 @@ export class AddRefDataFormComponent implements OnInit {
 
   initForm(){
     if(this.data.filterValue === 'Attribute Fixing'){
-      this.form = new FormGroup({
-        attributeName: new FormControl(null, Validators.required),
-        attributeLevel: new FormControl(null, Validators.required),
-        attributeType: new FormControl(null, Validators.required)
+      this.form = new UntypedFormGroup({
+        attributeName: new UntypedFormControl(null, Validators.required),
+        attributeLevel: new UntypedFormControl(null, Validators.required),
+        attributeType: new UntypedFormControl(null, Validators.required)
       })
     }
 

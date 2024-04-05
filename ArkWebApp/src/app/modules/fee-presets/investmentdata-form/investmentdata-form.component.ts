@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { PresetGridAction } from '../fee-presets.component';
 
 @Component({
@@ -13,7 +13,7 @@ export class InvestmentdataFormComponent implements OnInit {
   @Input() feeInvestment;
   @Input() action: PresetGridAction = PresetGridAction.ADD;
 
-  form: FormGroup
+  form: UntypedFormGroup
   constructor() { }
 
   ngOnChanges(changes: SimpleChanges)
@@ -47,13 +47,13 @@ export class InvestmentdataFormComponent implements OnInit {
   }
 
   initForm() {
-    this.form = new FormGroup({
-      presetName: new FormControl('', Validators.required),
-      cashYield: new FormControl('', Validators.required),
-      totalYield: new FormControl('', Validators.required),
-      financingRate: new FormControl('', Validators.required),
-      investmentPeriod: new FormControl('', Validators.required),
-      financingRatio: new FormControl('', Validators.required)
+    this.form = new UntypedFormGroup({
+      presetName: new UntypedFormControl('', Validators.required),
+      cashYield: new UntypedFormControl('', Validators.required),
+      totalYield: new UntypedFormControl('', Validators.required),
+      financingRate: new UntypedFormControl('', Validators.required),
+      investmentPeriod: new UntypedFormControl('', Validators.required),
+      financingRatio: new UntypedFormControl('', Validators.required)
     })
   }
 }

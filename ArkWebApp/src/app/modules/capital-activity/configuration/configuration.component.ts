@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Observable,} from 'rxjs';
 import { ICapitalActivityConfig } from 'src/app/shared/models/CapitalActivityModel';
@@ -43,7 +43,7 @@ export class ConfigurationComponent implements OnInit {
   /* Changes the CSS style of the return message given by API call based on SUCCESS or FAILURE*/
   saveStateMessage$ = this.configurationFormSvc.saveStateMessage$
   
-  configurationForm:FormGroup  = this.configurationFormSvc.configurationForm 
+  configurationForm:UntypedFormGroup  = this.configurationFormSvc.configurationForm 
 
   gridOptions: GridOptions = this.configurationGridSvc.getGridOptions()
   columnDefs: ColDef[] = this.configurationGridSvc.getColumnDefs()

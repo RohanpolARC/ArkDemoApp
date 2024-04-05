@@ -1,5 +1,5 @@
 import { Component, ContentChild, EventEmitter, Inject, Input, OnInit, Output, TemplateRef } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { ConfirmComponentConfigure } from 'src/app/shared/models/GeneralModel';
 
 
@@ -18,7 +18,7 @@ export class ConfirmationComponent implements OnInit {
   @ContentChild('form') form: TemplateRef<any> | undefined;
   @ContentChild('action') action: TemplateRef<any> | undefined;
 
-  textField = new FormControl('');
+  textField = new UntypedFormControl('');
   headerText:string = 'Confirmation';
   textFieldLabelValue:string;
   displayConfirmButton:boolean;

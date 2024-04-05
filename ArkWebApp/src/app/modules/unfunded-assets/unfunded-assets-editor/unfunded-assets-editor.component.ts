@@ -1,7 +1,7 @@
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { DecimalPipe } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, UntypedFormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
@@ -45,7 +45,7 @@ export class UnfundedAssetsEditorComponent implements OnInit {
     private msalSvc: MsalUserService
   ) { }
 
-  form: FormGroup
+  form: UntypedFormGroup
 
   formValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     
@@ -75,15 +75,15 @@ export class UnfundedAssetsEditorComponent implements OnInit {
 
   initForm(){
 
-    this.form = new FormGroup({
-      asset: new FormControl(null, Validators.required),
-      issuerShortName: new FormControl(null, Validators.required),
-      commitmentAmount: new FormControl(null, Validators.required),
-      ccy: new FormControl(null, Validators.required),
-      fundedAmount: new FormControl(null, Validators.required),
-      unfundedAmount: new FormControl(null, Validators.required),
-      tobeFundedAmount: new FormControl(null, Validators.required),
-      fundingDate: new FormControl(null, Validators.required) 
+    this.form = new UntypedFormGroup({
+      asset: new UntypedFormControl(null, Validators.required),
+      issuerShortName: new UntypedFormControl(null, Validators.required),
+      commitmentAmount: new UntypedFormControl(null, Validators.required),
+      ccy: new UntypedFormControl(null, Validators.required),
+      fundedAmount: new UntypedFormControl(null, Validators.required),
+      unfundedAmount: new UntypedFormControl(null, Validators.required),
+      tobeFundedAmount: new UntypedFormControl(null, Validators.required),
+      fundingDate: new UntypedFormControl(null, Validators.required) 
     }, {
       validators: this.formValidator
     })

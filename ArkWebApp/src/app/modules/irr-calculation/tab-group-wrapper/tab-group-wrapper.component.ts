@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { LoadStatus, MonthlyReturnsCalcParams, ParentTabType, PerfFeesCalcParams, ResultTab } from 'src/app/shared/models/IRRCalculationsModel';
 import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 import { PortfolioModellerService } from '../service/portfolio-modeller.service';
@@ -25,7 +25,7 @@ export class TabGroupWrapperComponent implements OnInit {
 
   pDisplayName: string
   subtabs: ResultTab[]
-  selected = new FormControl(0);
+  selected = new UntypedFormControl(0);
 
   constructor(public portfolioModellerService: PortfolioModellerService) { }
 

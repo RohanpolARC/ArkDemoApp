@@ -9,7 +9,7 @@ import { debounceTime, distinctUntilChanged, first, map, switchMap, startWith, f
 import { dateFormatter, dateTimeFormatter, nonAmountNumberFormatter, nullOrZeroFormatterWithoutLocale } from 'src/app/shared/functions/formatter';
 import { autosizeColumnExceptResized, getCurrentDate, getLastBusinessDay, getLastQuarterEnd, getLastToLastQuarterEnd, getMomentDate, getMomentDateStr } from 'src/app/shared/functions/utilities';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
-import { FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { FilterConfig } from '../../../shared/models/GeneralModel';
 
@@ -37,7 +37,7 @@ export class MarkOverrideMasterComponent implements OnInit {
   detailCellRendererParams: IDetailCellRendererParams<any, any>;
   markOverrideMasterGridApi: GridApi
   
-  dateRange: FormGroup
+  dateRange: UntypedFormGroup
   onFirstDataRendered: (event: FirstDataRenderedEvent<any>) => void = (event:FirstDataRenderedEvent)=>{
     autosizeColumnExceptResized(event)
   };
@@ -182,9 +182,9 @@ export class MarkOverrideMasterComponent implements OnInit {
   }
 
   initializeDateRangeField(){  
-    this.dateRange = new FormGroup({
-      start: new FormControl(getMomentDateStr(getLastQuarterEnd())),
-      end: new FormControl(getMomentDateStr(getCurrentDate())),
+    this.dateRange = new UntypedFormGroup({
+      start: new UntypedFormControl(getMomentDateStr(getLastQuarterEnd())),
+      end: new UntypedFormControl(getMomentDateStr(getCurrentDate())),
     });
     this.startDate =  this.dateRange.controls["start"].value;
     this.endDate = this.dateRange.controls["end"].value;

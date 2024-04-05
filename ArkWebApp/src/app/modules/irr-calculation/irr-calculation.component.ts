@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';
 import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.service';
@@ -41,7 +41,7 @@ export class IrrCalculationComponent implements OnInit {
   ) { }
 
   subscriptions: Subscription[] = []
-  selected = new FormControl(0);
+  selected = new UntypedFormControl(0);
   calcParamsMap = {} //<model name, IRRCalcParams>
   cashflowLoadStatus: LoadStatus = 'Loading';
   reInitializeIndex: boolean = false;

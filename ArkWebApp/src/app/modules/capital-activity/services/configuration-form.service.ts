@@ -5,7 +5,7 @@ import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/ca
 import { ICapitalActivityConfig } from 'src/app/shared/models/CapitalActivityModel';
 import { APIReponse } from 'src/app/shared/models/GeneralModel';
 import { ConfigurationService } from './configuration.service';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { DataService } from 'src/app/core/services/data.service';
 
 export type ValidateColumn = {isValid: boolean, col?: string};
@@ -35,7 +35,7 @@ export class ConfigurationFormService {
         this.saveStateMessage.next(saveStateMsg)
     }
 
-    configurationForm: FormGroup  
+    configurationForm: UntypedFormGroup  
 
     validationMessage$: Observable<string>
     disableSubmitButton$: Observable<boolean>
@@ -52,8 +52,8 @@ export class ConfigurationFormService {
 
     init(){
         
-        this.configurationForm = new FormGroup({
-            lockDate: new FormControl(null, Validators.required),
+        this.configurationForm = new UntypedFormGroup({
+            lockDate: new UntypedFormControl(null, Validators.required),
         })
 
 

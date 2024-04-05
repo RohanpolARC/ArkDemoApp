@@ -1,7 +1,7 @@
 import { AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { GridOptions, RowNode, GridReadyEvent, GridApi, Module } from '@ag-grid-community/core';
 import { Component, OnInit, Output } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Subject, Subscription, timer } from 'rxjs';
@@ -69,8 +69,8 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
 
   asOfDate: string = getMomentDateStr(getLastBusinessDay())
   selectedModelID: number
-  isAutomatic: FormControl
-  isLocal: FormControl
+  isAutomatic: UntypedFormControl
+  isLocal: UntypedFormControl
 
   subscriptions: Subscription[] = [];
   selectedPositionIDs: number[] = []
@@ -227,8 +227,8 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
     //This function sets reference data used by Virtual Positions form dropdown
     this.refSvc.loadRefData();
 
-    this.isAutomatic = new FormControl()
-    this.isLocal = new FormControl()
+    this.isAutomatic = new UntypedFormControl()
+    this.isLocal = new UntypedFormControl()
       // Toggle layout programmatically
     this.isAutomatic.setValue(false)
       // Don't toggle programmatically

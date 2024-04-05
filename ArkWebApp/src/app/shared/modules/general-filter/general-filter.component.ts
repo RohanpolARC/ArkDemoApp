@@ -6,7 +6,7 @@ import { getLastBusinessDay, getLastQuarterEnd, getLastToLastQuarterEnd, getMome
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { DataService } from 'src/app/core/services/data.service';
 import { debounceTime, distinctUntilChanged, first } from 'rxjs/operators';
-import { FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { FilterValueChangeParams } from '../../models/FilterPaneModel';
 
 @Component({
@@ -37,7 +37,7 @@ export class GeneralFilterComponent implements OnInit {
     allowSearchFilter: true
   }
   optionsListObject :  any[] = []
-  dateRange: FormGroup
+  dateRange: UntypedFormGroup
 
 
 
@@ -113,9 +113,9 @@ export class GeneralFilterComponent implements OnInit {
                 defaultEndDate = this.setDefaultDateValue(defaultValues?.[1])
               }
 
-              this.dateRange = new FormGroup({
-                start: new FormControl(defaultStartDate),
-                end: new FormControl(defaultEndDate),
+              this.dateRange = new UntypedFormGroup({
+                start: new UntypedFormControl(defaultStartDate),
+                end: new UntypedFormControl(defaultEndDate),
               });             
               this.onChange({
                 start:defaultStartDate,

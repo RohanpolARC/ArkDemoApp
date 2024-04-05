@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { PresetGridAction } from '../fee-presets.component';
@@ -17,7 +17,7 @@ export class FeedataFormComponent implements OnInit {
   @Output() presetNameEmitter = new EventEmitter<string>();
 
   subscriptions: Subscription[] = []
-  form: FormGroup
+  form: UntypedFormGroup
   stepperError: string = 'Incomplete'
   constructor() { }
 
@@ -28,7 +28,7 @@ export class FeedataFormComponent implements OnInit {
 
     if(changes?.feeData?.currentValue && (this.action === PresetGridAction.EDIT || this.action === PresetGridAction.CLONE)){
 
-      (<FormGroup>this.form.controls['general']).patchValue({
+      (<UntypedFormGroup>this.form.controls['general']).patchValue({
         commitment: this.feeData.commitment,
         currentCapitalCalled: this.feeData.currentCapitalCalled,
         presetName: this.feeData.presetName,
@@ -38,14 +38,14 @@ export class FeedataFormComponent implements OnInit {
         entity: this.feeData.entity
       });
 
-      (<FormGroup>this.form.controls['financing']).patchValue({
+      (<UntypedFormGroup>this.form.controls['financing']).patchValue({
         financingCommitment: this.feeData.financingCommitment,
         financingEndDate: this.feeData.financingEndDate,
         financingMaxCapitalDeploymentPerMonth: this.feeData.financingMaxCapitalDeploymentPerMonth,
         financingStartDate: this.feeData.financingStartDate
       });
 
-      (<FormGroup>this.form.controls['financingAdvanced']).patchValue({
+      (<UntypedFormGroup>this.form.controls['financingAdvanced']).patchValue({
         financingStage1Ratio: this.feeData.financingStage1Ratio,
         financingStage2Ratio: this.feeData.financingStage2Ratio,
         financingStage3Ratio: this.feeData.financingStage3Ratio,
@@ -53,14 +53,14 @@ export class FeedataFormComponent implements OnInit {
         financingStage2EndDate: this.feeData.financingStage2EndDate
       });
       
-      (<FormGroup>this.form.controls['capitalDeployment']).patchValue({
+      (<UntypedFormGroup>this.form.controls['capitalDeployment']).patchValue({
         holdback: this.feeData.holdback,
         holdingDate: this.feeData.holdingDate,
         maxCapitalDeploymentPerMonth: this.feeData.maxCapitalDeploymentPerMonth,
         reinvestInterest: this.feeData.reinvestInterest
       });
 
-      (<FormGroup>this.form.controls['terms']).patchValue({
+      (<UntypedFormGroup>this.form.controls['terms']).patchValue({
         catchupRate: this.feeData.catchupRate,
         hasCatchup: this.feeData.hasCatchup,
         hurdleCompoundingYears: this.feeData.hurdleCompoundingYears,
@@ -79,7 +79,7 @@ export class FeedataFormComponent implements OnInit {
         isPerfFeeAfterMgmtFee: this.feeData.isPerfFeeAfterMgmtFee        
       });
 
-      (<FormGroup>this.form.controls['other']).patchValue({
+      (<UntypedFormGroup>this.form.controls['other']).patchValue({
         overrideExpected: this.feeData.overrideExpected,
         useFXHedgingCashflows: this.feeData.useFXHedgingCashflows,
         otherExpensesFixed: this.feeData.otherExpensesFixed        
@@ -98,57 +98,57 @@ export class FeedataFormComponent implements OnInit {
   }
 
   initForm() {
-    this.form = new FormGroup({
-      general: new FormGroup({
-        commitment: new FormControl('', Validators.required),
-        currentCapitalCalled: new FormControl('', Validators.required),
-        presetName: new FormControl('', Validators.required),
-        startDate: new FormControl(''),
-        curveCurrency: new FormControl('', Validators.required),
-        curveName: new FormControl('', Validators.required),
-        entity: new FormControl(''),        
+    this.form = new UntypedFormGroup({
+      general: new UntypedFormGroup({
+        commitment: new UntypedFormControl('', Validators.required),
+        currentCapitalCalled: new UntypedFormControl('', Validators.required),
+        presetName: new UntypedFormControl('', Validators.required),
+        startDate: new UntypedFormControl(''),
+        curveCurrency: new UntypedFormControl('', Validators.required),
+        curveName: new UntypedFormControl('', Validators.required),
+        entity: new UntypedFormControl(''),        
       }),
-      financing: new FormGroup({
-        financingMaxCapitalDeploymentPerMonth: new FormControl(0, Validators.required),
-        financingEndDate: new FormControl('', Validators.required),
-        financingStartDate: new FormControl('', Validators.required),
-        financingCommitment: new FormControl(0, Validators.required)             
+      financing: new UntypedFormGroup({
+        financingMaxCapitalDeploymentPerMonth: new UntypedFormControl(0, Validators.required),
+        financingEndDate: new UntypedFormControl('', Validators.required),
+        financingStartDate: new UntypedFormControl('', Validators.required),
+        financingCommitment: new UntypedFormControl(0, Validators.required)             
       }),
-      financingAdvanced: new FormGroup({
-        financingStage1Ratio: new FormControl(0, Validators.required),
-        financingStage2Ratio: new FormControl(0, Validators.required),
-        financingStage3Ratio: new FormControl(0, Validators.required),
-        financingStage1EndDate: new FormControl('', Validators.required),
-        financingStage2EndDate: new FormControl('', Validators.required)        
+      financingAdvanced: new UntypedFormGroup({
+        financingStage1Ratio: new UntypedFormControl(0, Validators.required),
+        financingStage2Ratio: new UntypedFormControl(0, Validators.required),
+        financingStage3Ratio: new UntypedFormControl(0, Validators.required),
+        financingStage1EndDate: new UntypedFormControl('', Validators.required),
+        financingStage2EndDate: new UntypedFormControl('', Validators.required)        
       }),
-      capitalDeployment: new FormGroup({
-        holdback: new FormControl('', Validators.required),
-        holdingDate: new FormControl('', Validators.required),
-        maxCapitalDeploymentPerMonth: new FormControl('', Validators.required),
-        reinvestInterest: new FormControl('', Validators.required),        
+      capitalDeployment: new UntypedFormGroup({
+        holdback: new UntypedFormControl('', Validators.required),
+        holdingDate: new UntypedFormControl('', Validators.required),
+        maxCapitalDeploymentPerMonth: new UntypedFormControl('', Validators.required),
+        reinvestInterest: new UntypedFormControl('', Validators.required),        
       }),
-      terms: new FormGroup({
-        catchupRate: new FormControl('', Validators.required),
-        hasCatchup: new FormControl('', Validators.required),
-        hurdleCompoundingYears: new FormControl('', Validators.required),
-        hurdleRate: new FormControl('', Validators.required),
-        includeMgmtFee: new FormControl('', Validators.required),
-        includeOtherExpense: new FormControl('', Validators.required),
-        investmentDate: new FormControl('', Validators.required),
-        isMgmtFeesPaidAtEnd: new FormControl('', Validators.required),
-        isPerfFeesPaidAtEnd: new FormControl('', Validators.required),
-        isQuarterEndMgmtFees: new FormControl('', Validators.required),
-        mgmtFeesRate: new FormControl('', Validators.required),
-        otherExpenseRate: new FormControl('', Validators.required),
-        perfFeesRate: new FormControl('', Validators.required),
-        undrawnCommitFeesRate: new FormControl('', Validators.required),
-        useGIRAdjustment: new FormControl('', Validators.required),
-        isPerfFeeAfterMgmtFee: new FormControl('', Validators.required)        
+      terms: new UntypedFormGroup({
+        catchupRate: new UntypedFormControl('', Validators.required),
+        hasCatchup: new UntypedFormControl('', Validators.required),
+        hurdleCompoundingYears: new UntypedFormControl('', Validators.required),
+        hurdleRate: new UntypedFormControl('', Validators.required),
+        includeMgmtFee: new UntypedFormControl('', Validators.required),
+        includeOtherExpense: new UntypedFormControl('', Validators.required),
+        investmentDate: new UntypedFormControl('', Validators.required),
+        isMgmtFeesPaidAtEnd: new UntypedFormControl('', Validators.required),
+        isPerfFeesPaidAtEnd: new UntypedFormControl('', Validators.required),
+        isQuarterEndMgmtFees: new UntypedFormControl('', Validators.required),
+        mgmtFeesRate: new UntypedFormControl('', Validators.required),
+        otherExpenseRate: new UntypedFormControl('', Validators.required),
+        perfFeesRate: new UntypedFormControl('', Validators.required),
+        undrawnCommitFeesRate: new UntypedFormControl('', Validators.required),
+        useGIRAdjustment: new UntypedFormControl('', Validators.required),
+        isPerfFeeAfterMgmtFee: new UntypedFormControl('', Validators.required)        
       }),
-      other: new FormGroup({
-        overrideExpected: new FormControl('No', Validators.required),
-        useFXHedgingCashflows: new FormControl('No', Validators.required),
-        otherExpensesFixed: new FormControl(0, Validators.required)
+      other: new UntypedFormGroup({
+        overrideExpected: new UntypedFormControl('No', Validators.required),
+        useFXHedgingCashflows: new UntypedFormControl('No', Validators.required),
+        otherExpensesFixed: new UntypedFormControl(0, Validators.required)
       })
     })  
 

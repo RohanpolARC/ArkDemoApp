@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AbstractControl, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { AbstractControl, UntypedFormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { DataService } from 'src/app/core/services/data.service';
 import { formatDate } from 'src/app/shared/functions/formatter';
 import { getAmountNumber, getMomentDate } from 'src/app/shared/functions/utilities';
@@ -106,7 +106,7 @@ export class FormUtilService {
     }
   }
 
-  getCapitalActivityForm(form: FormGroup): CapitalActivityModel {
+  getCapitalActivityForm(form: UntypedFormGroup): CapitalActivityModel {
     let model: CapitalActivityModel = <CapitalActivityModel>{};
     model.valueDate = form.get('valueDate').value;
     model.callDate = form.get('callDate').value;
@@ -250,7 +250,7 @@ export class FormUtilService {
     return netAssets;
   }
 
-  setFundCcy(FH: string, form: FormGroup): void{
+  setFundCcy(FH: string, form: UntypedFormGroup): void{
     for(let i: number = 0; i < this.refData.length; i+= 1){
       let row = this.refData[i];
       if(row.fundHedging === FH){
