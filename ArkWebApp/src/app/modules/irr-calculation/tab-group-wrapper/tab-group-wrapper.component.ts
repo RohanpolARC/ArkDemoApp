@@ -3,7 +3,7 @@ import { UntypedFormControl } from '@angular/forms';
 import { LoadStatus, MonthlyReturnsCalcParams, ParentTabType, PerfFeesCalcParams, ResultTab } from 'src/app/shared/models/IRRCalculationsModel';
 import { IRRCalcParams } from 'src/app/shared/models/IRRCalculationsModel';
 import { PortfolioModellerService } from '../service/portfolio-modeller.service';
-import { MatTabChangeEvent } from '@angular/material/tabs';
+import { MatLegacyTabChangeEvent as MatTabChangeEvent } from '@angular/material/legacy-tabs';
 
 @Component({
   selector: 'app-tab-group-wrapper',

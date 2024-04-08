@@ -13,7 +13,7 @@ import { GridUtilService } from './portfolio-modeller/grid/grid-util.service';
 import { PortfolioModellerService } from './service/portfolio-modeller.service';
 import { FeeCalculationService } from 'src/app/core/services/FeeCalculation/fee-calculation.service';
 import { GridConfigService } from './portfolio-modeller/grid/grid-config.service';
-import { MatTabChangeEvent } from '@angular/material/tabs';
+import { MatLegacyTabChangeEvent as MatTabChangeEvent } from '@angular/material/legacy-tabs';
 import {  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 
 @Component({

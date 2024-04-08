@@ -1,7 +1,7 @@
 import { AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { GridOptions, Module, ColDef, GridReadyEvent, GridApi, CellClickedEvent } from '@ag-grid-community/core';
 import { Component, Input, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Observable, Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';

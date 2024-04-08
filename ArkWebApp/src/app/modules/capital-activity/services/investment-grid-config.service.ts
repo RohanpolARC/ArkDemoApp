@@ -7,7 +7,7 @@ import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities 
 import { InvestmentGridUtilService } from './investment-grid-util.service';
 
 import { AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero, AMOUNT_FORMATTER_CONFIG_Zero, BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, DATE_FORMATTER_CONFIG_ddMMyyyy, dateFormatter } from 'src/app/shared/functions/formatter';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 
 @Injectable()
 export class InvestmentGridConfigService {

@@ -1,6 +1,6 @@
 import { ColDef, GridOptions } from '@ag-grid-community/core';
 import { Component, OnInit, Inject, TemplateRef, Output, EventEmitter } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA} from '@angular/material/legacy-dialog';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { DetailedView } from 'src/app/shared/models/GeneralModel';

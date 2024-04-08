@@ -4,7 +4,7 @@ import { NavQuarterlyGridUtilService } from '../../services/nav-quarterly-grid-u
 import { ActivitiesGridUtilService} from '../../services/activities-grid-util.service';
 import { UploadService } from '../../services/upload.service';
 import * as XLSX from 'xlsx';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
 import { filter } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
 import { ConfigurationService } from '../../services/configuration.service';

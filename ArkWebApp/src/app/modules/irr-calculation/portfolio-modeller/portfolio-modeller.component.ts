@@ -2,7 +2,7 @@ import { AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable-angula
 import { GridOptions, RowNode, GridReadyEvent, GridApi, Module } from '@ag-grid-community/core';
 import { Component, OnInit, Output } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Subject, Subscription, timer } from 'rxjs';
 import { DataService } from 'src/app/core/services/data.service';

@@ -1,11 +1,11 @@
 import { Component, OnInit, Inject, Input, Output, EventEmitter } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
 import { CapitalActivityModel, CapitalInvestment, ICapitalActivityConfig } from 'src/app/shared/models/CapitalActivityModel';
 import { Subscription, combineLatest, config, of } from 'rxjs';
 import { Observable } from 'rxjs';
 import { startWith, map, tap, distinctUntilChanged, take, filter, switchMap, debounceTime } from 'rxjs/operators';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent } from '@angular/material/legacy-autocomplete';
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { ModalService } from '../services/modal.service';
 import { FormUtilService } from '../services/form-util.service';

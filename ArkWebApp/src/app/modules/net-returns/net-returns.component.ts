@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { interval, Observable, Subject, Subscription } from 'rxjs';
 import { filter, map, skip, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';

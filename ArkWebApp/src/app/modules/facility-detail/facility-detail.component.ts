@@ -15,7 +15,7 @@ import { MatAutocompleteEditorComponent } from 'src/app/shared/components/mat-au
 import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overlay/no-rows-overlay.component';
 import { DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { ActionColumnContext, AdaptableButton } from '@adaptabletools/adaptable-angular-aggrid';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { DefaultDetailedViewPopupComponent } from 'src/app/shared/modules/detailed-view/default-detailed-view-popup/default-detailed-view-popup.component';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import {  IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';

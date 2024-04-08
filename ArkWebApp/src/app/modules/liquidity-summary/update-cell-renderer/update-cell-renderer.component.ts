@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Subscription } from 'rxjs';
 import { LiquiditySummaryComponent } from '../liquidity-summary.component';
 import { LiquiditySummaryUpdateModel } from 'src/app/shared/models/LiquiditySummaryModel';

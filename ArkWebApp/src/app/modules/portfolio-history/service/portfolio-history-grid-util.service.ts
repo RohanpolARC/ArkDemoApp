@@ -4,7 +4,7 @@ import { ICheckboxControl, IDefaultValue, IShowCheckbox } from 'src/app/shared/m
 import { ActionColumnContext, AdaptableButton } from '@adaptabletools/adaptable-angular-aggrid';
 import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
 import { PortfolioHistoryComponentReaderService } from './portfolio-history-component-reader.service';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { first } from 'rxjs/operators';
 import { AssetGIRModel } from 'src/app/shared/models/AssetGIRModel';
 import { PortfolioHistoryService } from 'src/app/core/services/PortfolioHistory/portfolio-history.service';

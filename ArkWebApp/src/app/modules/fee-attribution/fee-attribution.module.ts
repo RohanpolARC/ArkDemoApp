@@ -4,7 +4,7 @@ import { FeeAttributionRoutingModule } from './fee-attribution-routing.module';
 import { FeeAttributionComponent } from './fee-attribution.component';
 import { FeeAttributionService } from './services/fee-attribution.service';
 import { FeeAttributionGridComponent } from './fee-attribution-grid/fee-attribution-grid.component';
-import { MatCardModule } from '@angular/material/card';
+import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
 

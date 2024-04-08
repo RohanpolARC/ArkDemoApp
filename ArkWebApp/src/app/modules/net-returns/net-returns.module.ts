@@ -5,12 +5,12 @@ import { NetReturnsRoutingModule } from './net-returns-routing.module';
 import { NetReturnsComponent } from './net-returns.component';
 import { NetReturnsIrrComponent } from './net-returns-irr/net-returns-irr.component';
 import { NetReturnsCashflowsComponent } from './net-returns-cashflows/net-returns-cashflows.component';
-import { MatCardModule } from '@angular/material/card';
+import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
 import { AgGridModule } from '@ag-grid-community/angular';
-import { MatButtonModule } from '@angular/material/button';
+import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
 import { SsrsReportViewerModule } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-viewer.module';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
 import { NetReturnsSummaryComponent } from './net-returns-summary/net-returns-summary.component';
 

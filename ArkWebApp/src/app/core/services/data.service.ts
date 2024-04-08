@@ -7,7 +7,7 @@ import { APIConfig } from 'src/app/configs/api-config';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { DetailedView, IUniqueValuesForField } from 'src/app/shared/models/GeneralModel';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 
 
 @Injectable({  

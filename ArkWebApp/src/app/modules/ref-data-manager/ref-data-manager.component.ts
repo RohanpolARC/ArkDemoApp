@@ -1,7 +1,7 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableOptions, DashboardState, LayoutState, UserInterfaceOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, Module, RowNode } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { forkJoin, Observable, Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { AccessService } from 'src/app/core/services/Auth/access.service';

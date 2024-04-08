@@ -5,7 +5,7 @@ import { ColDef, GridApi, GridOptions, GridReadyEvent, Module } from '@ag-grid-c
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { PortfolioManageModelService } from '../service/portfolio-manage-model.service';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
 
 @Component({
   selector: 'app-portfolio-manage-model',

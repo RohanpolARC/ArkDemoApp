@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ContractHistoryRoutingModule } from './contract-history-routing.module';
 import { ContractHistoryComponent } from './contract-history.component';
 import { AgGridModule } from '@ag-grid-community/angular';
-import { MatCardModule } from '@angular/material/card';
+import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
 
 

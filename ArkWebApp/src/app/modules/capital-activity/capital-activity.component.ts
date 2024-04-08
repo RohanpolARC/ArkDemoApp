@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatAccordion } from '@angular/material/expansion';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Module } from '@ag-grid-community/core';
 import { CapitalActivityModel, CapitalInvestment } from 'src/app/shared/models/CapitalActivityModel';
 import { Observable, combineLatest } from 'rxjs';

@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
 import { Observable,} from 'rxjs';
 import { ICapitalActivityConfig } from 'src/app/shared/models/CapitalActivityModel';
 import { ConfigurationFormService } from '../services/configuration-form.service';

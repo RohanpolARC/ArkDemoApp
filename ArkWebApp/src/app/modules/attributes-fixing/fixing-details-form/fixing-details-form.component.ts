@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { AttributesFixingService } from 'src/app/core/services/AttributesFixing/attributes-fixing.service';
-import { MatDialogRef,MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatLegacyDialogRef as MatDialogRef,MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { Form, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { DataService } from 'src/app/core/services/data.service';
