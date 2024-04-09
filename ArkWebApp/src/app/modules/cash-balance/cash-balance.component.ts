@@ -208,15 +208,18 @@ export class CashBalanceComponent implements OnInit {
 
     this.subscriptions.push(this.dataSvc.filterApplyBtnState.subscribe(isHit => {
       if(isHit){
+        this.gridOptions?.api?.showLoadingOverlay();
         if(this.sDate !== null){
           this.subscriptions.push(this.cashBalanceSvc.getCashBalance(this.sDate).subscribe({
             next: data => {
               if(data.length === 0){
                 this.noRowsToDisplayMsg = 'No data found for applied filter.'
               }
+              this.gridOptions?.api?.hideOverlay();
               this.rowData = data;
             },
             error: error => {
+              this.gridOptions?.api?.showNoRowsOverlay();
               console.error("Error in fetching Cash Balance Data" + error);
             }
         }));  

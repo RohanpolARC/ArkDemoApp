@@ -73,8 +73,9 @@ const routes: Routes = [
   { path: 'valuation', loadChildren: () => import('./modules/valuation/valuation.module').then(m => m.ValuationModule) },
   { path: 'fee-attribution', loadChildren: () => import('./modules/fee-attribution/fee-attribution.module').then(m => m.FeeAttributionModule) },
   { path: 'aum-report', loadChildren: () => import('./modules/aum-report/aum-report.module').then(m => m.AumReportModule) },
-  { path: 'market-value-delta', loadChildren: () => import('./modules/market-value-delta/market-value-delta.module').then(m => m.MarketValueDeltaModule) }
-  
+  { path: 'market-value-delta', loadChildren: () => import('./modules/market-value-delta/market-value-delta.module').then(m => m.MarketValueDeltaModule) },
+  { path: 'position-cashflow', loadChildren: () => import('./modules/portfolio-position-cashflows/portfolio-position-cashflows.module').then(m => m.PortfolioPositionCashflowsModule) },
+  { path: 'equalisation', loadChildren: () => import('./modules/equalisation/equalisation.module').then(m => m.EqualisationModule) }
 ];
 
 @NgModule({  

@@ -1,0 +1,14 @@
+<ag-grid-angular *ngIf = "(cashflowType$ | async) === 'Cashflows' || (cashflowType$ | async) === 'Cashflows Base'"
+    [modules]="agGridModules"
+    [gridOptions]="gridOptions"
+    [adaptableOptions]="adaptableOptions"
+    [rowGroupPanelShow]="'always'"
+    [rowData]="rowData$ | async"
+    (gridReady)="onGridReady($event)"
+    class="ag-theme-alpine ag-grid">
+</ag-grid-angular>
+<!-- Test
+<div>
+    Debug
+    <p>{{ rowData$ | async }}</p>
+</div> -->

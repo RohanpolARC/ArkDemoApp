@@ -125,5 +125,9 @@ export class APIConfig {
 
     public static MARKET_VALUE_DELTA_GET_API: string = APIConfig.BASEURL + "/api/MarketValueDelta/GetData";
 
+    public static EQUALISATION_POSITION_CASHFLOWS_GET_API: string = APIConfig.BASEURL + "/api/Equalisation/PositionCashflowsEqualised";
+    public static POSITION_CASHFLOWS_GET_API: string = APIConfig.BASEURL + "/api/Equalisation/PositionCashflows";
+    public static EQUALISATION_PORTFOLIO_HISTORY_GET_API: string = APIConfig.BASEURL + "/api/Equalisation/PortfolioHistory";
+    
     public static GET_REPORT_API:string = APIConfig.BASEURL + "/api/ReportViewer/GetReport";
 }

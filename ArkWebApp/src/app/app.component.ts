@@ -64,7 +64,10 @@ export class AppComponent {
   ValuationStyle: any = {};
   FeeAttributionStyle: any = {};
   AumReportStyle: any = {};
+  PortfolioPositionCashflowStyle: any = {};
   MarketValueDeltaStyle: any = {};
+  EqualisationPortfolioHistoryStyle: any = {};
+  EqualisationPositionCashflowsStyle: any = {};
 
   funds
   fundHedgings
@@ -238,11 +241,20 @@ export class AppComponent {
     else if(this.location.path() === '/valuation'){
       this.updateSelection('Valuation')
     }
+    else if(this.location.path() === '/position-cashflow'){
+      this.updateSelection('Position Cashflow')
+    }
     else if(this.location.path() === '/fee-attribution'){
       this.updateSelection('Fee Attribution')
     }
     else if(this.location.path() === '/market-value-delta'){
       this.updateSelection('Market Value Delta')
+    }
+    else if(this.location.path() === '/equalisation/portfolio-history'){
+      this.updateSelection('Equalisation - Portfolio History')
+    }
+    else if(this.location.path() === '/equalisation/position-cashflows'){
+      this.updateSelection('Equalisation - Position Cashflows')
     }
     else this.updateSelection('')
   }
@@ -259,7 +271,7 @@ export class AppComponent {
 
       /** On Subsequent Load (Dynamic) */
 
-    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle = this.AUMDeltaStyle = this.NetReturnsStyle = this.MarkChangeStyle = this.ValuationStyle = this.FeeAttributionStyle = this.AumReportStyle = this.MarketValueDeltaStyle = this.notSelectedElement;
+    this.GIREditorStyle = this.CashBalanceStyle = this.CapitalActivityStyle = this.FacilityDetailStyle = this.LiquiditySummaryStyle = this.AccessControlStyle = this.PortfolioModellerStyle = this.PortfolioMappingStyle = this.UnfundedAssetsStyle = this.ContractHistoryStyle = this.PerformanceFeesStyle = this.FeePresetStyle = this.FixingAttributesStyle = this.ManagementFeeStyle = this.RefDataManagerStyle = this.PositionsScreenStyle = this.AUMDeltaStyle = this.NetReturnsStyle = this.MarkChangeStyle = this.ValuationStyle = this.FeeAttributionStyle = this.AumReportStyle = this.MarketValueDeltaStyle = this.PortfolioPositionCashflowStyle = this.EqualisationPortfolioHistoryStyle = this.EqualisationPositionCashflowsStyle = this.notSelectedElement;
 
     if(screen === 'GIREditor'){
       this.GIREditorStyle = this.selectedElement;
@@ -364,6 +376,18 @@ export class AppComponent {
     else if(screen === 'Market Value Delta'){
       this.MarketValueDeltaStyle = this.selectedElement;
       this.router.navigate(['/market-value-delta'])
+    }
+    else if(screen === 'Position Cashflow'){
+      this.PortfolioPositionCashflowStyle = this.selectedElement;
+      this.router.navigate(['/position-cashflow'])
+    }
+    else if(screen === 'Equalisation - Portfolio History'){
+      this.EqualisationPortfolioHistoryStyle = this.selectedElement;
+      this.router.navigate(['/equalisation/portfolio-history'])
+    }
+    else if(screen === 'Equalisation - Position Cashflows'){
+      this.EqualisationPositionCashflowsStyle = this.selectedElement;
+      this.router.navigate(['/equalisation/position-cashflows'])
     }
   }
 }
