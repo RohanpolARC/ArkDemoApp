@@ -50,6 +50,10 @@ import { catchError, filter, map } from 'rxjs/operators';
 //   }  
 // }
 
+
+// https://stackoverflow.com/questions/75564717/angulars-canactivate-interface-is-deprecated-how-to-replace-it
+// Class-based Route guards are deprecated in favour of functional guards. An injectable class can be used as a functional guard using the inject function: canActivate: [() => inject(myGuard).canActivate()].
+
 class PermissionsService {
   tabs: string[];
   subscriptions: Subscription[] = [];
