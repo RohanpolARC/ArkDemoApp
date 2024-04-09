@@ -1,7 +1,6 @@
 import { AdaptableApi, AdaptableOptions, DetailInitContext } from '@adaptabletools/adaptable-angular-aggrid';
 import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, IDetailCellRendererParams, Module, DetailGridInfo, RowGroupOpenedEvent, RowDataUpdatedEvent, FilterChangedEvent, ColumnRowGroupChangedEvent, ValueGetterParams } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs-compat';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';
 import { AumReportService } from 'src/app/core/services/aum-report/aum-report.service';
@@ -12,6 +11,7 @@ import {  autosizeColumnExceptResized,  loadSharedEntities, presistSharedEntitie
 import { AsOfDateRange, IFilterPaneParams } from 'src/app/shared/models/FilterPaneModel';
 import { MasterDetailModule } from "@ag-grid-enterprise/master-detail";
 import masterDetailAgGridPlugin from '@adaptabletools/adaptable-plugin-master-detail-aggrid';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-aum-report',

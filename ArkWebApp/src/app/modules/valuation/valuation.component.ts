@@ -39,7 +39,7 @@ export class ValuationComponent implements OnInit {
   reviewedAssets: any[]
 
   modelValuations$: Observable<any[]>
-  closeTimer$ = new Subject<any>();
+  closeTimer$ = new Subject<void>();
 
   runValuationInProgress: boolean;
 

@@ -26,7 +26,7 @@ export class PerformanceFeeComponent implements OnInit {
   feePreset: string
   positionIDs: number[]
   modelID: number
-  closeStream: Subject<any> = new Subject<any>();
+  closeStream: Subject<void> = new Subject<void>();
   number : number
   ParentTabType: ParentTabType
 

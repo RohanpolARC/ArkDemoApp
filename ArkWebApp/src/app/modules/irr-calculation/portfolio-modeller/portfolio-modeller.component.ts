@@ -31,7 +31,7 @@ let adaptable_Api: AdaptableApi
   styleUrls: ['./portfolio-modeller.component.scss']
 })
 export class PortfolioModellerComponent implements OnInit, IPropertyReader {
-  closeTimer: Subject<any> = new Subject<any>();
+  closeTimer: Subject<void> = new Subject<void>();
   benchMarkIndexes: string[];
   noRowsToDisplayMsg: NoRowsCustomMessages = 'Please apply the filter.';
   agGridModules: Module[] = CommonConfig.AG_GRID_MODULES

@@ -1,7 +1,6 @@
 import { ColDef, FirstDataRenderedEvent, GridOptions } from '@ag-grid-community/core';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { Observable } from 'rxjs-compat';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { filter, map, switchMap, tap } from 'rxjs/operators';
 import { DataService } from 'src/app/core/services/data.service';
 import { NoRowsOverlayComponent } from '../../components/no-rows-overlay/no-rows-overlay.component';
