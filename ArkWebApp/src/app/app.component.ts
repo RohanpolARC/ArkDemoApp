@@ -5,10 +5,10 @@ import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Location } from '@angular/common';
 import { AccessService } from './core/services/Auth/access.service';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, filter } from 'rxjs';
 import { MsalUserService } from './core/services/Auth/msaluser.service';
 import { MsalBroadcastService } from '@azure/msal-angular';
-import { EventMessage, EventType } from '@azure/msal-browser';
+import { EventMessage, EventType, InteractionStatus } from '@azure/msal-browser';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 
@@ -76,6 +76,7 @@ export class AppComponent {
   cashflowTypes
 
   refDataFilter: string[];
+  isMsalInstanceInitialized:boolean = false;
 
   constructor(private http: HttpClient,
     private dataService: DataService,
@@ -175,9 +176,20 @@ export class AppComponent {
       }
     }))
 
-    this.checkAndSetActiveAccount();
-    this.fetchTabs();
-    this.userName=this.dataService.getCurrentUserName();
+    this.subscriptions.push(this.msalBroadcastSvc.inProgress$
+      .pipe(
+        filter((status: InteractionStatus) => status === InteractionStatus.None)
+      )
+      .subscribe(() => {
+        this.checkAndSetActiveAccount();
+        this.fetchTabs();
+        this.userName=this.dataService.getCurrentUserName();
+        /* Any API call has to be done after initialization of MSAL Instance */
+        /* This below flag is to allow App General Filter component to be rendered after MSAL Instance Initialization */ 
+        this.isMsalInstanceInitialized = true;
+      }))
+
+    
 
       /** On Initial Load (If screen is directly loaded from the url)*/
       /** If Cash Balance screen is directly loaded */
