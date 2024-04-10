@@ -21,7 +21,7 @@ export class FeeCalculationComponent implements OnInit {
   columnDefsCFs: ColDef[]
   gridOptionsCFs: GridOptions
   adaptableOptionsCFs: AdaptableOptions
-  closeTimer: Subject<any> = new Subject<any>();
+  closeTimer: Subject<void> = new Subject<void>();
   feeCashflows: any[] = []    // Fee Cashflows
   feeSmy: any[] = []    // Output summary
   gridApiCFs: GridApi

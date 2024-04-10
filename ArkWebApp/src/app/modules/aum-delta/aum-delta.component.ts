@@ -1,7 +1,7 @@
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { ColDef, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, HeaderValueGetterParams, Module, ValueGetterParams } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs-compat';
+import { Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { AumDeltaService } from 'src/app/core/services/AumDelta/aumDelta.service';
 import { GeneralFilterService } from 'src/app/core/services/GeneralFilter/general-filter.service';

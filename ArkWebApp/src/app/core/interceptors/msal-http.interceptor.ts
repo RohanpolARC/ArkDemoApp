@@ -31,7 +31,8 @@ export class MsalHttpInterceptor implements HttpInterceptor {
     // In msal v2->v3 upgrade, You must call and await the initialize function before attempting to call any other MSAL API.
     await instance.initialize();
     if(accounts.length === 0){
-      await instance.loginRedirect();
+      
+      this.msalSvc.handleRedirectObservable().subscribe()
 
       await instance.handleRedirectPromise().then(
         res => {

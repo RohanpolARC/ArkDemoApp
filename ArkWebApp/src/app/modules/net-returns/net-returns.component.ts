@@ -53,7 +53,7 @@ export class NetReturnsComponent implements OnInit {
     })
   )
 
-  closeTimer$ = new Subject<any>();
+  closeTimer$ = new Subject<void>();
   cashflows: any[] = []
   smy: any[] = []
 

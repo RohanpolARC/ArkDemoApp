@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { AccessService } from './core/services/Auth/access.service';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, of } from 'rxjs';
 import { catchError, filter, map } from 'rxjs/operators';
 
 @Injectable({
@@ -80,7 +80,7 @@ class PermissionsService {
       }),
       catchError(() => {
         this.router.navigate(['/accessibility']);
-        return Observable.of(false);
+        return of(false);
     }));
 
     // let tabs: {tab: string, isWrite: boolean}[] = this.accessService.accessibleTabs;

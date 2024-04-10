@@ -17,7 +17,7 @@ export class FeeCalculationService {
   feeCashflows: any[] | null
   positionCashflows: any[] | null
   terminateUri: string
-  closeTimer: Subject<any> = new Subject<any>();
+  closeTimer: Subject<void> = new Subject<void>();
   isCalculationLoaded: EventEmitter<{ feeSmy: any[] | null, feeCashflows: any[] | null }> = new EventEmitter();
 
   feeCalcSummaryGridApi: GridApi

@@ -31,7 +31,7 @@ export class IrrResultComponent implements OnInit {
   @Output() status = new EventEmitter<LoadStatus>();
 
   runID: string
-  closeStream: Subject<any> = new Subject<any>();
+  closeStream: Subject<void> = new Subject<void>();
   terminateUri: string
 
   aggregationType: string
@@ -131,7 +131,7 @@ export class IrrResultComponent implements OnInit {
 
   ]
 
-  closeTimer = new Subject<any>();
+  closeTimer = new Subject<void>();
   noRowsToDisplayMsg: NoRowsCustomMessages = 'No data found.';
   rowData$: Observable<any>;
 
