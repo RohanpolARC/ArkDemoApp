@@ -4,7 +4,7 @@ import {  NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';  
 import { AppComponent } from './app.component';  
 import { environment } from 'src/environments/environment';  
-import { MsalModule, MsalInterceptor, MsalGuard, MsalService, MsalGuardConfiguration, MsalInterceptorConfiguration, MSAL_INSTANCE, MSAL_GUARD_CONFIG, MSAL_INTERCEPTOR_CONFIG, MsalBroadcastService } from '@azure/msal-angular';  
+import { MsalModule, MsalInterceptor, MsalGuard, MsalService, MsalGuardConfiguration, MsalInterceptorConfiguration, MSAL_INSTANCE, MSAL_GUARD_CONFIG, MSAL_INTERCEPTOR_CONFIG, MsalBroadcastService, MsalRedirectComponent } from '@azure/msal-angular';  
 import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';  
 import { MsalUserService } from './core/services/Auth/msaluser.service';  
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';  
@@ -162,6 +162,6 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
     {provide: DateAdapter, useClass: InputDateAdapter, deps: [MAT_DATE_LOCALE, Platform]}
 
   ],  
-  bootstrap: [AppComponent]  
+  bootstrap: [AppComponent, MsalRedirectComponent]  
 })  
 export class AppModule { } 
