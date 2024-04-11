@@ -10,7 +10,7 @@ import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy
 import { MatIconModule } from '@angular/material/icon';
 import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
 import { AddRefDataFormComponent } from './add-ref-data-form/add-ref-data-form.component';
-import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatLegacyOptionModule as MatOptionModule } from '@angular/material/legacy-core';

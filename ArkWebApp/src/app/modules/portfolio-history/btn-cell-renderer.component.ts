@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import {MatLegacyDialog as MatDialog} from '@angular/material/legacy-dialog';
+import {MatDialog} from '@angular/material/dialog';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import {UpdateGirModalComponent} from './update-gir-modal/update-gir-modal.component'
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';

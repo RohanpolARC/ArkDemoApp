@@ -1,6 +1,6 @@
 import { ColDef, DetailGridInfo, FirstDataRenderedEvent, GetRowIdFunc, GetRowIdParams, GridApi, GridOptions, GridReadyEvent, IDetailCellRendererParams, IsRowMaster, Module, RowDataUpdatedEvent, RowGroupOpenedEvent } from '@ag-grid-community/core';
 import { Component, Inject, OnInit } from '@angular/core';
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { ValuationService } from 'src/app/core/services/Valuation/valuation.service';

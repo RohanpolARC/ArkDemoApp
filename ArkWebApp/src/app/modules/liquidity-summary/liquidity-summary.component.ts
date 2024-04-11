@@ -19,7 +19,7 @@ import { dateFormatter, customliquiditySummaryFormatter } from 'src/app/shared/f
 import { Subscription } from 'rxjs';
 import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/liquidity-summary.service';
 import { DataService } from 'src/app/core/services/data.service';
-import { MatLegacyDialog as MatDialog }  from '@angular/material/legacy-dialog';
+import { MatDialog }  from '@angular/material/dialog';
 import { AttributeEditorComponent } from './attribute-editor/attribute-editor.component';
 import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-renderer.component';
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';

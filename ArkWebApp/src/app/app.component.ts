@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';  
 import { DataService } from './core/services/data.service';  
 import { HttpClient } from '@angular/common/http';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Location } from '@angular/common';
 import { AccessService } from './core/services/Auth/access.service';
 import { Router } from '@angular/router';

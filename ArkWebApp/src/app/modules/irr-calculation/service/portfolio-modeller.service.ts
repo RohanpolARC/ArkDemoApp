@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { VirtualPositionFormComponent } from '../virtual-position-form/virtual-position-form.component';
 import { ScrollPosition, TabGroupSelected, TabLevel, VPositionModel } from 'src/app/shared/models/IRRCalculationsModel';
 import { DataService } from 'src/app/core/services/data.service';
