@@ -4,7 +4,7 @@ import { LiquiditySummaryComponent } from './liquidity-summary.component';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatButtonModule } from '@angular/material/button';
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { AttributeEditorComponent } from './attribute-editor/attribute-editor.component';
 import { MatDialogModule } from '@angular/material/dialog';

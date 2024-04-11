@@ -8,7 +8,7 @@ import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-c
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatButtonModule } from '@angular/material/button';
 import { AddRefDataFormComponent } from './add-ref-data-form/add-ref-data-form.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';

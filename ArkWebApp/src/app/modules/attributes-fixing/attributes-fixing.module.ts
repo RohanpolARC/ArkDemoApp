@@ -10,7 +10,7 @@ import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/materia
 import { ReactiveFormsModule } from '@angular/forms';
 import {  MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatLegacyOptionModule as MatOptionModule } from '@angular/material/legacy-core';
 import {MatLegacySelectModule as MatSelectModule} from '@angular/material/legacy-select';

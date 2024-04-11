@@ -8,7 +8,7 @@ import { NetReturnsCashflowsComponent } from './net-returns-cashflows/net-return
 import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
 import { AgGridModule } from '@ag-grid-community/angular';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatButtonModule } from '@angular/material/button';
 import { SsrsReportViewerModule } from 'src/app/shared/modules/ssrs-report-viewer/ssrs-report-viewer.module';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';

@@ -4,7 +4,7 @@ import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { UnfundedAssetsRoutingModule } from './unfunded-assets-routing.module';
 import { UnfundedAssetsComponent } from './unfunded-assets.component';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatButtonModule } from '@angular/material/button';
 import { UnfundedAssetsEditorComponent } from './unfunded-assets-editor/unfunded-assets-editor.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';

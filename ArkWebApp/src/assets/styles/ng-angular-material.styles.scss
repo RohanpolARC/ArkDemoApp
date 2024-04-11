@@ -13,3 +13,14 @@
 .mdc-dialog__actions .action{
     padding: 0px !important;
 }
+
+.mat-mdc-icon-button.mat-mdc-button-base{
+   padding: 8px !important;
+   font-size: 100% !important;
+   width: 40px !important;
+   height: 40px !important;
+}
+
+.mdc-button{
+   letter-spacing: normal !important;
+}

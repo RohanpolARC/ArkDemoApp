@@ -6,7 +6,7 @@ import { AgGridModule } from '@ag-grid-community/angular';
 
 import { CapitalActivityComponent } from './capital-activity.component';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatButtonModule } from '@angular/material/button';
 import { FormComponent } from './form/form.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';

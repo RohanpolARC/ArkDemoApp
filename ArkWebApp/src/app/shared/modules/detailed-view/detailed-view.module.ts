@@ -4,7 +4,7 @@ import { DefaultDetailedViewComponent } from './default-detailed-view/default-de
 import { DefaultDetailedViewPopupComponent } from './default-detailed-view-popup/default-detailed-view-popup.component';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatButtonModule } from '@angular/material/button';
 import { DetailedViewService } from './detailed-view.service';
 import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
 import { MultiSelectModule } from '../../components/multi-select/multi-select.module';
