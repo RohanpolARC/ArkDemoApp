@@ -15,7 +15,7 @@ import { MatSidenavModule} from '@angular/material/sidenav'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { MatDialogModule } from '@angular/material/dialog';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { MatLegacyListModule as MatListModule } from '@angular/material/legacy-list';
+import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatLegacyAutocompleteModule as MatAutocompleteModule } from '@angular/material/legacy-autocomplete';
 import { MatCardModule } from '@angular/material/card';
