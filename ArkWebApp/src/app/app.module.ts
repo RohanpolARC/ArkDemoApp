@@ -18,7 +18,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatLegacyListModule as MatListModule } from '@angular/material/legacy-list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatLegacyAutocompleteModule as MatAutocompleteModule } from '@angular/material/legacy-autocomplete';
-import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
+import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
 import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu';

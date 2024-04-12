@@ -5,7 +5,7 @@ import { NetReturnsRoutingModule } from './net-returns-routing.module';
 import { NetReturnsComponent } from './net-returns.component';
 import { NetReturnsIrrComponent } from './net-returns-irr/net-returns-irr.component';
 import { NetReturnsCashflowsComponent } from './net-returns-cashflows/net-returns-cashflows.component';
-import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
+import { MatCardModule } from '@angular/material/card';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MatButtonModule } from '@angular/material/button';

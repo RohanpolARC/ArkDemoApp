@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { PortfolioManagerComponent } from './portfolio-manager.component';
-import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
+import { MatCardModule } from '@angular/material/card';
 import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-renderer.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';

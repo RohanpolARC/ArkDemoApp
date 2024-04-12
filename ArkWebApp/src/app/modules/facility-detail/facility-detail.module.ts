@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FacilityDetailComponent } from './facility-detail.component';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';  
 import { AgGridModule } from '@ag-grid-community/angular';
-import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
+import { MatCardModule } from '@angular/material/card';
 import { ActionCellRendererComponent } from './action-cell-renderer.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/legacy-snack-bar';

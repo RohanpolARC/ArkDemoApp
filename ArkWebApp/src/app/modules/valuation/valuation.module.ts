@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ValuationRoutingModule } from './valuation-routing.module';
 import { ValuationComponent } from './valuation.component';
 import { ValuationGridComponent } from './valuation-grid/valuation-grid.component';
-import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
+import { MatCardModule } from '@angular/material/card';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
 import { ValuationGridService } from './service/valuation-grid.service';

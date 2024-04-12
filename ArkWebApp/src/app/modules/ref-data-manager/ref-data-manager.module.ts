@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RefDataManagerRoutingModule } from './ref-data-manager-routing.module';
 import { RefDataManagerComponent } from './ref-data-manager.component';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
-import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
+import { MatCardModule } from '@angular/material/card';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input';
 import { MatIconModule } from '@angular/material/icon';

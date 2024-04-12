@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PortfolioHistoryComponent } from './portfolio-history.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
+import { MatCardModule } from '@angular/material/card';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';  
 import { AgGridModule } from '@ag-grid-community/angular';
 import { BtnCellRenderer} from './btn-cell-renderer.component';

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AttributesFixingComponent } from './attributes-fixing.component';
 import { AttributesFixingRoutingModule } from './attributes-fixing-routing.module';
 import { AgGridModule } from '@ag-grid-community/angular';
-import {  MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
+import {  MatCardModule } from '@angular/material/card';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
 import { FixingDetailsFormComponent } from './fixing-details-form/fixing-details-form.component';
 import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
