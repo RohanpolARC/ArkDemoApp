@@ -25,6 +25,10 @@
    letter-spacing: normal !important;
 }
 
+.mat-mdc-card-content{
+    padding: 16px 10px !important;
+}
+
 .mat-mdc-card-content:first-child{
     padding-top: 0px !important
 }
@@ -54,4 +58,8 @@
 
 .mat-mdc-menu-item .mat-icon-no-color{
     color: #0000008a !important;
+}
+
+.mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled){
+    color: orange !important
 }
