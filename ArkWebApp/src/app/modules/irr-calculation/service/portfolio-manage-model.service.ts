@@ -10,7 +10,7 @@ import { autosizeColumnExceptResized, loadSharedEntities, presistSharedEntities 
 import { ModelUtilService } from "../portfolio-modeller/model/model-util.service";
 import { VModel, VPortfolioDeleteModel } from "src/app/shared/models/IRRCalculationsModel";
 import { first, map, switchMap, tap } from "rxjs/operators";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { ConfirmPopupComponent } from "src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component";
 import { PortfolioSaveRunModelComponent } from "../portfolio-save-run-model/portfolio-save-run-model.component";
 import { MsalUserService } from "src/app/core/services/Auth/msaluser.service";

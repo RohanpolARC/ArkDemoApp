@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CapitalActivityModel, CapitalInvestment, IModal } from 'src/app/shared/models/CapitalActivityModel';
 import { ModalService } from '../services/modal.service';
 import { Observable, Subscription } from 'rxjs';

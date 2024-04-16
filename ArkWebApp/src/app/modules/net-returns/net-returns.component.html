@@ -26,8 +26,8 @@
         </div>
     </div>
 
-    <div class="content">
-        <mat-card class="mat-content">
+    <mat-card appearance="raised" class="mat-content">
+        <mat-card-content>
 
             <!-- https://stackoverflow.com/a/67306987. Used to evaluate this ngIf as true always, so that the grids are always visible -->
             <ng-container *ngIf="{value1: rowData$ | async} as rd">
@@ -42,7 +42,6 @@
                 </app-net-returns-cashflows>
 
             </ng-container>
-        </mat-card>
-    </div>
-
+        </mat-card-content>
+    </mat-card>
 </div>

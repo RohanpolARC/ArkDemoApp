@@ -5,7 +5,7 @@ import { ManagementFeeRoutingModule } from './management-fee-routing.module';
 import { ManagementFeeComponent } from './management-fee.component';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';
-import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   declarations: [

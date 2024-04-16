@@ -1,0 +1,64 @@
+.mdc-dialog__surface{
+    padding: 24px !important
+}
+
+.mdc-dialog__title{
+    padding: 0px !important
+}
+
+.mdc-dialog__actions{
+    padding: 0px !important;
+}
+
+.mdc-dialog__actions .action{
+    padding: 0px !important;
+}
+
+.mat-mdc-icon-button.mat-mdc-button-base{
+    --mdc-icon-button-state-layer-size: 40px;
+    padding: 8px !important;
+    font-size: 100% !important;
+}
+
+.mdc-button{
+   --mdc-typography-button-letter-spacing: normal;
+}
+
+.mat-mdc-card-content{
+    padding: 16px 10px !important;
+}
+
+.mat-mdc-card-content:first-child{
+    padding-top: 0px !important
+}
+
+.mdc-list-item__primary-text{
+    --mdc-list-list-item-label-text-color: white;
+    --mdc-list-list-item-label-text-weight: bold;
+    --mdc-list-list-item-label-text-size: 15px;
+    --mdc-list-list-item-label-text-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.mat-expansion-indicator::after{
+    --mat-expansion-header-indicator-color: white;
+}
+
+.mat-expansion-panel-header{
+    --mat-expansion-header-text-size: 15px;
+    --mat-expansion-header-text-weight: 400;
+    --mat-expansion-header-text-font: 'Roboto','Helvetica Neue',sans-serif;
+}
+
+.mat-mdc-menu-content .mat-mdc-menu-item .mat-mdc-menu-item-text{
+    --mat-menu-item-label-text-size: 14px;
+    --mat-menu-item-label-text-font: 'Roboto','Helvetica Neue',sans-serif;
+    --mat-menu-item-label-text-weight: 400;
+}
+
+.mat-mdc-menu-item .mat-icon-no-color{
+    --mat-menu-item-icon-color: #0000008a;
+}
+
+.mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled){
+    --mat-snack-bar-button-color: orange;
+}

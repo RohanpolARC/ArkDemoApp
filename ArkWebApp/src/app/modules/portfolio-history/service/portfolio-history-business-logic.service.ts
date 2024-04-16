@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AssetGIRModel } from 'src/app/shared/models/AssetGIRModel';
 import { PortfolioHistoryComponentReaderService } from './portfolio-history-component-reader.service';
 import { PortfolioHistoryService } from 'src/app/core/services/PortfolioHistory/portfolio-history.service';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { ConfirmPopupComponent } from 'src/app/shared/modules/confirmation/confirm-popup/confirm-popup.component';
 import { first } from 'rxjs/operators';
 import { RowNode } from '@ag-grid-community/core';

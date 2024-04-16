@@ -1,6 +1,6 @@
 import { CellClickedEvent, CellStyle } from '@ag-grid-community/core';
 import { Injectable, OnDestroy } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { CapitalActivityService } from 'src/app/core/services/CapitalActivity/capital-activity.service';

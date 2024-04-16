@@ -61,7 +61,7 @@
     color: #1e2a46;
   }
 
-  .mat-card{
+  .mat-mdc-card{
     width: fit-content;
   }
   
@@ -159,12 +159,9 @@ min-width: 120px;
   height: 100% !important;
 }
 
-mat-list{
-  padding: 0;
-}
-
 .list-item-text{
   margin-left: 10%;   //Sub header indentation
+  color:white
 }
 
 .filter-element{

@@ -19,10 +19,10 @@ import { dateFormatter, customliquiditySummaryFormatter } from 'src/app/shared/f
 import { Subscription } from 'rxjs';
 import { LiquiditySummaryService } from 'src/app/core/services/LiquiditySummary/liquidity-summary.service';
 import { DataService } from 'src/app/core/services/data.service';
-import { MatLegacyDialog as MatDialog }  from '@angular/material/legacy-dialog';
+import { MatDialog }  from '@angular/material/dialog';
 import { AttributeEditorComponent } from './attribute-editor/attribute-editor.component';
 import { UpdateCellRendererComponent } from './update-cell-renderer/update-cell-renderer.component';
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccessService } from 'src/app/core/services/Auth/access.service';
 import { ConfirmComponentConfigure, DetailedView, NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
 import { AttributeGroupRendererComponent } from './attribute-group-renderer/attribute-group-renderer.component';
@@ -479,10 +479,10 @@ export class LiquiditySummaryComponent implements OnInit {
   openAssetDialog(unfundedAsset = null){
 
     // Check isWrite Access
-    if(!this.isWriteAccess){
-      this.dataSvc.setWarningMsg('No access', 'Dismiss', 'ark-theme-snackbar-warning')
-      return;
-    }
+    // if(!this.isWriteAccess){
+    //   this.dataSvc.setWarningMsg('No access', 'Dismiss', 'ark-theme-snackbar-warning')
+    //   return;
+    // }
     
     const dialogRef = this.dialog.open(UnfundedAssetsEditorComponent, {
       maxHeight: '90vh',
@@ -506,7 +506,7 @@ export class LiquiditySummaryComponent implements OnInit {
 
   openDialog(actionType: string = 'ADD'): void {
 
-    if(this.isWriteAccess){
+    
       const dialogRef = this.dialog.open(AttributeEditorComponent,{
         data: {
           action: actionType,
@@ -526,10 +526,10 @@ export class LiquiditySummaryComponent implements OnInit {
           this.fetchLiquiditySummary();
         }
       }))  
-    }
-    else {
-      this.setWarningMsg('Unauthorized', 'Dismiss', 'ark-theme-snackbar-error')
-    }
+    
+    // else {
+    //   this.setWarningMsg('Unauthorized', 'Dismiss', 'ark-theme-snackbar-error')
+    // }
   }
 
   onLiquidityCellClicked(event: CellClickedEvent){
