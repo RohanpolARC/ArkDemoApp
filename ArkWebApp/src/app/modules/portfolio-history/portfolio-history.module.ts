@@ -8,8 +8,8 @@ import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-
 import { AgGridModule } from '@ag-grid-community/angular';
 import { BtnCellRenderer} from './btn-cell-renderer.component';
 import { UpdateGirModalComponent } from './update-gir-modal/update-gir-modal.component'
-import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
-import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
 import { FormsModule } from '@angular/forms';
 import { PortfolioHistoryRoutingModule } from './portfolio-history-routing.module';

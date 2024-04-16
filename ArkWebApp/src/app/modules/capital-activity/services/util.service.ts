@@ -105,7 +105,7 @@ export class UtilService {
         gridData: gridData,
         isLocked: isLocked
       },
-      width: '70vw',
+      width: '75vw',
       maxWidth: '2000px',
       maxHeight: '99vh'
     });

@@ -10,17 +10,17 @@ import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/lega
 import { FormComponent } from './form/form.component';
 import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
-import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
 import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
-import { MatLegacyAutocompleteModule as MatAutocompleteModule } from '@angular/material/legacy-autocomplete';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { LinkInvestorModalComponent } from './link-investor-modal/link-investor-modal.component';
-import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { CapitalActivityRoutingModule } from './capital-activity-routing.module';
-import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { InputAmountNumberModule } from 'src/app/shared/modules/input-amount-number/input-amount-number.module';
 import { FileDropzoneModule } from 'src/app/shared/modules/file-dropzone/file-dropzone.module';
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
@@ -36,7 +36,7 @@ import { ActivitiesGridComponent } from './bulk-upload/activities-grid/activitie
 import { NavQuarterlyGridComponent } from './bulk-upload/nav-quarterly-grid/nav-quarterly-grid.component';
 import { ConfigurationComponent } from './configuration/configuration.component';
 import { ConfigurationAuditComponent } from './configuration-audit/configuration-audit.component';
-import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ConfigurationService } from './services/configuration.service';
 
 @NgModule({

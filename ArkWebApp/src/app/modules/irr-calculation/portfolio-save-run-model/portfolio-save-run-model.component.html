@@ -138,16 +138,15 @@
 
                     <mat-form-field class="col-12" appearance="outline">
                         <mat-label>Aggregation Order</mat-label>
-                        <mat-chip-list #aggrColList aria-label="Aggregation column selection">
-                          <mat-chip *ngFor="let aggrCol of aggrCols"
-                            [selectable]="true"
+                        <mat-chip-grid #aggrColList aria-label="Aggregation column selection">
+                          <mat-chip-row *ngFor="let aggrCol of aggrCols"
                             [removable]="true"
                             (removed)="removeAggrCol(aggrCol)">
                             {{aggrCol}}
                             <button matChipRemove *ngIf="removableChip">
                               <mat-icon>cancel</mat-icon>
                             </button>
-                          </mat-chip>
+                          </mat-chip-row>
                           <input
                             [disabled]="isIRRDisabled && !isClonedModel"
                             placeholder="New aggregation..."
@@ -156,7 +155,7 @@
                             [matAutocomplete]="autoAggrStr"
                             [matChipInputFor]="aggrColList"
                             (matChipInputTokenEnd)="addAggrCol($event)">
-                        </mat-chip-list>
+                        </mat-chip-grid>
                         <mat-autocomplete #autoAggrStr="matAutocomplete" (optionSelected)="selectedAggrCol($event)">
                           <mat-option *ngFor="let aggrCol of filteredAggrCols | async" [value]="aggrCol">
                             {{aggrCol}}

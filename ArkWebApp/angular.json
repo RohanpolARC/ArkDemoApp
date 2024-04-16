@@ -36,7 +36,8 @@
               "src/styles.scss",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/assets/styles/ng-multiselect-dropdown.theme.scss",
-              "src/assets/styles/ng-angular-material.styles.scss"
+              "src/assets/styles/ng-angular-material.styles.scss",
+              "src/assets/styles/ng-angular-material.styles2.scss"
 
             ],
             "scripts": []

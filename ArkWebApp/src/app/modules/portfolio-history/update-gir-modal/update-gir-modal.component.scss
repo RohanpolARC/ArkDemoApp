@@ -35,18 +35,26 @@
     color: #000 !important;
 }
     /* Thin outline*/
-::ng-deep .mat-form-field-outline {
-    color: #ccc !important ;
-}
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
+// ::ng-deep .mat-form-field-outline {
+//     color: #ccc !important ;
+// }
 
-.editable ::ng-deep .mat-form-field-outline {
-        color: #0590ca !important ;
-}    
+// Resolution
+
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
+// .editable ::ng-deep .mat-form-field-outline {
+//         color: #0590ca !important ;
+// }    
 
     /* Floating label*/
-::ng-deep .mat-form-field.mat-focused .mat-form-field-label {
-    color: #000 !important;
-}
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
+// ::ng-deep .mat-mdc-form-field.mat-focused .mat-form-field-label {
+//     color: #000 !important;
+// }
+
+// Resolution
+// This component is no longer used
 
 .popup-cont-1{
     display: flex;

@@ -155,8 +155,8 @@ min-width: 120px;
 }
 
 ::ng-deep .mat-datepicker-content .mat-calendar{
-  width: 90% !important;
-  height: 70% !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 mat-list{
@@ -168,7 +168,7 @@ mat-list{
 }
 
 .filter-element{
-  padding: 10px;
+  padding: 14px 10px 10px 10px;
   width: 100%;
 }
 

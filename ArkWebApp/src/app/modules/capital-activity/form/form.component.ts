@@ -5,7 +5,7 @@ import { CapitalActivityModel, CapitalInvestment, ICapitalActivityConfig } from 
 import { Subscription, combineLatest, config, of } from 'rxjs';
 import { Observable } from 'rxjs';
 import { startWith, map, tap, distinctUntilChanged, take, filter, switchMap, debounceTime } from 'rxjs/operators';
-import { MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent } from '@angular/material/legacy-autocomplete';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { AdaptableApi } from '@adaptabletools/adaptable-angular-aggrid';
 import { ModalService } from '../services/modal.service';
 import { FormUtilService } from '../services/form-util.service';

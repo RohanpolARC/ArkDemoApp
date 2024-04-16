@@ -2,7 +2,8 @@
 
             <mat-tab-group [selectedIndex]="selected.value" style="margin-right: 32px; width: 100vw;" 
                (selectedTabChange)="this.selected.setValue($event.index)"
-               (animationDone)="onParentTabChanged()">
+               (animationDone)="onParentTabChanged()"
+               mat-stretch-tabs="false">
 
                <mat-tab>
                     <ng-template mat-tab-label>
