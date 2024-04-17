@@ -26,8 +26,7 @@
                 <mat-form-field class="col-6" appearance="outline">
                     <mat-label>{{ form.get('attributeLevel').value || 'Attribute Level' }}</mat-label>
                     <mat-select formControlName="attributeLevelValue" disableOptionCentering
-                    [disabled]="readOnly"
-                    [style.color]="readOnly ? 'grey' : null">
+                    [disabled]="readOnly">
                         <mat-option *ngFor="let value of levelValues" [value]="value" >{{ value}}</mat-option>
                     </mat-select>
                 </mat-form-field>
@@ -39,8 +38,7 @@
             [class.col]="!attributeType">
                 <mat-label>Attribute Name</mat-label>
                 <mat-select formControlName="attributeName" disableOptionCentering                
-                [disabled]="readOnly"
-                [style.color]="readOnly ? 'pink' : null">
+                [disabled]="readOnly">
                     <mat-option *ngFor="let attr of attrNames" [value]="attr" >{{ attr}}</mat-option>
                 </mat-select>
             </mat-form-field>

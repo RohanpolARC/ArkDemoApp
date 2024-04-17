@@ -14,6 +14,14 @@
     padding: 0px !important;
 }
 
+.mdc-dialog .mdc-dialog__content{
+    padding: 0px 0px 0px 0px !important;
+}
+
+.mat-mdc-dialog-container .mdc-dialog__content{
+    --mdc-dialog-supporting-text-color: #000000de;
+}
+
 .mat-mdc-icon-button.mat-mdc-button-base{
     --mdc-icon-button-state-layer-size: 40px;
     padding: 8px !important;
@@ -33,7 +41,6 @@
 }
 
 .mdc-list-item__primary-text{
-    --mdc-list-list-item-label-text-color: white;
     --mdc-list-list-item-label-text-weight: bold;
     --mdc-list-list-item-label-text-size: 15px;
     --mdc-list-list-item-label-text-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -61,4 +68,47 @@
 
 .mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled){
     --mat-snack-bar-button-color: orange;
+}
+
+.mat-mdc-snack-bar-container{
+    margin: 24px !important
+}
+
+.mat-calendar-controls {
+    margin: 0px !important;
+}
+
+.mat-datepicker-toggle .mat-mdc-button-base{
+    padding-top: 10% !important;
+}
+
+.mat-mdc-form-field{   
+    --mat-form-field-container-text-size: 14px;
+    // --mdc-typography-body1-font-size: 14px;
+}
+
+.mat-mdc-form-field .mdc-text-field--outlined .mdc-notched-outline--upgraded .mdc-floating-label--float-above{
+    font-size: 14px !important;
+}
+
+.mdc-text-field--outlined .mdc-floating-label{
+    --mdc-outlined-text-field-label-text-size: 14px;
+    --mdc-outlined-text-field-label-text-font: 'Roboto','Helvetica Neue',sans-serif;
+}
+
+.mat-mdc-option{
+    --mdc-typography-body1-font-size: 14px;
+}
+
+.mat-mdc-tab{
+    --mat-tab-header-label-text-tracking: normal;
+    --mat-tab-header-label-text-font: 'Roboto','Helvetica Neue',sans-serif;
+}
+
+.mat-step-label.mat-step-label-selected{
+    --mat-stepper-header-selected-state-label-text-size: 14px
+}
+
+.mat-mdc-select{
+    --mat-select-enabled-trigger-text-color: #00000061;
 }
