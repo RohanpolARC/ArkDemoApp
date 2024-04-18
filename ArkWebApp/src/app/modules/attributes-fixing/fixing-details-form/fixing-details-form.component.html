@@ -16,7 +16,7 @@
                 <mat-label>As Of Date</mat-label>
                 <input matInput [matDatepicker]="asOfDatePicker" formControlName="asOfDate"
                 autocomplete="off" 
-                [disabled]="readOnly"
+                appDisableControl [disableControl]="readOnly"
                 [style.color]="readOnly ? 'grey' : null">
                 <mat-datepicker-toggle matSuffix [for]="asOfDatePicker"></mat-datepicker-toggle>
                 <mat-datepicker #asOfDatePicker></mat-datepicker>
@@ -26,7 +26,7 @@
                 <mat-form-field class="col-6" appearance="outline">
                     <mat-label>{{ form.get('attributeLevel').value || 'Attribute Level' }}</mat-label>
                     <mat-select formControlName="attributeLevelValue" disableOptionCentering
-                    [disabled]="readOnly">
+                    appDisableControl [disableControl]="readOnly">
                         <mat-option *ngFor="let value of levelValues" [value]="value" >{{ value}}</mat-option>
                     </mat-select>
                 </mat-form-field>
@@ -38,7 +38,7 @@
             [class.col]="!attributeType">
                 <mat-label>Attribute Name</mat-label>
                 <mat-select formControlName="attributeName" disableOptionCentering                
-                [disabled]="readOnly">
+                appDisableControl [disableControl]="readOnly">
                     <mat-option *ngFor="let attr of attrNames" [value]="attr" >{{ attr}}</mat-option>
                 </mat-select>
             </mat-form-field>

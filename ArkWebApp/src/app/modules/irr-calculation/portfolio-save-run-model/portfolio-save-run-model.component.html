@@ -22,7 +22,7 @@
                             <div class="mat-slide-toggle-content">
                                 Create &nbsp;
                             </div>
-                            <mat-slide-toggle [disabled]="disableUpdate || isSuccess"
+                            <mat-slide-toggle appDisableControl [disableControl]="disableUpdate || isSuccess"
                             [color]="'primary'" formControlName="isUpdate">
                                 Update
                             </mat-slide-toggle>
@@ -93,7 +93,7 @@
 
                     <mat-form-field class="col-3" appearance="outline">
                         <mat-label>IRR Aggregation Type</mat-label>
-                        <mat-select formControlName="aggregationType" required disableOptionCentering [disabled]="isIRRDisabled && !isClonedModel">
+                        <mat-select formControlName="aggregationType" required disableOptionCentering appDisableControl [disableControl]="isIRRDisabled && !isClonedModel">
                           <mat-option *ngFor="let aggr of aggregationTypes" [value]="aggr.type">
                             {{aggr.type}}
                           </mat-option>
@@ -102,7 +102,7 @@
 
                     <mat-form-field class="col-3" appearance="outline">
                         <mat-label>Monthly Returns Base Measure</mat-label>
-                        <mat-select formControlName="baseMeasure" required disableOptionCentering [disabled]="isMonthlyReturnsDisabled && !isClonedModel">
+                        <mat-select formControlName="baseMeasure" required disableOptionCentering appDisableControl [disableControl]="isMonthlyReturnsDisabled && !isClonedModel">
                           <mat-option *ngFor="let bM of baseMeasures" [value]="bM.baseMeasure">
                             {{bM.baseMeasure}}
                           </mat-option>
@@ -111,7 +111,7 @@
 
                     <mat-form-field class="col-3" appearance="outline">
                         <mat-label>Fee Preset</mat-label>
-                        <mat-select formControlName="feePreset" required disableOptionCentering [disabled]="isFeePresetDisabled && !isClonedModel">
+                        <mat-select formControlName="feePreset" required disableOptionCentering appDisableControl [disableControl]="isFeePresetDisabled && !isClonedModel">
                           <mat-option *ngFor="let fp of feePresets" [value]="fp.feePreset">
                             {{fp.feePreset}}
                           </mat-option>
@@ -120,7 +120,7 @@
 
                     <mat-form-field class="col-3" appearance="outline">
                         <mat-label>Base Curve Rate</mat-label>
-                        <mat-select formControlName="curveRateName" required disableOptionCentering [disabled]="isIRRDisabled && !isClonedModel">
+                        <mat-select formControlName="curveRateName" required disableOptionCentering appDisableControl [disableControl]="isIRRDisabled && !isClonedModel">
                           <mat-option *ngFor="let c of curveRates" [value]="c.curveRateName">
                             {{c.curveRateName}}
                           </mat-option>
@@ -148,7 +148,7 @@
                             </button>
                           </mat-chip-row>
                           <input
-                            [disabled]="isIRRDisabled && !isClonedModel"
+                            appDisableControl [disableControl]="isIRRDisabled && !isClonedModel"
                             placeholder="New aggregation..."
                             #aggrColInput
                             formControlName="aggrStr"

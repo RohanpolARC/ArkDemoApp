@@ -7,7 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { PortfolioSaveRunModelComponent } from './portfolio-save-run-model/portfolio-save-run-model.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, NgControl, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
@@ -40,6 +40,8 @@ import { IRRCalcService } from 'src/app/core/services/IRRCalculation/irrcalc.ser
 import { RefService } from './portfolio-modeller/ref/ref.service';
 import { PortfolioManageModelComponent } from './portfolio-manage-model/portfolio-manage-model.component';
 import { PortfolioManageModelGridComponent } from './portfolio-manage-model-grid/portfolio-manage-model-grid.component';
+import { DisableDirective } from 'src/app/shared/directives/disable.directive';
+
 
 @NgModule({
   declarations: [
@@ -85,7 +87,8 @@ import { PortfolioManageModelGridComponent } from './portfolio-manage-model-grid
     MatDatepickerModule,
 
     InputAmountNumberModule,
-    AsPipeModule
+    AsPipeModule,
+    DisableDirective
 
   ],
   providers: [
@@ -93,7 +96,7 @@ import { PortfolioManageModelGridComponent } from './portfolio-manage-model-grid
     {provide: DateAdapter, useClass: InputDateAdapter, deps: [MAT_DATE_LOCALE, Platform]},
     DatePipe,
     IRRCalcService,
-    RefService  
+    RefService
   ],
   exports: []
 })

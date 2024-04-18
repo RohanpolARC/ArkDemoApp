@@ -17,14 +17,14 @@ import {MatSelectModule} from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { ConfirmationPopupComponent } from 'src/app/shared/components/confirmation-popup/confirmation-popup.component';
 import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detailed-view.module';
+import { DisableDirective } from 'src/app/shared/directives/disable.directive';
 
 
 @NgModule({
   declarations: [
     AttributesFixingComponent,
     FixingDetailsFormComponent,
-    ConfirmationPopupComponent
-
+    ConfirmationPopupComponent,
   ],
   imports: [
     CommonModule,
@@ -43,7 +43,8 @@ import { DetailedViewModule } from 'src/app/shared/modules/detailed-view/detaile
     MatSelectModule,
     MatIconModule,
 
-    DetailedViewModule
+    DetailedViewModule,
+    DisableDirective
   ]
 })
 export class AttributesFixingModule { }

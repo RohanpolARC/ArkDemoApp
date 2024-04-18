@@ -20,6 +20,7 @@
 
 .mat-mdc-dialog-container .mdc-dialog__content{
     --mdc-dialog-supporting-text-color: #000000de;
+    --mdc-dialog-supporting-text-size: 14px;
 }
 
 .mat-mdc-icon-button.mat-mdc-button-base{
@@ -84,7 +85,7 @@
 
 .mat-mdc-form-field{   
     --mat-form-field-container-text-size: 14px;
-    // --mdc-typography-body1-font-size: 14px;
+    --mdc-typography-body1-font-size: 14px;
 }
 
 .mat-mdc-form-field .mdc-text-field--outlined .mdc-notched-outline--upgraded .mdc-floating-label--float-above{
@@ -105,10 +106,14 @@
     --mat-tab-header-label-text-font: 'Roboto','Helvetica Neue',sans-serif;
 }
 
+.mdc-tab__text-label{
+    line-height: 1.5 !important;
+}
+
 .mat-step-label.mat-step-label-selected{
     --mat-stepper-header-selected-state-label-text-size: 14px
 }
 
-.mat-mdc-select{
-    --mat-select-enabled-trigger-text-color: #00000061;
+.mat-icon{
+    height: auto !important
 }
