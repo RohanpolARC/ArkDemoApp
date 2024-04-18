@@ -33,20 +33,20 @@
                 <mat-form-field class="form-field" appearance="outline">
                     <mat-label>Commitment Amount</mat-label>
                     <input matInput type="text" InputAmountNumber formControlName="commitmentAmount" readonly="readonly">
-                    <div matPrefix *ngIf="form.get('commitmentAmount').value">&euro;</div>
+                    <span matTextPrefix *ngIf="form.get('commitmentAmount').value">&euro; &nbsp;</span>
                 </mat-form-field>
 
                 <mat-form-field class="form-field" appearance="outline">
                     <mat-label>Funded Amount</mat-label>
                     <input matInput type="text" InputAmountNumber formControlName="fundedAmount" readonly="readonly">
-                    <div matPrefix *ngIf="form.get('commitmentAmount').value">&euro;</div>
+                    <span matTextPrefix *ngIf="form.get('commitmentAmount').value">&euro; &nbsp;</span>
                 </mat-form-field>
 
                 <mat-form-field class="form-field" appearance="outline">
                     <mat-label>Unfunded Amount</mat-label>
                     <input matInput type="text" InputAmountNumber
                     formControlName="unfundedAmount" readonly="readonly">
-                    <div matPrefix *ngIf="form.get('commitmentAmount').value">&euro;</div>
+                    <span matTextPrefix *ngIf="form.get('commitmentAmount').value">&euro; &nbsp;</span>
 
                 </mat-form-field>    
 
@@ -56,7 +56,7 @@
                 <mat-form-field class="form-field" appearance="outline">
                     <mat-label>Asset</mat-label>
                     <input matInput type="text" formControlName="asset" [matAutocomplete]="assetAutocomplete" matAutocompletePosition="below">
-                    <span matSuffix *ngIf="!!assetID"> ({{ assetID }})</span>
+                    <span matSuffix *ngIf="!!assetID"> ({{ assetID }})&nbsp;&nbsp;</span>
                     <mat-error *ngIf="form.get('asset').invalid">Please select asset from the list</mat-error>
                     <mat-autocomplete autoActiveFirstOption #assetAutocomplete="matAutocomplete" panelWidth="auto">
                         <mat-option
