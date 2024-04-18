@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 .mdc-dialog__surface{
     padding: 24px !important
 }
@@ -23,7 +25,8 @@
 }
 
 .mat-mdc-icon-button.mat-mdc-button-base{
-    --mdc-icon-button-state-layer-size: 40px;
+    width: 40px;
+    height: 40px;
     padding: 8px !important;
     font-size: 100% !important;
 }
@@ -84,7 +87,7 @@
 
 .mat-mdc-form-field{   
     --mat-form-field-container-text-size: 14px;
-    // --mdc-typography-body1-font-size: 14px;
+    --mdc-typography-body1-font-size: 14px;
 }
 
 .mat-mdc-form-field .mdc-text-field--outlined .mdc-notched-outline--upgraded .mdc-floating-label--float-above{
@@ -111,4 +114,25 @@
 
 .mat-mdc-select{
     --mat-select-enabled-trigger-text-color: #00000061;
+}
+
+.mat-mdc-tab:not(.mat-mdc-tab-disabled).mdc-tab--active .mdc-tab__text-label{
+    color:#000000de;
+}
+
+.mdc-tab{
+    --mdc-typography-font-family: 'Roboto','Helvetica Neue',sans-serif;
+    letter-spacing: normal;
+}
+
+.mdc-tab__text-label{
+    line-height: 20px !important;
+}
+
+.mat-mdc-text-field-wrapper{
+    margin-top: 5px;
+}
+
+.mat-mdc-form-field {
+    @include mat.all-component-densities(-2);
 }
