@@ -85,10 +85,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "ArkWebApp:build:production"
+              "buildTarget": "ArkWebApp:build:production"
             },
             "development": {
-              "browserTarget": "ArkWebApp:build:development"
+              "buildTarget": "ArkWebApp:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -96,7 +96,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ArkWebApp:build"
+            "buildTarget": "ArkWebApp:build"
           }
         },
         "test": {
