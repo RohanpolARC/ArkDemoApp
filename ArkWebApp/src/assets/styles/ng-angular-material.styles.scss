@@ -109,37 +109,12 @@
     --mat-tab-header-label-text-font: 'Roboto','Helvetica Neue',sans-serif;
 }
 
-.mdc-tab__text-label{
-    line-height: 1.5 !important;
-}
-
 .mat-step-label.mat-step-label-selected{
     --mat-stepper-header-selected-state-label-text-size: 14px
 }
 
 .mat-icon{
     height: auto !important
-}
-
-.mat-mdc-tab:not(.mat-mdc-tab-disabled).mdc-tab--active .mdc-tab__text-label{
-    color:#000000de;
-}
-
-.mdc-tab{
-    --mdc-typography-font-family: 'Roboto','Helvetica Neue',sans-serif;
-    letter-spacing: normal;
-}
-
-.mdc-tab__text-label{
-    line-height: 20px !important;
-}
-
-.mat-mdc-text-field-wrapper{
-    margin-top: 5px;
-}
-
-.mat-mdc-form-field {
-    @include mat.all-component-densities(-2);
 }
 
 .mat-mdc-tab:not(.mat-mdc-tab-disabled).mdc-tab--active .mdc-tab__text-label{
