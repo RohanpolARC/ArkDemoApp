@@ -47,9 +47,9 @@
     "moment": "^2.30.1",
     "ng-multiselect-dropdown": "^1.0.0",
     "rxjs": "^7.0.0",
-    "typescript": "^4.9.3",
+    "typescript": "^5.4.5",
     "xlsx": "^0.17.5",
-    "zone.js": "^0.13.0"
+    "zone.js": "^0.14.4"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^16.2.13",
