@@ -24,7 +24,7 @@ export class TabUtilService {
             calcParamsData.push({ runID: runID, type: 'Monthly Returns', baseMeasure: contextData?.baseMeasure })
             break;  
           case 'SaveRunIRR':
-            calcParamsData.push({ runID: runID, type: 'IRR', aggrStr: contextData?.aggrStr, mapGroupCols: contextData?.mapGroupCols, curveRateDelta: contextData.curveRateDelta, latestWSOStatic: contextData?.latestWSOStatic, fundCurrency: contextData?.fundCurrency })
+            calcParamsData.push({ runID: runID, type: 'IRR', aggrStr: contextData?.aggrStr, mapGroupCols: contextData?.mapGroupCols, curveRateDelta: contextData.curveRateDelta, includeFutureUpfrontFees: contextData?.includeFutureUpfrontFees, fundCurrency: contextData?.fundCurrency })
             break;
           default:
             break;
@@ -94,7 +94,7 @@ export class TabUtilService {
       cp.aggrStr = p.aggrStr;
       cp.mapGroupCols = p.mapGroupCols;
       cp.curveRateDelta = p.curveRateDelta;
-      cp.latestWSOStatic = p.latestWSOStatic;
+      cp.includeFutureUpfrontFees = p.includeFutureUpfrontFees;
       cp.fundCurrency = p.fundCurrency;
 
       calcParams = cp as IRRCalcParams

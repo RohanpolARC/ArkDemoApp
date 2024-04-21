@@ -1,9 +1,9 @@
 
 import { AdaptableApi, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { ColDef, GridOptions,GridApi, GridReadyEvent, Module, FirstDataRenderedEvent, ProcessCellForExportParams, BodyScrollEvent } from '@ag-grid-community/core';
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { filter, first } from 'rxjs/operators';
+import { first } from 'rxjs/operators';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { CashFlowService } from 'src/app/core/services/CashFlows/cash-flow.service';
 import { DataService } from 'src/app/core/services/data.service';
@@ -12,7 +12,7 @@ import { NoRowsOverlayComponent } from 'src/app/shared/components/no-rows-overla
 import { BLANK_DATETIME_FORMATTER_CONFIG, CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER,  DATE_FORMATTER_CONFIG_ddMMyyyy } from 'src/app/shared/functions/formatter';
 import { autosizeColumnExceptResized,  getMomentDateStrFormat, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 import { NoRowsCustomMessages } from 'src/app/shared/models/GeneralModel';
-import { LoadStatus, ParentTabType, ScrollPosition } from 'src/app/shared/models/IRRCalculationsModel';
+import { LoadStatus, ParentTabType } from 'src/app/shared/models/IRRCalculationsModel';
 import { PortfolioModellerService } from '../service/portfolio-modeller.service';
 import { AgGridScrollService } from '../service/aggrid-scroll.service';
 
@@ -226,6 +226,7 @@ export class CashFlowsComponent implements OnInit {
       { field: 'isCashIRR', type: 'abColDefBoolean' },
       { field: 'isYTE', type: 'abColDefBoolean' },
       { field: 'isYTW', type: 'abColDefBoolean' },
+      { field: 'isFutureUpfrontFees', type: 'abColDefBoolean' },
       { field: 'feesCcy', type: 'abColDefNumber' },
       { field: 'interestCcy', type: 'abColDefNumber' },
       { field: 'repaymentCcy', type: 'abColDefNumber' },

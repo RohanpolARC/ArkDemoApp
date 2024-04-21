@@ -175,7 +175,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
       modelDesc: new FormControl(this.data.model?.modelDesc),
       isUpdate: new FormControl(!!this.modelID, Validators.required),
       isShared: new FormControl(this.data.isShared == "Yes" ? true:false, Validators.required),
-      latestWSOStatic: new FormControl(!!this.data.latestWSOStatic, Validators.required),
+      includeFutureUpfrontFees: new FormControl(!!this.data.includeFutureUpfrontFees, Validators.required),
       aggregationType: new FormControl(aggrStr, Validators.required),
       baseMeasure: new FormControl(this.baseMeasures[0]?.baseMeasure, Validators.required),
       feePreset: new FormControl(feePreset, Validators.required),
@@ -301,7 +301,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     model.isLocal = this.isLocal;
     model.isShared = this.modelForm.get('isShared').value ? "Yes" : "No";
     model.autoManualOption = this.autoManualOption;
-    model.latestWSOStatic = this.modelForm.get('latestWSOStatic').value;
+    model.includeFutureUpfrontFees = this.modelForm.get('includeFutureUpfrontFees').value;
     model.irrAggrType = this.modelForm.get('aggregationType').value;
     model.fundCurrency = this.modelForm.get('fundCurrency').value;
    
@@ -364,7 +364,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
               feePreset: this.isFeePresetDisabled ? null :  this.modelForm.get('feePreset').value,
               irrAggrType: this.isIRRDisabled ? null : this.modelForm.get('aggregationType').value,
               curveRateDelta: this.isIRRDisabled ? null : model.curveRateDelta,
-              latestWSOStatic: this.isIRRDisabled ? null : model.latestWSOStatic,
+              includeFutureUpfrontFees: this.isIRRDisabled ? null : model.includeFutureUpfrontFees,
               fundCurrency: this.modelForm.get('fundCurrency').value,  
               // Setting dynamically set aggregation order.
               aggrStr: this.aggrCols,
