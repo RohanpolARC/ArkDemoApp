@@ -305,7 +305,7 @@ export class CashFlowsComponent implements OnInit {
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
       
-      userInterfaceOptions:{
+      formatColumnOptions:{
         customDisplayFormatters:[
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',[...this.AMOUNT_COLUMNS]),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('fxFormatter',[...this.FX_COLUMNS])

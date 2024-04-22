@@ -237,7 +237,7 @@ export class ManagementFeeComponent implements OnInit {
         persistSharedEntities: presistSharedEntities.bind(this), 
         loadSharedEntities: loadSharedEntities.bind(this)
       },
-      userInterfaceOptions:{
+      formatColumnOptions:{
         customDisplayFormatters:[
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',this.AMOUNT_COLUMNS),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('noDecimalAmountFormatter',this.NO_DEC_AMOUNT_COLUMNS),

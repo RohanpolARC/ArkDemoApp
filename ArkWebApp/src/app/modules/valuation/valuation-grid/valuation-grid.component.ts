@@ -309,7 +309,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
         loadSharedEntities: loadSharedEntities.bind(this)
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
-      actionOptions: {
+      actionColumnOptions: {
         actionColumns: [
           {
             columnId: 'action',
@@ -365,7 +365,7 @@ export class ValuationGridComponent implements OnInit, IPropertyReader, OnDestro
           }
         ]
       },
-      userInterfaceOptions: {
+      formatColumnOptions: {
         customDisplayFormatters: [
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', ['faceValueIssue','faceValueIssueFunded', 'mark', 'costPrice', 
            'initialYCYield','currentYCYield','initialBenchmarkYield', 'currentBenchmarkYield','initialSpread','currentSpread', 'deltaSpreadDiscount', 'usedSpreadDiscount', 'marketValueIssue', 'marketValueIssueFunded', 'currentMarketValueIssue', 'previousMarketValueIssue', 'currentMarketValueIssueFunded', 'previousMarketValueIssueFunded', 'benchmarkIndexPrice']),

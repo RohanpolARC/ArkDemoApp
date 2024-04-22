@@ -130,7 +130,7 @@ export class GridConfigService {
       loadSharedEntities: loadSharedEntities.bind(this)
     },
 
-    userInterfaceOptions: {
+    formatColumnOptions: {
       customDisplayFormatters: [
         CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', this.AMOUNT_COLUMNS),
         CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat', ['markLatest' ,'markLast' ,'markDeltaExisting' ,'markDeltaNew'])

@@ -157,7 +157,7 @@ export class EqPoscashGridConfigService {
       adaptableId: 'Equalised Position Cashflows',
       adaptableStateKey: `Equalised Position Cashflows Key`,
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
-      searchOptions: {
+      quickSearchOptions: {
         clearSearchesOnStartUp: true
       },
       teamSharingOptions: {
@@ -166,7 +166,7 @@ export class EqPoscashGridConfigService {
         loadSharedEntities: loadSharedEntities.bind(this)
   
       },
-      userInterfaceOptions:{
+      formatColumnOptions:{
         customDisplayFormatters: [
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',this.AMOUNT_COLUMNS)
           ],

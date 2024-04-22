@@ -95,7 +95,7 @@ export class PortfolioManageModelService implements OnDestroy{
           loadSharedEntities: loadSharedEntities.bind(this)
         },
         
-        actionOptions: {
+        actionColumnOptions: {
           actionColumns: 
             [
                 {

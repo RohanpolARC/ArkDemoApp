@@ -253,7 +253,7 @@ export class GridConfigService {
       adaptableId: 'Equalisation - Portfolio History',
       adaptableStateKey: 'Equalisation - Portfolio History Key',
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
-      searchOptions: {
+      quickSearchOptions: {
         clearSearchesOnStartUp: true
       },
       teamSharingOptions: {
@@ -261,7 +261,7 @@ export class GridConfigService {
         persistSharedEntities: presistSharedEntities.bind(this), //https://docs.adaptabletools.com/guide/version-15-upgrade-guide
         loadSharedEntities: loadSharedEntities.bind(this)
       },
-      userInterfaceOptions: {
+      formatColumnOptions: {
         customDisplayFormatters: [
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',[...amountColumns]),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('fxFormatter',[...fxColumns])

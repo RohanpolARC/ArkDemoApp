@@ -323,7 +323,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
-      actionOptions: {
+      actionColumnOptions: {
         actionColumns: [
           {
             columnId: 'mark_override',
@@ -514,7 +514,7 @@ export class HedgingMarkComponent extends ValuationUtility implements OnInit, Af
         ]
       },
 
-      userInterfaceOptions: {
+      formatColumnOptions: {
         customDisplayFormatters: [
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', [...AMOUNT_COLUMNS_LIST])
         ],

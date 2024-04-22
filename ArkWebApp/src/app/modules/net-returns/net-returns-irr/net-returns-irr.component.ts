@@ -97,7 +97,7 @@ export class NetReturnsIrrComponent implements OnInit {
         persistSharedEntities: presistSharedEntities.bind(this), 
         loadSharedEntities: loadSharedEntities.bind(this)
       },
-      userInterfaceOptions: {
+      formatColumnOptions: {
         customDisplayFormatters: [
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('percentFormatter', this.columnDefs.map(c => c.field).filter(field => !['Category'].includes(field)))
         ]

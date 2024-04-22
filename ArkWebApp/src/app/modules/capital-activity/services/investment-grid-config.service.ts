@@ -101,7 +101,7 @@ export class InvestmentGridConfigService {
   
       },
   
-      userInterfaceOptions:{
+      formatColumnOptions:{
         customDisplayFormatters:[
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['amount','totalBase','totalEur', 'linkedAmountBase', 'breakBase', 'groupBreakBase']),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('nullableDateFormatter', ['minLinkedDate'])

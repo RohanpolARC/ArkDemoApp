@@ -118,7 +118,7 @@ export class UnfundedAssetsComponent implements OnInit {
   
       },
 
-      actionOptions: {
+      actionColumnOptions: {
         actionColumns: [
           {            
             columnId: 'actionEdit',
@@ -143,7 +143,7 @@ export class UnfundedAssetsComponent implements OnInit {
         ]
       },
 
-      userInterfaceOptions:{
+      formatColumnOptions:{
         customDisplayFormatters:[
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',[
             'commitmentAmount',

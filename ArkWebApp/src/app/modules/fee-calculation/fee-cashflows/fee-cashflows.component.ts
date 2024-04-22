@@ -319,7 +319,7 @@ export class FeeCashflowsComponent implements OnInit {
         loadSharedEntities: loadSharedEntities.bind(this)
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
-      userInterfaceOptions:{
+      formatColumnOptions:{
         customDisplayFormatters:[
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',this.AMOUNT_COLUMNS)
         ]

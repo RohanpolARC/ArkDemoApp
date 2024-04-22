@@ -97,7 +97,7 @@ export class RefDataManagerComponent implements OnInit {
       persistSharedEntities: presistSharedEntities.bind(this), 
       loadSharedEntities: loadSharedEntities.bind(this)
     },
-    actionOptions: {
+    actionColumnOptions: {
       actionColumns: [
         {
           columnId: 'ActionDelete',

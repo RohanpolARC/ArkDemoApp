@@ -135,7 +135,7 @@ export class AttributesFixingComponent implements OnInit {
         persistSharedEntities: presistSharedEntities.bind(this), //https://docs.adaptabletools.com/guide/version-15-upgrade-guide
         loadSharedEntities: loadSharedEntities.bind(this)
       },
-      actionOptions: {
+      actionColumnOptions: {
         actionColumns: [
           {
             columnId: 'ActionEdit',

@@ -112,7 +112,7 @@ export class PortfolioHistoryGridConfigService {
         loadSharedEntities: loadSharedEntities.bind(this)
       },
   
-      actionOptions:{
+      actionColumnOptions:{
         actionColumns:[
           {
             columnId: 'ActionDelete',
@@ -163,7 +163,7 @@ export class PortfolioHistoryGridConfigService {
         ]
       },
   
-      userInterfaceOptions:{
+      formatColumnOptions:{
         customDisplayFormatters: [
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['amount','parAmount', 'parAmountLocal', 'fundedParAmountLocal', 'costAmountLocal', 'fundedCostAmountLocal'])
           ],

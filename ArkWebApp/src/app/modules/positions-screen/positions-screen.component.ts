@@ -119,7 +119,7 @@ export class PositionsScreenComponent implements OnInit {
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
-      userInterfaceOptions:{
+      formatColumnOptions:{
         customDisplayFormatters: [
           //CUSTOM_AMOUNT_FORMATTER('amountFormatter',[...AMOUNT_COLUMNS_LIST])
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',[...AMOUNT_COLUMNS_LIST])

@@ -481,13 +481,13 @@ export class FacilityDetailComponent implements OnInit {
         loadSharedEntities: loadSharedEntities.bind(this)
       },
 
-      userInterfaceOptions:{
+      formatColumnOptions:{
         customDisplayFormatters:[
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',this.AMOUNT_COLUMNS)
         ]
       },
 
-      actionOptions:{
+      actionColumnOptions:{
         actionColumns:[
           {
             columnId:'Audit',

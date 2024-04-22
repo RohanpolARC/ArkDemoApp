@@ -91,7 +91,7 @@ export class ContractHistoryComponent implements OnInit {
       autoSizeColumnsInLayout: true
     },
 
-    userInterfaceOptions:{
+    formatColumnOptions:{
       customDisplayFormatters:[
         CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter')
       ]

@@ -211,6 +211,9 @@ export class IrrResultComponent implements OnInit {
         styleClassNames: [
           'realised-unrealised'
         ],
+      },
+
+      formatColumnOptions:{
         customDisplayFormatters:[
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', this.AMOUNT_COLUMNS),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('percentFormatter', this.PERCENT_COLUMNS),

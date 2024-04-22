@@ -94,7 +94,7 @@ export class InvestorGridConfigService {
 
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
-      searchOptions: {
+      quickSearchOptions: {
         clearSearchesOnStartUp: true
       },
 
@@ -105,7 +105,7 @@ export class InvestorGridConfigService {
   
       },
   
-      actionOptions: {
+      actionColumnOptions: {
         actionColumns: [
           {
             columnId: 'Edit',
@@ -135,7 +135,7 @@ export class InvestorGridConfigService {
         ]
       },
 
-      userInterfaceOptions:{
+      formatColumnOptions:{
         customDisplayFormatters: [
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat',['totalAmount','linkedAmount']),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('nonAmountNumberFormatter',['fxRate']),

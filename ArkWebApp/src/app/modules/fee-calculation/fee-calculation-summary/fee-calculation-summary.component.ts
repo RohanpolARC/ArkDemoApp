@@ -334,7 +334,7 @@ NON_AMOUNT_2DEC_COLUMNS=['GrossMOM',
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
-      userInterfaceOptions:{
+      formatColumnOptions:{
         customDisplayFormatters:[
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',[...this.AMOUNT_COLUMNS]),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('percentFormatter',[...this.PERCENT_COLUMNS]),

@@ -235,8 +235,8 @@ export class PoscashGridConfigService {
       adaptableId: 'Position Cashflows/Base',
       adaptableStateKey: `Position Cashflows/Base Key`,
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
-      searchOptions: {
-        clearSearchesOnStartUp: true
+      quickSearchOptions: {
+        clearQuickSearchOnStartUp: true
       },
       teamSharingOptions: {
         enableTeamSharing: true,
@@ -244,7 +244,7 @@ export class PoscashGridConfigService {
         loadSharedEntities: loadSharedEntities.bind(this)
   
       },
-      userInterfaceOptions:{
+      formatColumnOptions:{
         customDisplayFormatters: [
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',this.AMOUNT_COLUMNS)
           ],

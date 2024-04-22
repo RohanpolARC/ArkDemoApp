@@ -98,7 +98,7 @@ export class NetReturnsSummaryGridService {
         persistSharedEntities: presistSharedEntities.bind(this), 
         loadSharedEntities: loadSharedEntities.bind(this)
       },
-      userInterfaceOptions: {
+      formatColumnOptions: {
         customDisplayFormatters: [
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter')
         ]

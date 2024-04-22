@@ -196,7 +196,10 @@ export class GridConfigService {
         dateInputOptions: {
           dateFormat: 'dd/MM/yyyy',
           locale: 'en-GB'
-        },
+        }
+      },
+
+      formatColumnOptions:{
         customDisplayFormatters:[
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',[ 'maturityPrice','expectedPrice','floorRate','faceValueIssue','costPrice','mark','adjustedEBITDAatInv','ebitda','ltmRevenues','netLeverage','netLeverageAtInv','netLTV','netLTVatInv','revenueatInv','revenuePipeline','reportingEBITDA','reportingNetLeverage','unfundedMargin', 'floorRate']),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('customDateFormat',['expectedDate', 'localExpectedDate', 'globalExpectedDate','maturityDate', 'localMaturityDate', 'globalMaturityDate'])
@@ -207,7 +210,7 @@ export class GridConfigService {
         autoSaveLayouts: false
       },
 
-      actionOptions: {
+      actionColumnOptions: {
         actionColumns: 
         [{
             columnId: 'clear_override',

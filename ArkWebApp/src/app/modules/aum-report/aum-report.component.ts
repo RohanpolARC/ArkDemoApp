@@ -260,7 +260,7 @@ export class AumReportComponent implements OnInit {
       },
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
-      userInterfaceOptions: {
+      formatColumnOptions: {
         customDisplayFormatters: [
           CUSTOM_DISPLAY_FORMATTERS_CONFIG("amountMillionFormatter",this.AMOUNT_COLUMNS)
         ]
@@ -274,7 +274,7 @@ export class AumReportComponent implements OnInit {
             primaryKey: 'positionId',
             licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
             exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
-            userInterfaceOptions: {
+            formatColumnOptions: {
               customDisplayFormatters: [
                 CUSTOM_DISPLAY_FORMATTERS_CONFIG("amountMillionFormatter",this.AMOUNT_COLUMNS)
               ]

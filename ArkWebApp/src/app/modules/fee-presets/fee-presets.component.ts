@@ -102,7 +102,7 @@ export class FeePresetsComponent implements OnInit {
         persistSharedEntities: presistSharedEntities.bind(this), 
         loadSharedEntities: loadSharedEntities.bind(this)
       },
-      actionOptions: {
+      actionColumnOptions: {
         actionColumns: [
           {
             columnId: 'Action',
@@ -161,7 +161,7 @@ export class FeePresetsComponent implements OnInit {
           }
         ]
       },
-      userInterfaceOptions:{
+      formatColumnOptions:{
         customDisplayFormatters:[
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',this.feePresetsSvc.AMOUNT_COLUMNS),
           CUSTOM_DISPLAY_FORMATTERS_CONFIG('nonAmountNumberFormatter2Dec',this.feePresetsSvc.NON_AMOUNT_2DEC_COLUMNS)
