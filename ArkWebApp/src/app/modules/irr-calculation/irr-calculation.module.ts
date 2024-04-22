@@ -7,7 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { PortfolioSaveRunModelComponent } from './portfolio-save-run-model/portfolio-save-run-model.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { FormsModule, NgControl, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
