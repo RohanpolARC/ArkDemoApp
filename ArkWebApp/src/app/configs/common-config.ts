@@ -1,6 +1,6 @@
-import {  AdaptableOptions, ExportOptions, FilterOptions } from "@adaptabletools/adaptable-angular-aggrid";
+import {  AdaptableOptions, ExportOptions } from "@adaptabletools/adaptable-angular-aggrid";
 import { AdaptableModuleButtons } from "@adaptabletools/adaptable/src/PredefinedConfig/Common/Types";
-import {  ColumnResizedEvent,  ExcelStyle, GridOptions, Module, ProcessCellForExportParams, VirtualColumnsChangedEvent } from "@ag-grid-community/core";
+import {  ColumnResizedEvent,  ExcelStyle, FirstDataRenderedEvent, GridOptions, Module, ProcessCellForExportParams, RowDataUpdatedEvent, RowGroupOpenedEvent, VirtualColumnsChangedEvent } from "@ag-grid-community/core";
 
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
 import { ClipboardModule } from "@ag-grid-enterprise/clipboard";
@@ -15,7 +15,6 @@ import { SideBarModule } from "@ag-grid-enterprise/side-bar";
 import { CsvExportModule } from "@ag-grid-community/csv-export";
 import { autosizeColumnExceptResized,  getMomentDateStrFormat,  handleResizedColumns } from "../shared/functions/utilities";
 import { StatusBarModule } from "@ag-grid-enterprise/status-bar";
-
 
 export class CommonConfig{
 
@@ -37,13 +36,13 @@ export class CommonConfig{
           return getMomentDateStrFormat(params.value,'DD/MM/YYYY')
         return params.value;
       },
-      onFirstDataRendered(event) {
+      onFirstDataRendered(event: FirstDataRenderedEvent) {
         autosizeColumnExceptResized(event)
       },
-      onRowDataUpdated(event) {
+      onRowDataUpdated(event: RowDataUpdatedEvent) {
         autosizeColumnExceptResized(event)
       },
-      onRowGroupOpened(event) {
+      onRowGroupOpened(event: RowGroupOpenedEvent) {
         autosizeColumnExceptResized(event)
       }
     }
@@ -72,10 +71,13 @@ export class CommonConfig{
 
     // Common Adaptable Options
     public static ADAPTABLE_OPTIONS : AdaptableOptions = {
+
       primaryKey:'',
-      filterOptions:{
-        showDistinctFilteredValuesOnly:true,
-        maxFilterValuesToDisplay:Number.MAX_SAFE_INTEGER
+      columnFilterOptions: {
+        valuesFilterOptions: {
+          showDistinctFilteredValuesOnly: true,
+          maxFilterValuesToDisplay: Number.MAX_SAFE_INTEGER
+        }
       }
     }
     
@@ -112,5 +114,5 @@ export class CommonConfig{
         StatusBarModule
       ];
 
-    public static DASHBOARD_MODULE_BUTTONS: AdaptableModuleButtons = ['SettingsPanel', 'TeamSharing', 'Export', 'Layout', 'Filter'] 
+    public static DASHBOARD_MODULE_BUTTONS: AdaptableModuleButtons = ['SettingsPanel', 'TeamSharing', 'Export', 'Layout', 'GridFilter'] 
 }

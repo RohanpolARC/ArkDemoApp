@@ -17,7 +17,7 @@ export type VPortfolioModel = {
     isLocal: string,
     autoManualOption: string,
     isShared: string,
-    latestWSOStatic: boolean,
+    includeFutureUpfrontFees: boolean,
     localOverrides: VPortfolioLocalOverrideModel[],
     irrAggrType: string, // `type1 > type2 > type3`,
     curveRateDelta: number,   // percentage with direction (+/-)
@@ -51,7 +51,7 @@ export interface IRRCalcParams  {
     // Dynamically created aggregations order
     aggrStr?: string[]
     mapGroupCols?: string[],
-    latestWSOStatic: boolean,
+    includeFutureUpfrontFees: boolean,
     fundCurrency: string
 }
 
@@ -89,7 +89,7 @@ export interface PortfolioModellerCalcParams {
     feePreset: string,
     irrAggrType: string,
     curveRateDelta: number,
-    latestWSOStatic: boolean,
+    includeFutureUpfrontFees: boolean,
     fundCurrency: string,
     runBy: string
 }
@@ -126,7 +126,7 @@ export type VModel = {
     modelID: number, modelName: string, displayName: string, modelDesc: string, 
     rules: ColumnFilter[], positionIDs: number[], 
     isLocal: YesNoType, autoManualOption: AutoManualType, username: string, isShared: YesNoType, aggregationType: string,
-    fundCurrency: string, latestWSOStatic: boolean, feePreset: string, rulesStr : string, createdBy: string,
+    fundCurrency: string, includeFutureUpfrontFees: boolean, feePreset: string, rulesStr : string, createdBy: string,
     createdOn: string, modifiedOn: string
 }
 
@@ -145,7 +145,7 @@ export type TabContext = {
     aggrStr?: string[],
     mapGroupCols?: string[],
     curveRateDelta: number,
-    latestWSOStatic?: boolean,
+    includeFutureUpfrontFees?: boolean,
     fundCurrency: string
 }
 

@@ -258,7 +258,9 @@ export class AumReportComponent implements OnInit {
         persistSharedEntities: presistSharedEntities.bind(this), //https://docs.adaptabletools.com/guide/version-15-upgrade-guide
         loadSharedEntities: loadSharedEntities.bind(this)
       },
-      exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
+      exportOptions: {
+        exportFormatType: 'rawValue'
+      },
 
       formatColumnOptions: {
         customDisplayFormatters: [
@@ -375,7 +377,7 @@ export class AumReportComponent implements OnInit {
                 }],
               },
               FormatColumn:{
-                Revision :10,
+                Revision :11,
                 FormatColumns:[
                   CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountMillionFormatter')
                 ]
@@ -484,7 +486,7 @@ export class AumReportComponent implements OnInit {
           
         },
         FormatColumn:{
-          Revision :10,
+          Revision :11,
           FormatColumns:[
             CUSTOM_FORMATTER(this.AMOUNT_COLUMNS,'amountMillionFormatter')
           ]

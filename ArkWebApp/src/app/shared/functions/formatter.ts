@@ -190,7 +190,9 @@ export function BLANK_DATETIME_FORMATTER_CONFIG(dateFields: string[], IncludeGro
             Pattern: ' '
           }
         },
-        IncludeGroupedRows: IncludeGroupedRows
+        RowScope: {
+            ExcludeGroupRows: !IncludeGroupedRows
+        }
     }
     return formatCol;
 }
@@ -206,7 +208,9 @@ export function DATE_FORMATTER_CONFIG_ddMMyyyy(dateFields: string[], format: str
                 Pattern: format,
             },
         },
-        IncludeGroupedRows: IncludeGroupedRows
+        RowScope: {
+            ExcludeGroupRows: !IncludeGroupedRows
+        }
     }
     return formatCol;
 }
@@ -222,7 +226,9 @@ export function DATE_FORMATTER_CONFIG_MMMyy(dateFields: string[], format: string
                 Pattern: format,
             },
         },
-        IncludeGroupedRows: IncludeGroupedRows
+        RowScope: {
+            ExcludeGroupRows: !IncludeGroupedRows
+        }
     }
     return formatCol;
 }
@@ -238,7 +244,9 @@ export function DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm(dateTimeFields: string[]
                 Pattern: format,
             },
         },
-        IncludeGroupedRows: IncludeGroupedRows
+        RowScope: {
+            ExcludeGroupRows: !IncludeGroupedRows
+        }
     }
     return formatCol;
 }
@@ -262,7 +270,9 @@ export function AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(fields: string[], decim
                 CustomDisplayFormats: customDisplayFormats
             }
         },
-        IncludeGroupedRows:true,
+        RowScope: {
+            ExcludeGroupRows: false
+        },
         CellAlignment: 'Right'
     }   
 }
@@ -284,7 +294,9 @@ export function AMOUNT_FORMATTER_CONFIG_Zero(fields: string[], decimalPoints: nu
                 CustomDisplayFormats: customDisplayFormats
             }
         },
-        IncludeGroupedRows:true,
+        RowScope: {
+            ExcludeGroupRows: false
+        },
         CellAlignment: 'Right'
     }   
 }
@@ -305,7 +317,9 @@ export function AMOUNT_FORMATTER_CONFIG_MILLIONS(fields: string[]){
             }
         },
         CellAlignment: 'Right',
-        IncludeGroupedRows: true
+        RowScope: {
+            ExcludeGroupRows: false
+        },
     }
 }
 

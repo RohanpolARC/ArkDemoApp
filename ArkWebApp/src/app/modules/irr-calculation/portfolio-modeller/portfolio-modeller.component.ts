@@ -139,7 +139,7 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
     m.feePreset = contextData.feePreset;
     m.irrAggrType = contextData?.aggrStr?.join(' > ') ?? '';
     m.curveRateDelta = contextData.curveRateDelta ?? 0.0;
-    m.latestWSOStatic = contextData?.latestWSOStatic ?? false;
+    m.includeFutureUpfrontFees = contextData?.includeFutureUpfrontFees ?? false;
     m.fundCurrency = contextData?.fundCurrency;
     m.runBy = this.dataSvc.getCurrentUserName();
 
@@ -292,6 +292,7 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
         isShared: this.modelSvc.modelMap[this.selectedModelID]?.isShared,
         positionIDs: this.selectedPositionIDs,
         aggregationType: this.modelSvc.modelMap[this.selectedModelID]?.aggregationType,
+        includeFutureUpfrontFees: this.modelSvc.modelMap[this.selectedModelID]?.['includeFutureUpfrontFees'],
         feePreset: this.modelSvc.modelMap[this.selectedModelID]?.feePreset,
         updatedValues: this.gridUtilSvc.getUpdatedValues(this.gridApi),
         context: context
@@ -324,7 +325,7 @@ export class PortfolioModellerComponent implements OnInit, IPropertyReader {
               curveRateDelta: res?.['curveRateDelta'],
               aggrStr: res?.['aggrStr'],
               mapGroupCols: res?.['mapGroupCols'],
-              latestWSOStatic: res?.['latestWSOStatic'],
+              includeFutureUpfrontFees: res?.['includeFutureUpfrontFees'],
               fundCurrency: res?.['fundCurrency']
             }
           )

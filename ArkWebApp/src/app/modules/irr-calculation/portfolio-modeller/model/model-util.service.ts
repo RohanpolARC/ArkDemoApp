@@ -27,7 +27,7 @@ export class ModelUtilService {
       modelData[i].isLocal = data[i].isLocal;
       modelData[i].isShared = data[i].isShared;
       modelData[i].autoManualOption = data[i].autoManualOption;
-      modelData[i].latestWSOStatic = Boolean(data[i].latestWSOStatic);
+      modelData[i].includeFutureUpfrontFees = Boolean(data[i].includeFutureUpfrontFees);
       modelData[i].username = null;
       modelData[i].positionIDs = data[i].positionIDs?.split(',').map(x => parseInt(x))
       modelData[i].rules = [];

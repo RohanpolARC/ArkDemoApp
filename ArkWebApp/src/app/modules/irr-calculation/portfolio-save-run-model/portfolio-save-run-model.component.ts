@@ -301,7 +301,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
     model.isLocal = this.isLocal;
     model.isShared = this.modelForm.get('isShared').value ? "Yes" : "No";
     model.autoManualOption = this.autoManualOption;
-    model.latestWSOStatic = this.modelForm.get('latestWSOStatic').value;
+    model.includeFutureUpfrontFees = this.modelForm.get('includeFutureUpfrontFees').value;
     model.irrAggrType = this.modelForm.get('aggregationType').value;
     model.fundCurrency = this.modelForm.get('fundCurrency').value;
    
@@ -364,7 +364,7 @@ export class PortfolioSaveRunModelComponent implements OnInit {
               feePreset: this.isFeePresetDisabled ? null :  this.modelForm.get('feePreset').value,
               irrAggrType: this.isIRRDisabled ? null : this.modelForm.get('aggregationType').value,
               curveRateDelta: this.isIRRDisabled ? null : model.curveRateDelta,
-              latestWSOStatic: this.isIRRDisabled ? null : model.latestWSOStatic,
+              includeFutureUpfrontFees: this.isIRRDisabled ? null : model.includeFutureUpfrontFees,
               fundCurrency: this.modelForm.get('fundCurrency').value,  
               // Setting dynamically set aggregation order.
               aggrStr: this.aggrCols,
