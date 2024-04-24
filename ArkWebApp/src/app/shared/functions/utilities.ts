@@ -247,43 +247,44 @@ export function handleResizedColumns(params: ColumnResizedEvent) {
 
     let coldef: ColDef<any> = params.column?.getColDef();
 
-    let columnName: string = coldef.colId;
+    if(coldef){
+      let columnName: string = coldef.colId;
 
-    resizedColumnSet.add(coldef.colId);
-    params.context.resizedColumnList = Array.from(resizedColumnSet);
-
-    let sizes: {
-      rowHeight: number;
-      headerHeight: number;
-    } = params.api.getSizesForCurrentTheme();
-    
-    let wrapSizes: number[] = getWrapWidth(coldef);
-
-    let columnWidth: number = params.column?.getActualWidth();
-    
-    if (columnWidth > wrapSizes[0] && columnWidth < wrapSizes[1]) {
-
-      coldef.headerClass = 'header-font-size-small';
-      coldef.headerTooltip = coldef.headerName;
-
-      if (sizes.headerHeight > 30) {
-        coldef.wrapHeaderText = true;
+      resizedColumnSet.add(coldef.colId);
+      params.context.resizedColumnList = Array.from(resizedColumnSet);
+  
+      let sizes: {
+        rowHeight: number;
+        headerHeight: number;
+      } = params.api.getSizesForCurrentTheme();
+      
+      let wrapSizes: number[] = getWrapWidth(coldef);
+  
+      let columnWidth: number = params.column?.getActualWidth();
+      
+      if (columnWidth > wrapSizes[0] && columnWidth < wrapSizes[1]) {
+  
+        coldef.headerClass = 'header-font-size-small';
+        coldef.headerTooltip = coldef.headerName;
+  
+        if (sizes.headerHeight > 30) {
+          coldef.wrapHeaderText = true;
+        }
+      } 
+      else {
+        coldef.headerClass = ' ';
+        coldef.wrapHeaderText = false;
       }
-    } 
-    else {
-      coldef.headerClass = ' ';
-      coldef.wrapHeaderText = false;
+  
+      let columnDefs = <ColDef[]> params.api.getColumnDefs();
+  
+      columnDefs.forEach((def, index) => {
+        if(def.colId === columnName){
+          def = coldef
+        }
+      });
+  
+      params.api.setGridOption("columnDefs", columnDefs);  
     }
-
-    let columnDefs = <ColDef[]> params.api.getColumnDefs();
-
-    columnDefs.forEach((def, index) => {
-      if(def.colId === columnName){
-        def = coldef
-      }
-    });
-
-    params.api.setGridOption("columnDefs", columnDefs);
-
   }  
 }

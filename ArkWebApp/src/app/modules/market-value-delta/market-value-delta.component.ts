@@ -22,7 +22,8 @@ export class MarketValueDeltaComponent implements OnInit {
 
 
   constructor(
-    private utilService: UtilService
+    private utilService: UtilService,
+    private gridConfigSvc: GridConfigService
   ) { 
     this.currentAsOfDateRange$ = this.utilService.currentAsOfDateRange$
     this.currentNewIssuerOrAsset$ = this.utilService.currentNewIssuerOrAsset$
@@ -31,5 +32,7 @@ export class MarketValueDeltaComponent implements OnInit {
 
   ngOnInit(): void {
   }
+
+  createChart = this.gridConfigSvc.createChart.bind(this.gridConfigSvc)
 
 }
