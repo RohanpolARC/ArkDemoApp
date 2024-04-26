@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { APIConfig } from 'src/app/configs/api-config';
+// import { APIConfig } from 'src/app/configs/api-config';
 import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { MarketValueDeltaModel, NewIssuerOrAsset } from 'src/app/shared/models/MarketValueDeltaModel';
 
@@ -16,10 +16,8 @@ export class MarketValueDeltaService {
   ) { }
 
   getMarketValueDeltaData(asofdate: AsOfDateRange, newIssuerOrAsset: NewIssuerOrAsset){
-    return this.http.get<MarketValueDeltaModel[]>(
-      `${APIConfig.MARKET_VALUE_DELTA_GET_API}/?prevdate=${asofdate.start}&currentdate=${asofdate.end}&newIssuerOrAsset=${newIssuerOrAsset}`).pipe(
-      catchError((ex) => throwError(ex))
-    )
+
+    return of([])
   }
 
 }

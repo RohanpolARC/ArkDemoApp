@@ -10,8 +10,6 @@ if (environment.production) {
   enableProdMode();
 }
 
-// Setting Ag-grid license key for the Ag-grid library wide
-LicenseManager.setLicenseKey(CommonConfig.AG_GRID_LICENSE_KEY)
 
 ModuleRegistry.registerModules(CommonConfig.AG_GRID_MODULES);
 

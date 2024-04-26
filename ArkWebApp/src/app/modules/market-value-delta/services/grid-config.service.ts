@@ -132,7 +132,23 @@ export class GridConfigService {
     ...CommonConfig.ADAPTABLE_GRID_OPTIONS,
     columnDefs: this.columnDefs,
     enableRangeSelection: true,
-    sideBar: true,
+    sideBar: {
+      toolPanels: [
+        'columns',
+        'filters',
+        {
+          id: 'adaptable',
+          toolPanel: 'AdaptableToolPanel',
+          labelDefault: 'My Grid',
+          labelKey: 'adaptable',
+          iconKey: 'menu',
+          width: 300,
+          minWidth: 300,
+          maxWidth: 500,
+        },
+      ],
+    },
+  
     headerHeight: 30,
     rowHeight: 30,
     rowGroupPanelShow: 'always',
@@ -153,7 +169,7 @@ export class GridConfigService {
 
   adaptableOptions: AdaptableOptions = {
     ...CommonConfig.ADAPTABLE_OPTIONS,
-    licenseKey: CommonConfig.ADAPTABLE_LICENSE_KEY,
+
     autogeneratePrimaryKey: true,
     primaryKey: '',
     userName: this.dataSvc.getCurrentUserName(),
@@ -171,6 +187,11 @@ export class GridConfigService {
         CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter', this.AMOUNT_COLUMNS),
         CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountZeroFormat', ['markLatest' ,'markLast' ,'markDeltaExisting' ,'markDeltaNew'])
       ]
+    },
+    entitlementOptions: {
+      moduleEntitlements: [
+        {adaptableModule: 'ToolPanel', accessLevel: 'ReadOnly'},
+      ],
     },
 
     predefinedConfig: {

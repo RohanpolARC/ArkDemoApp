@@ -3,10 +3,8 @@ import {  NgModule } from '@angular/core';
   
 import { AppRoutingModule } from './app-routing.module';  
 import { AppComponent } from './app.component';  
-import { environment } from 'src/environments/environment';  
-import { MsalModule, MsalInterceptor, MsalGuard, MsalService, MsalGuardConfiguration, MsalInterceptorConfiguration, MSAL_INSTANCE, MSAL_GUARD_CONFIG, MSAL_INTERCEPTOR_CONFIG, MsalBroadcastService, MsalRedirectComponent } from '@azure/msal-angular';  
-import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';  
-import { MsalUserService } from './core/services/Auth/msaluser.service';  
+import { HttpClientModule, HttpClient } from '@angular/common/http';  
+
 import { AdaptableAngularAgGridModule } from '@adaptabletools/adaptable-angular-aggrid';  
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -25,79 +23,24 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { DateAdapter, MatNativeDateModule } from '@angular/material/core';
+import {  MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized.component';
 import { HomeComponent } from '../app/home-component/home.component'
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { AccessControlComponent } from './shared/components/access-control/access-control.component';
 import { MatSelectModule } from '@angular/material/select';
-import { Platform } from '@angular/cdk/platform';
-import { InputDateAdapter } from './shared/providers/date-adapter';
 import { MatTableModule } from '@angular/material/table';
-import { IPublicClientApplication, PublicClientApplication, BrowserCacheLocation, InteractionType, LogLevel } from '@azure/msal-browser';
-import { MsalHttpInterceptor } from './core/interceptors/msal-http.interceptor';
+
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { NoRowsOverlayComponent } from './shared/components/no-rows-overlay/no-rows-overlay.component';
-import { GeneralFilterModule } from './shared/modules/general-filter/general-filter.module';
-
-export const protectedResourceMap: any =  
-  [  
-    // ["https://graph.microsoft.com/v1.0/me", ["user.read", "profile"]],
-    [environment.baseUrl, environment.scopeUri  ],
-    [environment.arkFunctionUrl, environment.arkFunctionScopeUri],
-    [environment.feeCalcFunctionUrl, environment.feeCalcFunctionScopeUri]  
-  ];  
-
-export function loggerCallback(logLevel: LogLevel, message: string) {
-  if(LogLevel.Error === logLevel || LogLevel.Warning === logLevel)
-    console.log(message);
-}
-
-export function MSALInstanceFactory(): IPublicClientApplication {
-
-  return new PublicClientApplication({
-    auth: {
-      clientId: environment.uiClienId,
-      authority: 'https://login.microsoftonline.com/' + environment.tenantId,
-      redirectUri: environment.redirectUrl
-    },
-    cache: {
-      cacheLocation: BrowserCacheLocation.LocalStorage
-    },
-    system: {
-      loggerOptions: {
-        loggerCallback,
-        logLevel: LogLevel.Error,
-        piiLoggingEnabled: false
-      }
-    }
-  })
-} 
-
-export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
-  return {
-    interactionType: InteractionType.Redirect,
-    protectedResourceMap
-  };
-}
-
-export function MSALGuardConfigFactory(): MsalGuardConfiguration {
-  return { 
-    interactionType: InteractionType.Redirect,
-  };
-}
   
   
 @NgModule({  
   declarations: [  
-    AppComponent, UnauthorizedComponent, HomeComponent, AccessControlComponent, NoRowsOverlayComponent
+    AppComponent, HomeComponent
   ],  
   imports: [  
-    MsalModule,
     BrowserModule,  
     AppRoutingModule,  
     HttpClientModule,
@@ -127,41 +70,16 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
     MatCheckboxModule,
     MatSelectModule,
     MatTableModule,
-    MatProgressSpinnerModule,
-    GeneralFilterModule
+    MatProgressSpinnerModule
 
   ],  
   providers: [  
     HttpClient,  
-    MsalUserService, 
-    MsalService,
-    MsalBroadcastService,
-    MsalGuard, 
-    {  
-      provide: HTTP_INTERCEPTORS, useClass: MsalHttpInterceptor, multi: true  
-    },
-    {
-      provide: MSAL_INSTANCE,
-      useFactory: MSALInstanceFactory
-    },
-    {
-      provide: MSAL_GUARD_CONFIG,
-      useFactory: MSALGuardConfigFactory
-    },
-    {
-      provide: MSAL_INTERCEPTOR_CONFIG,
-      useFactory: MSALInterceptorConfigFactory
-    },
-    /* 
-    Switched to: DD-MM-YYYY.
-      Default locale is 'en-US' : MM-DD-YYYY
-      
-      Applicable to all Ng Material fields for this module.
-    */
-    {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},  
-    {provide: DateAdapter, useClass: InputDateAdapter, deps: [MAT_DATE_LOCALE, Platform]}
+ 
+    {provide: MAT_DATE_LOCALE, useValue: 'en-GB'}
 
   ],  
-  bootstrap: [AppComponent, MsalRedirectComponent]  
+  bootstrap: [AppComponent
+  ]  
 })  
 export class AppModule { } 

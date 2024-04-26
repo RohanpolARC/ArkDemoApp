@@ -22,62 +22,14 @@
       <span class="user-name"> {{userName}} </span>
   </div>
   <mat-menu #menu="matMenu">
-    <button (click)="logout()" mat-menu-item> <mat-icon>logout</mat-icon> Logout</button>
-    <button (click)="showUserRoles()" mat-menu-item> <mat-icon>group</mat-icon> Roles</button>
+    <!-- <button (click)="logout()" mat-menu-item> <mat-icon>logout</mat-icon> Logout</button> -->
+    <!-- <button (click)="showUserRoles()" mat-menu-item> <mat-icon>group</mat-icon> Roles</button> -->
   </mat-menu>
   </mat-toolbar>
   <mat-sidenav-container [hasBackdrop]="false">
   <mat-sidenav mode="side" class="left-sidenav" [(opened)]="leftSIdebarOpened" position="start">
   
-    <mat-accordion class="example-headers-align" multi>
-      <mat-expansion-panel [expanded]="false" >
-        <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
-          <mat-panel-title>
-  
-           Liquidity
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-  
-        <mat-list>
-          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Liquidity Summary');" [ngStyle]="LiquiditySummaryStyle">
-            <div class="list-item-text"> Liquidity Summary </div>
-            </mat-list-item>
-          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Cash Balance');" [ngStyle]="CashBalanceStyle">
-            <div class="list-item-text"> Cash Balance </div>
-            </mat-list-item>
-          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Capital Activity');" [ngStyle]="CapitalActivityStyle">
-            <div class="list-item-text">Capital Activity</div>
-          </mat-list-item>
-          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Unfunded Assets');" [ngStyle]="UnfundedAssetsStyle">
-            <div class="list-item-text">Unfunded Assets</div>
-          </mat-list-item>
-        </mat-list>  
-  
-      </mat-expansion-panel>
-  </mat-accordion>
 
-  <mat-accordion>
-    <mat-expansion-panel [expanded]="false" >
-      <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
-        <mat-panel-title>
-         Returns
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-  
-      <mat-list>
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Facility Detail')" [ngStyle]="FacilityDetailStyle">
-          <div class="list-item-text">Asset Browser</div>
-        </mat-list-item>
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Portfolio Modeller')" [ngStyle]="PortfolioModellerStyle">
-          <div class="list-item-text">Portfolio Modeller</div>
-        </mat-list-item>
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Net Returns')" [ngStyle]="NetReturnsStyle">
-          <div class="list-item-text">Net Returns</div>
-        </mat-list-item>
-      </mat-list>
-
-    </mat-expansion-panel>
-  </mat-accordion>
 
 
   <mat-accordion>
@@ -89,120 +41,14 @@
       </mat-expansion-panel-header>
   
       <mat-list>
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Positions Screen')" [ngStyle]="PositionsScreenStyle">
-          <div class="list-item-text">Positions</div>
-        </mat-list-item>
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Valuation')" [ngStyle]="ValuationStyle" >
-          <div class="list-item-text">Valuation</div>
-        </mat-list-item>
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Position Cashflow')" [ngStyle]="PortfolioPositionCashflowStyle" >
-          <div class="list-item-text">Position Cashflow</div>
-        </mat-list-item>
+
         <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Market Value Delta')" [ngStyle]="MarketValueDeltaStyle" >
           <div class="list-item-text">Market Value Delta</div>
         </mat-list-item>
-        <!-- <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('AUM Delta')" [ngStyle]="AUMDeltaStyle">
-          <div class="list-item-text">AUM Delta</div>
-        </mat-list-item> -->
-        <!-- <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Mark Changes')" [ngStyle]="MarkChangeStyle">
-          <div class="list-item-text">Mark Changes</div>
-        </mat-list-item> -->
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('AUM Report')" [ngStyle]="AumReportStyle">
-          <div class="list-item-text">AUM Report</div>
-        </mat-list-item>
+       
       </mat-list>
     </mat-expansion-panel>
   </mat-accordion>
-
-  <mat-accordion>
-    <mat-expansion-panel [expanded]="false" >
-      <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
-        <mat-panel-title> Fees </mat-panel-title>
-      </mat-expansion-panel-header>
-
-      <mat-list>
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Fee Presets')" [ngStyle]="FeePresetStyle">
-          <div class="list-item-text">Fee Presets</div>
-        </mat-list-item> 
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Performance Fees')" [ngStyle]="PerformanceFeesStyle">
-          <div class="list-item-text">Performance Fees</div>
-        </mat-list-item>          
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Management Fee')" [ngStyle]="ManagementFeeStyle">
-          <div class="list-item-text">Management Fees</div>
-        </mat-list-item>
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Fee Attribution')" [ngStyle]="FeeAttributionStyle">
-          <div class="list-item-text">Fee Attribution</div>
-        </mat-list-item>
-      </mat-list>
-    </mat-expansion-panel>
-  </mat-accordion>
-  
-  <mat-accordion>
-    <mat-expansion-panel [expanded]="false">
-      <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
-        <mat-panel-title>
-          Equalisation
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-
-      <mat-list>
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Equalisation - Portfolio History')" [ngStyle]="EqualisationPortfolioHistoryStyle">
-          <div class="list-item-text">Portfolio History</div>
-        </mat-list-item>
-        <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Equalisation - Position Cashflows')" [ngStyle]="EqualisationPositionCashflowsStyle">
-          <div class="list-item-text">Position Cashflows</div>
-        </mat-list-item>
-      </mat-list>
-    </mat-expansion-panel>
-  </mat-accordion>
-
-  <mat-accordion>
-      <mat-expansion-panel [expanded]="false" >
-        <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
-          <mat-panel-title>
-           Misc.
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-
-        <mat-list>
-          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Contract History')" [ngStyle]="ContractHistoryStyle">
-            <div class="list-item-text">Contract History</div>
-          </mat-list-item>
-          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('GIREditor')" [ngStyle]="GIREditorStyle">
-            <div class="list-item-text">Going In Rates Editor</div>
-          </mat-list-item>
-          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Portfolio Mapping')" [ngStyle]="PortfolioMappingStyle">
-            <div class="list-item-text">Portfolio Mapping</div>
-          </mat-list-item>
-          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Fixing Attributes')" [ngStyle]="FixingAttributesStyle">
-            <div class="list-item-text">Fixing Attributes</div>
-          </mat-list-item>
-        </mat-list>
-
-      </mat-expansion-panel>
-  </mat-accordion>
-
-    <mat-accordion>
-      <mat-expansion-panel [expanded]="false" >
-        <mat-expansion-panel-header [expandedHeight]="'48px'" [collapsedHeight]="'48px'">
-          <mat-panel-title>
-           Admin Center
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-  
-        <mat-list>
-          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Access Control')" [ngStyle]="AccessControlStyle">
-            <div class="list-item-text">Access Control</div>
-          </mat-list-item>
-
-          <mat-list-item (click)= "leftSIdebarOpened = false; updateSelection('Ref Data Manager')" [ngStyle]="RefDataManagerStyle">
-            <div class="list-item-text">Ref Data Manager</div>
-          </mat-list-item>
-        </mat-list>
-  
-      </mat-expansion-panel>
-    </mat-accordion>
-
   
   </mat-sidenav>
   <mat-sidenav  class="right-sidenav" #right [(opened)]="rightSidebarOpened" position="end">
@@ -210,100 +56,21 @@
     <div class="sidenav-right-heading right-cont">
       <span>Filter Pane</span>
       <button mat-raised-button id="apply-button"  
-        *ngIf="[
-        '/facility-detail', '/liquidity-summary', '/fee-calculation', '/management-fee',
-        '/irr/portfoliomodeller', '/contract-history', '/cash-balance','/positions-screen','/aum-delta', '/net-returns','/mark-changes','/valuation','/fee-attribution','/aum-report','/market-value-delta','/position-cashflow','/equalisation/position-cashflows','/equalisation/portfolio-history'].includes(location.path())" 
+        *ngIf="['/market-value-delta'].includes(location.path())" 
         (click)="filterApply()">Apply</button>
     </div>
 
     <ng-container *ngIf="isMsalInstanceInitialized">
-      <div *ngIf="location.path() === '/cash-balance'" class="filter-element">
-        <app-general-filter [screen] = "'cash-balance'"></app-general-filter>
-      </div>
+      
   
-      <div *ngIf="location.path() === '/contract-history'" class="filter-element">
-        <app-general-filter [screen] = "'contract-history'"></app-general-filter>
-      </div>
-  
-      <div *ngIf="location.path() === '/facility-detail'" class="filter-element">
-        <app-general-filter [screen] = "'facility-detail'"></app-general-filter>
-      </div>
-  
-      <div *ngIf="location.path() === '/liquidity-summary'" class="filter-element">
-        <app-general-filter [screen] = "'liquidity-summary'"></app-general-filter>
-      </div>
-  
-      <div *ngIf="location.path() === '/irr/portfoliomodeller'" class="filter-element">
-        <app-general-filter [screen] = "'portfoliomodeller'"></app-general-filter>
-      </div>
-  
-      <div *ngIf="location.path() === '/fee-calculation'" class="filter-element">
-        <app-general-filter [screen] = "'fee-calculation'"></app-general-filter>
-      </div>
-  
-  
-      <div *ngIf="location.path() === '/ref-data-manager'" class="filter-element">
-        <app-general-filter [screen] = "'ref-data-manager'"></app-general-filter>
-      </div>
-  
-      <div *ngIf="location.path() === '/management-fee'" class="filter-element">
-        <app-general-filter [screen] = "'management-fee'"></app-general-filter>
-      </div>
-  
-      <div *ngIf="location.path() === '/positions-screen'" class="filter-element">
-        <app-general-filter [screen] = "'positions-screen'"></app-general-filter>
-      </div>
-  
-      <div *ngIf="location.path() === '/aum-delta'" class="filter-element">
-        <app-general-filter [screen] = "'aum-delta'"></app-general-filter>
-      </div>
-  
-      <div *ngIf="location.path() === '/net-returns'" class="filter-element">
-        <app-general-filter [screen] = "'net-returns'"></app-general-filter>
-      </div>
-  
-      <div *ngIf="location.path() === '/mark-changes'" class="filter-element">
-        <app-general-filter [screen] = "'mark-changes'"></app-general-filter>
-      </div>
-  
-      <div *ngIf="location.path() === '/valuation'" class="filter-element">
-        <app-general-filter [screen] = "'valuation'"></app-general-filter>
-      </div>
-  
-      <div *ngIf="location.path() === '/fee-attribution'" class="filter-element">
-        <app-general-filter [screen] = "'Fee Attribution'"></app-general-filter>
-      </div>
-  
-      <div *ngIf="location.path() === '/aum-report'" class="filter-element">
-        <app-general-filter [screen] = "'Aum Report'"></app-general-filter>
-      </div>
-  
-      <div *ngIf="location.path() === '/market-value-delta'" class="filter-element">
-        <app-general-filter [screen] = "'Market Value Delta'"></app-general-filter>
-      </div>
-  
-      <div *ngIf="location.path() === '/position-cashflow'" class="filter-element">
-        <app-general-filter [screen] = "'Position Cashflow'"></app-general-filter>
-      </div>
-  
-      <div *ngIf="location.path() === '/equalisation/position-cashflows'" class="filter-element">
-        <app-general-filter [screen] = "'Equalisation - Position Cashflows'"></app-general-filter>
-      </div>
-        
-      <div *ngIf="location.path() === '/equalisation/portfolio-history'" class="filter-element">
-        <app-general-filter [screen] = "'Equalisation - Portfolio History'"></app-general-filter>
-      </div>
+
     </ng-container>
     
 
   </mat-sidenav>
 
   <mat-sidenav-content>  
-    <div class="filter-btn-row">
-      <mat-icon class="filter-btn" (click)="rightSidebarOpened=!rightSidebarOpened">
-        filter_alt
-        </mat-icon>
-    </div>
+
 
     <router-outlet></router-outlet>
   </mat-sidenav-content>
