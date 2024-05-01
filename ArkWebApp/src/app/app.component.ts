@@ -98,6 +98,8 @@ export class AppComponent {
   
     if(this.location.path() === '/market-value-delta'){
       this.updateSelection('Market Value Delta')
+    }else if(this.location.path() === '/facility-detail'){
+      this.updateSelection('Facility Detail')
     }
     else this.updateSelection('')
   }
@@ -118,6 +120,13 @@ export class AppComponent {
     if(screen === 'Market Value Delta'){
       this.MarketValueDeltaStyle = this.selectedElement;
       this.router.navigate(['/market-value-delta'])
+    }else if(screen === 'Facility Detail'){
+
+      this.FacilityDetailStyle = this.selectedElement
+      // setTimeout(() => { this.filterApply() }, 250)
+
+
+      this.router.navigate(['/facility-detail'])
     }
   
   }

@@ -4,6 +4,8 @@ import { AsOfDateRange } from 'src/app/shared/models/FilterPaneModel';
 import { UtilService } from './services/util.service';
 import { MarketValueDeltaModel, NewIssuerOrAsset } from 'src/app/shared/models/MarketValueDeltaModel';
 import { GridConfigService } from './services/grid-config.service';
+import { MatDialog } from '@angular/material/dialog';
+import { PortfolioManageModelComponent } from './portfolio-manage-model/portfolio-manage-model.component';
 
 @Component({
   selector: 'app-market-value-delta',
@@ -23,7 +25,8 @@ export class MarketValueDeltaComponent implements OnInit {
 
   constructor(
     private utilService: UtilService,
-    private gridConfigSvc: GridConfigService
+    private gridConfigSvc: GridConfigService,
+    public dialog: MatDialog,
   ) { 
     this.currentAsOfDateRange$ = this.utilService.currentAsOfDateRange$
     this.currentNewIssuerOrAsset$ = this.utilService.currentNewIssuerOrAsset$
@@ -32,6 +35,16 @@ export class MarketValueDeltaComponent implements OnInit {
 
   ngOnInit(): void {
   }
+
+  onManageModel(context="Manage"){
+    const dialogRef = this.dialog.open(PortfolioManageModelComponent, {
+      height:'85vh',
+      width:'80vw'
+    })
+
+  }
+
+
 
   createChart = this.gridConfigSvc.createChart.bind(this.gridConfigSvc)
 

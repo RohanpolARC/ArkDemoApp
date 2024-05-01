@@ -9,6 +9,7 @@ const routes: Routes = [
     canActivate: []
   },  
    { path: 'market-value-delta', loadChildren: () => import('./modules/market-value-delta/market-value-delta.module').then(m => m.MarketValueDeltaModule) },
+   { path: 'facility-detail', loadChildren: () => import('./modules/facility-detail/facility-detail.module').then(m => m.FacilityDetailModule) },
 ];
 
 @NgModule({  

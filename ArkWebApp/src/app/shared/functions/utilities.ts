@@ -234,7 +234,7 @@ export function autosizeColumnExceptResized(
                                            .map((column: Column) => column.getColId())
                                            .filter((colId: string) => !resizedColumnList.includes(colId));
 
-  event.api.autoSizeColumns(autosizeColumns);
+  event.api?.autoSizeColumns(autosizeColumns);
 }
 
 export function handleResizedColumns(params: ColumnResizedEvent) {
