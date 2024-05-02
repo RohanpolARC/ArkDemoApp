@@ -170,8 +170,7 @@ export class AumReportComponent implements OnInit {
           detailAdaptableOptions: {            
             ...CommonConfig.ADAPTABLE_OPTIONS,
             adaptableId: 'AumReportDetails',
-            primaryKey: '',
-            autogeneratePrimaryKey: true,
+            primaryKey: 'positionId',
 
             exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
           
