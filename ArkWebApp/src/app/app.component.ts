@@ -38,32 +38,9 @@ export class AppComponent {
     'cursor': 'pointer'
   }
 
-  GIREditorStyle: any = {};
-  CashBalanceStyle: any = {};
-  CapitalActivityStyle: any = {};
   FacilityDetailStyle: any = {};
-  LiquiditySummaryStyle: any = {};
-  AccessControlStyle: any = {};
-  PortfolioModellerStyle: any = {};
-  PortfolioMappingStyle: any = {};
-  UnfundedAssetsStyle: any = {};
-  ContractHistoryStyle: any = {};
-  PerformanceFeesStyle: any = {};
-  FeePresetStyle: any = {};
-  FixingAttributesStyle:any = {};
-  RefDataManagerStyle:any = {};
-  ManagementFeeStyle: any = {};
-  PositionsScreenStyle: any = {};
-  NetReturnsStyle: any = {};
-  AUMDeltaStyle: any = {};
-  MarkChangeStyle:any = {};
-  ValuationStyle: any = {};
-  FeeAttributionStyle: any = {};
   AumReportStyle: any = {};
-  PortfolioPositionCashflowStyle: any = {};
   MarketValueDeltaStyle: any = {};
-  EqualisationPortfolioHistoryStyle: any = {};
-  EqualisationPositionCashflowsStyle: any = {};
 
   funds
   fundHedgings
@@ -100,6 +77,8 @@ export class AppComponent {
       this.updateSelection('Market Value Delta')
     }else if(this.location.path() === '/facility-detail'){
       this.updateSelection('Facility Detail')
+    }else if(this.location.path() === '/aum-report'){
+      this.updateSelection('AUM Report')
     }
     else this.updateSelection('')
   }
@@ -127,6 +106,9 @@ export class AppComponent {
 
 
       this.router.navigate(['/facility-detail'])
+    }else if(screen === 'AUM Report'){
+      this.AumReportStyle = this.selectedElement;
+      this.router.navigate(['/aum-report'])
     }
   
   }

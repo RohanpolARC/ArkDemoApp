@@ -194,6 +194,7 @@ export class FacilityDetailComponent implements OnInit {
       allowContextMenuWithControlKey:true, 
       components:this.frameworkComponents,
       excelStyles: CommonConfig.GENERAL_EXCEL_STYLES,
+      context: this.context
     }
 
 
