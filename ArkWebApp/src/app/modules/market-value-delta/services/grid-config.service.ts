@@ -1,6 +1,6 @@
 import { ActionColumnContext, AdaptableApi, AdaptableButton, AdaptableOptions } from '@adaptabletools/adaptable-angular-aggrid';
 import { ChartToolPanelsDef, ColDef, GridApi, GridOptions, Module } from '@ag-grid-community/core';
-import { GridChartsModule } from '@ag-grid-enterprise/charts';
+import { GridChartsModule } from"@ag-grid-enterprise/charts-enterprise";
 import { Injectable } from '@angular/core';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { DataService } from 'src/app/core/services/data.service';
@@ -53,7 +53,8 @@ export class GridConfigService {
           rowEndIndex: 0,
           columns: ["marketValueLatest","marketValueLast","mvDeltaExisting"],
         },
-        chartType: "bar"
+        // chartType: "bar",
+        chartType: "waterfall"
       });
   }
 
@@ -169,7 +170,6 @@ export class GridConfigService {
 
   adaptableOptions: AdaptableOptions = {
     ...CommonConfig.ADAPTABLE_OPTIONS,
-
     autogeneratePrimaryKey: true,
     primaryKey: '',
     userName: this.dataSvc.getCurrentUserName(),
