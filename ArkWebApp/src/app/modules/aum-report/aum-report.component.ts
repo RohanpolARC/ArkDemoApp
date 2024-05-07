@@ -1,10 +1,10 @@
 import { AdaptableApi, AdaptableOptions, AdaptableReadyInfo, DetailInitContext } from '@adaptabletools/adaptable-angular-aggrid';
-import { ColDef, GridApi, GridOptions, IDetailCellRendererParams, Module, DetailGridInfo, RowGroupOpenedEvent } from '@ag-grid-community/core';
+import { ColDef, GridApi, GridOptions, IDetailCellRendererParams, Module, DetailGridInfo, RowGroupOpenedEvent, ICellRendererParams } from '@ag-grid-community/core';
 import { Component, OnInit } from '@angular/core';
 import { CommonConfig } from 'src/app/configs/common-config';
 import { AumReportService } from 'src/app/core/services/aum-report/aum-report.service';
 import { DataService } from 'src/app/core/services/data.service';
-import {   nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
+import {   CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, nonAmountNumberFormatter } from 'src/app/shared/functions/formatter';
 import { MasterDetailModule } from "@ag-grid-enterprise/master-detail";
 import masterDetailAgGridPlugin from '@adaptabletools/adaptable-plugin-master-detail-aggrid';
 import { Subscription, of } from 'rxjs';
@@ -26,7 +26,7 @@ export class AumReportComponent implements OnInit {
   adaptableApi: AdaptableApi;
   subscriptions: Subscription[] = []
   noRowsToDisplayMsg = 'Please select the filter.'
-  detailCellRendererParams: IDetailCellRendererParams<any, any>;
+  detailCellRendererParams: (params: ICellRendererParams) => IDetailCellRendererParams<any, any>;
   funds: string[] = []
 
 
@@ -90,12 +90,63 @@ export class AumReportComponent implements OnInit {
 
     ]
 
-    this.detailCellRendererParams = {
+    this.detailCellRendererParams =(params: ICellRendererParams) => {
       
-      detailGridOptions: {
+      return <IDetailCellRendererParams>{
+        detailGridOptions: {
         ...CommonConfig.GRID_OPTIONS,
         ...{
-          columnDefs: this.detailColumnDefs,
+          columnDefs:  [
+            {field: "positionId",type:"abColDefNumber"},
+            {field: "issuerShortName", type:"abColDefString"},
+            {field: "fund", type:"abColDefString"},
+            {field: "fundHedging", type:"abColDefString"},
+            {field: "portfolio", type:"abColDefString"},
+            {field: "fundStrategy", type: "abColDefString"},
+            {field: "issuer", type:"abColDefString"},
+            {field: "asset", type:"abColDefString"},
+            {field: "aumLatest",type:"abColDefNumber", valueFormatter: nonAmountNumberFormatter, headerName:"AUM Latest"},
+            {field: "aumLast",type:"abColDefNumber", headerName:"AUM Last"},
+            {field: "aumDiff",type:"abColDefNumber", headerName:"AUM Diff"},
+            {field: "aumSpotLatest",type:"abColDefNumber", headerName:"AUM Spot Latest" },
+            {field: "aumSpotLast",type:"abColDefNumber", headerName:"AUM Spot Last"},
+            {field: "aumSpotDiff",type:"abColDefNumber", headerName:"AUM Spot Diff"},
+            {field: "coinvestCostChange",type:"abColDefNumber", headerName:"Co-Invest Cost Change"},
+            {field: "smaCostChange",type:"abColDefNumber", headerName:"SMA Cost Change"},
+            {field: "grossCostAmountEurCurrent",type:'abColDefNumber'},
+            {field: "grossCostAmountEurLast",type:'abColDefNumber'},
+            {field: "grossCostAmountEurDiff",type:'abColDefNumber'},
+            {field: "grossFundedCostAmountEurCurrent",type:'abColDefNumber'},
+            {field: "grossFundedCostAmountEurLast",type:'abColDefNumber'},
+            {field: "grossFundedCostAmountEurDiff",type:'abColDefNumber'},
+            {field: "costAmountEurCurrent",type:'abColDefNumber'},
+            {field: "costAmountEurLast",type:'abColDefNumber'},
+            {field: "costAmountEurDiff",type:'abColDefNumber'},
+            {field: "fundedCostAmountEurCurrent",type:'abColDefNumber'},
+            {field: "fundedCostAmountEurLast",type:'abColDefNumber'},
+            {field: "fundedCostAmountEurDiff",type:'abColDefNumber'},
+            {field: "costAmountLocalCurrent",type:'abColDefNumber'},
+            {field: "costAmountLocalLast",type:'abColDefNumber'},
+            {field: "costAmountLocalDiff",type:'abColDefNumber'},
+            {field: "aumEurAdjustmentCurrent",type:'abColDefNumber', headerName:"AUM Eur Adjustment Current"},
+            {field: "aumEurAdjustmentLast",type:'abColDefNumber', headerName: "AUM Eur Adjustment Last"},
+            {field: "aumEurAdjustmentDiff",type:'abColDefNumber', headerName: "AUM Eur Adjustment Diff"},
+            {field: "grossGPSLatest", type:'abColDefNumber'},
+            {field: "grossGPSLast", type:'abColDefNumber'},
+            {field: "grossGPSDiff", type:'abColDefNumber'},
+      
+            {field: "netGPSLatest", type:'abColDefNumber'},
+            {field: "netGPSLast", type:'abColDefNumber'},
+            {field: "netGPSDiff", type:'abColDefNumber'},
+      
+            {field: "netOfRebateGPSLatest", type:'abColDefNumber'},
+            {field: "netOfRebateGPSLast", type:'abColDefNumber'},
+            {field: "netOfRebateGPSDiff", type:'abColDefNumber'},
+            {field: "upfrontFeesCurrent",type:"abColDefNumber", headerName:"Upfront Fees Current"},
+            {field: "upfrontFeesLast",type:"abColDefNumber", headerName:"Upfront Fees Last"},
+            {field: "upfrontFeesDiff",type:"abColDefNumber", headerName:"Upfront Fees Diff"}
+  
+          ],
           defaultColDef: {
             resizable: true,
             filter: true,
@@ -117,7 +168,8 @@ export class AumReportComponent implements OnInit {
           }
         })
       )},
-    } as IDetailCellRendererParams;
+    }
+  } //as IDetailCellRendererParams;
 
     this.gridOptions = {
       ...CommonConfig.GRID_OPTIONS,
@@ -277,6 +329,12 @@ export class AumReportComponent implements OnInit {
         }),
       ],
       
+      formatColumnOptions:{
+        customDisplayFormatters: [
+          CUSTOM_DISPLAY_FORMATTERS_CONFIG('amountFormatter',['aumLatest'])
+          ],
+      },
+
       predefinedConfig: {
         Dashboard: {
           Revision:6,
@@ -371,9 +429,15 @@ export class AumReportComponent implements OnInit {
             }
           }]
           
-        }
+        },
         
+      FormatColumn: {
+        Revision: 2,
+        FormatColumns: [
+          CUSTOM_FORMATTER(['aumLatest'],['amountFormatter']),
+        ]
       }
+      },
 
     }
 
@@ -427,61 +491,7 @@ export class AumReportComponent implements OnInit {
     }
 
       onRowGroupOpened: (event: RowGroupOpenedEvent<any>) => void = (params: RowGroupOpenedEvent) => {
-        this.detailColumnDefs = [
-          {field: "positionId",type:"abColDefNumber"},
-          {field: "issuerShortName", type:"abColDefString"},
-          {field: "fund", type:"abColDefString"},
-          {field: "fundHedging", type:"abColDefString"},
-          {field: "portfolio", type:"abColDefString"},
-          {field: "fundStrategy", type: "abColDefString"},
-          {field: "issuer", type:"abColDefString"},
-          {field: "asset", type:"abColDefString"},
-          {field: "aumLatest",type:"abColDefNumber", valueFormatter: nonAmountNumberFormatter, headerName:"AUM Latest"},
-          {field: "aumLast",type:"abColDefNumber", headerName:"AUM Last"},
-          {field: "aumDiff",type:"abColDefNumber", headerName:"AUM Diff"},
-          {field: "aumSpotLatest",type:"abColDefNumber", headerName:"AUM Spot Latest" },
-          {field: "aumSpotLast",type:"abColDefNumber", headerName:"AUM Spot Last"},
-          {field: "aumSpotDiff",type:"abColDefNumber", headerName:"AUM Spot Diff"},
-          {field: "coinvestCostChange",type:"abColDefNumber", headerName:"Co-Invest Cost Change"},
-          {field: "smaCostChange",type:"abColDefNumber", headerName:"SMA Cost Change"},
-          {field: "grossCostAmountEurCurrent",type:'abColDefNumber'},
-          {field: "grossCostAmountEurLast",type:'abColDefNumber'},
-          {field: "grossCostAmountEurDiff",type:'abColDefNumber'},
-          {field: "grossFundedCostAmountEurCurrent",type:'abColDefNumber'},
-          {field: "grossFundedCostAmountEurLast",type:'abColDefNumber'},
-          {field: "grossFundedCostAmountEurDiff",type:'abColDefNumber'},
-          {field: "costAmountEurCurrent",type:'abColDefNumber'},
-          {field: "costAmountEurLast",type:'abColDefNumber'},
-          {field: "costAmountEurDiff",type:'abColDefNumber'},
-          {field: "fundedCostAmountEurCurrent",type:'abColDefNumber'},
-          {field: "fundedCostAmountEurLast",type:'abColDefNumber'},
-          {field: "fundedCostAmountEurDiff",type:'abColDefNumber'},
-          {field: "costAmountLocalCurrent",type:'abColDefNumber'},
-          {field: "costAmountLocalLast",type:'abColDefNumber'},
-          {field: "costAmountLocalDiff",type:'abColDefNumber'},
-          {field: "aumEurAdjustmentCurrent",type:'abColDefNumber', headerName:"AUM Eur Adjustment Current"},
-          {field: "aumEurAdjustmentLast",type:'abColDefNumber', headerName: "AUM Eur Adjustment Last"},
-          {field: "aumEurAdjustmentDiff",type:'abColDefNumber', headerName: "AUM Eur Adjustment Diff"},
-          {field: "grossGPSLatest", type:'abColDefNumber'},
-          {field: "grossGPSLast", type:'abColDefNumber'},
-          {field: "grossGPSDiff", type:'abColDefNumber'},
     
-          {field: "netGPSLatest", type:'abColDefNumber'},
-          {field: "netGPSLast", type:'abColDefNumber'},
-          {field: "netGPSDiff", type:'abColDefNumber'},
-    
-          {field: "netOfRebateGPSLatest", type:'abColDefNumber'},
-          {field: "netOfRebateGPSLast", type:'abColDefNumber'},
-          {field: "netOfRebateGPSDiff", type:'abColDefNumber'},
-          {field: "upfrontFeesCurrent",type:"abColDefNumber", headerName:"Upfront Fees Current"},
-          {field: "upfrontFeesLast",type:"abColDefNumber", headerName:"Upfront Fees Last"},
-          {field: "upfrontFeesDiff",type:"abColDefNumber", headerName:"Upfront Fees Diff"}
-
-        ]
-        let detailGridInfo: DetailGridInfo = params.api.getDetailGridInfo(`detail_${params.data?.['__ADAPTABLE_PK__']}`);
-        if(detailGridInfo){
-          detailGridInfo.api.setGridOption("columnDefs", this.detailColumnDefs);
-        }
       }
       
   onAdaptableReady(params: AdaptableReadyInfo){

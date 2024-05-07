@@ -24,7 +24,7 @@ export class AumReportService {
         ,fund : 'fund'
         ,issuerShortName	: 'isn'
         ,moveType : 'No-Move'
-        ,aumLatest : 150000000
+        ,aumLatest : -464675.93197051
         ,aumLast : 150000000
         ,aumDiff	: 0
         ,aumSpotLatest : 150000000

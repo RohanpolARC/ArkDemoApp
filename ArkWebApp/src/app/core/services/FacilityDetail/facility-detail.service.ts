@@ -20,7 +20,7 @@ export class FacilityDetailService {
           ,assetID : 123
           ,assetTypeName : ''
           ,ccy : 'EUR'
-          ,faceValueIssueQuantity : 100
+          ,faceValueIssueQuantity : -345345.234
           ,costPrice : 100
           ,mark : 100
           ,maturityDate : '29/11/2017'
@@ -63,7 +63,7 @@ export class FacilityDetailService {
           ,assetID : 124
           ,assetTypeName : ''
           ,ccy : 'EUR'
-          ,faceValueIssueQuantity : 100
+          ,faceValueIssueQuantity : 32523523.234
           ,costPrice : 100
           ,mark : 100
           ,maturityDate : '29/11/2017'
@@ -106,7 +106,7 @@ export class FacilityDetailService {
           ,assetID : 125
           ,assetTypeName : ''
           ,ccy : 'EUR'
-          ,faceValueIssueQuantity : 100
+          ,faceValueIssueQuantity : 75674465.456
           ,costPrice : 100
           ,mark : 100
           ,maturityDate : '29/11/2017'
