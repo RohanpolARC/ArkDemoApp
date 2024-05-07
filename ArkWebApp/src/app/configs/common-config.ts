@@ -7,7 +7,6 @@ import { ClipboardModule } from "@ag-grid-enterprise/clipboard";
 import { ColumnsToolPanelModule } from "@ag-grid-enterprise/column-tool-panel";
 import { ExcelExportModule } from "@ag-grid-enterprise/excel-export";
 import { FiltersToolPanelModule } from "@ag-grid-enterprise/filter-tool-panel";
-import { MenuModule } from "@ag-grid-enterprise/menu";
 import { RangeSelectionModule } from "@ag-grid-enterprise/range-selection";
 import { RowGroupingModule } from "@ag-grid-enterprise/row-grouping";
 import { SetFilterModule } from "@ag-grid-enterprise/set-filter";
@@ -99,7 +98,6 @@ export class CommonConfig{
         ClientSideRowModelModule,
         SetFilterModule,
         ColumnsToolPanelModule,
-        MenuModule,
         ExcelExportModule,
         CsvExportModule,
         FiltersToolPanelModule,
