@@ -20,52 +20,36 @@ export class GridComponent implements OnInit {
 
 
 
-  rowData = [{
-    PositionId                  :   0,
-    marketValueLatest           :   5,
-    marketValueLast             :   10,
-    mvDeltaExisting             :   15,
-    MVDeltaNew                  :   0,
-    MarketValueIssueLatest      :   0,
-    MarketValueIssueLast        :   0,
-    MVIssueDeltaExisting        :   0,
-    MVIssueDeltaNew             :   0,
-    MarkLatest                  :   0,
-    MarkLast                    :   0,
-    MarkDeltaExisting           :   0,
-    MarkDeltaNew                :   0,
-    IssuerShortName             :   'string',
-    Asset                       :   'string',
-    AssetId                     :   0,
-    Fund                        :   'string',
-    FundHedging                 :   'string',
-    PortfolioName               :   'string',
-    PortfolioType               :   'string',
-    ValuationMethod             :   'string',
-    CcyName                     :   'string',
-    FundCcy                     :   'string',
-    FundAdmin                   :   'string',
-    AssetTypeName               :   'string',
-    BenchmarkIndex              :   'string',
-    MaturityDate                :   new Date(),
-    FaceValue                   :   0,
-    FaceValueFunded             :   0,
-    FaceValueFundedSD           :   0,
-    CostValue                   :   0,
-    CostValueFunded             :   0,
-    CostValueFundedSD           :   0,
-    MarketValueFunded           :   0,
-    MarketValueFundedSD         :   0,
-    FaceValueIssue              :   0,
-    FaceValueIssueFunded        :   0,
-    FaceValueIssueFundedSD      :   0,
-    CostValueIssue              :   0,
-    CostValueIssueFunded        :   0,
-    CostValueIssueFundedSD      :   0,
-    MarketValueIssue            :   0,
-    MarketValueIssueFunded      :   0,
-    MarketValueIssueFundedSD    :   0
-  }]
+  rowData = [
+    {
+      marketValues:"Market Value Last",
+      displayValues:10000000000,
+      markValues:"Mark Last",
+      mark:76.9235,
+      chartingValues:10000000000
+    },
+    {
+      marketValues:"MV Delta Existing",
+      displayValues:1000000000,
+      markValues:"Mark Delta Existing",
+      mark:-0.3815,
+      chartingValues:1000000000
+    },
+    {
+      marketValues:"MV Delta New",
+      displayValues:1000000000,
+      markValues:"Mark Delta New",
+      mark: 0,
+      chartingValues:1000000000
+    },
+    {
+      marketValues:"Market Value Latest",
+      displayValues:12000000000,
+      markValues:"Mark Latest",
+      mark:76.9941,
+      chartingValues:-12000000000
+    }
+  ]
 
   
   constructor(

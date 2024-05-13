@@ -61,56 +61,11 @@ export class GridConfigService {
   agGridModules: Module[] = [...CommonConfig.AG_GRID_MODULES,GridChartsModule]
 
   columnDefs: ColDef[] = [
-    { field:'positionId', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'marketValueLatest', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'marketValueLast', type: 'abColDefNumber',  chartDataType: "series" },
-    { field:'mvDeltaExisting', type: 'abColDefNumber', headerName: 'MV Delta Existing', chartDataType: "series" },
-    { field:'mvDeltaNew', type: 'abColDefNumber', headerName: 'MV Delta New', chartDataType: "series" },
-    { field:'marketValueIssueLatest', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'marketValueIssueLast', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'mvIssueDeltaExisting', type: 'abColDefNumber', chartDataType: "series", headerName: 'MV Issue Delta Existing' },
-    { field:'mvIssueDeltaNew', type: 'abColDefNumber', chartDataType: "series", headerName: 'MV Issue Delta New' },
-    { field:'markLatest', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'markLast', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'markDeltaExisting', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'markDeltaNew', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'issuerShortName', type: 'abColDefString', chartDataType: "category"},
-    { field:'asset', type: 'abColDefString', chartDataType: "category" },
-    { field:'assetId', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'fund', type: 'abColDefString', chartDataType: "category" },
-    { field:'fundHedging', type: 'abColDefString', chartDataType: "category" },
-    { field:'portfolioName', type: 'abColDefString', chartDataType: "category" },
-    { field:'portfolioType', type: 'abColDefString', chartDataType: "category" },
-    { field:'valuationMethod', type: 'abColDefString', chartDataType: "category" },
-    { field:'ccyName', type: 'abColDefString', chartDataType: "category" },
-    { field:'fundCcy', type: 'abColDefString', chartDataType: "category" },
-    { field:'fundAdmin', type: 'abColDefString', chartDataType: "category" },
-    { field:'assetTypeName', type: 'abColDefString', chartDataType: "category" },
-    { field:'benchmarkIndex', type: 'abColDefString', chartDataType: "category" },
-    { field:'maturityDate', type: 'abColDefDate', chartDataType: "category" },
-    { field:'faceValue', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'faceValueFunded', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'faceValueFundedSD', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'costValue', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'costValueFunded', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'costValueFundedSD', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'marketValueFunded', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'marketValueFundedSD', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'faceValueIssue', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'faceValueIssueFunded', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'faceValueIssueFundedSD', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'costValueIssue', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'costValueIssueFunded', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'costValueIssueFundedSD', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'marketValueIssue', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'marketValueIssueFunded', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'marketValueIssueFundedSD', type: 'abColDefNumber', chartDataType: "series" },
-    { field:'action', type: 'abSpecialColumn' },
-    // {
-    //   colId: 'action',
-    //   type: ['abSpecialColumn'],
-    //   headerTooltip: 'Waterfall Chart'
-    //   },
+    { field:'marketValues', headerName: 'Market Value Category' ,type: 'abColDefString' },
+    { field:'chartingValues', type: 'abColDefNumber' },
+    { field: 'displayValues', headerName: 'Values', type: 'abColDefNumber'},
+    { field: 'markValues', headerName: 'Mark Value Category', type: 'abColDefString'},
+    { field: 'mark', type: 'abColDefNumber'},
   ]
   public popupParent: HTMLElement | null = document.body;
 
@@ -175,7 +130,10 @@ export class GridConfigService {
     userName: this.dataSvc.getCurrentUserName(),
     adaptableId: 'MV Delta Id',
     adaptableStateKey: 'MV Delta Key',
-    exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
+    exportOptions: {
+      ...CommonConfig.GENERAL_EXPORT_OPTIONS,
+    },
+    
     teamSharingOptions: {
       enableTeamSharing: true,
       persistSharedEntities: presistSharedEntities.bind(this), 
@@ -204,70 +162,33 @@ export class GridConfigService {
         }],
         IsHidden: false, DashboardTitle: ' '
       },
-      FormatColumn: {
-        Revision: 3,
-        FormatColumns: [
-          BLANK_DATETIME_FORMATTER_CONFIG(['maturityDate']), 
-          DATE_FORMATTER_CONFIG_ddMMyyyy(['maturityDate']), 
-          AMOUNT_FORMATTER_CONFIG_Zero(['markLatest' ,'markLast' ,'markDeltaExisting' ,'markDeltaNew'], 2, ['amountZeroFormat']),
-          AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['markLatest' ,'markLast' ,'markDeltaExisting' ,'markDeltaNew'], 4),
-          CUSTOM_FORMATTER(this.AMOUNT_COLUMNS, 'amountFormatter')
-        ]
-      },
-      Layout: {
-        Revision: 4,
-        CurrentLayout: 'Default',
-        Layouts:[
-          {
-            Name: 'Default',
-            Columns: [ "positionId","marketValueLatest","marketValueLast","mvDeltaExisting","mvDeltaNew","ccyName","marketValueIssueLatest","marketValueIssueLast","mvIssueDeltaExisting","mvIssueDeltaNew","markLatest","markLast","markDeltaExisting","markDeltaNew","issuerShortName","asset","assetId","fund","fundHedging","portfolioName","portfolioType","fundCcy","assetTypeName","maturityDate","action"],
-            RowGroupedColumns: [ "valuationMethod","issuerShortName","asset" ],
-            AggregationColumns: {
-              "marketValueLatest":"sum",
-              "marketValueLast":"sum",
-              "mvDeltaExisting":"sum",
-              "mvDeltaNew":"sum",
-              "ccyName":"first",
-              "marketValueIssueLatest":"sum",
-              "marketValueIssueLast":"sum",
-              "mvIssueDeltaExisting":"sum",
-              "mvIssueDeltaNew":"sum",
-              "markLatest":"avg",
-              "markLast":"avg",
-              "markDeltaExisting":"avg"
-            },
-            ColumnSorts:[{
-              ColumnId:"asset",
-              SortOrder:"Desc"
-            }],
-            EnablePivot: false,
-            ColumnFilters: [{
-              ColumnId : "marketValueLatest",
-              Predicate : {
-                PredicateId : "NotBetween",
-                Inputs : [-0.1,0.1]
-              }
-            }],
-            SuppressAggFuncInHeader : true,
-            PinnedColumnsMap: { 
-              action: 'right'
-            },
+      Layout:{
+        Revision: 4.3,
+        CurrentLayout: 'Basic Layout',
+        Layouts: [{
+          Name: 'Basic Layout',
+          Columns: [
+            'marketValues',
+            'displayValues',
+            'markValues',
+            'mark',
+            'action'
+          ],
+          PinnedColumnsMap:{
+            'action' :'right'
           }
+        }]
+      },
+      FormatColumn: {
+        Revision: 3.1,
+        FormatColumns:[
+          CUSTOM_FORMATTER(['displayValues'],['amountFormatter']),
+          AMOUNT_FORMATTER_CONFIG_Zero(['mark'], 2, ['amountZeroFormat']),
+          AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['mark'], 4),
         ]
       },
-      StatusBar: {
-        Revision: 1,
-        StatusBars: [
-          {
-            Key: 'Center Panel',
-            StatusBarPanels: ['GridFilter']
-          },
-          {
-            Key: 'Right Panel',
-            StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
-          },
-        ],
-      }
+      
+
     },
 
     actionColumnOptions: {
@@ -294,7 +215,14 @@ export class GridConfigService {
               ) => {
                
 
-                 console.log("Action")
+                this.gridApi.createRangeChart({
+                  cellRange: {
+                    rowStartIndex: 0,
+                    rowEndIndex: 3,
+                    columns: ["marketValues","chartingValues"],
+                  },
+                  chartType: "waterfall"
+                })!;
 
               },
             },
