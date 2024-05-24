@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ChartToolPanelsDef, ColDef, GridOptions, GridReadyEvent, Module } from '@ag-grid-community/core';
-import { AdaptableOptions, AdaptableReadyInfo } from '@adaptabletools/adaptable-angular-aggrid';
+import { AdaptableApi, AdaptableOptions, AdaptableReadyInfo } from '@adaptabletools/adaptable-angular-aggrid';
 import { GridConfigService } from '../services/grid-config.service';
 import { Observable } from 'rxjs';
 import { MarketValueDeltaModel } from 'src/app/shared/models/MarketValueDeltaModel';
 import { UtilService } from '../services/util.service';
+import { CUSTOM_FORMATTER } from 'src/app/shared/functions/formatter';
 
 @Component({
   selector: 'app-grid',
@@ -26,6 +27,7 @@ export class GridComponent implements OnInit {
       displayValues:10000000000,
       markValues:"Mark Last",
       mark:76.9235,
+      maturityDate:'09/29/2024',
       chartingValues:10000000000
     },
     {
@@ -33,6 +35,7 @@ export class GridComponent implements OnInit {
       displayValues:1000000000,
       markValues:"Mark Delta Existing",
       mark:-0.3815,
+      maturityDate:'12/05/2025',
       chartingValues:1000000000
     },
     {
@@ -40,6 +43,7 @@ export class GridComponent implements OnInit {
       displayValues:1000000000,
       markValues:"Mark Delta New",
       mark: 0,
+      maturityDate:'06/08/2026',
       chartingValues:1000000000
     },
     {
@@ -47,15 +51,17 @@ export class GridComponent implements OnInit {
       displayValues:12000000000,
       markValues:"Mark Latest",
       mark:76.9941,
+      maturityDate:'02/15/2027',
       chartingValues:-12000000000
     }
   ]
+  adaptableApi: AdaptableApi;
 
-  
+
   constructor(
     private gridConfigService: GridConfigService,
     private utilService: UtilService
-  ) { 
+  ) {
     this.agGridModules = this.gridConfigService.agGridModules,
     this.gridOptions = this.gridConfigService.gridOptions,
     this.adaptableOptions = this.gridConfigService.adaptableOptions

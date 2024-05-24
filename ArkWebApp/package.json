@@ -10,8 +10,8 @@
   },
   "private": true,
   "dependencies": {
-    "@adaptabletools/adaptable-angular-aggrid": "^18.0.6",
-    "@adaptabletools/adaptable-plugin-master-detail-aggrid": "^18.0.6",
+    "@adaptabletools/adaptable-angular-aggrid": "18.0.6",
+    "@adaptabletools/adaptable-plugin-master-detail-aggrid": "18.0.6",
     "@ag-grid-community/angular": "^31.2.1",
     "@ag-grid-community/client-side-row-model": "^31.2.1",
     "@ag-grid-community/core": "^31.2.1",

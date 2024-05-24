@@ -66,6 +66,7 @@ export class GridConfigService {
     { field: 'displayValues', headerName: 'Values', type: 'abColDefNumber'},
     { field: 'markValues', headerName: 'Mark Value Category', type: 'abColDefString'},
     { field: 'mark', type: 'abColDefNumber'},
+    {field: 'maturityDate', headerName: 'Maturity Date', type: 'abColDefDate'}
   ]
   public popupParent: HTMLElement | null = document.body;
 
@@ -163,15 +164,19 @@ export class GridConfigService {
         IsHidden: false, DashboardTitle: ' '
       },
       Layout:{
-        Revision: 4.3,
+        Revision: 4.5,
         CurrentLayout: 'Basic Layout',
         Layouts: [{
           Name: 'Basic Layout',
+          AggregationColumns: {
+            'maturityDate': 'last'
+          },
           Columns: [
             'marketValues',
             'displayValues',
             'markValues',
             'mark',
+            'maturityDate',
             'action'
           ],
           PinnedColumnsMap:{
@@ -180,14 +185,26 @@ export class GridConfigService {
         }]
       },
       FormatColumn: {
-        Revision: 3.1,
+        Revision: 3.4,
         FormatColumns:[
-          CUSTOM_FORMATTER(['displayValues'],['amountFormatter']),
-          AMOUNT_FORMATTER_CONFIG_Zero(['mark'], 2, ['amountZeroFormat']),
-          AMOUNT_FORMATTER_CONFIG_DECIMAL_Non_Zero(['mark'], 4),
+          BLANK_DATETIME_FORMATTER_CONFIG(['maturityDate']), 
+          DATE_FORMATTER_CONFIG_ddMMyyyy(['maturityDate']), 
         ]
       },
-      
+
+      StatusBar: {
+        Revision: 1,
+        StatusBars: [
+          {
+            Key: 'Center Panel',
+            StatusBarPanels: ['ColumnFilter']
+          },
+          {
+            Key: 'Right Panel',
+            StatusBarPanels: ['StatusBar','CellSummary','Layout','Export'],
+          },
+        ],
+      }    
 
     },
 
