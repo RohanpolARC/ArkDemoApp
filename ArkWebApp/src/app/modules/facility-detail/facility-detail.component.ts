@@ -250,7 +250,7 @@ export class FacilityDetailComponent implements OnInit {
           Revision: 3
         },
         Layout:{
-          Revision: 10,
+          Revision: 10.1,
           CurrentLayout: 'Basic Facility Detail',
           Layouts: [{
             Name: 'Basic Facility Detail',
@@ -306,7 +306,7 @@ export class FacilityDetailComponent implements OnInit {
               Audit:'right'
             },
             ColumnWidthMap:{
-              'Audit':75
+              'Audit':150
             }
           }]
         },
