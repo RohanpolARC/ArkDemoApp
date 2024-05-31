@@ -1,0 +1,29 @@
+<div class="parent">
+    <div class="header">
+        <div class="title">
+            Ref Data Manager
+        </div>
+    </div>
+
+    <div class="content">
+        <mat-card appearance="raised" class="mat-content">
+          <adaptable-provider 
+            [adaptableOptions]="adaptableOptions" 
+            [gridOptions]="gridOptions" 
+            [modules]="agGridModules"
+            (adaptableReady)="onAdaptableReady($event)" 
+            style="height: 100%; width: 100%;">
+    
+            <adaptable-ui style="flex: none;"></adaptable-ui>
+            <ag-grid-angular
+              *adaptable="let adaptable" 
+              [gridOptions]="adaptable.gridOptions" 
+              [rowData]="rowData | async"
+              [modules]="adaptable.modules"
+              style="flex: 1;" 
+              class="ag-theme-alpine">
+            </ag-grid-angular>
+          </adaptable-provider>    
+        </mat-card>
+    </div>
+</div>

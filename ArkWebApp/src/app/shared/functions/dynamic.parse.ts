@@ -13,24 +13,28 @@ export { GENERAL_FORMATTING_EXCEPTIONS }
 
 export { GENERAL_DATETIME_FORMATTING_COLUMNS }
 
-export function saveAndSetLayout(columnDefs: ColDef[], adaptableApi: AdaptableApi, layoutName: string = 'Basic Layout', columnSorts: ColumnSort[] = null){
+export function saveAndSetLayout(columnDefs: ColDef[], adaptableApi: AdaptableApi, layoutName: string = 'Basic Layout', columnSorts: ColumnSort[] = null, PinnedColumnsMap: { [columnId: string]: 'left' | 'right' } = null, ColumnWidthMap: {[columnId: string]: number} = null){
 
   if(adaptableApi == null)
     return;
 
-  // Existing layout doesn't get updated is the layout object doesnt exactly match properties(existing layout) = properties (new layout). To update an exisiting layout, you need to have it's Uuid as well. Only layout name is not enough.
+  // Existing layout doesn't get updated is the layout object doesnt exactly match properties(existing layout) = properties (new layout). To update an existing layout, you need to have it's Uuid as well. Only layout name is not enough.
 
   let layout: Layout, existingLayout: Layout = adaptableApi?.layoutApi.getLayoutByName(layoutName);
   if(existingLayout != null){
     layout = existingLayout     // Will have Uuid and other dynamically added properties.
     layout.Columns = columnDefs.map(col => col.field)
     layout.ColumnSorts = columnSorts
+    layout.PinnedColumnsMap = PinnedColumnsMap
+    layout.ColumnWidthMap = ColumnWidthMap
   }
   else{
     layout = {
       Columns: columnDefs.map(col => col.field),
       Name: layoutName,
-      ColumnSorts: columnSorts
+      ColumnSorts: columnSorts,
+      PinnedColumnsMap: PinnedColumnsMap,
+      ColumnWidthMap: ColumnWidthMap,
     }
   }
 

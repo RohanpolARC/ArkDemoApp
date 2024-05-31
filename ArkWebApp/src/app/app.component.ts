@@ -41,6 +41,7 @@ export class AppComponent {
   FacilityDetailStyle: any = {};
   AumReportStyle: any = {};
   MarketValueDeltaStyle: any = {};
+  RefDataManagerStyle: any = {};
 
   funds
   fundHedgings
@@ -79,6 +80,8 @@ export class AppComponent {
       this.updateSelection('Facility Detail')
     }else if(this.location.path() === '/aum-report'){
       this.updateSelection('AUM Report')
+    }else if(this.location.path() === '/ref-data-manager'){
+      this.updateSelection('Ref Data Manager')
     }
     else this.updateSelection('')
   }
@@ -109,6 +112,9 @@ export class AppComponent {
     }else if(screen === 'AUM Report'){
       this.AumReportStyle = this.selectedElement;
       this.router.navigate(['/aum-report'])
+    }else if(screen === 'Ref Data Manager'){
+      this.RefDataManagerStyle= this.selectedElement;
+      this.router.navigate(['/ref-data-manager'])
     }
   
   }
