@@ -279,7 +279,7 @@ export class RefDataManagerComponent implements OnInit {
               { field: 'AttributeType', tooltipField: 'AttributeType'},
               { field: 'CreatedOn', tooltipField: 'CreatedOn'},
               { field: 'CreatedBy', tooltipField: 'CreatedBy'},
-              { field: 'ActionDelete', tooltipField: 'ActionDelete', pinned: 'right'}
+              { field: 'ActionDelete', tooltipField: 'ActionDelete'}
              ], 
             this.adaptableApi,'Basic Layout',null,{ActionDelete: 'right'},{ActionDelete: 18});
             this.gridApi?.setGridOption("rowData", this.rowRefData)            
