@@ -1,13 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AdaptableOptions, AdaptableApi } from '@adaptabletools/adaptable/types';
 import { Subscription } from 'rxjs';
-import { removeDecimalFormatter, formatDate,DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm,CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, BLANK_DATETIME_FORMATTER_CONFIG } from 'src/app/shared/functions/formatter';
+import { removeDecimalFormatter, formatDate,DATETIME_FORMATTER_CONFIG_ddMMyyyy_HHmm,CUSTOM_DISPLAY_FORMATTERS_CONFIG, CUSTOM_FORMATTER, BLANK_DATETIME_FORMATTER_CONFIG, dateFormatter, amountFormatter } from 'src/app/shared/functions/formatter';
 import { DataService } from 'src/app/core/services/data.service';
 import { CommonConfig } from 'src/app/configs/common-config';
-import { CellValueChangedEvent, ColDef,  EditableCallbackParams, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, ICellRendererParams, Module, PostSortRowsParams, RowNode } from '@ag-grid-community/core';
+import { AgChartThemeOverrides, CellValueChangedEvent, ColDef,  EditableCallbackParams, FirstDataRenderedEvent, GridApi, GridOptions, GridReadyEvent, ICellRendererParams, Module, PostSortRowsParams, RowNode } from '@ag-grid-community/core';
 import { ActionColumnContext, AdaptableButton, AdaptableReadyInfo } from '@adaptabletools/adaptable-angular-aggrid';
 import { MatDialog } from '@angular/material/dialog';
 import { FacilityDetailService } from 'src/app/core/services/FacilityDetail/facility-detail.service';
+import { getMomentDateStr_ddmmyyyy } from 'src/app/shared/functions/utilities';
 
 @Component({
   selector: 'app-facility-detail',
@@ -46,6 +47,54 @@ export class FacilityDetailComponent implements OnInit {
     ) { }
 
 
+    chartThemeOverrides:AgChartThemeOverrides = {
+      // Series tooltip property is not available for common chart type so its defined specific to a chart type
+      line: {
+        series: {
+          tooltip: {
+            enabled: true,
+            renderer: ({ datum, xKey, yKey }) => {
+              return {
+                content: `${getMomentDateStr_ddmmyyyy(datum[xKey]?.['value'])}: ${this.formatAmount(datum[yKey])}`,
+              };
+            },
+          },
+          marker: {
+            enabled: false
+          }
+        },
+      },
+      common: {
+        title: {
+          enabled: true,
+          text: 'Asset Flows',
+        },
+        navigator: {
+          enabled: true,
+          height: 20,
+          margin: 25,
+        },
+        axes: {
+          time: {
+            label: {
+              rotation: 0,
+              format: '%d %b',
+            },
+          },
+          category: {
+            label: {
+              rotation: 0,
+              formatter: dateFormatter
+            },
+          },
+          number: {
+            label: {
+              formatter: amountFormatter
+            },
+          },
+        },
+      },
+    };
 
   frameworkComponents = {}
 
@@ -249,6 +298,26 @@ export class FacilityDetailComponent implements OnInit {
           DashboardTitle: ' ',
           Revision: 3
         },
+        Charting: {
+          Revision: 1,
+          ChartDefinitions: [
+            {
+                Name: 'Asset Flows',
+                Model: {
+                  modelType: 'range',
+                  chartType: 'line',
+                  chartId: 'facilityDetail',
+                  cellRange: {
+                    rowStartIndex: 0,
+                    rowEndIndex: null,
+                    columns: ['maturityDate','adjustedEBITDAatInv', 'netLeverageAtInv','netLTV']
+                  },
+                  chartOptions: this.chartThemeOverrides,
+                  suppressChartRanges: true
+                }
+            }
+          ]
+        },
         Layout:{
           Revision: 10.1,
           CurrentLayout: 'Basic Facility Detail',
@@ -319,11 +388,11 @@ export class FacilityDetailComponent implements OnInit {
           ]
         },
         StatusBar: {
-          Revision: 2,
+          Revision: 5,
           StatusBars: [
             {
               Key: 'Center Panel',
-              StatusBarPanels: ['GridFilter']
+              StatusBarPanels: ['ColumnFilter', 'Charting']
             },
             {
               Key: 'Right Panel',
@@ -345,4 +414,26 @@ export class FacilityDetailComponent implements OnInit {
     this.gridApi.closeToolPanel();
 
   };
+
+  formatAmount(amount:string){
+    if(amount!=undefined && Number(Number(amount).toFixed(2))!=0){
+      if(Number.isInteger(Number(Number(amount).toFixed(2)))){         // Don't show trailing 0's if number rounded off to 2 decimals is an integer
+          return Number(amount).toLocaleString(undefined,{
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0
+          })
+      }
+      else{
+          return Number(amount).toLocaleString(undefined, {     // Show 2 trailing digits if non integer
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+          });    
+      }
+    }
+    else if(Number(Number(amount).toFixed(2))==0) {
+        return "-"
+    } else{
+        return ""
+    }
+  }
 }

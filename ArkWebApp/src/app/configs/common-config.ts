@@ -75,7 +75,7 @@ export class CommonConfig{
       primaryKey:'',
       columnFilterOptions: {
         valuesFilterOptions: {
-          showDistinctFilteredValuesOnly: true,
+          showCurrentlyFilteredValuesOnly: true,
           maxFilterValuesToDisplay: Number.MAX_SAFE_INTEGER
         }
       }
