@@ -8,7 +8,7 @@ import { AgChartThemeOverrides, CellValueChangedEvent, ColDef,  EditableCallback
 import { ActionColumnContext, AdaptableButton, AdaptableReadyInfo } from '@adaptabletools/adaptable-angular-aggrid';
 import { MatDialog } from '@angular/material/dialog';
 import { FacilityDetailService } from 'src/app/core/services/FacilityDetail/facility-detail.service';
-import { getMomentDateStr_ddmmyyyy } from 'src/app/shared/functions/utilities';
+import { getMomentDateStr_ddmmyyyy, loadSharedEntities, presistSharedEntities } from 'src/app/shared/functions/utilities';
 
 @Component({
   selector: 'app-facility-detail',
@@ -254,6 +254,11 @@ export class FacilityDetailComponent implements OnInit {
       userName: this.dataSvc.getCurrentUserName(),
       adaptableId: "Facility Detail ID",
       adaptableStateKey: 'Facility Detail Key',
+      teamSharingOptions: {
+        enableTeamSharing: true,
+        persistSharedEntities: presistSharedEntities.bind(this), 
+        loadSharedEntities: loadSharedEntities.bind(this)
+      },
 
       exportOptions: CommonConfig.GENERAL_EXPORT_OPTIONS,
 
